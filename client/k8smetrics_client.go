@@ -35,6 +35,13 @@ func main() {
 	//Create schema
 	clickhouse.CreateSchema(connection)
 
+	//Get db data
+	// data, err := clickhouse.RetrieveEvent(connection)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// log.Printf("DB: %s", data)
+
 	// Create durable consumer monitor
 	js.Subscribe("METRICS.event", func(msg *nats.Msg) {
 		msg.Ack()

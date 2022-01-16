@@ -76,27 +76,28 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 	}
 }
 
-func RetrieveEvent(connect *sql.DB) {
-	rows, err := connect.Query("SELECT country_code, os_id, browser_id, categories, action_day, action_time FROM example")
+func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
+	rows, err := connect.Query("SELECT id, op_type, name, namespace, kind, message, host, event, first_time, last_time, event_time FROM events")
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error: %s", err)
+		return nil, err
 	}
 	defer rows.Close()
-
+	var events []model.DbEvent
 	for rows.Next() {
-		var (
-			country               string
-			os, browser           uint8
-			categories            []int16
-			actionDay, actionTime time.Time
-		)
-		if err := rows.Scan(&country, &os, &browser, &categories, &actionDay, &actionTime); err != nil {
-			log.Fatal(err)
+		var dbEvent model.DbEvent
+		if err := rows.Scan(&dbEvent.Id, &dbEvent.Op_type, &dbEvent.Name, &dbEvent.Namespace, &dbEvent.Kind, &dbEvent.Message, &dbEvent.Host, &dbEvent.Event, &dbEvent.First_time, &dbEvent.Last_time, &dbEvent.Event_time); err != nil {
+			log.Printf("Error: %s", err)
+			return nil, err
 		}
-		log.Printf("country: %s, os: %d, browser: %d, categories: %v, action_day: %s, action_time: %s", country, os, browser, categories, actionDay, actionTime)
+		eventJson, _ := json.Marshal(dbEvent)
+		log.Printf("DB Event: %s", string(eventJson))
+		events = append(events, dbEvent)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		log.Printf("Error: %s", err)
+		return nil, err
 	}
+	return events, nil
 }

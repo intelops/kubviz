@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/ClickHouse/clickhouse-go v1.5.1
 	github.com/ghodss/yaml v1.0.0
+	github.com/google/uuid v1.1.2
 	github.com/nats-io/nats.go v1.13.1-0.20211122170419-d7c1d78a50fc
 	k8s.io/api v0.23.1
 	k8s.io/apimachinery v0.23.1
