@@ -36,6 +36,7 @@ func CreateSchema(connect *sql.DB) {
 			namespace    String,
 			kind         String,
 			message      String,
+			reason       String,
 			host         String,
 			event        String,
 			first_time   DateTime,
@@ -52,7 +53,7 @@ func CreateSchema(connect *sql.DB) {
 func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO events (id, op_type, name, namespace, kind, message, host, event, first_time, last_time, event_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO events (id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	eventJson, _ := json.Marshal(metrics.Event)
@@ -63,6 +64,7 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 		metrics.Event.Namespace,
 		metrics.Event.InvolvedObject.Kind,
 		metrics.Event.Message,
+		metrics.Event.Reason,
 		metrics.Event.Source.Host,
 		string(eventJson),
 		metrics.Event.FirstTimestamp.Time,
@@ -77,7 +79,7 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 }
 
 func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
-	rows, err := connect.Query("SELECT id, op_type, name, namespace, kind, message, host, event, first_time, last_time, event_time FROM events")
+	rows, err := connect.Query("SELECT id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time FROM events")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err

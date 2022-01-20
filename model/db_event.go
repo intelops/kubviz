@@ -13,6 +13,7 @@ type DbEvent struct {
 	Namespace  string
 	Kind       string
 	Message    string
+	Reason     string
 	Host       string
 	Event      string
 	First_time time.Time

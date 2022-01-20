@@ -212,17 +212,17 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 					fmt.Printf("err: %v\n", err)
 				}
 				fmt.Printf("Add event: %s \n", y)
-				publishK8sMetrics(string(event.InvolvedObject.UID), "ADD", event, js)
+				publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js)
 			},
 			DeleteFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
 				fmt.Printf("Delete event: %s \n", obj)
-				publishK8sMetrics(string(event.InvolvedObject.UID), "DELETE", event, js)
+				publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				event := newObj.(*v1.Event)
 				fmt.Printf("Change event \n")
-				publishK8sMetrics(string(event.InvolvedObject.UID), "UPDATE", event, js)
+				publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js)
 			},
 		},
 	)
