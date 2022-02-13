@@ -25,6 +25,6 @@ jobs:
     - name: Docker push
       run: |
         docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.REGISTRY_TOKEN }}
-        docker push ${{ env.REGISTRY }}/agent:latest 
+        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/agent:latest 
 
   
