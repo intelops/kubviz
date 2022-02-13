@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build . --file dockerfiles/agent/Dockerfile --tag ${{ env.REGISTRY }}/agent:latest
+      run: docker build . --file dockerfiles/agent/Dockerfile --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/agent:latest
     - name: Docker push
       run: |
         docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.REGISTRY_TOKEN }}
