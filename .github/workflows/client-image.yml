@@ -3,12 +3,8 @@ name: Docker Image CI
 on:
   push:
     branches: [ main ]
-    paths:
-      - '**client/k8smetrics_client.go'
   pull_request:
     branches: [ main ]
-    paths:
-      - '**client/k8smetrics_client.go'
 
 env:
   # Use docker.io for Docker Hub if empty
