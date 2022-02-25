@@ -24,7 +24,7 @@ jobs:
       run: docker build . --file dockerfiles/client/Dockerfile --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/client:latest
     - name: Docker push
       run: |
-        docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.REGISTRY_TOKEN }}
+        docker login ${{ env.REGISTRY }} -u jebinjeb -p ${{ secrets.GITHUB_TOKEN }}
         docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/client:latest 
 
   
