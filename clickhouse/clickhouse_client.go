@@ -58,7 +58,7 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 	defer stmt.Close()
 	eventJson, _ := json.Marshal(metrics.Event)
 	if _, err := stmt.Exec(
-		metrics.ID,
+		metrics.Event.UID,
 		metrics.Type,
 		metrics.Event.Name,
 		metrics.Event.Namespace,
