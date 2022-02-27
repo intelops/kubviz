@@ -43,7 +43,7 @@ const (
 func main() {
 
 	// Connect to NATS
-	nc, err := nats.Connect("127.0.0.1", nats.Name("K8s Metrics"), nats.Token("UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"))
+	nc, err := nats.Connect("nats", nats.Name("K8s Metrics"), nats.Token("UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"))
 	checkErr(err)
 	// Creates JetStreamContext
 	js, err := nc.JetStream()

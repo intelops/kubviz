@@ -12,7 +12,7 @@ import (
 )
 
 func GetClickHouseConnection() (*sql.DB, error) {
-	connect, err := sql.Open("clickhouse", "tcp://127.0.0.1:9009?debug=true")
+	connect, err := sql.Open("clickhouse", "tcp://clickhouse:9009?debug=true")
 	if err != nil {
 		log.Fatal(err)
 	}
