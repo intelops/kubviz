@@ -1,0 +1,25 @@
+{{- if .Values.serviceAccount.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agent-role
+  labels:
+    {{- include "agent.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["namespace", "events"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: agent-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: agent-role
+subjects:
+- kind: ServiceAccount
+  name: {{ include "agent.serviceAccountName" . }}
+{{- end }}
+
