@@ -77,3 +77,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+nats:
+  #Authentication setup
+  auth:
+    enabled: true
+    token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
