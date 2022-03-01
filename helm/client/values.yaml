@@ -79,6 +79,7 @@ tolerations: []
 affinity: {}
 
 nats:
+  enabled: true
   #Authentication setup
   auth:
     enabled: true
