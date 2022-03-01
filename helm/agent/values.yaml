@@ -79,3 +79,7 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+nats:
+  auth:
+    token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"

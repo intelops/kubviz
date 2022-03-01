@@ -45,6 +45,9 @@ spec:
 #            httpGet:
 #              path: /
 #              port: http
+          env:
+            name: NATS_TOKEN
+            values: {{ .Values.nats.auth.token }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
