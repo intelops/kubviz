@@ -48,6 +48,10 @@ spec:
           env:
           - name: NATS_TOKEN
             value: {{ .Values.nats.auth.token }}
+          - name: NATS_ADDRESS
+            value: {{ include "client.fullname" . }}-nats
+          - name: DB_ADDRESS
+            value: {{ include "client.fullname" . }}-clickhouse
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
