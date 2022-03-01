@@ -84,3 +84,6 @@ nats:
   auth:
     enabled: true
     token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
+
+clickhouse:
+  enabled: true
