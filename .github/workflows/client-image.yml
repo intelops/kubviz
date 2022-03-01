@@ -2,8 +2,14 @@ name: Docker Image CI
 
 on:
   push:
+    paths-ignore:
+      - 'helm/**'
+      - '**.md'
     branches: [ main ]
   pull_request:
+    paths-ignore:
+      - 'helm/**'
+      - '**.md'
     branches: [ main ]
 
 env:
