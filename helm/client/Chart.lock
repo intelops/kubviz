@@ -1,9 +1,0 @@
-dependencies:
-- name: nats
-  repository: https://nats-io.github.io/k8s/helm/charts/
-  version: 0.13.1
-- name: clickhouse
-  repository: https://liwenhe1993.github.io/charts/
-  version: 1.0.1
-digest: sha256:7527ccd2c25cb5b6f898a7aa589388fa73264fe7e6818f2edab9ef4a8d43cccb
-generated: "2022-03-01T20:41:06.027081088+05:30"
