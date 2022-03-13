@@ -1,0 +1,72 @@
+apiVersion: v1
+entries:
+  agent:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-03-13T06:36:20.572586663Z"
+    description: A Helm chart for kubeviz agent
+    digest: ecd256ab30f7699bcf86c08818e84983d09b770d20e7892a46ac7de3ea8b6f67
+    name: agent
+    type: application
+    urls:
+    - https://github.com/kube-tarian/kubviz/releases/download/agent-0.1.0/agent-0.1.0.tgz
+    version: 0.1.0
+  clickhouse:
+  - apiVersion: v1
+    appVersion: "19.14"
+    created: "2022-03-13T06:36:20.761343447Z"
+    description: ClickHouse is an open source column-oriented database management system capable of real time generation of analytical data reports using SQL queries
+    digest: b216a2585544fe50053da2d9e1554016281993e2bf3e35eaaec6bb98ed517301
+    home: https://clickhouse.yandex/
+    icon: https://clickhouse.yandex/images/logo.png
+    keywords:
+    - clickhouse
+    - olap
+    - database
+    maintainers:
+    - email: 411934049@qq.com
+      name: liwenhe
+    name: clickhouse
+    sources:
+    - https://github.com/liwenhe1993/charts
+    urls:
+    - https://github.com/kube-tarian/kubviz/releases/download/clickhouse-1.0.1/clickhouse-1.0.1.tgz
+    version: 1.0.1
+  client:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-03-13T06:36:20.962677477Z"
+    description: A Helm chart for kubeviz client
+    digest: 6bc9eecb9f8a1977ff9f23e59175189ea116e7c133e2fd98fe43150841aff0c1
+    name: client
+    type: application
+    urls:
+    - https://github.com/kube-tarian/kubviz/releases/download/client-0.1.0/client-0.1.0.tgz
+    version: 0.1.0
+  nats:
+  - apiVersion: v2
+    appVersion: 2.7.2
+    created: "2022-03-13T06:36:21.171300849Z"
+    description: A Helm chart for the NATS.io High Speed Cloud Native Distributed Communications Technology.
+    digest: 89fad211e6f8792e255987d9ea5728edd3d4e24c23c57ee75915c5e5a5fdbc98
+    home: http://github.com/nats-io/k8s
+    icon: https://nats.io/img/nats-icon-color.png
+    keywords:
+    - nats
+    - messaging
+    - cncf
+    maintainers:
+    - email: wally@nats.io
+      name: Waldemar Quevedo
+      url: https://github.com/wallyqs
+    - email: colin@nats.io
+      name: Colin Sullivan
+      url: https://github.com/ColinSullivan1
+    - email: jaime@nats.io
+      name: Jaime Piña
+      url: https://github.com/variadico
+    name: nats
+    urls:
+    - https://github.com/kube-tarian/kubviz/releases/download/nats-0.13.1/nats-0.13.1.tgz
+    version: 0.13.1
+generated: "2022-03-13T06:36:20.325032432Z"
