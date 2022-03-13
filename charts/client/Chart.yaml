@@ -1,6 +1,6 @@
 apiVersion: v2
 name: client
-description: A Helm chart for kubeviz client 
+description: A Helm chart for kubeviz client
 
 # A chart can be either an 'application' or a 'library' chart.
 #
