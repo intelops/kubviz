@@ -22,12 +22,3 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
-dependencies:
-  - name: nats
-    condition: nats.enabled
-    version: 0.13.1
-    repository: https://nats-io.github.io/k8s/helm/charts/
-  - name: clickhouse
-    condition: clickhouse.enabled
-    version: 1.0.1
-    repository: https://liwenhe1993.github.io/charts/
