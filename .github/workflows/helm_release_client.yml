@@ -3,7 +3,7 @@ name: Client Release Charts
 on:
   push:
     paths:
-      - 'charts/**'
+      - 'charts/client/**'
     branches:
       - main
 jobs:
