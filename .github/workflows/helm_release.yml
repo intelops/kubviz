@@ -1,4 +1,4 @@
-name: Agent Release Charts
+name: Helm Chart publish
 
 on:
   push:
