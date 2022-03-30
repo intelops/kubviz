@@ -84,8 +84,9 @@ nats:
   auth:
     enabled: true
     token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
-  jetstream:
-    enabled: true
+  nats:
+    jetstream:
+      enabled: true
 
 clickhouse:
   enabled: true
