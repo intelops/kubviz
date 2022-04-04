@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"runtime"
 
 	"github.com/ghodss/yaml"
@@ -13,10 +14,15 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
+//to read the token from env variables
+var token string = os.Getenv("token")
+
 func main() {
 
 	// Connect to NATS
-	nc, err := nats.Connect("nats", nats.Name("K8s Metrics"), nats.Token("UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"))
+
+	//, nats.Token("UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD")
+	nc, err := nats.Connect("nats", nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
 	log.Println(nc)
 	js, err := nc.JetStream()
