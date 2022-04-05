@@ -15,14 +15,16 @@ import (
 )
 
 //to read the token from env variables
-var token string = os.Getenv("token")
+var token string = os.Getenv("NATS_TOKEN")
+
+var natsurl string = os.Getenv("NATS_ADDRESS")
 
 func main() {
 
 	// Connect to NATS
 
 	//, nats.Token("UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD")
-	nc, err := nats.Connect("nats", nats.Name("K8s Metrics"), nats.Token(token))
+	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
 	log.Println(nc)
 	js, err := nc.JetStream()
