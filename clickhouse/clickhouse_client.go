@@ -12,13 +12,11 @@ import (
 	"github.com/kube-tarian/kubviz/model"
 )
 
-//reading the interserver_http_port from env variable
-//var port string = os.Getenv("interserver_http_port")
-
 var dbAdress string = os.Getenv("DB_ADDRESS")
+var dbPort string = os.Getenv("DB_PORT")
 
 func GetClickHouseConnection() (*sql.DB, error) {
-	connect, err := sql.Open(dbAdress, "tcp://clickhouse:9009?debug=true")
+	connect, err := sql.Open("clickhouse", dbAdress+":"+dbPort+"?debug=true")
 	if err != nil {
 		log.Fatal(err)
 	}

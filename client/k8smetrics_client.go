@@ -23,7 +23,6 @@ func main() {
 
 	// Connect to NATS
 
-	//, nats.Token("UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD")
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
 	log.Println(nc)
