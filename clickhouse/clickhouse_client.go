@@ -5,14 +5,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go"
 	"github.com/kube-tarian/kubviz/model"
 )
 
+var dbAdress string = os.Getenv("DB_ADDRESS")
+var dbPort string = os.Getenv("DB_PORT")
+
 func GetClickHouseConnection() (*sql.DB, error) {
-	connect, err := sql.Open("clickhouse", "tcp://clickhouse:9009?debug=true")
+	connect, err := sql.Open("clickhouse", dbAdress+":"+dbPort+"?debug=true")
 	if err != nil {
 		log.Fatal(err)
 	}
