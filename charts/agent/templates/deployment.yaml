@@ -48,6 +48,8 @@ spec:
           env:
           - name: NATS_TOKEN
             value: {{ .Values.nats.auth.token }}
+          - name: NATS_ADDRESS
+            value: {{ .Values.nats.host }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

@@ -81,5 +81,6 @@ tolerations: []
 affinity: {}
 
 nats:
+  host: kubviz-client-nats 
   auth:
     token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
