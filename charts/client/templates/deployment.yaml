@@ -53,7 +53,7 @@ spec:
           - name: DB_ADDRESS
             value: {{ include "client.fullname" . }}-clickhouse
           - name: DB_PORT
-            value: 9000
+            value: "9000"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
