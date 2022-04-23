@@ -65,6 +65,25 @@ entries:
   client:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2022-04-23T16:05:34.810956409Z"
+    dependencies:
+    - condition: nats.enabled
+      name: nats
+      repository: https://kube-tarian.github.io/kubviz/
+      version: 0.13.1
+    - condition: clickhouse.enabled
+      name: clickhouse
+      repository: https://kube-tarian.github.io/kubviz/
+      version: 1.0.1
+    description: A Helm chart for kubeviz client
+    digest: 6163c4c549e6ea3dce508b71f5885af5238c407317016349519bb3322181ff8a
+    name: client
+    type: application
+    urls:
+    - https://github.com/kube-tarian/kubviz/releases/download/client-0.1.7/client-0.1.7.tgz
+    version: 0.1.7
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2022-04-21T08:39:13.98044531Z"
     dependencies:
     - condition: nats.enabled
@@ -188,6 +207,31 @@ entries:
     - https://github.com/kube-tarian/kubviz/releases/download/client-0.1.0/client-0.1.0.tgz
     version: 0.1.0
   nats:
+  - apiVersion: v2
+    appVersion: 2.7.2
+    created: "2022-04-23T16:05:34.994074682Z"
+    description: A Helm chart for the NATS.io High Speed Cloud Native Distributed Communications Technology.
+    digest: 1ee1a6ac052406e2362e57681c5060808ad7dd3cc32f3adfc7c760dfad087e32
+    home: http://github.com/nats-io/k8s
+    icon: https://nats.io/img/nats-icon-color.png
+    keywords:
+    - nats
+    - messaging
+    - cncf
+    maintainers:
+    - email: wally@nats.io
+      name: Waldemar Quevedo
+      url: https://github.com/wallyqs
+    - email: colin@nats.io
+      name: Colin Sullivan
+      url: https://github.com/ColinSullivan1
+    - email: jaime@nats.io
+      name: Jaime Piña
+      url: https://github.com/variadico
+    name: nats
+    urls:
+    - https://github.com/kube-tarian/kubviz/releases/download/nats-0.13.2/nats-0.13.2.tgz
+    version: 0.13.2
   - apiVersion: v2
     appVersion: 2.7.2
     created: "2022-03-13T06:36:21.171300849Z"
