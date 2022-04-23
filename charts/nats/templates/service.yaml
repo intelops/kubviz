@@ -13,6 +13,7 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
+  type: {{ .Values.service.type }}
   selector:
     {{- include "nats.selectorLabels" . | nindent 4 }}
   clusterIP: None

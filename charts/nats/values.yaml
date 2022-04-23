@@ -671,3 +671,6 @@ podManagementPolicy: Parallel
 # Toggle that this is an upgrade to enable healthz, in case not
 # using `helm upgrade` command to apply upgrades.
 upgrade: false
+
+service:
+  type: LoadBalancer

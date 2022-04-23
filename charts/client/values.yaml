@@ -90,3 +90,5 @@ nats:
 
 clickhouse:
   enabled: true
+  clickhouse:
+    replicas: "1"
