@@ -1,5 +1,5 @@
 # kubviz
-Visualize Kubernetes. Tracks changes real-time across your entire K8s, analyzing their effects and providing you with the context you need to troubleshoot efficiently. Get the Observability you need, easily.
+Visualize Kubernetes & DevSecOps Workflows. Tracks changes/events real-time across your entire K8s clusters, git repos, container registries, SBOM, Vulnerability foot print, etc. , analyzing their effects and providing you with the context you need to troubleshoot efficiently. Get the Observability you need, easily.
 
 
 ## Install kubviz using Helm:
