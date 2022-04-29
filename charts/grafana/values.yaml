@@ -466,7 +466,8 @@ lifecycleHooks: {}
 
 ## Pass the plugins you want installed as a list.
 ##
-plugins: []
+plugins:
+  - vertamedia-clickhouse-datasource
   # - digrich-bubblechart-panel
   # - grafana-clock-panel
 
