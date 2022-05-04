@@ -34,7 +34,7 @@ func main() {
 	checkErr(err)
 	log.Println(stream)
 	//Get clickhouse connection
-	connection, err := clickhouse.GetClickHouseConnection()
+	connection, err := clickhouse.GetClickHouseConnection(url)
 	if err != nil {
 		log.Fatal(err)
 	}
