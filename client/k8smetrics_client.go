@@ -19,6 +19,10 @@ var token string = os.Getenv("NATS_TOKEN")
 
 var natsurl string = os.Getenv("NATS_ADDRESS")
 
+var dbAdress string = os.Getenv("DB_ADDRESS")
+var dbPort string = os.Getenv("DB_PORT")
+var url string = fmt.Sprintf("%s:%s?debug=true", dbAdress, dbPort)
+
 func main() {
 
 	// Connect to NATS
@@ -34,7 +38,7 @@ func main() {
 	checkErr(err)
 	log.Println(stream)
 	//Get clickhouse connection
-	connection, err := clickhouse.GetClickHouseConnection()
+	connection, err := clickhouse.GetClickHouseConnection(url)
 	if err != nil {
 		log.Fatal(err)
 	}
