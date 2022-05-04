@@ -5,20 +5,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
+	
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go"
 	"github.com/kube-tarian/kubviz/model"
 )
 
-var dbAdress string = os.Getenv("DB_ADDRESS")
-var dbPort string = os.Getenv("DB_PORT")
-var url string = fmt.Sprintf("%s:%s?debug=true", dbAdress, dbPort)
 
-func GetClickHouseConnection() (*sql.DB, error) {
-//	connect, err := sql.Open("clickhouse", url)
-	connect, err := sql.Open("clickhouse", "tcp://kubviz-client-clickhouse:9000?debug=true")
+
+func GetClickHouseConnection(url string) (*sql.DB, error) {
+	connect, err := sql.Open("clickhouse", url)
+//	connect, err := sql.Open("clickhouse", "tcp://kubviz-client-clickhouse:9000?debug=true")
 	if err != nil {
 		log.Fatal(err)
 	}
