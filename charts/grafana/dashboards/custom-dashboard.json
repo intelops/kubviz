@@ -21,97 +21,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 27,
-  "iteration": 1650642730106,
+  "id": 2,
+  "iteration": 1651809328098,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "Pw03tKwnk"
-      },
-      "description": "This stats panel shows the healthy pods ",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "blue",
-            "mode": "fixed"
-          },
-          "mappings": [],
-          "noValue": "0",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 4,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "vertical",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "text": {
-          "valueSize": 150
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.4.5",
-      "targets": [
-        {
-          "database": "default",
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "Pw03tKwnk"
-          },
-          "dateColDataType": "",
-          "dateLoading": false,
-          "dateTimeType": "DATETIME",
-          "datetimeLoading": false,
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "intervalFactor": 1,
-          "query": "SELECT\n    count()\nFROM $table\n\nWHERE reason IN ('Healthy') AND namespace IN ($namespace)\n\n",
-          "rawQuery": "SELECT\n    count()\nFROM default.events\n\nWHERE reason IN ('Healthy') AND namespace IN ('default','kubviz')",
-          "refId": "A",
-          "round": "0s",
-          "skip_comments": true,
-          "table": "events",
-          "tableLoading": false
-        }
-      ],
-      "title": "healthy pods in Namespace : $namespace",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "Pw03tKwnk"
-      },
-      "description": "This stats panel shows the unhealthy pods ",
+      "description": "This stats panel shows the pod creation events.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -140,7 +56,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 0
       },
       "id": 6,
       "options": {
@@ -158,13 +74,12 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.4.5",
+      "pluginVersion": "8.4.6",
       "targets": [
         {
           "database": "default",
           "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "Pw03tKwnk"
+            "type": "vertamedia-clickhouse-datasource"
           },
           "dateColDataType": "",
           "dateLoading": false,
@@ -174,8 +89,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT\n    count()\nFROM $table\n\nWHERE reason IN ('Unhealthy') AND namespace IN ($namespace)\n\n\n\n\n",
-          "rawQuery": "SELECT\n    count()\nFROM default.events\n\nWHERE reason IN ('Unhealthy') AND namespace IN ('default','kubviz')",
+          "query": "SELECT\n    count()\nFROM $table\n\nWHERE kind IN ('Pod') AND reason IN ('Created') AND namespace IN ($namespace)\n\n\n\n\n\n",
+          "rawQuery": "SELECT\n    count()\nFROM default.events\n\nWHERE kind IN ('Pod') AND reason IN ('Created') AND namespace IN ('default','kube-system')",
           "refId": "A",
           "round": "0s",
           "skip_comments": true,
@@ -183,13 +98,12 @@
           "tableLoading": false
         }
       ],
-      "title": "unHealthy  pods in Namespace: $namespace",
+      "title": "number of pod creation events in Namespace: $namespace",
       "type": "stat"
     },
     {
       "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "Pw03tKwnk"
+        "type": "vertamedia-clickhouse-datasource"
       },
       "description": "This table panal shows all the kubernetes datas.\nif its not showing the data check the time range and refresh.it will take some time to load the data. wait for sometime before clicking refresh another time.",
       "fieldConfig": {
@@ -233,7 +147,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 7
       },
       "id": 2,
       "interval": "10s",
@@ -246,13 +160,12 @@
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "8.4.5",
+      "pluginVersion": "8.4.6",
       "targets": [
         {
           "database": "default",
           "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "Pw03tKwnk"
+            "type": "vertamedia-clickhouse-datasource"
           },
           "dateColDataType": "",
           "dateLoading": false,
@@ -290,8 +203,7 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource",
-          "uid": "Pw03tKwnk"
+          "type": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT namespace FROM default.events",
         "hide": 0,
@@ -313,8 +225,7 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource",
-          "uid": "Pw03tKwnk"
+          "type": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT reason FROM default.events",
         "hide": 0,
@@ -336,8 +247,7 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource",
-          "uid": "Pw03tKwnk"
+          "type": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT kind FROM default.events",
         "hide": 0,
@@ -364,6 +274,6 @@
   "timezone": "",
   "title": "kubedatas",
   "uid": "WnmZG5Jnz",
-  "version": 5,
+  "version": 1,
   "weekStart": ""
 }
