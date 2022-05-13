@@ -23,7 +23,7 @@ var dbAdress string = os.Getenv("DB_ADDRESS")
 
 var dbPort string = os.Getenv("DB_PORT")
 
-var url string = fmt.Sprintf("%s:%s?debug=true", dbAdress, dbPort)
+var url string = fmt.Sprintf("tcp://%s:%s?debug=true", dbAdress, dbPort)
 
 func main() {
 
