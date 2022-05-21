@@ -35,3 +35,21 @@ helm upgrade -i grafana-kubviz kubviz/grafana -n kubviz
 ```bash
 helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address>
 ```
+## Use Cases
+
+### Cluster Event Tracking
+
+<img src=".readme_assets/cluster_events.png" alt="Cluster Events" width="525" align="right">
+
+<br>
+
+Use kubviz to monitor your cluster events, including:
+
+- State changes 
+- Errors
+- Other messages that occur in the cluster
+- A Map of TCP drops and TCP retransmits across your cluster.
+
+<br>
+
+<br clear="all">
