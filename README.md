@@ -25,6 +25,11 @@ helm repo update
 
 helm upgrade -i kubviz-client kubviz/client -n kubviz
 ```
+NOTE: The kubviz client will also install NATS and Clickhouse. NATS service is exposed as Load balancer and the external IP of this service kubviz-client-nats-external has to be noted and passed during the kubviz agent installation.
+
+```bash
+kubectl get services kubviz-client-nats-external -n kubviz --output jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
 
 #### Grafana Installation
 ```bash
