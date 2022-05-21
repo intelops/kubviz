@@ -48,7 +48,6 @@ Use kubviz to monitor your cluster events, including:
 - State changes 
 - Errors
 - Other messages that occur in the cluster
-- A Map of TCP drops and TCP retransmits across your cluster.
 
 <br>
 
