@@ -39,7 +39,7 @@ helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Add
 
 ### Cluster Event Tracking
 
-<img src=".readme_assets/cluster_events.png" alt="Cluster Events" width="525" align="right">
+<img src=".readme_assets/kubviz.jpeg" alt="Cluster Events" width="525" align="right">
 
 <br>
 
