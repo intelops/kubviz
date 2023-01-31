@@ -42,7 +42,8 @@ func CreateSchema(connect *sql.DB) {
 			event        String,
 			first_time   DateTime,
 			last_time    DateTime,
-			event_time   DateTime
+			event_time   DateTime,
+			cluster_name string
 		) engine=File(TabSeparated)
 	`)
 
@@ -54,7 +55,7 @@ func CreateSchema(connect *sql.DB) {
 func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO events (id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO events (id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time, cluster_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	eventJson, _ := json.Marshal(metrics.Event)
@@ -71,6 +72,7 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 		metrics.Event.FirstTimestamp.Time,
 		metrics.Event.LastTimestamp.Time,
 		time.Now(),
+		metrics.ClusterName,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -80,7 +82,7 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 }
 
 func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
-	rows, err := connect.Query("SELECT id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time FROM events")
+	rows, err := connect.Query("SELECT id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time, cluster_name FROM events")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -89,7 +91,7 @@ func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
 	var events []model.DbEvent
 	for rows.Next() {
 		var dbEvent model.DbEvent
-		if err := rows.Scan(&dbEvent.Id, &dbEvent.Op_type, &dbEvent.Name, &dbEvent.Namespace, &dbEvent.Kind, &dbEvent.Message, &dbEvent.Host, &dbEvent.Event, &dbEvent.First_time, &dbEvent.Last_time, &dbEvent.Event_time); err != nil {
+		if err := rows.Scan(&dbEvent.Id, &dbEvent.Op_type, &dbEvent.Name, &dbEvent.Namespace, &dbEvent.Kind, &dbEvent.Message, &dbEvent.Host, &dbEvent.Event, &dbEvent.First_time, &dbEvent.Last_time, &dbEvent.Event_time, &dbEvent.Cluster_name); err != nil {
 			log.Printf("Error: %s", err)
 			return nil, err
 		}

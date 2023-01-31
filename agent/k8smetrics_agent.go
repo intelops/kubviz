@@ -41,10 +41,12 @@ const (
 	allSubject     = "METRICS.all"
 )
 
-//to read the token from env variables
-var token string = os.Getenv("NATS_TOKEN")
-
-var natsurl string = os.Getenv("NATS_ADDRESS")
+// to read the token from env variables
+var (
+	ClusterName        = os.Getenv("CLUSTER_NAME")
+	token       string = os.Getenv("NATS_TOKEN")
+	natsurl     string = os.Getenv("NATS_ADDRESS")
+)
 
 func main() {
 
@@ -93,9 +95,10 @@ func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext) e
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext) (bool, error) {
 	metrics := model.Metrics{
-		ID:    id,
-		Type:  mtype,
-		Event: mdata,
+		ID:          id,
+		Type:        mtype,
+		Event:       mdata,
+		ClusterName: ClusterName,
 	}
 	metricsJson, _ := json.Marshal(metrics)
 	_, err := js.Publish(eventSubject, metricsJson)
