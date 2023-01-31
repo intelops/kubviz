@@ -80,6 +80,7 @@ tolerations: []
 
 affinity: {}
 
+clusterName: "kubviz"
 nats:
   host: kubviz-client-nats 
   auth:

@@ -14,7 +14,7 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-//to read the token from env variables
+// to read the token from env variables
 var token string = os.Getenv("NATS_TOKEN")
 
 var natsurl string = os.Getenv("NATS_ADDRESS")
@@ -68,7 +68,7 @@ func main() {
 			fmt.Printf("err: %v\n", err)
 		}
 		//fmt.Printf("Add event: %s \n", y)
-		log.Printf("Metrics received - subject: %s, ID: %s, Type: %s, Event: %s\n", msg.Subject, metrics.ID, metrics.Type, y)
+		log.Printf("Metrics received - subject: %s, ID: %s, Type: %s, Event: %s, ClusterName %s\n", msg.Subject, metrics.ID, metrics.Type, y, metrics.ClusterName)
 		// Insert event
 		clickhouse.InsertEvent(connection, metrics)
 		log.Println()

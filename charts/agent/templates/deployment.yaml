@@ -46,6 +46,8 @@ spec:
 #              path: /
 #              port: http
           env:
+          - name: CLUSTER_NAME
+            value: {{ .Values.clusterName }}
           - name: NATS_TOKEN
             value: {{ .Values.nats.auth.token }}
           - name: NATS_ADDRESS
