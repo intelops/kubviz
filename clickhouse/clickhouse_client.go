@@ -43,7 +43,7 @@ func CreateSchema(connect *sql.DB) {
 			first_time   DateTime,
 			last_time    DateTime,
 			event_time   DateTime,
-			cluster_name string
+			cluster_name String
 		) engine=File(TabSeparated)
 	`)
 
