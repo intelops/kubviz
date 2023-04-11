@@ -1,0 +1,26 @@
+current cluster name:
+  kubectl config current-context
+ 
+to get all namespaces : 
+  kubectl get namespaces
+
+to get current config:
+  kubectl config view
+
+
+func publishKubePugMetrics(js nats.JetStreamContext) error {
+	args := []string{"check", "--format", "json"}
+	cmd := exec.Command("kubepug", args...)
+	output, err := cmd.Output()
+	if err != nil {
+		return err
+	}
+	metricsJson, _ := json.Marshal(string(output))
+	_, err = js.Publish("METRICS.kubepug", metricsJson)
+	if err != nil {
+		return err
+	}
+
+	log.Print("Metrics with NAME:METRICS.kubepug has been published\n")
+	return nil
+}

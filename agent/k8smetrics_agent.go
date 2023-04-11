@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -15,7 +17,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+	"k8s.io/client-go/util/homedir"
 
 	// Uncomment to load all auth plugins
 	// _ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -32,6 +34,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
@@ -48,8 +51,11 @@ var (
 	natsurl     string = os.Getenv("NATS_ADDRESS")
 )
 
-func main() {
+// var token = "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
+// var ClusterName = "kubviz"
+// var natsurl = "127.0.0.1:4222"
 
+func main() {
 	// Connect to NATS
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
@@ -59,9 +65,14 @@ func main() {
 	// Creates stream
 	err = createStream(js)
 	checkErr(err)
+	// KubePreUpgradeDetector detects the depricated and deleted api from
+	// the current kubernetes cluster
+
+	// Publish Depricated api using kubepug to nats JetStream
 	// Create pull METRICS and publish them to nats JetStream
-	clientset := getK8sClient()
-	//getK8sEvents(clientset)
+	clientset, kubeconfig := getK8sClient()
+	KubePreUpgradeDetector(js, kubeconfig)
+	getK8sEvents(clientset)
 	err = publishMetrics(clientset, js)
 	checkErr(err)
 }
@@ -126,32 +137,33 @@ func createStream(js nats.JetStreamContext) error {
 		checkErr(err)
 	}
 	return nil
+
 }
 
-func getK8sClient() *kubernetes.Clientset {
+func getK8sClient() (*kubernetes.Clientset, *string) {
 
-	// var kubeconfig *string
-	// if home := homedir.HomeDir(); home != "" {
-	// 	kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	// } else {
-	// 	kubeconfig = flag.String("kubeconfig", "", "/Users/avikn/Documents/kubeconfig/167")
-	// }
-	// flag.Parse()
+	var kubeconfig *string
+	if home := homedir.HomeDir(); home != "" {
+		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "dev-config"), "(optional) absolute path to the kubeconfig file")
+	} else {
+		kubeconfig = flag.String("kubeconfig", "", "/home/ahinvinith/.kube/dev-config")
+	}
+	flag.Parse()
 
 	// // use the current context in kubeconfig
-	// config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	// checkErr(err)
+	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	checkErr(err)
 
 	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		panic(err.Error())
-	}
+	// config, err := rest.InClusterConfig()
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
 
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	checkErr(err)
-	return clientset
+	return clientset, kubeconfig
 }
 
 func getK8sPods(clientset *kubernetes.Clientset) string {

@@ -1,0 +1,32 @@
+version: "3.3"
+
+services:
+  nats:
+    image: nats:latest
+    command: ["--js"]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+  clickhouse:
+    image: yandex/clickhouse-server
+    environment:
+      - CLICKHOUSE_PASSWORD=password
+      - CLICKHOUSE_USER=admin
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+      - "9009:9009"
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+     
+
+
+# db, err := sql.Open("clickhouse", "tcp://localhost:8123?usernameadmin=&password=password")
+# if err != nil {
+#     log.Fatal(err)
+# }
+# defer db.Close()
