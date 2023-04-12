@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/kube-tarian/kubviz/model"
@@ -48,8 +49,16 @@ var (
 	natsurl     string = os.Getenv("NATS_ADDRESS")
 )
 
-func main() {
+// var token = "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
+// var ClusterName = "kubviz"
+// var natsurl = "127.0.0.1:4222"
 
+func main() {
+	errCh1 := make(chan error, 1)
+	errCh2 := make(chan error, 1)
+	errCh3 := make(chan error, 1)
+	var wg sync.WaitGroup
+	wg.Add(3)
 	// Connect to NATS
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
@@ -59,17 +68,46 @@ func main() {
 	// Creates stream
 	err = createStream(js)
 	checkErr(err)
-	// Create pull METRICS and publish them to nats JetStream
+	// Publishes the outdated images in the cluster
 	clientset := getK8sClient()
-	//getK8sEvents(clientset)
-	err = publishMetrics(clientset, js)
-	checkErr(err)
+	go outDatedImages(js, &wg, errCh1)
+
+	// Publish Depricated api using kubepug to nats JetStream
+	// Create pull METRICS and publish them to nats JetStream
+
+	// KubePreUpgradeDetector detects the depricated and deleted api from
+	// the current kubernetes cluster
+	go KubePreUpgradeDetector(js, &wg, errCh2)
+	getK8sEvents(clientset)
+	go publishMetrics(clientset, js, &wg, errCh3)
+	wg.Wait()
+	close(errCh1)
+	close(errCh2)
+	close(errCh3)
+	for {
+		select {
+		case err := <-errCh1:
+			if err != nil {
+				log.Println(err)
+			}
+		case err := <-errCh2:
+			if err != nil {
+				log.Println(err)
+			}
+		case err := <-errCh3:
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}
+
 }
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
-func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext) error {
-	// //Publish Nodes data
+func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+	defer wg.Done()
+	//Publish Nodes data
 	// for i := 1; i <= 10; i++ {
 	// 	shouldReturn, returnValue := publishK8sMetrics(i, "Node", getK8sNodes(clientset), js)
 	// 	if shouldReturn {
@@ -77,7 +115,7 @@ func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext) e
 	// 	}
 	// 	time.Sleep(100 * time.Millisecond)
 	// }
-	// //Publish Pods data
+	//Publish Pods data
 	// for i := 1; i <= 10; i++ {
 
 	// 	shouldReturn, returnValue := publishK8sMetrics(i, "Pod", getK8sPods(clientset), js)
@@ -90,7 +128,7 @@ func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext) e
 	//publishK8sMetrics(1, "Event", getK8sEvents(clientset), js)
 	watchK8sEvents(clientset, js)
 
-	return nil
+	errCh <- nil
 }
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext) (bool, error) {
@@ -126,19 +164,20 @@ func createStream(js nats.JetStreamContext) error {
 		checkErr(err)
 	}
 	return nil
+
 }
 
 func getK8sClient() *kubernetes.Clientset {
 
 	// var kubeconfig *string
 	// if home := homedir.HomeDir(); home != "" {
-	// 	kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+	// 	kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "dev-config"), "(optional) absolute path to the kubeconfig file")
 	// } else {
-	// 	kubeconfig = flag.String("kubeconfig", "", "/Users/avikn/Documents/kubeconfig/167")
+	// 	kubeconfig = flag.String("kubeconfig", "", "/Users/vijeshdeepan/.kube/dev-config")
 	// }
 	// flag.Parse()
 
-	// // use the current context in kubeconfig
+	// use the current context in kubeconfig
 	// config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	// checkErr(err)
 

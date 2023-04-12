@@ -25,6 +25,7 @@ func GetClickHouseConnection(url string) (*sql.DB, error) {
 		}
 		return nil, err
 	}
+
 	return connect, nil
 }
 
@@ -48,6 +49,34 @@ func CreateSchema(connect *sql.DB) {
 	`)
 
 	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func CreateKubePugSchema(connect *sql.DB) {
+	_, err := connect.Exec(`
+		CREATE TABLE IF NOT EXISTS kubepug (
+			result String
+        ) engine=File(TabSeparated)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func InsertKubepugEvent(connect *sql.DB, metrics model.Result) {
+	var (
+		tx, _   = connect.Begin()
+		stmt, _ = tx.Prepare("INSERT INTO kubepug (result) VALUES (?)")
+	)
+	defer stmt.Close()
+	eventJson, _ := json.Marshal(metrics)
+	if _, err := stmt.Exec(
+		string(eventJson),
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -79,6 +108,28 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
+}
+func RetriveKubepugEvent(connect *sql.DB) ([]model.Result, error) {
+	rows, err := connect.Query("SELECT result FROM kubepug")
+	if err != nil {
+		log.Printf("Error: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+	var events []model.Result
+	for rows.Next() {
+		var result model.Result
+		if err := rows.Scan(&result); err != nil {
+			log.Printf("Error: %s", err)
+			return nil, err
+		}
+		events = append(events, result)
+	}
+	if err := rows.Err(); err != nil {
+		log.Printf("Error: %s", err)
+		return nil, err
+	}
+	return events, nil
 }
 
 func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
