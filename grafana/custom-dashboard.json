@@ -43,6 +43,7 @@
           "custom": {
             "align": "center",
             "displayMode": "color-text",
+            "filterable": true,
             "inspect": false
           },
           "mappings": [],
@@ -116,6 +117,7 @@
           "custom": {
             "align": "center",
             "displayMode": "color-text",
+            "filterable": true,
             "inspect": false
           },
           "mappings": [],
@@ -189,6 +191,7 @@
           "custom": {
             "align": "center",
             "displayMode": "color-text",
+            "filterable": true,
             "inspect": false
           },
           "mappings": [],
