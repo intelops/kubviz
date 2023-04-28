@@ -25,6 +25,7 @@ func GetClickHouseConnection(url string) (*sql.DB, error) {
 		}
 		return nil, err
 	}
+
 	return connect, nil
 }
 
@@ -48,6 +49,104 @@ func CreateSchema(connect *sql.DB) {
 	`)
 
 	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func CreateKubePugSchema(connect *sql.DB) {
+	_, err := connect.Exec(`
+		CREATE TABLE IF NOT EXISTS deprecatedAPIs_and_deletedAPIs (
+			result String,
+			cluster_name String
+        ) engine=File(TabSeparated)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func CreateKetallSchema(connect *sql.DB) {
+	_, err := connect.Exec(`
+		CREATE TABLE IF NOT EXISTS getall_resources (
+			resource String,
+			namespace String,
+			age String,
+			cluster_name String
+        ) engine=File(TabSeparated)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func CreateOutdatedSchema(connect *sql.DB) {
+	_, err := connect.Exec(`
+	    CREATE TABLE IF NOT EXISTS outdated_images (
+		    current_image String,
+			current_tag String,
+			latest_version String,
+			versions_behind Int64,
+			cluster_name String
+	    ) engine=File(TabSeparated)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func InsertKetallEvent(connect *sql.DB, metrics model.Resource) {
+	var (
+		tx, _   = connect.Begin()
+		stmt, _ = tx.Prepare("INSERT INTO getall_resources (resource, namespace, age, cluster_name) VALUES (?, ?, ?, ?)")
+	)
+	defer stmt.Close()
+	if _, err := stmt.Exec(
+		metrics.Resource,
+		metrics.Namespace,
+		metrics.Age,
+		metrics.ClusterName,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func InsertOutdatedEvent(connect *sql.DB, metrics model.CheckResultfinal) {
+	var (
+		tx, _   = connect.Begin()
+		stmt, _ = tx.Prepare("INSERT INTO outdated_images (current_image, current_tag, latest_version, versions_behind, cluster_name) VALUES (?, ?, ?, ?, ?)")
+	)
+	defer stmt.Close()
+	if _, err := stmt.Exec(
+		metrics.Image,
+		metrics.Current,
+		metrics.LatestVersion,
+		metrics.VersionsBehind,
+		metrics.ClusterName,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func InsertKubepugEvent(connect *sql.DB, metrics model.Result) {
+	var (
+		tx, _   = connect.Begin()
+		stmt, _ = tx.Prepare("INSERT INTO deprecatedAPIs_and_deletedAPIs (result, cluster_name) VALUES (?, ?)")
+	)
+	defer stmt.Close()
+	eventJson, _ := json.Marshal(metrics)
+	if _, err := stmt.Exec(
+		string(eventJson),
+		metrics.ClusterName,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -79,6 +178,75 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func RetriveKetallEvent(connect *sql.DB) ([]model.Resource, error) {
+	rows, err := connect.Query("SELECT resource, namespace, age, cluster_name FROM getall_resources")
+	if err != nil {
+		log.Printf("Error: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+	var events []model.Resource
+	for rows.Next() {
+		var result model.Resource
+		if err := rows.Scan(&result.Resource, &result.Namespace, &result.Age, &result.ClusterName); err != nil {
+			log.Printf("Error: %s", err)
+			return nil, err
+		}
+		events = append(events, result)
+	}
+	if err := rows.Err(); err != nil {
+		log.Printf("Error: %s", err)
+		return nil, err
+	}
+	return events, nil
+}
+
+func RetriveOutdatedEvent(connect *sql.DB) ([]model.CheckResultfinal, error) {
+	rows, err := connect.Query("SELECT current_image, current_tag, latest_version, versions_behind, cluster_name FROM outdated_images")
+	if err != nil {
+		log.Printf("Error: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+	var events []model.CheckResultfinal
+	for rows.Next() {
+		var result model.CheckResultfinal
+		if err := rows.Scan(&result.Image, &result.Current, &result.LatestVersion, &result.VersionsBehind, &result.ClusterName); err != nil {
+			log.Printf("Error: %s", err)
+			return nil, err
+		}
+		events = append(events, result)
+	}
+	if err := rows.Err(); err != nil {
+		log.Printf("Error: %s", err)
+		return nil, err
+	}
+	return events, nil
+}
+
+func RetriveKubepugEvent(connect *sql.DB) ([]model.Result, error) {
+	rows, err := connect.Query("SELECT result, cluster_name FROM deprecatedAPIs_and_deletedAPIs")
+	if err != nil {
+		log.Printf("Error: %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+	var events []model.Result
+	for rows.Next() {
+		var result model.Result
+		if err := rows.Scan(&result, &result.ClusterName); err != nil {
+			log.Printf("Error: %s", err)
+			return nil, err
+		}
+		events = append(events, result)
+	}
+	if err := rows.Err(); err != nil {
+		log.Printf("Error: %s", err)
+		return nil, err
+	}
+	return events, nil
 }
 
 func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
