@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/kube-tarian/kubviz/model"
@@ -34,6 +35,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
+// constants for jetstream
 const (
 	streamName     = "METRICS"
 	streamSubjects = "METRICS.*"
@@ -41,35 +43,76 @@ const (
 	allSubject     = "METRICS.all"
 )
 
-// to read the token from env variables
+// env variables for getting
+// nats token, natsurl, clustername
 var (
-	ClusterName        = os.Getenv("CLUSTER_NAME")
+	ClusterName string = os.Getenv("CLUSTER_NAME")
 	token       string = os.Getenv("NATS_TOKEN")
 	natsurl     string = os.Getenv("NATS_ADDRESS")
 )
 
 func main() {
-
-	// Connect to NATS
+	// error channels declared for the go routines
+	outdatedErrChan := make(chan error, 1)
+	kubePreUpgradeChan := make(chan error, 1)
+	getAllResourceChan := make(chan error, 1)
+	clusterMetricsChan := make(chan error, 1)
+	var wg sync.WaitGroup
+	// waiting for 4 go routines
+	wg.Add(4)
+	// connecting with nats ...
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
-	// Creates JetStreamContext
+	// creating a jetstream connection using the nats connection
 	js, err := nc.JetStream()
 	checkErr(err)
-	// Creates stream
+	// creating a stream with stream name METRICS
 	err = createStream(js)
 	checkErr(err)
-	// Create pull METRICS and publish them to nats JetStream
+	// getting kubernetes clientset
 	clientset := getK8sClient()
-	//getK8sEvents(clientset)
-	err = publishMetrics(clientset, js)
-	checkErr(err)
+	// starting all the go routines
+	go outDatedImages(js, &wg, outdatedErrChan)
+	go KubePreUpgradeDetector(js, &wg, kubePreUpgradeChan)
+	go GetAllResources(js, &wg, getAllResourceChan)
+	getK8sEvents(clientset)
+	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+	wg.Wait()
+	// once the go routines completes we will close the error channels
+	close(outdatedErrChan)
+	close(kubePreUpgradeChan)
+	close(getAllResourceChan)
+	close(clusterMetricsChan)
+	// for loop will wait for the error channels
+	// logs if any error occurs
+	for {
+		select {
+		case err := <-outdatedErrChan:
+			if err != nil {
+				log.Println(err)
+			}
+		case err := <-kubePreUpgradeChan:
+			if err != nil {
+				log.Println(err)
+			}
+		case err := <-getAllResourceChan:
+			if err != nil {
+				log.Println(err)
+			}
+		case err := <-clusterMetricsChan:
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}
+
 }
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
-func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext) error {
-	// //Publish Nodes data
+func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+	defer wg.Done()
+	//Publish Nodes data
 	// for i := 1; i <= 10; i++ {
 	// 	shouldReturn, returnValue := publishK8sMetrics(i, "Node", getK8sNodes(clientset), js)
 	// 	if shouldReturn {
@@ -77,7 +120,7 @@ func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext) e
 	// 	}
 	// 	time.Sleep(100 * time.Millisecond)
 	// }
-	// //Publish Pods data
+	//Publish Pods data
 	// for i := 1; i <= 10; i++ {
 
 	// 	shouldReturn, returnValue := publishK8sMetrics(i, "Pod", getK8sPods(clientset), js)
@@ -90,7 +133,7 @@ func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext) e
 	//publishK8sMetrics(1, "Event", getK8sEvents(clientset), js)
 	watchK8sEvents(clientset, js)
 
-	return nil
+	errCh <- nil
 }
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext) (bool, error) {
@@ -126,22 +169,10 @@ func createStream(js nats.JetStreamContext) error {
 		checkErr(err)
 	}
 	return nil
+
 }
 
 func getK8sClient() *kubernetes.Clientset {
-
-	// var kubeconfig *string
-	// if home := homedir.HomeDir(); home != "" {
-	// 	kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	// } else {
-	// 	kubeconfig = flag.String("kubeconfig", "", "/Users/avikn/Documents/kubeconfig/167")
-	// }
-	// flag.Parse()
-
-	// // use the current context in kubeconfig
-	// config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	// checkErr(err)
-
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
