@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -21,12 +24,234 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1651809328098,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
     {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "7Oq9n4s4z"
+      },
+      "description": "This panel shows all the resources in the cluster",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "displayMode": "color-text",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 12,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "7Oq9n4s4z"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "select * from default.getall_resources\n",
+          "rawQuery": "select * from default.getall_resources",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "kubernetes_resources",
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "7Oq9n4s4z"
+      },
+      "description": "This panel displays all out-of-date images running in a Kubernetes cluster.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "displayMode": "color-text",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 10,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "7Oq9n4s4z"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "select * from default.outdated_images\n",
+          "rawQuery": "select * from default.outdated_images",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "outdated_images",
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "7Oq9n4s4z"
+      },
+      "description": "This panel shows all the deprecated and deleted APIs in the cluster",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "displayMode": "color-text",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "id": 8,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "7Oq9n4s4z"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "select * from default.deprecatedAPIs_and_deletedAPIs\n",
+          "rawQuery": "select * from default.deprecatedAPIs_and_deletedAPIs",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "deprecated_and_deletedAPIs",
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource"
+      },
       "description": "This stats panel shows the pod creation events.",
       "fieldConfig": {
         "defaults": {
@@ -56,7 +281,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 27
       },
       "id": 6,
       "options": {
@@ -65,7 +290,9 @@
         "justifyMode": "auto",
         "orientation": "vertical",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -74,7 +301,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "9.3.2",
       "targets": [
         {
           "database": "default",
@@ -111,7 +338,8 @@
           "custom": {
             "align": "center",
             "displayMode": "color-text",
-            "filterable": true
+            "filterable": true,
+            "inspect": false
           },
           "mappings": [],
           "thresholds": {
@@ -147,20 +375,22 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 34
       },
       "id": 2,
       "interval": "10s",
       "options": {
         "footer": {
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "9.3.2",
       "targets": [
         {
           "database": "default",
@@ -191,7 +421,7 @@
     }
   ],
   "refresh": "",
-  "schemaVersion": 35,
+  "schemaVersion": 37,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -203,7 +433,8 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource"
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "7Oq9n4s4z"
         },
         "definition": "SELECT namespace FROM default.events",
         "hide": 0,
@@ -225,7 +456,8 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource"
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "7Oq9n4s4z"
         },
         "definition": "SELECT reason FROM default.events",
         "hide": 0,
@@ -247,7 +479,8 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource"
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "7Oq9n4s4z"
         },
         "definition": "SELECT kind FROM default.events",
         "hide": 0,
@@ -274,6 +507,6 @@
   "timezone": "",
   "title": "kubedatas",
   "uid": "WnmZG5Jnz",
-  "version": 1,
+  "version": 3,
   "weekStart": ""
 }
