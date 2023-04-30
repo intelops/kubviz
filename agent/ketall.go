@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"path/filepath"
 	"sync"
 	"time"
 
@@ -13,8 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
+	"k8s.io/client-go/rest"
 )
 
 const (
@@ -35,24 +33,10 @@ func PublishAllResources(result model.Resource, js nats.JetStreamContext) error 
 
 func GetAllResources(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
-	// TODO:should be removed after testing
-	var kubeconfig string
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = filepath.Join(home, ".kube", "dev-config")
-	}
-
-	// Build the configuration from the kubeconfig file
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	config, err := rest.InClusterConfig()
 	if err != nil {
-		log.Error(err)
 		errCh <- err
 	}
-	// TODO:upto here delete
-	// TODO:Production code:
-	// config, err := rest.InClusterConfig()
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
 	// TODO: upto this uncomment for production
 	// Create a new discovery client to discover all resources in the cluster
 	dc := discovery.NewDiscoveryClientForConfigOrDie(config)
