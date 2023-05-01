@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"runtime"
 
 	"github.com/kube-tarian/kubviz/clickhouse"
@@ -16,16 +17,12 @@ import (
 // to read the token from env variables
 
 var (
-// token    string = os.Getenv("NATS_TOKEN")
-// natsurl  string = os.Getenv("NATS_ADDRESS")
-// dbAdress string = os.Getenv("DB_ADDRESS")
-// dbPort   string = os.Getenv("DB_PORT")
-// url      string = fmt.Sprintf("tcp://%s:%s?debug=true", dbAdress, dbPort)
+	token    string = os.Getenv("NATS_TOKEN")
+	natsurl  string = os.Getenv("NATS_ADDRESS")
+	dbAdress string = os.Getenv("DB_ADDRESS")
+	dbPort   string = os.Getenv("DB_PORT")
+	url      string = fmt.Sprintf("tcp://%s:%s?debug=true", dbAdress, dbPort)
 )
-
-var url = "tcp://localhost:9000?username=admin&password=password"
-var token = "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
-var natsurl = "127.0.0.1:4222"
 
 func main() {
 
