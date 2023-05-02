@@ -3,10 +3,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "datasource",
-          "uid": "grafana"
-        },
+        "datasource": "-- Grafana --",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -30,8 +27,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "7Oq9n4s4z"
+        "type": "vertamedia-clickhouse-datasource"
       },
       "description": "This panel shows all the resources in the cluster",
       "fieldConfig": {
@@ -83,8 +79,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "7Oq9n4s4z"
+            "type": "vertamedia-clickhouse-datasource"
           },
           "dateTimeType": "DATETIME",
           "extrapolate": true,
@@ -104,8 +99,7 @@
     },
     {
       "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "7Oq9n4s4z"
+        "type": "vertamedia-clickhouse-datasource"
       },
       "description": "This panel displays all out-of-date images running in a Kubernetes cluster.",
       "fieldConfig": {
@@ -156,8 +150,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "7Oq9n4s4z"
+            "type": "vertamedia-clickhouse-datasource"
           },
           "dateTimeType": "DATETIME",
           "extrapolate": true,
@@ -177,8 +170,7 @@
     },
     {
       "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "7Oq9n4s4z"
+        "type": "vertamedia-clickhouse-datasource"
       },
       "description": "This panel shows all the deprecated and deleted APIs in the cluster",
       "fieldConfig": {
@@ -229,8 +221,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "7Oq9n4s4z"
+            "type": "vertamedia-clickhouse-datasource"
           },
           "dateTimeType": "DATETIME",
           "extrapolate": true,
@@ -433,8 +424,7 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource",
-          "uid": "7Oq9n4s4z"
+          "type": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT namespace FROM default.events",
         "hide": 0,
@@ -456,8 +446,7 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource",
-          "uid": "7Oq9n4s4z"
+          "type": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT reason FROM default.events",
         "hide": 0,
@@ -479,8 +468,7 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource",
-          "uid": "7Oq9n4s4z"
+          "type": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT kind FROM default.events",
         "hide": 0,
