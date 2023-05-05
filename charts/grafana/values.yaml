@@ -542,6 +542,8 @@ dashboards:
     #  $RAW_JSON
     custom-dashboard:
       file: dashboards/custom-dashboard.json
+    plugins-dashboard:
+      file: dashboards/plugins-dashboard.json    
   #   prometheus-stats:
   #     gnetId: 2
   #     revision: 2
