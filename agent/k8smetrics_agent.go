@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/kube-tarian/kubviz/agent/config"
 	"log"
 	"os"
 	"strconv"
@@ -57,9 +58,10 @@ func main() {
 	kubePreUpgradeChan := make(chan error, 1)
 	getAllResourceChan := make(chan error, 1)
 	clusterMetricsChan := make(chan error, 1)
+	kubescoreMetricsChan := make(chan error, 1)
 	var wg sync.WaitGroup
 	// waiting for 4 go routines
-	wg.Add(4)
+	wg.Add(5)
 	// connecting with nats ...
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
@@ -71,18 +73,23 @@ func main() {
 	checkErr(err)
 	// getting kubernetes clientset
 	clientset := getK8sClient()
+
+	setupAgent()
+
 	// starting all the go routines
 	go outDatedImages(js, &wg, outdatedErrChan)
 	go KubePreUpgradeDetector(js, &wg, kubePreUpgradeChan)
 	go GetAllResources(js, &wg, getAllResourceChan)
 	getK8sEvents(clientset)
 	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+	go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 	wg.Wait()
 	// once the go routines completes we will close the error channels
 	close(outdatedErrChan)
 	close(kubePreUpgradeChan)
 	close(getAllResourceChan)
 	close(clusterMetricsChan)
+	close(kubescoreMetricsChan)
 	// for loop will wait for the error channels
 	// logs if any error occurs
 	for {
@@ -103,9 +110,31 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
+		case err := <-kubescoreMetricsChan:
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 
+}
+
+func setupAgent() {
+	configurations, err := config.GetAgentConfigurations()
+	if err != nil {
+		log.Printf("Failed to get agent config: %v\n", err)
+		panic(err)
+	}
+	k8s := K8sData{
+		Namespace:          configurations.SANamespace,
+		ServiceAccountName: configurations.SAName,
+		KubeconfigFileName: KUBECONFIG,
+	}
+	_, err = k8s.GenerateKubeConfiguration()
+	if err != nil {
+		log.Printf("Failed to generate kubeconfig: %v\n", err)
+		panic(err)
+	}
 }
 
 // publishMetrics publishes stream of events

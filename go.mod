@@ -10,6 +10,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/google/uuid v1.1.2
 	github.com/hashicorp/go-version v1.6.0
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nats-io/nats.go v1.13.1-0.20211122170419-d7c1d78a50fc
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.0
@@ -17,6 +18,7 @@ require (
 	k8s.io/api v0.23.1
 	k8s.io/apimachinery v0.23.1
 	k8s.io/client-go v0.23.1
+	sigs.k8s.io/kustomize/pseudo/k8s v0.1.0
 )
 
 require (
@@ -62,6 +64,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	gotest.tools/v3 v3.4.0 // indirect
+	k8s.io/klog v1.0.0 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
 	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b // indirect
