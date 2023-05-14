@@ -125,7 +125,7 @@ func setupAgent() {
 		log.Printf("Failed to get agent config: %v\n", err)
 		panic(err)
 	}
-	k8s := K8sData{
+	k8s := &K8sData{
 		Namespace:          configurations.SANamespace,
 		ServiceAccountName: configurations.SAName,
 		KubeconfigFileName: KUBECONFIG,

@@ -1,15 +1,16 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/kube-tarian/kubviz/model"
 	"github.com/nats-io/nats.go"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"log"
 	exec "os/exec"
-	metav1 "sigs.k8s.io/kustomize/pseudo/k8s/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/kustomize/pseudo/k8s/apimachinery/pkg/util/json"
-	"sigs.k8s.io/kustomize/pseudo/k8s/client-go/kubernetes"
 	"sync"
 )
 
@@ -21,7 +22,7 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg 
 
 	nsList, err := clientset.CoreV1().
 		Namespaces().
-		List(metav1.ListOptions{})
+		List(context.Background(), metav1.ListOptions{})
 	//checkErr(err)
 	fmt.Println(err)
 
