@@ -55,11 +55,31 @@ func CreateSchema(connect *sql.DB) {
 
 func CreateKubePugSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
-		CREATE TABLE IF NOT EXISTS deprecatedAPIs_and_deletedAPIs (
-			result String,
-			cluster_name String
+        CREATE TABLE IF NOT EXISTS DeprecatedAPIs (
+            Description String,
+            Kind String,
+            Deprecated UInt8,
+            ClusterName String,
+            Scope String,
+            ObjectName String
         ) engine=File(TabSeparated)
-	`)
+    `)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = connect.Exec(`
+        CREATE TABLE IF NOT EXISTS DeletedAPIs (
+            Group String,
+            Kind String,
+            Version String,
+            Name String,
+            Deleted UInt8,
+            ClusterName String,
+            Scope String,
+            ObjectName String
+        ) engine=File(TabSeparated)
+    `)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -133,19 +153,63 @@ func InsertOutdatedEvent(connect *sql.DB, metrics model.CheckResultfinal) {
 	}
 }
 
-func InsertKubepugEvent(connect *sql.DB, metrics model.Result) {
+func InsertDeprecatedAPI(connect *sql.DB, deprecatedAPI model.DeprecatedAPI) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO deprecatedAPIs_and_deletedAPIs (result, cluster_name) VALUES (?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO DeprecatedAPIs (Description, Kind, Deprecated, ClusterName, Scope, ObjectName) VALUES (?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
-	eventJson, _ := json.Marshal(metrics)
-	if _, err := stmt.Exec(
-		string(eventJson),
-		metrics.ClusterName,
-	); err != nil {
+
+	deprecated := uint8(0)
+	if deprecatedAPI.Deprecated {
+		deprecated = 1
+	}
+
+	for _, item := range deprecatedAPI.Items {
+		if _, err := stmt.Exec(
+			deprecatedAPI.Description,
+			deprecatedAPI.Kind,
+			deprecated,
+			deprecatedAPI.ClusterName,
+			item.Scope,
+			item.ObjectName,
+		); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func InsertDeletedAPI(connect *sql.DB, deletedAPI model.DeletedAPI) {
+	var (
+		tx, _   = connect.Begin()
+		stmt, _ = tx.Prepare("INSERT INTO DeletedAPIs (Group, Kind, Version, Name, Deleted, ClusterName, Scope, ObjectName) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+	)
+	defer stmt.Close()
+
+	deleted := uint8(0)
+	if deletedAPI.Deleted {
+		deleted = 1
+	}
+
+	for _, item := range deletedAPI.Items {
+		if _, err := stmt.Exec(
+			deletedAPI.Group,
+			deletedAPI.Kind,
+			deletedAPI.Version,
+			deletedAPI.Name,
+			deleted,
+			deletedAPI.ClusterName,
+			item.Scope,
+			item.ObjectName,
+		); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}

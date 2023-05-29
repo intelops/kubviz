@@ -91,17 +91,29 @@ func main() {
 
 	}, nats.Durable("OUTDATED_EVENTS_CONSUMER"), nats.ManualAck())
 	// consume kubepug result and insert in clickhouse
-	js.Subscribe("METRICS.kubepug", func(msg *nats.Msg) {
+	js.Subscribe("METRICS.deprecatedAPI", func(msg *nats.Msg) {
 		msg.Ack()
-		var metrics model.Result
-		err := json.Unmarshal(msg.Data, &metrics)
+		var deprecatedAPI model.DeprecatedAPI
+		err := json.Unmarshal(msg.Data, &deprecatedAPI)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("Kubepug Metrics Received: %#v, clustername: %s", metrics, metrics.ClusterName)
-		clickhouse.InsertKubepugEvent(connection, metrics)
+		log.Printf("Deprecated API Received: %#v, clustername: %s", deprecatedAPI, deprecatedAPI.ClusterName)
+		clickhouse.InsertDeprecatedAPI(connection, deprecatedAPI)
 		log.Println()
-	}, nats.Durable("KUBEPUG_EVENTS_CONSUMER"), nats.ManualAck())
+	}, nats.Durable("DEPRECATED_API_CONSUMER"), nats.ManualAck())
+
+	js.Subscribe("METRICS.deletedAPI", func(msg *nats.Msg) {
+		msg.Ack()
+		var deletedAPI model.DeletedAPI
+		err := json.Unmarshal(msg.Data, &deletedAPI)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("Deleted API Received: %#v, clustername: %s", deletedAPI, deletedAPI.ClusterName)
+		clickhouse.InsertDeletedAPI(connection, deletedAPI)
+		log.Println()
+	}, nats.Durable("DELETED_API_CONSUMER"), nats.ManualAck())
 
 	js.Subscribe("METRICS.event", func(msg *nats.Msg) {
 		msg.Ack()

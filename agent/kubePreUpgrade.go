@@ -25,12 +25,13 @@ import (
 )
 
 const (
-	baseURL                         = "https://raw.githubusercontent.com/kubernetes/kubernetes"
-	fileURL                         = "api/openapi-spec/swagger.json"
-	crdGroup                        = "apiextensions.k8s.io"
-	apiRegistration                 = "apiregistration.k8s.io"
-	kubeConfigFileName              = "dev-config"
-	eventSubject_depricated_deleted = "METRICS.kubepug"
+	baseURL                 = "https://raw.githubusercontent.com/kubernetes/kubernetes"
+	fileURL                 = "api/openapi-spec/swagger.json"
+	crdGroup                = "apiextensions.k8s.io"
+	apiRegistration         = "apiregistration.k8s.io"
+	kubeConfigFileName      = "dev-config"
+	eventSubject_deleted    = "METRICS.deletedAPI"
+	eventSubject_depricated = "METRICS.deprecatedAPI"
 )
 
 type ignoreStruct map[string]struct{}
@@ -56,16 +57,30 @@ var (
 var result *model.Result
 
 func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamContext) error {
-	metrics := result
-	metrics.ClusterName = ClusterName
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(eventSubject_depricated_deleted, metricsJson)
-	if err != nil {
-		return err
+	for _, deprecatedAPI := range result.DeprecatedAPIs {
+		deprecatedAPI.ClusterName = ClusterName
+		fmt.Println("deprecatedAPI", deprecatedAPI)
+		deprecatedAPIJson, _ := json.Marshal(deprecatedAPI)
+		_, err := js.Publish(eventSubject_depricated, deprecatedAPIJson)
+		if err != nil {
+			return err
+		}
 	}
+
+	for _, deletedAPI := range result.DeletedAPIs {
+		deletedAPI.ClusterName = ClusterName
+		fmt.Println("deletedAPI", deletedAPI)
+		deletedAPIJson, _ := json.Marshal(deletedAPI)
+		_, err := js.Publish(eventSubject_deleted, deletedAPIJson)
+		if err != nil {
+			return err
+		}
+	}
+
 	log.Printf("Metrics with Deletedapi and depricated api has been published")
 	return nil
 }
+
 func KubePreUpgradeDetector(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
 	swaggerdir, err := os.MkdirTemp("", "kubepug")
