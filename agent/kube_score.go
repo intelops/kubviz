@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/kube-tarian/kubviz/constants"
 	"github.com/kube-tarian/kubviz/model"
 	"github.com/nats-io/nats.go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -13,9 +14,6 @@ import (
 	exec "os/exec"
 	"sync"
 )
-
-const KUBECONFIG = "kubeconfig"
-const SUBJECT = "METRICS.kubescore"
 
 func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
@@ -34,7 +32,7 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg 
 
 func publish(ns string, js nats.JetStreamContext, errCh chan error) {
 	out, err := executeCommand("kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} bash -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - " +
-		" --kubeconfig=" + KUBECONFIG)
+		" --kubeconfig=" + constants.KUBECONFIG)
 	if err != nil {
 		log.Println("Error occurred while running kube-score: ", err)
 		errCh <- err
@@ -54,7 +52,7 @@ func publishKubescoreMetrics(id string, ns string, recommendations string, js na
 		ClusterName:     ClusterName,
 	}
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(SUBJECT, metricsJson)
+	_, err := js.Publish(constants.SUBJECT, metricsJson)
 	if err != nil {
 		return err
 	}

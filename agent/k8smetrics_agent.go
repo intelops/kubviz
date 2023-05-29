@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/kube-tarian/kubviz/agent/config"
+	"github.com/kube-tarian/kubviz/constants"
 	"log"
 	"os"
 	"strconv"
@@ -19,10 +20,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	// Uncomment to load all auth plugins
-	// _ "k8s.io/client-go/plugin/pkg/client/auth"
-	//
-	// Or uncomment to load specific auth plugins
 	"fmt"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -128,7 +125,7 @@ func setupAgent() {
 	k8s := &K8sData{
 		Namespace:          configurations.SANamespace,
 		ServiceAccountName: configurations.SAName,
-		KubeconfigFileName: KUBECONFIG,
+		KubeconfigFileName: constants.KUBECONFIG,
 	}
 	_, err = k8s.GenerateKubeConfiguration()
 	if err != nil {
@@ -141,25 +138,6 @@ func setupAgent() {
 // with subject "METRICS.created"
 func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
-	//Publish Nodes data
-	// for i := 1; i <= 10; i++ {
-	// 	shouldReturn, returnValue := publishK8sMetrics(i, "Node", getK8sNodes(clientset), js)
-	// 	if shouldReturn {
-	// 		return returnValue
-	// 	}
-	// 	time.Sleep(100 * time.Millisecond)
-	// }
-	//Publish Pods data
-	// for i := 1; i <= 10; i++ {
-
-	// 	shouldReturn, returnValue := publishK8sMetrics(i, "Pod", getK8sPods(clientset), js)
-	// 	if shouldReturn {
-	// 		return returnValue
-	// 	}
-	// 	time.Sleep(100 * time.Millisecond)
-	// }
-	//Publish events data
-	//publishK8sMetrics(1, "Event", getK8sEvents(clientset), js)
 	watchK8sEvents(clientset, js)
 
 	errCh <- nil
@@ -276,9 +254,6 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 			AddFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
 				fmt.Printf("Event namespace: %s \n", event.GetNamespace())
-				// j, err := json.MarshalIndent(obj, "", "  ")
-				// checkErr(err)
-				//fmt.Printf("Add event: %s \n", event)
 				y, err := yaml.Marshal(event)
 				if err != nil {
 					fmt.Printf("err: %v\n", err)

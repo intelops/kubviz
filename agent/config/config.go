@@ -7,7 +7,7 @@ import (
 
 type AgentConfigurations struct {
 	SANamespace string `envconfig:"SA_NAMESPACE" default:"default"`
-	SAName      string `envconfig:"SA_NAME" default:""`
+	SAName      string `envconfig:"SA_NAME" default:"default"`
 }
 
 func GetAgentConfigurations() (serviceConf *AgentConfigurations, err error) {
