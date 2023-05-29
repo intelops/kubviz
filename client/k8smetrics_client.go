@@ -91,7 +91,7 @@ func main() {
 
 	}, nats.Durable("OUTDATED_EVENTS_CONSUMER"), nats.ManualAck())
 	// consume kubepug result and insert in clickhouse
-	js.Subscribe("deprecatedAPI", func(msg *nats.Msg) {
+	js.Subscribe("METRICS.deprecatedAPI", func(msg *nats.Msg) {
 		msg.Ack()
 		var deprecatedAPI model.DeprecatedAPI
 		err := json.Unmarshal(msg.Data, &deprecatedAPI)
@@ -103,7 +103,7 @@ func main() {
 		log.Println()
 	}, nats.Durable("DEPRECATED_API_CONSUMER"), nats.ManualAck())
 
-	js.Subscribe("deletedAPI", func(msg *nats.Msg) {
+	js.Subscribe("METRICS.deletedAPI", func(msg *nats.Msg) {
 		msg.Ack()
 		var deletedAPI model.DeletedAPI
 		err := json.Unmarshal(msg.Data, &deletedAPI)
