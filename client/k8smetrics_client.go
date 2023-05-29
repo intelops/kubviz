@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/kube-tarian/kubviz/constants"
 	"log"
 	"os"
 	"runtime"
@@ -49,6 +50,7 @@ func main() {
 	clickhouse.CreateKubePugSchema(connection)
 	clickhouse.CreateOutdatedSchema(connection)
 	clickhouse.CreateKetallSchema(connection)
+	clickhouse.CreateKubeScoreSchema(connection)
 	//Get db data
 	// data, err := clickhouse.RetrieveEvent(connection)
 	// if err != nil {
@@ -102,6 +104,19 @@ func main() {
 		clickhouse.InsertKubepugEvent(connection, metrics)
 		log.Println()
 	}, nats.Durable("KUBEPUG_EVENTS_CONSUMER"), nats.ManualAck())
+
+	// consume kubepug result and insert in clickhouse
+	js.Subscribe(constants.SUBJECT, func(msg *nats.Msg) {
+		msg.Ack()
+		var metrics model.KubeScoreRecommendations
+		err := json.Unmarshal(msg.Data, &metrics)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("Kubescore Metrics Received: %#v, clustername: %s", metrics, metrics.ClusterName)
+		clickhouse.InsertKubeScoreMetrics(connection, metrics)
+		log.Println()
+	}, nats.Durable("KUBESCORE_EVENTS_CONSUMER"), nats.ManualAck())
 
 	js.Subscribe("METRICS.event", func(msg *nats.Msg) {
 		msg.Ack()

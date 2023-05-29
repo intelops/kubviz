@@ -94,6 +94,20 @@ func CreateOutdatedSchema(connect *sql.DB) {
 	}
 }
 
+func CreateKubeScoreSchema(connect *sql.DB) {
+	_, err := connect.Exec(`
+	    CREATE TABLE IF NOT EXISTS outdated_images (
+		    id UUID,
+			namespace String,
+			cluster_name String,
+			recommendations String
+	    ) engine=File(TabSeparated)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func InsertKetallEvent(connect *sql.DB, metrics model.Resource) {
 	var (
 		tx, _   = connect.Begin()
@@ -172,6 +186,25 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 		metrics.Event.LastTimestamp.Time,
 		time.Now(),
 		metrics.ClusterName,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func InsertKubeScoreMetrics(connect *sql.DB, metrics model.KubeScoreRecommendations) {
+	var (
+		tx, _   = connect.Begin()
+		stmt, _ = tx.Prepare("INSERT INTO getall_resources (id, namespace, cluster_name, recommendations) VALUES (?, ?, ?, ?)")
+	)
+	defer stmt.Close()
+	if _, err := stmt.Exec(
+		metrics.ID,
+		metrics.Namespace,
+		metrics.ClusterName,
+		metrics.Recommendations,
 	); err != nil {
 		log.Fatal(err)
 	}
