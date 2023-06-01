@@ -22,5 +22,7 @@ type CheckResultfinal struct {
 	Current        string `json:"current_tag"`
 	LatestVersion  string `json:"latest_version"`
 	VersionsBehind int64  `json:"versions_behind"`
+	Pod            string `json:"pod"`
+	Namespace      string `json:"namespace"`
 	ClusterName    string `json:"clustername"`
 }

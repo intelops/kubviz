@@ -89,6 +89,7 @@ func CreateKetallSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
 		CREATE TABLE IF NOT EXISTS getall_resources (
 			resource String,
+			kind String,
 			namespace String,
 			age String,
 			cluster_name String
@@ -106,6 +107,8 @@ func CreateOutdatedSchema(connect *sql.DB) {
 			current_tag String,
 			latest_version String,
 			versions_behind Int64,
+			pod String,
+			namespace String,
 			cluster_name String
 	    ) engine=File(TabSeparated)
 	`)
@@ -117,11 +120,12 @@ func CreateOutdatedSchema(connect *sql.DB) {
 func InsertKetallEvent(connect *sql.DB, metrics model.Resource) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO getall_resources (resource, namespace, age, cluster_name) VALUES (?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO getall_resources (resource, kind, namespace, age, cluster_name) VALUES (?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	if _, err := stmt.Exec(
 		metrics.Resource,
+		metrics.Kind,
 		metrics.Namespace,
 		metrics.Age,
 		metrics.ClusterName,
@@ -136,7 +140,7 @@ func InsertKetallEvent(connect *sql.DB, metrics model.Resource) {
 func InsertOutdatedEvent(connect *sql.DB, metrics model.CheckResultfinal) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO outdated_images (current_image, current_tag, latest_version, versions_behind, cluster_name) VALUES (?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO outdated_images (current_image, current_tag, latest_version, versions_behind, pod, namespace, cluster_name) VALUES (?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	if _, err := stmt.Exec(
@@ -144,6 +148,8 @@ func InsertOutdatedEvent(connect *sql.DB, metrics model.CheckResultfinal) {
 		metrics.Current,
 		metrics.LatestVersion,
 		metrics.VersionsBehind,
+		metrics.Pod,
+		metrics.Namespace,
 		metrics.ClusterName,
 	); err != nil {
 		log.Fatal(err)
@@ -245,7 +251,7 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 }
 
 func RetriveKetallEvent(connect *sql.DB) ([]model.Resource, error) {
-	rows, err := connect.Query("SELECT resource, namespace, age, cluster_name FROM getall_resources")
+	rows, err := connect.Query("SELECT resource, kind, namespace, age, cluster_name FROM getall_resources")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -254,7 +260,7 @@ func RetriveKetallEvent(connect *sql.DB) ([]model.Resource, error) {
 	var events []model.Resource
 	for rows.Next() {
 		var result model.Resource
-		if err := rows.Scan(&result.Resource, &result.Namespace, &result.Age, &result.ClusterName); err != nil {
+		if err := rows.Scan(&result.Resource, &result.Kind, &result.Namespace, &result.Age, &result.ClusterName); err != nil {
 			log.Printf("Error: %s", err)
 			return nil, err
 		}
@@ -268,7 +274,7 @@ func RetriveKetallEvent(connect *sql.DB) ([]model.Resource, error) {
 }
 
 func RetriveOutdatedEvent(connect *sql.DB) ([]model.CheckResultfinal, error) {
-	rows, err := connect.Query("SELECT current_image, current_tag, latest_version, versions_behind, cluster_name FROM outdated_images")
+	rows, err := connect.Query("SELECT current_image, current_tag, latest_version, versions_behind, pod, namespace, cluster_name FROM outdated_images")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -277,7 +283,7 @@ func RetriveOutdatedEvent(connect *sql.DB) ([]model.CheckResultfinal, error) {
 	var events []model.CheckResultfinal
 	for rows.Next() {
 		var result model.CheckResultfinal
-		if err := rows.Scan(&result.Image, &result.Current, &result.LatestVersion, &result.VersionsBehind, &result.ClusterName); err != nil {
+		if err := rows.Scan(&result.Image, &result.Current, &result.LatestVersion, &result.VersionsBehind, &result.Pod, &result.Namespace, &result.ClusterName); err != nil {
 			log.Printf("Error: %s", err)
 			return nil, err
 		}
