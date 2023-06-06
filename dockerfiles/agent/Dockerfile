@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o k8smetri
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
 COPY --from=builder /workspace/k8smetrics_agent .
-COPY --from= zegl/kube-score:v1.16.0 /usr/bin/kube-score /usr/bin/kube-score
+COPY --from=zegl/kube-score:v1.16.0 /usr/bin/kube-score /usr/bin/kube-score
 COPY --from=bitnami/kubectl:1.22.5 /opt/bitnami/kubectl/bin/kubectl /usr/local/bin/
 COPY --from=busybox:1.35.0-uclibc /bin/sh /bin/sh
 USER 65532:65532
