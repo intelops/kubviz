@@ -74,6 +74,8 @@ func outDatedImages(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan err
 		errCh <- err
 	}
 	for _, image := range images {
+		namespace := image.Namespace
+		pod := image.Pod
 		checkResult, _ := ParseImage(image.Image, image.PullableImage)
 		repo, img, tag, err := ParseImageName(image.Image)
 		final := model.CheckResultfinal{}
@@ -86,6 +88,8 @@ func outDatedImages(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan err
 				message = checkResult.CheckError
 			}
 			final.LatestVersion = message
+			final.Namespace = namespace
+			final.Pod = pod
 			err := PublishOutdatedImages(final, js)
 			if err != nil {
 				errCh <- err
@@ -100,6 +104,8 @@ func outDatedImages(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan err
 					final.Image = img
 					final.LatestVersion = checkResult.LatestVersion
 					final.VersionsBehind = checkResult.VersionsBehind
+					final.Namespace = namespace
+					final.Pod = pod
 					err := PublishOutdatedImages(final, js)
 					if err != nil {
 						errCh <- err
@@ -115,6 +121,8 @@ func outDatedImages(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan err
 						message = checkResult.CheckError
 					}
 					final.LatestVersion = message
+					final.Namespace = namespace
+					final.Pod = pod
 					err := PublishOutdatedImages(final, js)
 					if err != nil {
 						errCh <- err

@@ -73,12 +73,14 @@ func GetAllResources(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan er
 			if item.GetNamespace() == "" {
 				resource = model.Resource{
 					Resource:  item.GetName(),
+					Kind:      item.GetKind(),
 					Namespace: "Default",
 					Age:       age,
 				}
 			} else {
 				resource = model.Resource{
 					Resource:  item.GetName(),
+					Kind:      item.GetKind(),
 					Namespace: item.GetNamespace(),
 					Age:       age,
 				}

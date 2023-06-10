@@ -21,8 +21,9 @@ type DeprecatedAPI struct {
 	Version     string `json,yaml:"version,omitempty"`
 	Name        string `json,yaml:"name,omitempty"`
 	// TODO: What is this boolean for? All APIs here aren't already marked as Deprecated?
-	Deprecated bool   `json,yaml:"deprecated,omitempty"`
-	Items      []Item `json,yaml:"deprecated_items,omitempty"`
+	Deprecated  bool   `json,yaml:"deprecated,omitempty"`
+	Items       []Item `json,yaml:"deprecated_items,omitempty"`
+	ClusterName string `json,yaml:"clustername,omitempty"`
 }
 
 // Item definition of the Items inside a deprecated API
@@ -40,8 +41,9 @@ type DeletedAPI struct {
 	Version string `json,yaml:"version,omitempty"`
 	Name    string `json,yaml:"name,omitempty"`
 	// TODO: What is this boolean for? All APIs here aren't already marked as Deleted?
-	Deleted bool   `json,yaml:"deleted,omitempty"`
-	Items   []Item `json,yaml:"deleted_items,omitempty"`
+	Deleted     bool   `json,yaml:"deleted,omitempty"`
+	Items       []Item `json,yaml:"deleted_items,omitempty"`
+	ClusterName string `json,yaml:"clustername,omitempty"`
 }
 
 // Result to show final user
