@@ -96,7 +96,7 @@ func CreateOutdatedSchema(connect *sql.DB) {
 
 func CreateKubeScoreSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
-	    CREATE TABLE IF NOT EXISTS outdated_images (
+	    CREATE TABLE IF NOT EXISTS kubescore (
 		    id UUID,
 			namespace String,
 			cluster_name String,
@@ -197,7 +197,7 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 func InsertKubeScoreMetrics(connect *sql.DB, metrics model.KubeScoreRecommendations) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO getall_resources (id, namespace, cluster_name, recommendations) VALUES (?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO kubescore (id, namespace, cluster_name, recommendations) VALUES (?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	if _, err := stmt.Exec(
