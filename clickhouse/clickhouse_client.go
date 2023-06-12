@@ -52,6 +52,21 @@ func CreateSchema(connect *sql.DB) {
 		log.Fatal(err)
 	}
 }
+func CreateRakeesMetricsSchema(connect *sql.DB) {
+	_, err := connect.Exec(`
+		CREATE TABLE IF NOT EXISTS rakees (
+			name String,
+			create String,
+			delete String,
+			list String,
+			update String,
+			cluster_name String
+        ) engine=File(TabSeparated)
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func CreateKubePugSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
@@ -110,6 +125,26 @@ func CreateOutdatedSchema(connect *sql.DB) {
 	    ) engine=File(TabSeparated)
 	`)
 	if err != nil {
+		log.Fatal(err)
+	}
+}
+func InsertRakeesMetrics(connect *sql.DB, metrics model.RakeesMetrics) {
+	var (
+		tx, _   = connect.Begin()
+		stmt, _ = tx.Prepare("INSERT INTO rakees (name, create, delete, list, update, cluster_name) VALUES (?, ?, ?, ?, ?, ?)")
+	)
+	defer stmt.Close()
+	if _, err := stmt.Exec(
+		metrics.Name,
+		metrics.Create,
+		metrics.Delete,
+		metrics.List,
+		metrics.Update,
+		metrics.ClusterName,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -24,14 +24,14 @@ import (
 	// Or uncomment to load specific auth plugins
 	"fmt"
 
-	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
-
 	"github.com/ghodss/yaml"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
+
+	//  _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -57,9 +57,10 @@ func main() {
 	kubePreUpgradeChan := make(chan error, 1)
 	getAllResourceChan := make(chan error, 1)
 	clusterMetricsChan := make(chan error, 1)
+	RakeesErrChan := make(chan error, 1)
 	var wg sync.WaitGroup
 	// waiting for 4 go routines
-	wg.Add(4)
+	wg.Add(5)
 	// connecting with nats ...
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
@@ -75,7 +76,8 @@ func main() {
 	go outDatedImages(js, &wg, outdatedErrChan)
 	go KubePreUpgradeDetector(js, &wg, kubePreUpgradeChan)
 	go GetAllResources(js, &wg, getAllResourceChan)
-	getK8sEvents(clientset)
+	go RakeesOutput(js, &wg, RakeesErrChan)
+	go getK8sEvents(clientset)
 	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
 	wg.Wait()
 	// once the go routines completes we will close the error channels
@@ -83,6 +85,7 @@ func main() {
 	close(kubePreUpgradeChan)
 	close(getAllResourceChan)
 	close(clusterMetricsChan)
+	close(RakeesErrChan)
 	// for loop will wait for the error channels
 	// logs if any error occurs
 	for {
@@ -100,6 +103,10 @@ func main() {
 				log.Println(err)
 			}
 		case err := <-clusterMetricsChan:
+			if err != nil {
+				log.Println(err)
+			}
+		case err := <-RakeesErrChan:
 			if err != nil {
 				log.Println(err)
 			}
