@@ -481,7 +481,7 @@ func HumanreadableAccessCode(o Outcome) string {
 	case Err:
 		return "ERR"
 	default:
-		panic("unknown access code")
+		return "unknown access code"
 	}
 }
 
