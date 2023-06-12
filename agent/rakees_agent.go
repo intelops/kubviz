@@ -97,7 +97,7 @@ func RakeesOutput(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error
 			Update:      rakkess.HumanreadableAccessCode(updateOutcome),
 		}
 		metricsJson, _ := json.Marshal(metrics)
-		_, err = js.Publish(eventSubject_getall_resource, metricsJson)
+		_, err = js.Publish(eventSubject_rakees, metricsJson)
 		if err != nil {
 			errCh <- err
 		}
