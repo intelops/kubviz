@@ -49,6 +49,7 @@ func main() {
 	clickhouse.CreateKubePugSchema(connection)
 	clickhouse.CreateOutdatedSchema(connection)
 	clickhouse.CreateKetallSchema(connection)
+	clickhouse.CreateRakeesMetricsSchema(connection)
 	//Get db data
 	// data, err := clickhouse.RetrieveEvent(connection)
 	// if err != nil {
@@ -76,6 +77,19 @@ func main() {
 		log.Println()
 
 	}, nats.Durable("KETALL_EVENTS_CONSUMER"), nats.ManualAck())
+
+	js.Subscribe("METRICS.rakees", func(msg *nats.Msg) {
+		msg.Ack()
+		var metrics model.RakeesMetrics
+		err := json.Unmarshal(msg.Data, &metrics)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("Rakees Metrics Received: %#v,", metrics)
+		clickhouse.InsertRakeesMetrics(connection, metrics)
+		log.Println()
+
+	}, nats.Durable("RAKEES_METRICS_CONSUMER"), nats.ManualAck())
 
 	// consume outdated result and insert in clickhouse
 	js.Subscribe("METRICS.outdated", func(msg *nats.Msg) {
