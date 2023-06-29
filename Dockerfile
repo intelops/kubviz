@@ -13,7 +13,7 @@ RUN go mod download -json
 RUN ls -al
 RUN df -h /app
 
-COPY . .
+COPY * ./
 RUN ls -al
 
 RUN go build -a -o /k8smetrics_agent agent/*.go
