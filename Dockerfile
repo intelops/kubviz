@@ -1,22 +1,20 @@
-# Build the manager binary
-FROM docker.io/golang:1.20 as builder
+FROM docker.io/golang:1.19 AS build-stage
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
+WORKDIR /app
 
 COPY go.mod go.sum ./
 RUN go mod download -json
-COPY ./ /workspace/ 
-
+COPY . .
+RUN ls -al
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o k8smetrics_agent agent/*.go
+RUN go build -o /k8smetrics_agent agent/*.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
-COPY --from=builder /workspace/k8smetrics_agent .
-
-USER 65532:65532
+COPY --from=build-stage /k8smetrics_agent /k8smetrics_agent
 
 ENTRYPOINT ["/k8smetrics_agent"]
