@@ -9,7 +9,12 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download -json
 
+# Check the files and size
+RUN ls -al
+RUN df -h /app
+
 COPY . .
+RUN ls -al
 
 RUN go build -a -o /k8smetrics_agent agent/*.go
 
