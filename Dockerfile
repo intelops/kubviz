@@ -6,10 +6,10 @@ FROM docker.io/golang:1.19 AS build-stage
 WORKDIR /app
 
 # Copy the Go Modules manifests
-COPY ./ ./
+COPY go.mod go.sum ./
 RUN go mod download -json
 
-COPY *.go ./
+COPY . .
 
 RUN go build -a -o /k8smetrics_agent agent/*.go
 
