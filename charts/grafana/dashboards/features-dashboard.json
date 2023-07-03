@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -30,7 +30,7 @@
         "type": "vertamedia-clickhouse-datasource",
         "uid": "vertamedia-clickhouse-datasource"
       },
-      "description": "This panel displays all the resources running on the Kubernetes cluster.",
+      "description": "This panel displays all the resources from the cluster.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -60,7 +60,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 24,
         "x": 0,
         "y": 0
@@ -126,7 +126,7 @@
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 10
               }
             ]
           }
@@ -134,10 +134,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 9
       },
       "id": 6,
       "options": {
@@ -162,8 +162,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT * FROM default.outdated_images",
-          "rawQuery": "SELECT * FROM default.outdated_images",
+          "query": "SELECT * FROM default.outdated_images\nWHERE VersionsBehind > 0",
+          "rawQuery": "SELECT * FROM default.outdated_images\nWHERE VersionsBehind > 0",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -178,7 +178,7 @@
         "type": "vertamedia-clickhouse-datasource",
         "uid": "vertamedia-clickhouse-datasource"
       },
-      "description": "This panel displays all the DeletedAPIs from the cluster",
+      "description": "This panel displays all the DeletedAPIs from the cluster.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -211,7 +211,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 18
       },
       "id": 4,
       "options": {
@@ -269,7 +269,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -281,10 +282,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
+        "h": 8,
         "w": 24,
         "x": 0,
-        "y": 24
+        "y": 26
       },
       "id": 2,
       "options": {
@@ -334,7 +335,7 @@
   "timepicker": {},
   "timezone": "",
   "title": "Kubviz Features",
-  "uid": "N4PNG194z",
+  "uid": "ktptHJ9Vz",
   "version": 1,
   "weekStart": ""
 }
