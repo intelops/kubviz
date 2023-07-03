@@ -79,7 +79,8 @@
         {
           "database": "default",
           "datasource": {
-            "type": "vertamedia-clickhouse-datasource"
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "dateColDataType": "",
           "dateLoading": false,
@@ -103,7 +104,8 @@
     },
     {
       "datasource": {
-        "type": "vertamedia-clickhouse-datasource"
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
       },
       "description": "This table panal shows all the kubernetes datas.\nif its not showing the data check the time range and refresh.it will take some time to load the data. wait for sometime before clicking refresh another time.",
       "fieldConfig": {
@@ -165,7 +167,8 @@
         {
           "database": "default",
           "datasource": {
-            "type": "vertamedia-clickhouse-datasource"
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "dateColDataType": "",
           "dateLoading": false,
@@ -203,7 +206,8 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource"
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT namespace FROM default.events",
         "hide": 0,
@@ -225,7 +229,8 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource"
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT reason FROM default.events",
         "hide": 0,
@@ -247,7 +252,8 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource"
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT kind FROM default.events",
         "hide": 0,
@@ -272,7 +278,7 @@
     "hidden": false
   },
   "timezone": "",
-  "title": "kubedatas",
+  "title": "Kubedata",
   "uid": "WnmZG5Jnz",
   "version": 1,
   "weekStart": ""
