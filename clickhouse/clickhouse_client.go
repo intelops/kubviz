@@ -72,11 +72,11 @@ func CreateKubePugSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
         CREATE TABLE IF NOT EXISTS DeprecatedAPIs (
 			ClusterName String,
+			ObjectName String,
             Description String,
             Kind String,
             Deprecated UInt8,
-            Scope String,
-            ObjectName String
+            Scope String
         ) engine=File(TabSeparated)
     `)
 	if err != nil {
@@ -86,13 +86,13 @@ func CreateKubePugSchema(connect *sql.DB) {
 	_, err = connect.Exec(`
         CREATE TABLE IF NOT EXISTS DeletedAPIs (
 			ClusterName String,
+			ObjectName String,
             Group String,
             Kind String,
             Version String,
             Name String,
             Deleted UInt8,
-            Scope String,
-            ObjectName String
+            Scope String
         ) engine=File(TabSeparated)
     `)
 	if err != nil {
@@ -103,7 +103,7 @@ func CreateKubePugSchema(connect *sql.DB) {
 func CreateKetallSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
 		CREATE TABLE IF NOT EXISTS getall_resources (
-			Cluster_Name String,
+			ClusterName String,
 			Namespace String,
 			Kind String,
 			Resource String,
@@ -118,13 +118,13 @@ func CreateKetallSchema(connect *sql.DB) {
 func CreateOutdatedSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
 	    CREATE TABLE IF NOT EXISTS outdated_images (
-			Cluster_Name String,
+			ClusterName String,
 			Namespace String,
 			Pod String,
-		    Current_Image String,
-			Current_Tag String,
-			Latest_Version String,
-			Versions_Behind Int64
+		    CurrentImage String,
+			CurrentTag String,
+			LatestVersion String,
+			VersionsBehind Int64
 	    ) engine=File(TabSeparated)
 	`)
 	if err != nil {
@@ -155,7 +155,7 @@ func InsertRakeesMetrics(connect *sql.DB, metrics model.RakeesMetrics) {
 func InsertKetallEvent(connect *sql.DB, metrics model.Resource) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO getall_resources (Cluster_Name, Namespace, Kind, Resource, Age) VALUES (?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO getall_resources (ClusterName, Namespace, Kind, Resource, Age) VALUES (?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	if _, err := stmt.Exec(
@@ -175,7 +175,7 @@ func InsertKetallEvent(connect *sql.DB, metrics model.Resource) {
 func InsertOutdatedEvent(connect *sql.DB, metrics model.CheckResultfinal) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO outdated_images (Cluster_Name, Namespace, Pod, Current_Image, Current_Tag, Latest_Version, Versions_Behind) VALUES (?, ?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO outdated_images (ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind) VALUES (?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	if _, err := stmt.Exec(
@@ -197,7 +197,7 @@ func InsertOutdatedEvent(connect *sql.DB, metrics model.CheckResultfinal) {
 func InsertDeprecatedAPI(connect *sql.DB, deprecatedAPI model.DeprecatedAPI) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO DeprecatedAPIs (ClusterName, Description, Kind, Deprecated, Scope, ObjectName) VALUES (?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO DeprecatedAPIs (ClusterName, ObjectName, Description, Kind, Deprecated, Scope) VALUES (?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 
@@ -209,11 +209,11 @@ func InsertDeprecatedAPI(connect *sql.DB, deprecatedAPI model.DeprecatedAPI) {
 	for _, item := range deprecatedAPI.Items {
 		if _, err := stmt.Exec(
 			deprecatedAPI.ClusterName,
+			item.ObjectName,
 			deprecatedAPI.Description,
 			deprecatedAPI.Kind,
 			deprecated,
 			item.Scope,
-			item.ObjectName,
 		); err != nil {
 			log.Fatal(err)
 		}
@@ -227,7 +227,7 @@ func InsertDeprecatedAPI(connect *sql.DB, deprecatedAPI model.DeprecatedAPI) {
 func InsertDeletedAPI(connect *sql.DB, deletedAPI model.DeletedAPI) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO DeletedAPIs (ClusterName, Group, Kind, Version, Name, Deleted, Scope, ObjectName) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO DeletedAPIs (ClusterName, ObjectName, Group, Kind, Version, Name, Deleted, Scope) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 
@@ -239,13 +239,13 @@ func InsertDeletedAPI(connect *sql.DB, deletedAPI model.DeletedAPI) {
 	for _, item := range deletedAPI.Items {
 		if _, err := stmt.Exec(
 			deletedAPI.ClusterName,
+			item.ObjectName,
 			deletedAPI.Group,
 			deletedAPI.Kind,
 			deletedAPI.Version,
 			deletedAPI.Name,
 			deleted,
 			item.Scope,
-			item.ObjectName,
 		); err != nil {
 			log.Fatal(err)
 		}

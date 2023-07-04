@@ -21,12 +21,15 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1651809328098,
+  "id": 15,
   "links": [],
   "liveNow": false,
   "panels": [
     {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
       "description": "This stats panel shows the pod creation events.",
       "fieldConfig": {
         "defaults": {
@@ -35,7 +38,6 @@
             "mode": "fixed"
           },
           "mappings": [],
-          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -58,44 +60,38 @@
         "x": 0,
         "y": 0
       },
-      "id": 6,
+      "id": 4,
       "options": {
         "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "vertical",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
-        "text": {
-          "valueSize": 150
-        },
         "textMode": "auto"
       },
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "9.3.2",
       "targets": [
         {
-          "database": "default",
           "datasource": {
-            "type": "vertamedia-clickhouse-datasource"
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
           },
-          "dateColDataType": "",
-          "dateLoading": false,
           "dateTimeType": "DATETIME",
-          "datetimeLoading": false,
           "extrapolate": true,
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT\n    count()\nFROM $table\n\nWHERE kind IN ('Pod') AND reason IN ('Created') AND namespace IN ($namespace)\n\n\n\n\n\n",
-          "rawQuery": "SELECT\n    count()\nFROM default.events\n\nWHERE kind IN ('Pod') AND reason IN ('Created') AND namespace IN ('default','kube-system')",
+          "query": "SELECT\n    count()\nFROM default.events\n\nWHERE Kind IN ('Pod') AND Reason IN ('Created') AND Namespace IN ($namespace)\n",
+          "rawQuery": "SELECT\n    count()\nFROM default.events\n\nWHERE Kind IN ('Pod') AND Reason IN ('Created') AND Namespace IN ('argocd','quality','default','sonarqube','observability')",
           "refId": "A",
           "round": "0s",
-          "skip_comments": true,
-          "table": "events",
-          "tableLoading": false
+          "skip_comments": true
         }
       ],
       "title": "number of pod creation events in Namespace: $namespace",
@@ -103,15 +99,20 @@
     },
     {
       "datasource": {
-        "type": "vertamedia-clickhouse-datasource"
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
       },
       "description": "This table panal shows all the kubernetes datas.\nif its not showing the data check the time range and refresh.it will take some time to load the data. wait for sometime before clicking refresh another time.",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {
             "align": "center",
             "displayMode": "color-text",
-            "filterable": true
+            "filterable": true,
+            "inspect": false
           },
           "mappings": [],
           "thresholds": {
@@ -128,70 +129,50 @@
             ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "eventname"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 489
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 16,
         "w": 24,
         "x": 0,
         "y": 7
       },
       "id": 2,
-      "interval": "10s",
       "options": {
         "footer": {
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
-        "showHeader": true,
-        "sortBy": []
+        "showHeader": true
       },
-      "pluginVersion": "8.4.6",
+      "pluginVersion": "9.3.2",
       "targets": [
         {
-          "database": "default",
           "datasource": {
-            "type": "vertamedia-clickhouse-datasource"
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
           },
-          "dateColDataType": "",
-          "dateLoading": false,
-          "dateTimeColDataType": "event_time",
           "dateTimeType": "DATETIME",
-          "datetimeLoading": false,
           "extrapolate": true,
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT *\r\n    \r\nFROM $table\r\n\r\nWHERE namespace IN ($namespace) AND reason IN ($reason) AND $timeFilter AND kind IN ($kind)\r\n",
-          "rawQuery": "SELECT *\r\n    \r\nFROM default.events\r\n\r\nWHERE namespace IN ('kube-system','kubviz','default','monitoring','argocd','istio-system','crossplane-system','ingress-system','tekton-pipelines','kyverno') AND reason IN ('ApplyingManifest','ApplyManifestFailed','SuccessfulCreate','FailedScheduling','Starting','InvalidDiskCapacity','NodeHasSufficientMemory','NodeHasNoDiskPressure','NodeHasSufficientPID','NodeAllocatableEnforced','Scheduled','RegisteredNode','Pulling','Pulled','Created','Started','NodeReady','FailedToUpdateEndpoint','NoPods','RemovingNode','LeaderElection','EnsuringLoadBalancer','EnsuredLoadBalancer','Synced','FailedToUpdateEndpointSlices','Updated','Unhealthy','ApplyRoles','TaintManagerEviction','FailedCreate','FailedMount','BackOff','ResourceUpdated','UpdatedLoadBalancer','FailedGetResourceMetric','Killing','FailedKillPod','UnpackPackage') AND event_time >= toDateTime(1650613877) AND event_time <= toDateTime(1650635477) AND kind IN ('Addon','ReplicaSet','Pod','Node','DaemonSet','Endpoints','PodDisruptionBudget','Lease','Service','Secret','ConfigMap','Namespace','StatefulSet','Application','HorizontalPodAutoscaler','Provider')",
+          "query": "SELECT * FROM default.events\nWHERE Namespace IN ($namespace) AND Reason IN ($reason) AND Kind IN ($kind) AND ClusterName IN ($clusterName)",
+          "rawQuery": "SELECT * FROM default.events\nWHERE Namespace IN ('argocd','quality','default','sonarqube','observability') AND Reason IN ('OperationStarted','ResourceUpdated','OperationCompleted','FailedMount','ApplyClusterRoles','ApplyRoles','UpdateFailed','Unhealthy','InstallPackageRevision','Valid','Updated','RenderCRD','BackOff','BindClusterRole','SyncPackage') AND Kind IN ('Application','Pod','ProviderRevision','CompositeResourceDefinition','Namespace','ExternalSecret','Provider','SecretStore') AND ClusterName IN ('kubviz')",
           "refId": "A",
           "round": "0s",
-          "skip_comments": true,
-          "table": "events",
-          "tableLoading": false
+          "skip_comments": true
         }
       ],
-      "title": "kubernetes",
+      "title": "Kubernetes",
       "transparent": true,
       "type": "table"
     }
   ],
-  "refresh": "",
-  "schemaVersion": 35,
+  "schemaVersion": 37,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -203,15 +184,16 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource"
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "vertamedia-clickhouse-datasource"
         },
-        "definition": "SELECT namespace FROM default.events",
+        "definition": "SELECT Namespace FROM  default.events",
         "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "namespace",
         "options": [],
-        "query": "SELECT namespace FROM default.events",
+        "query": "SELECT Namespace FROM  default.events",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -225,15 +207,16 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource"
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "vertamedia-clickhouse-datasource"
         },
-        "definition": "SELECT reason FROM default.events",
+        "definition": "SELECT Reason FROM default.events",
         "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "reason",
         "options": [],
-        "query": "SELECT reason FROM default.events",
+        "query": "SELECT Reason FROM default.events",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -247,15 +230,39 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "vertamedia-clickhouse-datasource"
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "vertamedia-clickhouse-datasource"
         },
-        "definition": "SELECT kind FROM default.events",
+        "definition": "SELECT Kind FROM default.events",
         "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "kind",
         "options": [],
-        "query": "SELECT kind FROM default.events",
+        "query": "SELECT Kind FROM default.events",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "vertamedia-clickhouse-datasource"
+        },
+        "definition": "SELECT ClusterName FROM default.events",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "clusterName",
+        "options": [],
+        "query": "SELECT ClusterName FROM default.events",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -265,15 +272,13 @@
     ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-15m",
     "to": "now"
   },
-  "timepicker": {
-    "hidden": false
-  },
+  "timepicker": {},
   "timezone": "",
-  "title": "kubedatas",
-  "uid": "WnmZG5Jnz",
+  "title": "Kubedata",
+  "uid": "Qq-FK1rVz",
   "version": 1,
   "weekStart": ""
 }
