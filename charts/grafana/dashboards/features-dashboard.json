@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 10,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -30,7 +30,7 @@
         "type": "vertamedia-clickhouse-datasource",
         "uid": "vertamedia-clickhouse-datasource"
       },
-      "description": "This panel displays all the resources from the cluster.",
+      "description": "This panel displays all the resources running in the kubernetes cluster.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -60,7 +60,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 0
@@ -137,7 +137,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 8
       },
       "id": 6,
       "options": {
@@ -211,7 +211,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 17
       },
       "id": 4,
       "options": {
@@ -282,10 +282,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 24,
         "x": 0,
-        "y": 26
+        "y": 25
       },
       "id": 2,
       "options": {
@@ -335,7 +335,7 @@
   "timepicker": {},
   "timezone": "",
   "title": "Kubviz Features",
-  "uid": "ktptHJ9Vz",
+  "uid": "o2M7hbrVk",
   "version": 1,
   "weekStart": ""
 }
