@@ -83,7 +83,7 @@ Use kubviz to monitor your cluster events, including:
 
 ### Deprecated Kubernetes APIs
 
-<img src=".readme_assets/deleted_apis.png" alt="Cluster Events" width="525" align="left">
+<img src=".readme_assets/deleted_apis.png" alt="Deprecated Kubernetes APIs" width="525" align="right">
 
 <br>
 
