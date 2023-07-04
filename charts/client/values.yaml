@@ -92,3 +92,17 @@ clickhouse:
   enabled: true
   clickhouse:
     replicas: "1"
+
+grafana:
+  enabled: false
+
+dashboards:
+  enabled: false
+  label: grafana_dashboard
+  labelValue: "1"
+
+datasources:
+  enabled: false
+  label: grafana_datasource
+  labelValue: "1"
+  uid: vertamedia-clickhouse-datasource

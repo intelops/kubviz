@@ -31,3 +31,7 @@ dependencies:
     condition: clickhouse.enabled
     version: 1.0.1
     repository: https://kube-tarian.github.io/kubviz/
+  - name: grafana
+    condition: grafana.enabled
+    version: 6.26.13
+    repository: https://kube-tarian.github.io/kubviz/
