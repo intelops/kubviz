@@ -29,6 +29,9 @@ Kubviz client can be installed on any Kubernetes cluster. Kubviz agent runs in a
 
 Kubviz client receives the events and passes it to Clickhouse database. The events present in the Clickhouse database can be visualized through Grafana or Vizual App.
 
+## Architecture diagram
+
+![Arch. Diagram](.readme_assets/kubviz.png) 
 
 ###  How to install and run Kubviz:
 
