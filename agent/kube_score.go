@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/kube-tarian/kubviz/constants"
 	"github.com/kube-tarian/kubviz/model"
@@ -21,23 +20,27 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg 
 	nsList, err := clientset.CoreV1().
 		Namespaces().
 		List(context.Background(), metav1.ListOptions{})
-	//checkErr(err)
-	fmt.Println(err)
+	if err != nil {
+		log.Println("Error occurred while getting client set for kube-score: ", err)
+		return
+	}
 
+	log.Printf("Namespace size: %d", len(nsList.Items))
 	for _, n := range nsList.Items {
-		log.Println("Publishing kube-score recommendations for namespace: ", n.Namespace)
-		publish(n.Namespace, js, errCh)
+		log.Printf("Publishing kube-score recommendations for namespace: %s\n", n.Name)
+		publish(n.Name, js, errCh)
 	}
 }
 
 func publish(ns string, js nats.JetStreamContext, errCh chan error) {
-	out, err := executeCommand("kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} bash -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - " +
-		" --kubeconfig=" + constants.KUBECONFIG)
+	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - "
+	log.Printf("Command:  %#v,", cmd)
+	out, err := executeCommand(cmd)
 	if err != nil {
 		log.Println("Error occurred while running kube-score: ", err)
 		errCh <- err
 	}
-	err = publishKubescoreMetrics(uuid.New().String(), "all", out, js)
+	err = publishKubescoreMetrics(uuid.New().String(), ns, out, js)
 	if err != nil {
 		errCh <- err
 	}
@@ -57,6 +60,7 @@ func publishKubescoreMetrics(id string, ns string, recommendations string, js na
 		return err
 	}
 	log.Printf("Recommendations with ID:%s has been published\n", id)
+	log.Printf("Recommendations  :%#v", recommendations)
 	return nil
 }
 
@@ -65,8 +69,7 @@ func executeCommand(command string) (string, error) {
 	stdout, err := cmd.Output()
 
 	if err != nil {
-		log.Println(err.Error())
-		return "", err
+		log.Println("Execute Command Error", err.Error())
 	}
 
 	// Print the output
