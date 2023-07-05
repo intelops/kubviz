@@ -109,6 +109,6 @@ See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ## License
 
-Refer the licence - [LICENCE](./LICENSE).
+Refer the licence - [LICENCE](./LICENSE.md).
 
 ## Join our Slack channel
