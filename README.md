@@ -67,7 +67,7 @@ helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Add
 
 ### Cluster Event Tracking
 
-<img src=".readme_assets/kubviz.jpeg" alt="Cluster Events" width="525" align="right">
+<img src=".readme_assets/kubedata.png" alt="Cluster Events" width="525" align="right">
 
 <br>
 
@@ -76,6 +76,20 @@ Use kubviz to monitor your cluster events, including:
 - State changes 
 - Errors
 - Other messages that occur in the cluster
+
+<br>
+
+<br clear="all">
+
+### Deprecated Kubernetes APIs
+
+<img src=".readme_assets/deleted_apis.png" alt="Deprecated Kubernetes APIs" width="525" align="right">
+
+<br>
+
+- Visualize Deprecated Kubernetes APIs: KubeViz provides a clear visualization of deprecated Kubernetes APIs, allowing users to easily identify and update their usage to comply with the latest Kubernetes versions
+- Track Outdated Images: With KubeViz, you can track and monitor outdated images within your clusters, ensuring that you are using the most up-to-date and secure versions.
+- Identify Deleted APIs: KubeViz helps you identify any deleted APIs in your clusters, guiding you to find alternative approaches or replacements to adapt to changes in Kubernetes APIs.
 
 <br>
 
