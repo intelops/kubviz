@@ -32,19 +32,19 @@ func GetClickHouseConnection(url string) (*sql.DB, error) {
 func CreateSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
 		CREATE TABLE IF NOT EXISTS events (
-			id           UUID,
-			op_type      String,
-			name         String,
-			namespace    String,
-			kind         String,
-			message      String,
-			reason       String,
-			host         String,
-			event        String,
-			first_time   DateTime,
-			last_time    DateTime,
-			event_time   DateTime,
-			cluster_name String
+			ClusterName String,
+			Id           UUID,
+			EventTime   DateTime,
+			OpType      String,
+			Name         String,
+			Namespace    String,
+			Kind         String,
+			Message      String,
+			Reason       String,
+			Host         String,
+			Event        String,
+			FirstTime   DateTime,
+			LastTime    DateTime
 		) engine=File(TabSeparated)
 	`)
 
@@ -259,12 +259,14 @@ func InsertDeletedAPI(connect *sql.DB, deletedAPI model.DeletedAPI) {
 func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO events (id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time, cluster_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO events (ClusterName, Id, EventTime, OpType, Name, Namespace, Kind, Message, Reason, Host, Event, FirstTime, LastTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	eventJson, _ := json.Marshal(metrics.Event)
 	if _, err := stmt.Exec(
+		metrics.ClusterName,
 		metrics.Event.UID,
+		time.Now(),
 		metrics.Type,
 		metrics.Event.Name,
 		metrics.Event.Namespace,
@@ -275,8 +277,6 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 		string(eventJson),
 		metrics.Event.FirstTimestamp.Time,
 		metrics.Event.LastTimestamp.Time,
-		time.Now(),
-		metrics.ClusterName,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -286,7 +286,7 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 }
 
 func RetriveKetallEvent(connect *sql.DB) ([]model.Resource, error) {
-	rows, err := connect.Query("SELECT Cluster_Name, Namespace, Kind, Resource, Age FROM getall_resources")
+	rows, err := connect.Query("SELECT ClusterName, Namespace, Kind, Resource, Age FROM getall_resources")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -309,7 +309,7 @@ func RetriveKetallEvent(connect *sql.DB) ([]model.Resource, error) {
 }
 
 func RetriveOutdatedEvent(connect *sql.DB) ([]model.CheckResultfinal, error) {
-	rows, err := connect.Query("SELECT Cluster_Name, Namespace, Pod, Current_Image, Current_Tag, Latest_Version, Versions_Behind FROM outdated_images")
+	rows, err := connect.Query("SELECT ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind FROM outdated_images")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -355,7 +355,7 @@ func RetriveKubepugEvent(connect *sql.DB) ([]model.Result, error) {
 }
 
 func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
-	rows, err := connect.Query("SELECT id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time, cluster_name FROM events")
+	rows, err := connect.Query("SELECT ClusterName, Id, EventTime, OpType, Name, Namespace, Kind, Message, Reason, Host, Event, FirstTime, LastTime FROM events")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -364,7 +364,7 @@ func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
 	var events []model.DbEvent
 	for rows.Next() {
 		var dbEvent model.DbEvent
-		if err := rows.Scan(&dbEvent.Id, &dbEvent.Op_type, &dbEvent.Name, &dbEvent.Namespace, &dbEvent.Kind, &dbEvent.Message, &dbEvent.Host, &dbEvent.Event, &dbEvent.First_time, &dbEvent.Last_time, &dbEvent.Event_time, &dbEvent.Cluster_name); err != nil {
+		if err := rows.Scan(&dbEvent.Cluster_name, &dbEvent.Id, &dbEvent.Event_time, &dbEvent.Op_type, &dbEvent.Name, &dbEvent.Namespace, &dbEvent.Kind, &dbEvent.Message, &dbEvent.Host, &dbEvent.Event, &dbEvent.First_time, &dbEvent.Last_time); err != nil {
 			log.Printf("Error: %s", err)
 			return nil, err
 		}
