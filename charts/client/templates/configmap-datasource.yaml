@@ -1,0 +1,16 @@
+{{- if .Values.datasources.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "client.fullname" . }}-clickhouse-datasource
+  labels:
+    {{ .Values.datasources.label }}: {{ .Values.datasources.labelValue | quote }}
+data:
+  datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+      - name: vertamedia-clickhouse-datasource
+        type: vertamedia-clickhouse-datasource
+        url: http://kubviz-client-clickhouse:8123
+        access: proxy
+{{- end }}

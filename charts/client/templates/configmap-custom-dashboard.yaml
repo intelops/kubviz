@@ -1,0 +1,294 @@
+{{- if .Values.dashboards.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "client.fullname" . }}-kubedatas-dashboard
+  labels:
+    {{ .Values.dashboards.label }}: {{ .Values.dashboards.labelValue | quote }}
+data:
+  kubedatas.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 15,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This stats panel shows the pod creation events.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "red",
+                "mode": "fixed"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "vertical",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT\n    count()\nFROM default.events\n\nWHERE Kind IN ('Pod') AND Reason IN ('Created') AND Namespace IN ($namespace)\n",
+              "rawQuery": "SELECT\n    count()\nFROM default.events\n\nWHERE Kind IN ('Pod') AND Reason IN ('Created') AND Namespace IN ('argocd','quality','default','sonarqube','observability')",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "number of pod creation events in Namespace: $namespace",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This table panal shows all the kubernetes datas.\nif its not showing the data check the time range and refresh.it will take some time to load the data. wait for sometime before clicking refresh another time.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "color-text",
+                "filterable": true,
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 16,
+            "w": 24,
+            "x": 0,
+            "y": 7
+          },
+          "id": 2,
+          "options": {
+            "footer": {
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "9.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT * FROM default.events\nWHERE Namespace IN ($namespace) AND Reason IN ($reason) AND Kind IN ($kind) AND ClusterName IN ($clusterName)",
+              "rawQuery": "SELECT * FROM default.events\nWHERE Namespace IN ('argocd','quality','default','sonarqube','observability') AND Reason IN ('OperationStarted','ResourceUpdated','OperationCompleted','FailedMount','ApplyClusterRoles','ApplyRoles','UpdateFailed','Unhealthy','InstallPackageRevision','Valid','Updated','RenderCRD','BackOff','BindClusterRole','SyncPackage') AND Kind IN ('Application','Pod','ProviderRevision','CompositeResourceDefinition','Namespace','ExternalSecret','Provider','SecretStore') AND ClusterName IN ('kubviz')",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Kubernetes",
+          "transparent": true,
+          "type": "table"
+        }
+      ],
+      "schemaVersion": 37,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "selected": false,
+              "text": "All",
+              "value": "$__all"
+            },
+            "datasource": {
+              "type": "vertamedia-clickhouse-datasource",
+              "uid": "{{ .Values.datasources.uid }}"
+            },
+            "definition": "SELECT Namespace FROM  default.events",
+            "hide": 0,
+            "includeAll": true,
+            "multi": true,
+            "name": "namespace",
+            "options": [],
+            "query": "SELECT Namespace FROM  default.events",
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {
+              "selected": false,
+              "text": "All",
+              "value": "$__all"
+            },
+            "datasource": {
+              "type": "vertamedia-clickhouse-datasource",
+              "uid": "{{ .Values.datasources.uid }}"
+            },
+            "definition": "SELECT Reason FROM default.events",
+            "hide": 0,
+            "includeAll": true,
+            "multi": true,
+            "name": "reason",
+            "options": [],
+            "query": "SELECT Reason FROM default.events",
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {
+              "selected": false,
+              "text": "All",
+              "value": "$__all"
+            },
+            "datasource": {
+              "type": "vertamedia-clickhouse-datasource",
+              "uid": "{{ .Values.datasources.uid }}"
+            },
+            "definition": "SELECT Kind FROM default.events",
+            "hide": 0,
+            "includeAll": true,
+            "multi": true,
+            "name": "kind",
+            "options": [],
+            "query": "SELECT Kind FROM default.events",
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {
+              "selected": false,
+              "text": "All",
+              "value": "$__all"
+            },
+            "datasource": {
+              "type": "vertamedia-clickhouse-datasource",
+              "uid": "{{ .Values.datasources.uid }}"
+            },
+            "definition": "SELECT ClusterName FROM default.events",
+            "hide": 0,
+            "includeAll": true,
+            "multi": true,
+            "name": "clusterName",
+            "options": [],
+            "query": "SELECT ClusterName FROM default.events",
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-15m",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "Kubedata",
+      "uid": "Qq-FK1rVz",
+      "version": 1,
+      "weekStart": ""
+    }
+{{- end }}
