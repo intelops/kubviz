@@ -49,7 +49,8 @@ kubectl create namespace kubviz
 helm repo add kubviz https://kube-tarian.github.io/kubviz/
 helm repo update
 
-helm upgrade -i kubviz-client kubviz/client -n kubviz
+token=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token"
 ```
 NOTE: The kubviz client will also install NATS and Clickhouse. NATS service is exposed as Load balancer and the external IP of this service kubviz-client-nats-external has to be noted and passed during the kubviz agent installation.
 
@@ -57,14 +58,9 @@ NOTE: The kubviz client will also install NATS and Clickhouse. NATS service is e
 kubectl get services kubviz-client-nats-external -n kubviz --output jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ```
 
-#### Grafana Installation
-```bash
-helm upgrade -i grafana-kubviz kubviz/grafana -n kubviz
-```
-
 #### Agent Installation
 ```bash
-helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address>
+helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token"
 ```
 ## Use Cases
 
