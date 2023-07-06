@@ -97,12 +97,12 @@ grafana:
   enabled: false
 
 dashboards:
-  enabled: false
+  enabled: true
   label: grafana_dashboard
   labelValue: "1"
 
 datasources:
-  enabled: false
+  enabled: true
   label: grafana_datasource
   labelValue: "1"
   uid: vertamedia-clickhouse-datasource

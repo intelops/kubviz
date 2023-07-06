@@ -33,5 +33,5 @@ dependencies:
     repository: https://kube-tarian.github.io/kubviz/
   - name: grafana
     condition: grafana.enabled
-    version: 6.26.13
-    repository: https://kube-tarian.github.io/kubviz/
+    version: 1.0.0
+    repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
