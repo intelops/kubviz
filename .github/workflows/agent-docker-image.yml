@@ -17,7 +17,7 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE: ${{ github.repository }}/agent
+  IMAGE: ${{ github.repository }}/kubviz-agent
 
 jobs:
   build:
@@ -62,7 +62,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./dockerfiles/agent/Dockerfile
+          file: ./dockerfiles/agent/kubviz/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -75,8 +75,8 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           context: .
-          file: ./dockerfiles/agent/Dockerfile
-          push: true
+          file: ./dockerfiles/agent/kubviz/Dockerfile
+          push: false
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE }}:pr-${{ github.event.pull_request.number }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
