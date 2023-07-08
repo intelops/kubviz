@@ -1,0 +1,17 @@
+{{- if .Values.git_bridge.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "agent.fullname" . }}-git
+  labels:
+    {{- include "agent.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http-git
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "agent.selectorLabels" . | nindent 4 }}
+{{- end }}

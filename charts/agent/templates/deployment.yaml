@@ -35,7 +35,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
 #          livenessProbe:
 #            httpGet:
@@ -54,6 +54,28 @@ spec:
             value: {{ .Values.nats.host }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+{{- if .Values.git_bridge.enabled }}
+        - name: git-bridge
+          image: "{{ .Values.git_bridge.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.container_bridge.image.pullPolicy }}
+          ports:
+            - name: http-git
+              containerPort: 8081
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.git_bridge.resources | nindent 12 }}
+{{- end }}
+{{- if .Values.container_bridge.enabled }}
+        - name: container-bridge
+          image: "{{ .Values.container_bridge.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.container_bridge.image.pullPolicy }}
+          ports:
+            - name: http-container
+              containerPort: 8082
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.container_bridge.resources | nindent 12 }}
+{{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
