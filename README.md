@@ -62,22 +62,7 @@ kubectl get services kubviz-client-nats-external -n kubviz --output jsonpath='{.
 ```bash
 helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token" --set git_bridge.enabled=true --set git_bridge.ingress.hosts[0].host="<HOST NAME>",git_bridge.ingress.hosts[0].paths[0].path=/ --set container_bridge.enabled=true --set container_bridge.ingress.hosts[0].host="<HOST NAME>",container_bridge.ingress.hosts[0].paths[0].path=/ 
 ```
-
-The following table lists the configurable parameters of the Agent Helm chart and their default values.
-
-| Parameter                  | Description                                     | Default                                                    |
-| -----------------------    | ---------------------------------------------   | ---------------------------------------------------------- |
-| `image.repository`         | image repository                                | `ghcr.io/kube-tarian/kubviz/agent`                         |
-| `image.tag`                | Image tag                                       | `latest`                                                   |
-| `image.pullPolicy`         | Image pull policy                               | `Always`                                                   |
-| `git_bridge.enabled`       | Enable Git Bridge Agent                         | `false`                                                    |
-| `container_bridge.enabled` | Enable Container Bridge Agent                   | `false`                                                    |
-| `service.name`             | Kubernetes service name                         | `Node`                                                     |
-| `service.type`             | Kubernetes service type exposing port           | `NodePort`                                                 |
-| `service.port`             | TCP Port for this service                       | 3000                                                       |
-| `resources.limits.memory`  | Memory resource limits                          | `128m`                                                     |
-| `resources.limits.cpu`     | CPU resource limits                             | `100m`                                                     |
-
+NOTE: Replace <INGRESS HOSTNAME> with the desired hostname for the Git Bridge and Container Bridge Ingress configurations.
 
 ## Use Cases
 
