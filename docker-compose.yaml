@@ -47,7 +47,7 @@ services:
         entrypoint: '/k8smetrics_agent'
         build:
             context: ./
-            dockerfile: dockerfiles/agent/Dockerfile.Kubviz
+            dockerfile: dockerfiles/agent/kubviz/Dockerfile
         restart: always
         environment:
             NATS_TOKEN: 'UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD'
@@ -71,7 +71,7 @@ services:
         entrypoint: '/agent'
         build:
             context: ./
-            dockerfile: dockerfiles/agent/Dockerfile.Git
+            dockerfile: dockerfiles/agent/git/Dockerfile
         restart: always
         environment:
             NATS_TOKEN: 'UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD'
@@ -95,7 +95,7 @@ services:
         entrypoint: '/agent'
         build:
             context: ./
-            dockerfile: dockerfiles/agent/Dockerfile.Container
+            dockerfile: dockerfiles/agent/container/Dockerfile
         restart: always
         environment:
             NATS_TOKEN: 'UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD'
@@ -119,7 +119,7 @@ services:
         entrypoint: '/k8smetrics_client'
         build:
             context: ./
-            dockerfile: dockerfiles/client/Dockerfile.Clients
+            dockerfile: dockerfiles/client/Dockerfile
         restart: always
         environment:
             NATS_TOKEN: 'UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD'
