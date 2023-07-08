@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/kube-tarian/kubviz/agent
+  repository: ghcr.io/kube-tarian/kubviz/kubviz-agent
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -45,16 +45,16 @@ service:
 git_bridge:
   enabled: false
   image:
-    repository: ghcr.io/kube-tarian/kubviz
+    repository: ghcr.io/kube-tarian/git-agent
     pullPolicy: Always
     tag: "latest"
   resources: 
      limits:
-       cpu: 100m
-       memory: 128Mi
+       cpu: 200m
+       memory: 256Mi
      requests:
-       cpu: 100m
-       memory: 128Mi
+       cpu: 200m
+       memory: 256Mi
   ingress:
     enabled: true
     annotations: {}
@@ -74,16 +74,16 @@ git_bridge:
 container_bridge:
   enabled: false
   image:
-    repository: ghcr.io/kube-tarian/kubviz
+    repository: ghcr.io/kube-tarian/container-agent
     pullPolicy: Always
     tag: "latest"
   resources: 
      limits:
-       cpu: 100m
-       memory: 128Mi
+       cpu: 200m
+       memory: 256Mi
      requests:
-       cpu: 100m
-       memory: 128Mi
+       cpu: 200m
+       memory: 256Mi
   ingress:
     enabled: true
     annotations: {}
@@ -111,17 +111,13 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
 
 autoscaling:
   enabled: false
