@@ -1,20 +1,24 @@
 package clickhouse
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go"
+	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+
+	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/kube-tarian/kubviz/client/pkg/config"
 	"github.com/kube-tarian/kubviz/model"
 )
 
 type DBClient struct {
-	conn *sql.DB
-	conf *config.Config
+	splconn driver.Conn
+	conn    *sql.DB
+	conf    *config.Config
 }
 type DBInterface interface {
 	InsertRakeesMetrics(model.RakeesMetrics)
@@ -33,12 +37,23 @@ type DBInterface interface {
 }
 
 func NewDBClient(conf *config.Config) (DBInterface, error) {
+	ctx := context.Background()
 	log.Println("Connecting to Clickhouse DB and creating schemas...")
-	conn, err := sql.Open("clickhouse", DbUrl(conf))
+	splconn, err := clickhouse.Open(&clickhouse.Options{
+		Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+		Debug: true,
+		Debugf: func(format string, v ...any) {
+			fmt.Printf(format, v)
+		},
+		Settings: clickhouse.Settings{
+			"allow_experimental_object_type": 1,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
-	if err := conn.Ping(); err != nil {
+
+	if err := splconn.Ping(ctx); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
@@ -48,11 +63,22 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 	}
 	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerTable, gitTable}
 	for _, table := range tables {
-		if _, err = conn.Exec(string(table)); err != nil {
+		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
 		}
 	}
-	return &DBClient{conn: conn, conf: conf}, nil
+	stdconn := clickhouse.OpenDB(&clickhouse.Options{
+		Addr: []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+	})
+	if err := stdconn.Ping(); err != nil {
+		if exception, ok := err.(*clickhouse.Exception); ok {
+			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+		} else {
+			fmt.Println(err)
+		}
+		return nil, err
+	}
+	return &DBClient{splconn: splconn, conn: stdconn, conf: conf}, nil
 }
 
 func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
@@ -203,29 +229,32 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	}
 }
 func (c *DBClient) InsertGitEvent(event string) {
-	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(fmt.Sprintf("INSERT INTO git_json FORMAT JSONAsObject %v", event))
-	)
-	defer stmt.Close()
-
-	if _, err := stmt.Exec(); err != nil {
+	ctx := context.Background()
+	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO git_json")
+	if err != nil {
 		log.Fatal(err)
 	}
-	if err := tx.Commit(); err != nil {
+
+	if err = batch.Append(event); err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Send(); err != nil {
 		log.Fatal(err)
 	}
 }
 func (c *DBClient) InsertContainerEvent(event string) {
-	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(fmt.Sprintf("INSERT INTO container_bridge FORMAT JSONAsObject %v", event))
-	)
-	defer stmt.Close()
-	if _, err := stmt.Exec(); err != nil {
+	ctx := context.Background()
+	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO container_bridge")
+	if err != nil {
 		log.Fatal(err)
 	}
-	if err := tx.Commit(); err != nil {
+
+	if err = batch.Append(event); err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Send(); err != nil {
 		log.Fatal(err)
 	}
 }
