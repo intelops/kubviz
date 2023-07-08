@@ -59,10 +59,23 @@ kubectl get services kubviz-client-nats-external -n kubviz --output jsonpath='{.
 ```
 
 #### Agent Installation
+
+##### Deploying Agent Cluster on the Same Kubernetes Cluster as kubeviz Client:
+1. Make sure you have the kubeviz client running on your Kubernetes cluster.
+2. Run the following command to deploy the agent cluster:
+
 ```bash
 helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token" --set git_bridge.enabled=true --set git_bridge.ingress.hosts[0].host="<HOST NAME>",git_bridge.ingress.hosts[0].paths[0].path=/ --set container_bridge.enabled=true --set container_bridge.ingress.hosts[0].host="<HOST NAME>",container_bridge.ingress.hosts[0].paths[0].path=/ 
 ```
-NOTE: Replace <INGRESS HOSTNAME> with the desired hostname for the Git Bridge and Container Bridge Ingress configurations.
+3. Replace "NATS IP Address" with the IP address of your NATS server.
+4. Replace "INGRESS HOSTNAME" with the desired hostname for the Git Bridge and Container Bridge Ingress configurations.
+
+##### Deploying Agent Cluster on a Different Kubernetes Cluster:
+1. Run the following command to deploy the agent cluster:
+```bash
+helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token"  
+```
+2. Replace "NATS IP Address" with the IP address of your NATS server.
 
 ## Use Cases
 
