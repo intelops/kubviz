@@ -1,0 +1,33 @@
+for local testing:
+
+clone the repo
+
+in agent/kubviz/k8smetrics_agent.go file change the code like this
+
+`func main() {
+	env := Development
+    `
+
+create a file named civo in the repo root directory
+
+paste your kubeconfig content in this file
+
+docker-compose up -d (to run agents and client)
+
+open postman ,
+
+send a sample json to localhost:8090/github
+
+`
+{
+    "author":"intelops"
+}
+`
+this will populate the git_json table
+
+
+to populate the container_bridge table follow these steps
+
+docker pull ubuntu:latest
+docker tag ubuntu:latest localhost:5001/ubuntu:v1
+docker push localhost:5001/ubuntu:v1

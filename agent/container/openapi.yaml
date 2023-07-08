@@ -1,0 +1,38 @@
+openapi: "3.0.1"
+
+info:
+  title: Container bridge Open REST API Specification
+  description: Container bridge Open REST API specification
+  version: 1.0.0
+# package: agent
+
+servers:
+  - url: /
+
+paths:
+  /status:
+    get:
+      tags:
+        - private
+      summary: Kubernetes readiness and liveness probe endpoint
+      responses:
+        '200':
+          description: successful operation
+
+  /api-docs:
+    get:
+      tags:
+        - public
+      summary: List of APIs provided by the service
+      responses:
+        '200':
+          description: OK
+
+  /event/docker:
+    post:
+      tags:
+        - public
+      summary: Post Docker artifactory events
+      responses:
+        '200':
+          description: OK

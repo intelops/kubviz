@@ -31,12 +31,8 @@ func PublishAllResources(result model.Resource, js nats.JetStreamContext) error 
 	return nil
 }
 
-func GetAllResources(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+func GetAllResources(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		errCh <- err
-	}
 	// TODO: upto this uncomment for production
 	// Create a new discovery client to discover all resources in the cluster
 	dc := discovery.NewDiscoveryClientForConfigOrDie(config)

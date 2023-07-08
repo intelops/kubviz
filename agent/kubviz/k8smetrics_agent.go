@@ -33,14 +33,22 @@ import (
 
 	//  _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 // constants for jetstream
 const (
 	streamName     = "METRICS"
 	streamSubjects = "METRICS.*"
-	eventSubject   = "METRICS.event"
+	eventSubject   = "METRICS.kubvizevent"
 	allSubject     = "METRICS.all"
+)
+
+type RuningEnv int
+
+const (
+	Development RuningEnv = iota
+	Production
 )
 
 // env variables for getting
@@ -49,9 +57,14 @@ var (
 	ClusterName string = os.Getenv("CLUSTER_NAME")
 	token       string = os.Getenv("NATS_TOKEN")
 	natsurl     string = os.Getenv("NATS_ADDRESS")
+	//for local testing provide the location of kubeconfig
+	// inside the civo file paste your kubeconfig
+	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)
+	cluster_conf_loc string = os.Getenv("CONFIG_LOCATION")
 )
 
 func main() {
+	env := Production
 	// error channels declared for the go routines
 	outdatedErrChan := make(chan error, 1)
 	kubePreUpgradeChan := make(chan error, 1)
@@ -70,15 +83,34 @@ func main() {
 	// creating a stream with stream name METRICS
 	err = createStream(js)
 	checkErr(err)
-	// getting kubernetes clientset
-	clientset := getK8sClient()
-	// starting all the go routines
-	go outDatedImages(js, &wg, outdatedErrChan)
-	go KubePreUpgradeDetector(js, &wg, kubePreUpgradeChan)
-	go GetAllResources(js, &wg, getAllResourceChan)
-	go RakeesOutput(js, &wg, RakeesErrChan)
-	go getK8sEvents(clientset)
-	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+	if env != Production {
+		config, err := clientcmd.BuildConfigFromFlags("", cluster_conf_loc)
+		if err != nil {
+			log.Fatal(err)
+		}
+		clientset := getK8sClient(config)
+		// starting all the go routines
+		go outDatedImages(config, js, &wg, outdatedErrChan)
+		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+		go GetAllResources(config, js, &wg, getAllResourceChan)
+		go RakeesOutput(config, js, &wg, RakeesErrChan)
+		go getK8sEvents(clientset)
+		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+	} else {
+		config, err := rest.InClusterConfig()
+		if err != nil {
+			log.Fatal(err)
+		}
+		clientset := getK8sClient(config)
+		// starting all the go routines
+		go outDatedImages(config, js, &wg, outdatedErrChan)
+		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+		go GetAllResources(config, js, &wg, getAllResourceChan)
+		go RakeesOutput(config, js, &wg, RakeesErrChan)
+		go getK8sEvents(clientset)
+		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+	}
+
 	wg.Wait()
 	// once the go routines completes we will close the error channels
 	close(outdatedErrChan)
@@ -179,13 +211,7 @@ func createStream(js nats.JetStreamContext) error {
 
 }
 
-func getK8sClient() *kubernetes.Clientset {
-	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		panic(err.Error())
-	}
-
+func getK8sClient(config *rest.Config) *kubernetes.Clientset {
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	checkErr(err)

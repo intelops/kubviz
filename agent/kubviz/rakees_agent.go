@@ -10,7 +10,7 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/kube-tarian/kubviz/agent/rakkess"
+	"github.com/kube-tarian/kubviz/agent/kubviz/rakkess"
 	"github.com/kube-tarian/kubviz/model"
 	"github.com/nats-io/nats.go"
 	"k8s.io/client-go/kubernetes"
@@ -34,18 +34,7 @@ func accessToOutcome(access rakkess.Access) (rakkess.Outcome, error) {
 	}
 }
 
-func RakeesOutput(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
-	// var kubeConfig string
-	// if home := homedir.HomeDir(); home != "" {
-	// 	kubeConfig = filepath.Join(home, ".kube", "dev-config")
-	// }
-	// Build Kubernetes configuration from flags
-	// config, err := clientcmd.BuildConfigFromFlags("", kubeConfig)
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func RakeesOutput(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	// Create a new Kubernetes client
 	client, err := kubernetes.NewForConfig(config)
 	if err != nil {

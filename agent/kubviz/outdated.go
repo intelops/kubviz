@@ -66,9 +66,9 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 	return nil
 }
 
-func outDatedImages(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+func outDatedImages(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
-	images, err := ListImages()
+	images, err := ListImages(config)
 	if err != nil {
 		log.Println("unable to list images")
 		errCh <- err
@@ -162,13 +162,8 @@ func ParseImageName(imageName string) (string, string, string, error) {
 
 	return hostname, fmt.Sprintf("%s/%s", namespace, image), tag, nil
 }
-func ListImages() ([]model.RunningImage, error) {
-	var config *rest.Config
+func ListImages(config *rest.Config) ([]model.RunningImage, error) {
 	var err error
-	config, err = rest.InClusterConfig()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read kubeconfig")
-	}
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create clientset")

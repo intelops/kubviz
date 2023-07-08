@@ -81,7 +81,7 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 	return nil
 }
 
-func KubePreUpgradeDetector(js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
 	swaggerdir, err := os.MkdirTemp("", "kubepug")
 	if err != nil {
@@ -99,7 +99,7 @@ func KubePreUpgradeDetector(js nats.JetStreamContext, wg *sync.WaitGroup, errCh 
 	if err != nil {
 		errCh <- err
 	}
-	result = getResults(kubernetesAPIs)
+	result = getResults(config, kubernetesAPIs)
 	err = publishK8sDepricated_Deleted_Api(result, js)
 	errCh <- err
 	// b, _ := json.MarshalIndent(result, "", " ")
@@ -217,16 +217,11 @@ func getGroupVersionKind(value map[string]interface{}) (group, version, kind str
 	return group, version, kind
 }
 
-func getResults(kubeAPIs model.KubernetesAPIs) *model.Result {
+func getResults(configRest *rest.Config, kubeAPIs model.KubernetesAPIs) *model.Result {
 	var res model.Result
 	var deleted []model.DeletedAPI
 	var deprecated []model.DeprecatedAPI
 	var resourceName string
-
-	configRest, err := rest.InClusterConfig()
-	if err != nil {
-		panic(err.Error())
-	}
 
 	client, err := dynamic.NewForConfig(configRest)
 	if err != nil {
