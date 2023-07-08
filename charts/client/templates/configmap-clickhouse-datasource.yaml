@@ -1,0 +1,18 @@
+{{- if .Values.datasources.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "client.fullname" . }}-clickhouse-datasource
+  labels:
+    {{ .Values.datasources.label }}: {{ .Values.datasources.labelValue | quote }}
+data:
+  datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+      - name: ClickHouse
+        type: grafana-clickhouse-datasource
+        jsonData:
+          port: 9000
+          server: kubviz-client-clickhouse
+          tlsSkipVerify: true
+{{- end }}
