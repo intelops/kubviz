@@ -65,9 +65,15 @@ kubectl get services kubviz-client-nats-external -n kubviz --output jsonpath='{.
 2. Run the following command to deploy the kubeviz agent:
 
 ```bash
-helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token" --set git_bridge.enabled=true --set git_bridge.ingress.hosts[0].host="<HOST NAME>",git_bridge.ingress.hosts[0].paths[0].path=/ --set container_bridge.enabled=true --set container_bridge.ingress.hosts[0].host="<HOST NAME>",container_bridge.ingress.hosts[0].paths[0].path=/ 
+helm upgrade -i kubviz-agent kubviz/agent -n kubviz \
+  --set nats.host=<NATS IP ADDRESS> \
+  --set "nats.auth.token=$token" \
+  --set git_bridge.enabled=true \
+  --set "git_bridge.ingress.hosts[0].host=<INGRESS HOSTNAME>",git_bridge.ingress.hosts[0].paths[0].path=/ \
+  --set container_bridge.enabled=true \
+  --set "container_bridge.ingress.hosts[0].host=<INGRESS HOSTNAME>",container_bridge.ingress.hosts[0].paths[0].path=/
 ```
-3. Replace "NATS IP Address" with the IP address of your NATS server.
+3. Replace "NATS IP ADDRESS" with the IP address of your NATS server.
 4. Replace "INGRESS HOSTNAME" with the desired hostname for the Git Bridge and Container Bridge Ingress configurations.
 
 ##### Deploying Agent on a Different Kubernetes Cluster:
