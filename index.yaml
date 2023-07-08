@@ -3,6 +3,16 @@ entries:
   agent:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-07-08T17:43:24.805555456Z"
+    description: A Helm chart for kubeviz agent
+    digest: 3bcd7ba86ddc3fc8aedd0449dff76a7b1b7ae753a214da100359e68b1acc5ef6
+    name: agent
+    type: application
+    urls:
+    - https://github.com/kube-tarian/kubviz/releases/download/agent-0.1.10/agent-0.1.10.tgz
+    version: 0.1.10
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-07-08T12:55:35.139614668Z"
     description: A Helm chart for kubeviz agent
     digest: 079e425bfdd5f4c13d0fb45e5b99376bb9a24299d16ac3e14a840394580fe763
