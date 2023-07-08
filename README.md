@@ -60,7 +60,7 @@ kubectl get services kubviz-client-nats-external -n kubviz --output jsonpath='{.
 
 #### Agent Installation
 ```bash
-helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token"
+helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token" --set git_bridge.enabled=true --set git_bridge.ingress.hosts[0].host="<HOST NAME>",git_bridge.ingress.hosts[0].paths[0].path=/ --set container_bridge.enabled=true --set container_bridge.ingress.hosts[0].host="<HOST NAME>",container_bridge.ingress.hosts[0].paths[0].path=/ 
 ```
 
 The following table lists the configurable parameters of the Agent Helm chart and their default values.
