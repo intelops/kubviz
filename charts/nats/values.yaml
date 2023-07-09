@@ -674,3 +674,4 @@ upgrade: false
 
 service:
   type: LoadBalancer
+
