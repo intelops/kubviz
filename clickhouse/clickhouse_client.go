@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go"
-	"github.com/kube-tarian/kubviz/model"
+	"github.com/intelops/kubviz/model"
 )
 
 func GetClickHouseConnection(url string) (*sql.DB, error) {

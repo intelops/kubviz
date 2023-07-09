@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/kube-tarian/kubviz/client/pkg/clickhouse"
-	"github.com/kube-tarian/kubviz/client/pkg/config"
+	"github.com/intelops/kubviz/client/pkg/clickhouse"
+	"github.com/intelops/kubviz/client/pkg/config"
 	"github.com/nats-io/nats.go"
 )
 

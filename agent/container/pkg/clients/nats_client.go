@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/kube-tarian/kubviz/agent/container/pkg/config"
+	"github.com/intelops/kubviz/agent/container/pkg/config"
 
 	"github.com/nats-io/nats.go"
 )

@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/kube-tarian/kubviz/agent/container/api"
-	"github.com/kube-tarian/kubviz/agent/container/pkg/clients"
+	"github.com/intelops/kubviz/agent/container/api"
+	"github.com/intelops/kubviz/agent/container/pkg/clients"
 )
 
 type APIHandler struct {

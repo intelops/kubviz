@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/kube-tarian/kubviz/agent/git/pkg/application"
-	"github.com/kube-tarian/kubviz/agent/git/pkg/clients"
-	"github.com/kube-tarian/kubviz/agent/git/pkg/config"
+	"github.com/intelops/kubviz/agent/git/pkg/application"
+	"github.com/intelops/kubviz/agent/git/pkg/clients"
+	"github.com/intelops/kubviz/agent/git/pkg/config"
 
 	"github.com/kelseyhightower/envconfig"
 )

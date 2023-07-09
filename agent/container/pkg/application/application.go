@@ -8,10 +8,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/intelops/kubviz/agent/container/pkg/clients"
+	"github.com/intelops/kubviz/agent/container/pkg/config"
+	"github.com/intelops/kubviz/agent/container/pkg/handler"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/kube-tarian/kubviz/agent/container/pkg/clients"
-	"github.com/kube-tarian/kubviz/agent/container/pkg/config"
-	"github.com/kube-tarian/kubviz/agent/container/pkg/handler"
 )
 
 type Application struct {

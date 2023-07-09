@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/kube-tarian/kubviz/client/pkg/clickhouse"
+	"github.com/intelops/kubviz/client/pkg/clickhouse"
 	"github.com/nats-io/nats.go"
 )
 
