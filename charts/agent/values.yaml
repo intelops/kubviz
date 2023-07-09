@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/kube-tarian/kubviz/kubviz-agent
+  repository: ghcr.io/intelops/kubviz/kubviz-agent
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -45,7 +45,7 @@ service:
 git_bridge:
   enabled: false
   image:
-    repository: ghcr.io/kube-tarian/git-agent
+    repository: ghcr.io/intelops/git-agent
     pullPolicy: Always
     tag: "latest"
   resources: 
@@ -74,7 +74,7 @@ git_bridge:
 container_bridge:
   enabled: false
   image:
-    repository: ghcr.io/kube-tarian/container-agent
+    repository: ghcr.io/intelops/container-agent
     pullPolicy: Always
     tag: "latest"
   resources: 
