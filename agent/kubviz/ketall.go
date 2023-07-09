@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kube-tarian/kubviz/model"
+	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
 	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

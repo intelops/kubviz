@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kube-tarian/kubviz/model"
+	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
 
 	"context"

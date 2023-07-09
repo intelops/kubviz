@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kube-tarian/kubviz/agent/git/api"
+	"github.com/intelops/kubviz/agent/git/api"
 )
 
 func (app *Application) PostGitea(c *gin.Context) {

@@ -3,10 +3,10 @@ package application
 import (
 	"log"
 
+	"github.com/intelops/kubviz/client/pkg/clickhouse"
+	"github.com/intelops/kubviz/client/pkg/clients"
+	"github.com/intelops/kubviz/client/pkg/config"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/kube-tarian/kubviz/client/pkg/clickhouse"
-	"github.com/kube-tarian/kubviz/client/pkg/clients"
-	"github.com/kube-tarian/kubviz/client/pkg/config"
 )
 
 type Application struct {

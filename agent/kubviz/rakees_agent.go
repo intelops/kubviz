@@ -10,8 +10,8 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/kube-tarian/kubviz/agent/kubviz/rakkess"
-	"github.com/kube-tarian/kubviz/model"
+	"github.com/intelops/kubviz/agent/kubviz/rakkess"
+	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
