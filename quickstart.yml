@@ -1,0 +1,150 @@
+version: '3'
+
+services:
+    docker-registry:
+        image: registry:2
+        ports:
+            - '5001:5000'
+        volumes:
+            - ./docker-registry-config.yaml:/etc/docker/registry/config.yml
+        networks:
+            - ch_ntw
+
+    ch_server:
+        image: clickhouse/clickhouse-server:22.6
+        ports:
+            - '8123:8123'
+            - '9000:9000'
+        volumes:
+            - ./ch_server_db:/var/lib/clickhouse
+        networks:
+            - ch_ntw
+
+    nats:
+        image: nats:latest
+        command:
+            - '--jetstream'
+            - '--http_port'
+            - '8222'
+            - '--auth'
+            - 'UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD'
+        environment:
+            NATS_HTTP_PORT_NUMBER: 8222
+        expose:
+            - '4222'
+        ports:
+            - '8222:8222'
+            - '4222:4222'
+        networks:
+            - ch_ntw
+
+    grafana:
+        image: grafana/grafana
+        ports:
+            - 3000:3000
+        networks:
+            - ch_ntw
+
+    kubvizagent:
+        entrypoint: '/k8smetrics_agent'
+        build:
+            context: ./
+            dockerfile: quickstart/dockerfiles/agent/Dockerfile.Kubviz
+        restart: always
+        environment:
+            NATS_TOKEN: 'UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD'
+            NATS_ADDRESS: 'nats://nats:4222'
+            CLUSTER_NAME: 'Kubviz'
+            CONFIG_LOCATION: '/etc/myapp/civo'
+        # ports:
+        #     - '8090:8090'
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 256M
+                reservations:
+                    cpus: '0.25'
+                    memory: 64M
+        networks:
+            - ch_ntw
+
+    gitagent:
+        entrypoint: '/agent'
+        build:
+            context: ./
+            dockerfile: quickstart/dockerfiles/agent/Dockerfile.Git
+        restart: always
+        environment:
+            NATS_TOKEN: 'UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD'
+            NATS_ADDRESS: 'nats://nats:4222'
+            CLUSTER_NAME: 'Kubviz'
+            PORT: '8090'
+        ports:
+            - '8090:8090'
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 256M
+                reservations:
+                    cpus: '0.25'
+                    memory: 64M
+        networks:
+            - ch_ntw
+
+    containeragent:
+        entrypoint: '/agent'
+        build:
+            context: ./
+            dockerfile: quickstart/dockerfiles/agent/Dockerfile.Container
+        restart: always
+        environment:
+            NATS_TOKEN: 'UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD'
+            NATS_ADDRESS: 'nats://nats:4222'
+            CLUSTER_NAME: 'Kubviz'
+            PORT: '8091'
+        ports:
+            - '8091:8091'
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 256M
+                reservations:
+                    cpus: '0.25'
+                    memory: 64M
+        networks:
+            - ch_ntw
+
+    client:
+        entrypoint: '/k8smetrics_client'
+        build:
+            context: ./
+            dockerfile: quickstart/dockerfiles/client/Dockerfile.Clients
+        restart: always
+        environment:
+            NATS_TOKEN: 'UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD'
+            NATS_ADDRESS: 'nats://nats:4222'
+            DB_ADDRESS: 'ch_server'
+            DB_PORT: '9000'
+        depends_on:
+            - containeragent
+            - gitagent
+            - kubvizagent
+        # ports:
+        #     - '8091:8091'
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 256M
+                reservations:
+                    cpus: '0.25'
+                    memory: 64M
+        networks:
+            - ch_ntw
+
+networks:
+    ch_ntw:
+        driver: bridge
