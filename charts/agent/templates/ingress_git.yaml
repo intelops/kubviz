@@ -16,7 +16,7 @@ apiVersion: extensions/v1beta1
 {{- end }}
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-git
   labels:
     {{- include "agent.labels" . | nindent 4 }}
   {{- with .Values.git_bridge.ingress.annotations }}
