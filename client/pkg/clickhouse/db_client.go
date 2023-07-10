@@ -156,11 +156,11 @@ func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 	for _, item := range deprecatedAPI.Items {
 		if _, err := stmt.Exec(
 			deprecatedAPI.ClusterName,
+			item.ObjectName,
 			deprecatedAPI.Description,
 			deprecatedAPI.Kind,
 			deprecated,
 			item.Scope,
-			item.ObjectName,
 		); err != nil {
 			log.Fatal(err)
 		}
@@ -184,13 +184,13 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 	for _, item := range deletedAPI.Items {
 		if _, err := stmt.Exec(
 			deletedAPI.ClusterName,
+			item.ObjectName,
 			deletedAPI.Group,
 			deletedAPI.Kind,
 			deletedAPI.Version,
 			deletedAPI.Name,
 			deleted,
 			item.Scope,
-			item.ObjectName,
 		); err != nil {
 			log.Fatal(err)
 		}
@@ -208,7 +208,9 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	defer stmt.Close()
 	eventJson, _ := json.Marshal(metrics.Event)
 	if _, err := stmt.Exec(
+		metrics.ClusterName,
 		metrics.Event.UID,
+		time.Now(),
 		metrics.Type,
 		metrics.Event.Name,
 		metrics.Event.Namespace,
@@ -219,8 +221,6 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 		string(eventJson),
 		metrics.Event.FirstTimestamp.Time,
 		metrics.Event.LastTimestamp.Time,
-		time.Now(),
-		metrics.ClusterName,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -266,7 +266,7 @@ func DbUrl(conf *config.Config) string {
 	return fmt.Sprintf("tcp://%s:%d?debug=true", conf.DBAddress, conf.DbPort)
 }
 func (c *DBClient) RetriveKetallEvent() ([]model.Resource, error) {
-	rows, err := c.conn.Query("SELECT Cluster_Name, Namespace, Kind, Resource, Age FROM getall_resources")
+	rows, err := c.conn.Query("SELECT ClusterName, Namespace, Kind, Resource, Age FROM getall_resources")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -288,7 +288,7 @@ func (c *DBClient) RetriveKetallEvent() ([]model.Resource, error) {
 	return events, nil
 }
 func (c *DBClient) RetriveOutdatedEvent() ([]model.CheckResultfinal, error) {
-	rows, err := c.conn.Query("SELECT Cluster_Name, Namespace, Pod, Current_Image, Current_Tag, Latest_Version, Versions_Behind FROM outdated_images")
+	rows, err := c.conn.Query("SELECT ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind FROM outdated_images")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -332,7 +332,7 @@ func (c *DBClient) RetriveKubepugEvent() ([]model.Result, error) {
 	return events, nil
 }
 func (c *DBClient) RetrieveKubvizEvent() ([]model.DbEvent, error) {
-	rows, err := c.conn.Query("SELECT id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time, cluster_name FROM events")
+	rows, err := c.conn.Query("SELECT ClusterName, Id, EventTime, OpType, Name, Namespace, Kind, Message, Reason, Host, Event, FirstTime, LastTime FROM events")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -341,7 +341,7 @@ func (c *DBClient) RetrieveKubvizEvent() ([]model.DbEvent, error) {
 	var events []model.DbEvent
 	for rows.Next() {
 		var dbEvent model.DbEvent
-		if err := rows.Scan(&dbEvent.Id, &dbEvent.Op_type, &dbEvent.Name, &dbEvent.Namespace, &dbEvent.Kind, &dbEvent.Message, &dbEvent.Host, &dbEvent.Event, &dbEvent.First_time, &dbEvent.Last_time, &dbEvent.Event_time, &dbEvent.Cluster_name); err != nil {
+		if err := rows.Scan(&dbEvent.Cluster_name, &dbEvent.Id, &dbEvent.Event_time, &dbEvent.Op_type, &dbEvent.Name, &dbEvent.Namespace, &dbEvent.Kind, &dbEvent.Message, &dbEvent.Reason, &dbEvent.Host, &dbEvent.Event, &dbEvent.First_time, &dbEvent.Last_time); err != nil {
 			log.Printf("Error: %s", err)
 			return nil, err
 		}
