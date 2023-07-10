@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/kube-tarian/kubviz/client/pkg/clickhouse"
-	"github.com/kube-tarian/kubviz/model"
+	"github.com/intelops/kubviz/client/pkg/clickhouse"
+	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
 )
 

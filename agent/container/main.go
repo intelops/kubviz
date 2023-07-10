@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/kube-tarian/kubviz/agent/container/pkg/application"
+	"github.com/intelops/kubviz/agent/container/pkg/application"
 )
 
 func main() {

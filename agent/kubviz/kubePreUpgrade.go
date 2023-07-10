@@ -18,7 +18,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/kube-tarian/kubviz/model"
+	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"

@@ -1,4 +1,4 @@
-module github.com/kube-tarian/kubviz
+module github.com/intelops/kubviz
 
 go 1.20
 

@@ -2,7 +2,7 @@ package clients
 
 import (
 	"fmt"
-	"github.com/kube-tarian/kubviz/agent/git/pkg/config"
+	"github.com/intelops/kubviz/agent/git/pkg/config"
 	"log"
 	"time"
 

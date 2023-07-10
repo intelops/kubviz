@@ -11,8 +11,8 @@ import (
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
-	"github.com/kube-tarian/kubviz/client/pkg/config"
-	"github.com/kube-tarian/kubviz/model"
+	"github.com/intelops/kubviz/client/pkg/config"
+	"github.com/intelops/kubviz/model"
 )
 
 type DBClient struct {
