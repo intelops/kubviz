@@ -5,8 +5,8 @@ type DBStatement string
 const kubvizTable DBStatement = `
 	CREATE TABLE IF NOT EXISTS events (
 		ClusterName String,
-		Id           UUID,
-		EventTime   DateTime,
+		Id          String,
+		EventTime   DateTime64,
 		OpType      String,
 		Name         String,
 		Namespace    String,
@@ -15,8 +15,8 @@ const kubvizTable DBStatement = `
 		Reason       String,
 		Host         String,
 		Event        String,
-		FirstTime   DateTime,
-		LastTime    DateTime
+		FirstTime   DateTime64,
+		LastTime    DateTime64
 	) engine=File(TabSeparated)
 `
 const rakeesTable DBStatement = `

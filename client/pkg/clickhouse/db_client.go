@@ -210,7 +210,7 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	eventJson, _ := json.Marshal(metrics.Event)
 	if _, err := stmt.Exec(
 		metrics.ClusterName,
-		metrics.Event.UID,
+		string(metrics.Event.UID),
 		time.Now(),
 		metrics.Type,
 		metrics.Event.Name,

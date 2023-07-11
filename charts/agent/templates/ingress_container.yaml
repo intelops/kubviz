@@ -1,5 +1,5 @@
 {{- if .Values.container_bridge.enabled }}
-{{- if .Values.git_bridge.ingress.enabled -}}
+{{- if .Values.container_bridge.ingress.enabled -}}
 {{- $fullName := include "agent.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 {{- if and .Values.container_bridge.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
@@ -16,7 +16,7 @@ apiVersion: extensions/v1beta1
 {{- end }}
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-container
   labels:
     {{- include "agent.labels" . | nindent 4 }}
   {{- with .Values.container_bridge.ingress.annotations }}

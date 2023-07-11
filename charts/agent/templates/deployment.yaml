@@ -62,6 +62,13 @@ spec:
             - name: http-git
               containerPort: 8081
               protocol: TCP
+          env:
+          - name: CLUSTER_NAME
+            value: {{ .Values.clusterName }}
+          - name: NATS_TOKEN
+            value: {{ .Values.nats.auth.token }}
+          - name: NATS_ADDRESS
+            value: {{ .Values.nats.host }}
           resources:
             {{- toYaml .Values.git_bridge.resources | nindent 12 }}
 {{- end }}
@@ -73,6 +80,13 @@ spec:
             - name: http-container
               containerPort: 8082
               protocol: TCP
+          env:
+          - name: CLUSTER_NAME
+            value: {{ .Values.clusterName }}
+          - name: NATS_TOKEN
+            value: {{ .Values.nats.auth.token }}
+          - name: NATS_ADDRESS
+            value: {{ .Values.nats.host }}
           resources:
             {{- toYaml .Values.container_bridge.resources | nindent 12 }}
 {{- end }}
