@@ -1,4 +1,4 @@
-# Contribute to Ory KubViz
+# Contribute to KubViz
 
 - [Introduction](#introduction)
 - [FAQ](#faq)
