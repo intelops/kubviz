@@ -67,7 +67,11 @@ func main() {
 	clusterMetricsChan := make(chan error, 1)
 	kubescoreMetricsChan := make(chan error, 1)
 	RakeesErrChan := make(chan error, 1)
-	var wg sync.WaitGroup
+	var (
+		wg        sync.WaitGroup
+		config    *rest.Config
+		clientset *kubernetes.Clientset
+	)
 	// waiting for 4 go routines
 	wg.Add(5)
 	// connecting with nats ...
@@ -81,33 +85,26 @@ func main() {
 	checkErr(err)
 	//setupAgent()
 	if env != Production {
-		config, err := clientcmd.BuildConfigFromFlags("", cluster_conf_loc)
+		config, err = clientcmd.BuildConfigFromFlags("", cluster_conf_loc)
 		if err != nil {
 			log.Fatal(err)
 		}
-		clientset := getK8sClient(config)
-		// starting all the go routines
-		go outDatedImages(config, js, &wg, outdatedErrChan)
-		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-		go GetAllResources(config, js, &wg, getAllResourceChan)
-		go RakeesOutput(config, js, &wg, RakeesErrChan)
-		go getK8sEvents(clientset)
-		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+		clientset = getK8sClient(config)
 	} else {
-		config, err := rest.InClusterConfig()
+		config, err = rest.InClusterConfig()
 		if err != nil {
 			log.Fatal(err)
 		}
-		clientset := getK8sClient(config)
-		// starting all the go routines
-		go outDatedImages(config, js, &wg, outdatedErrChan)
-		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-		go GetAllResources(config, js, &wg, getAllResourceChan)
-		go RakeesOutput(config, js, &wg, RakeesErrChan)
-		go getK8sEvents(clientset)
-		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+		clientset = getK8sClient(config)
 	}
-
+	// starting all the go routines
+	go outDatedImages(config, js, &wg, outdatedErrChan)
+	go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+	go GetAllResources(config, js, &wg, getAllResourceChan)
+	go RakeesOutput(config, js, &wg, RakeesErrChan)
+	go getK8sEvents(clientset)
+	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+	go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 	wg.Wait()
 	// once the go routines completes we will close the error channels
 	close(outdatedErrChan)

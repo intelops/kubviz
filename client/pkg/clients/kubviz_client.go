@@ -2,6 +2,7 @@ package clients
 
 import (
 	"encoding/json"
+	"github.com/nats-io/nats.go"
 	"log"
 
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
@@ -21,8 +22,8 @@ const (
 	deletedConsumer    = "DELETED_API_CONSUMER"
 	kubvizSubject      = "METRICS.kubvizevent"
 	kubvizConsumer     = "KUBVIZ_EVENTS_CONSUMER"
-	kubscoreSubject    = ""
-	kubscoreConsumer   = ""
+	kubscoreSubject    = "METRICS.kubescore"
+	kubscoreConsumer   = "KUBSCORE_CONSUMER"
 )
 
 type SubscriptionInfo struct {
