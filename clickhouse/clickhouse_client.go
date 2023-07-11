@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go"
-	"github.com/kube-tarian/kubviz/model"
+	"github.com/intelops/kubviz/model"
 )
 
 func GetClickHouseConnection(url string) (*sql.DB, error) {
@@ -32,22 +32,37 @@ func GetClickHouseConnection(url string) (*sql.DB, error) {
 func CreateSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
 		CREATE TABLE IF NOT EXISTS events (
-			id           UUID,
-			op_type      String,
-			name         String,
-			namespace    String,
-			kind         String,
-			message      String,
-			reason       String,
-			host         String,
-			event        String,
-			first_time   DateTime,
-			last_time    DateTime,
-			event_time   DateTime,
-			cluster_name String
+			ClusterName String,
+			Id           UUID,
+			EventTime   DateTime,
+			OpType      String,
+			Name         String,
+			Namespace    String,
+			Kind         String,
+			Message      String,
+			Reason       String,
+			Host         String,
+			Event        String,
+			FirstTime   DateTime,
+			LastTime    DateTime
 		) engine=File(TabSeparated)
 	`)
 
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func CreateRakeesMetricsSchema(connect *sql.DB) {
+	_, err := connect.Exec(`
+		CREATE TABLE IF NOT EXISTS rakkess (
+			ClusterName String,
+			Name String,
+			Create String,
+			Delete String,
+			List String,
+			Update String
+        ) engine=File(TabSeparated)
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,12 +71,12 @@ func CreateSchema(connect *sql.DB) {
 func CreateKubePugSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
         CREATE TABLE IF NOT EXISTS DeprecatedAPIs (
+			ClusterName String,
+			ObjectName String,
             Description String,
             Kind String,
             Deprecated UInt8,
-            ClusterName String,
-            Scope String,
-            ObjectName String
+            Scope String
         ) engine=File(TabSeparated)
     `)
 	if err != nil {
@@ -70,14 +85,14 @@ func CreateKubePugSchema(connect *sql.DB) {
 
 	_, err = connect.Exec(`
         CREATE TABLE IF NOT EXISTS DeletedAPIs (
+			ClusterName String,
+			ObjectName String,
             Group String,
             Kind String,
             Version String,
             Name String,
             Deleted UInt8,
-            ClusterName String,
-            Scope String,
-            ObjectName String
+            Scope String
         ) engine=File(TabSeparated)
     `)
 	if err != nil {
@@ -88,11 +103,11 @@ func CreateKubePugSchema(connect *sql.DB) {
 func CreateKetallSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
 		CREATE TABLE IF NOT EXISTS getall_resources (
-			resource String,
-			kind String,
-			namespace String,
-			age String,
-			cluster_name String
+			ClusterName String,
+			Namespace String,
+			Kind String,
+			Resource String,
+			Age String
         ) engine=File(TabSeparated)
 	`)
 	if err != nil {
@@ -103,16 +118,36 @@ func CreateKetallSchema(connect *sql.DB) {
 func CreateOutdatedSchema(connect *sql.DB) {
 	_, err := connect.Exec(`
 	    CREATE TABLE IF NOT EXISTS outdated_images (
-		    current_image String,
-			current_tag String,
-			latest_version String,
-			versions_behind Int64,
-			pod String,
-			namespace String,
-			cluster_name String
+			ClusterName String,
+			Namespace String,
+			Pod String,
+		    CurrentImage String,
+			CurrentTag String,
+			LatestVersion String,
+			VersionsBehind Int64
 	    ) engine=File(TabSeparated)
 	`)
 	if err != nil {
+		log.Fatal(err)
+	}
+}
+func InsertRakeesMetrics(connect *sql.DB, metrics model.RakeesMetrics) {
+	var (
+		tx, _   = connect.Begin()
+		stmt, _ = tx.Prepare("INSERT INTO rakkess (ClusterName, Name, Create, Delete, List, Update) VALUES (?, ?, ?, ?, ?, ?)")
+	)
+	defer stmt.Close()
+	if _, err := stmt.Exec(
+		metrics.ClusterName,
+		metrics.Name,
+		metrics.Create,
+		metrics.Delete,
+		metrics.List,
+		metrics.Update,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -134,15 +169,15 @@ func CreateKubeScoreSchema(connect *sql.DB) {
 func InsertKetallEvent(connect *sql.DB, metrics model.Resource) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO getall_resources (resource, kind, namespace, age, cluster_name) VALUES (?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO getall_resources (ClusterName, Namespace, Kind, Resource, Age) VALUES (?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	if _, err := stmt.Exec(
-		metrics.Resource,
-		metrics.Kind,
-		metrics.Namespace,
-		metrics.Age,
 		metrics.ClusterName,
+		metrics.Namespace,
+		metrics.Kind,
+		metrics.Resource,
+		metrics.Age,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -154,17 +189,17 @@ func InsertKetallEvent(connect *sql.DB, metrics model.Resource) {
 func InsertOutdatedEvent(connect *sql.DB, metrics model.CheckResultfinal) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO outdated_images (current_image, current_tag, latest_version, versions_behind, pod, namespace, cluster_name) VALUES (?, ?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO outdated_images (ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind) VALUES (?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	if _, err := stmt.Exec(
+		metrics.ClusterName,
+		metrics.Namespace,
+		metrics.Pod,
 		metrics.Image,
 		metrics.Current,
 		metrics.LatestVersion,
 		metrics.VersionsBehind,
-		metrics.Pod,
-		metrics.Namespace,
-		metrics.ClusterName,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -176,7 +211,7 @@ func InsertOutdatedEvent(connect *sql.DB, metrics model.CheckResultfinal) {
 func InsertDeprecatedAPI(connect *sql.DB, deprecatedAPI model.DeprecatedAPI) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO DeprecatedAPIs (Description, Kind, Deprecated, ClusterName, Scope, ObjectName) VALUES (?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO DeprecatedAPIs (ClusterName, ObjectName, Description, Kind, Deprecated, Scope) VALUES (?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 
@@ -187,12 +222,12 @@ func InsertDeprecatedAPI(connect *sql.DB, deprecatedAPI model.DeprecatedAPI) {
 
 	for _, item := range deprecatedAPI.Items {
 		if _, err := stmt.Exec(
+			deprecatedAPI.ClusterName,
+			item.ObjectName,
 			deprecatedAPI.Description,
 			deprecatedAPI.Kind,
 			deprecated,
-			deprecatedAPI.ClusterName,
 			item.Scope,
-			item.ObjectName,
 		); err != nil {
 			log.Fatal(err)
 		}
@@ -206,7 +241,7 @@ func InsertDeprecatedAPI(connect *sql.DB, deprecatedAPI model.DeprecatedAPI) {
 func InsertDeletedAPI(connect *sql.DB, deletedAPI model.DeletedAPI) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO DeletedAPIs (Group, Kind, Version, Name, Deleted, ClusterName, Scope, ObjectName) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO DeletedAPIs (ClusterName, ObjectName, Group, Kind, Version, Name, Deleted, Scope) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 
@@ -217,14 +252,14 @@ func InsertDeletedAPI(connect *sql.DB, deletedAPI model.DeletedAPI) {
 
 	for _, item := range deletedAPI.Items {
 		if _, err := stmt.Exec(
+			deletedAPI.ClusterName,
+			item.ObjectName,
 			deletedAPI.Group,
 			deletedAPI.Kind,
 			deletedAPI.Version,
 			deletedAPI.Name,
 			deleted,
-			deletedAPI.ClusterName,
 			item.Scope,
-			item.ObjectName,
 		); err != nil {
 			log.Fatal(err)
 		}
@@ -238,12 +273,14 @@ func InsertDeletedAPI(connect *sql.DB, deletedAPI model.DeletedAPI) {
 func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 	var (
 		tx, _   = connect.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO events (id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time, cluster_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO events (ClusterName, Id, EventTime, OpType, Name, Namespace, Kind, Message, Reason, Host, Event, FirstTime, LastTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 	eventJson, _ := json.Marshal(metrics.Event)
 	if _, err := stmt.Exec(
+		metrics.ClusterName,
 		metrics.Event.UID,
+		time.Now(),
 		metrics.Type,
 		metrics.Event.Name,
 		metrics.Event.Namespace,
@@ -254,8 +291,6 @@ func InsertEvent(connect *sql.DB, metrics model.Metrics) {
 		string(eventJson),
 		metrics.Event.FirstTimestamp.Time,
 		metrics.Event.LastTimestamp.Time,
-		time.Now(),
-		metrics.ClusterName,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -284,7 +319,7 @@ func InsertKubeScoreMetrics(connect *sql.DB, metrics model.KubeScoreRecommendati
 }
 
 func RetriveKetallEvent(connect *sql.DB) ([]model.Resource, error) {
-	rows, err := connect.Query("SELECT resource, kind, namespace, age, cluster_name FROM getall_resources")
+	rows, err := connect.Query("SELECT ClusterName, Namespace, Kind, Resource, Age FROM getall_resources")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -293,7 +328,7 @@ func RetriveKetallEvent(connect *sql.DB) ([]model.Resource, error) {
 	var events []model.Resource
 	for rows.Next() {
 		var result model.Resource
-		if err := rows.Scan(&result.Resource, &result.Kind, &result.Namespace, &result.Age, &result.ClusterName); err != nil {
+		if err := rows.Scan(&result.ClusterName, &result.Namespace, &result.Kind, &result.Resource, &result.Age); err != nil {
 			log.Printf("Error: %s", err)
 			return nil, err
 		}
@@ -307,7 +342,7 @@ func RetriveKetallEvent(connect *sql.DB) ([]model.Resource, error) {
 }
 
 func RetriveOutdatedEvent(connect *sql.DB) ([]model.CheckResultfinal, error) {
-	rows, err := connect.Query("SELECT current_image, current_tag, latest_version, versions_behind, pod, namespace, cluster_name FROM outdated_images")
+	rows, err := connect.Query("SELECT ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind FROM outdated_images")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -316,7 +351,7 @@ func RetriveOutdatedEvent(connect *sql.DB) ([]model.CheckResultfinal, error) {
 	var events []model.CheckResultfinal
 	for rows.Next() {
 		var result model.CheckResultfinal
-		if err := rows.Scan(&result.Image, &result.Current, &result.LatestVersion, &result.VersionsBehind, &result.Pod, &result.Namespace, &result.ClusterName); err != nil {
+		if err := rows.Scan(&result.ClusterName, &result.Namespace, &result.Pod, &result.Image, &result.Current, &result.LatestVersion, &result.VersionsBehind); err != nil {
 			log.Printf("Error: %s", err)
 			return nil, err
 		}
@@ -353,7 +388,7 @@ func RetriveKubepugEvent(connect *sql.DB) ([]model.Result, error) {
 }
 
 func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
-	rows, err := connect.Query("SELECT id, op_type, name, namespace, kind, message, reason, host, event, first_time, last_time, event_time, cluster_name FROM events")
+	rows, err := connect.Query("SELECT ClusterName, Id, EventTime, OpType, Name, Namespace, Kind, Message, Reason, Host, Event, FirstTime, LastTime FROM events")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil, err
@@ -362,7 +397,7 @@ func RetrieveEvent(connect *sql.DB) ([]model.DbEvent, error) {
 	var events []model.DbEvent
 	for rows.Next() {
 		var dbEvent model.DbEvent
-		if err := rows.Scan(&dbEvent.Id, &dbEvent.Op_type, &dbEvent.Name, &dbEvent.Namespace, &dbEvent.Kind, &dbEvent.Message, &dbEvent.Host, &dbEvent.Event, &dbEvent.First_time, &dbEvent.Last_time, &dbEvent.Event_time, &dbEvent.Cluster_name); err != nil {
+		if err := rows.Scan(&dbEvent.Cluster_name, &dbEvent.Id, &dbEvent.Event_time, &dbEvent.Op_type, &dbEvent.Name, &dbEvent.Namespace, &dbEvent.Kind, &dbEvent.Message, &dbEvent.Host, &dbEvent.Event, &dbEvent.First_time, &dbEvent.Last_time); err != nil {
 			log.Printf("Error: %s", err)
 			return nil, err
 		}

@@ -1,0 +1,17 @@
+{{- if .Values.container_bridge.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "agent.fullname" . }}-container
+  labels:
+    {{- include "agent.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http-container
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "agent.selectorLabels" . | nindent 4 }}
+{{- end }}

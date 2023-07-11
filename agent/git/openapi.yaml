@@ -1,0 +1,77 @@
+openapi: "3.0.1"
+info:
+  title: Webhooks API
+  description: An API for handling webhooks from different repositories
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /liveness:
+    get:
+      summary: Kubernetes readiness and liveness probe endpoint
+      responses:
+        '200':
+          description: successful operation
+  /github:
+    post:
+      summary: Handle Github webhooks post requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: successful operation
+  /gitlab:
+    post:
+      summary: Handle Gitlab webhooks post requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: successful operation
+  /bitbucket:
+    post:
+      summary: Handle Bitbucket webhooks post requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: successful operation
+  /azure:
+    post:
+      summary: Handle Azure webhooks post requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: successful operation
+  /gitea:
+    post:
+      summary: Handle Gitea webhooks post requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: successful operation
+  /api-docs:
+    get:
+      tags:
+        - public
+      summary: List of APIs provided by the service
+      responses:
+        '200':
+          description: OK

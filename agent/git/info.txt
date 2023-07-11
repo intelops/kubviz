@@ -1,0 +1,1 @@
+for agent : oapi-codegen -config ./agent/cfg.yaml ./agent/openapi.yaml
