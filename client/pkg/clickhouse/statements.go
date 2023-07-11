@@ -5,7 +5,7 @@ type DBStatement string
 const kubvizTable DBStatement = `
 	CREATE TABLE IF NOT EXISTS events (
 		ClusterName String,
-		Id           UUID,
+		Id          String,
 		EventTime   DateTime,
 		OpType      String,
 		Name         String,
