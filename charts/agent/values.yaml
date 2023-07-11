@@ -45,7 +45,7 @@ service:
 git_bridge:
   enabled: false
   image:
-    repository: ghcr.io/intelops/git-agent
+    repository: ghcr.io/intelops/kubviz/git-agent
     pullPolicy: Always
     tag: "latest"
   resources: 
@@ -64,6 +64,7 @@ git_bridge:
       - host: gitbridge.local
         paths:
           - path: /
+            pathType: Prefix
     tls: []
     #  - secretName: chart-example-tls
     #    hosts:
@@ -74,7 +75,7 @@ git_bridge:
 container_bridge:
   enabled: false
   image:
-    repository: ghcr.io/intelops/container-agent
+    repository: ghcr.io/intelops/kubviz/container-agent
     pullPolicy: Always
     tag: "latest"
   resources: 
@@ -93,6 +94,7 @@ container_bridge:
       - host: containerbridge.local
         paths:
           - path: /
+            pathType: Prefix
     tls: []
     #  - secretName: chart-example-tls
     #    hosts:
