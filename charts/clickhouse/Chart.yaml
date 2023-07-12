@@ -13,4 +13,4 @@ maintainers:
 name: clickhouse
 sources:
 - https://github.com/liwenhe1993/charts
-version: 1.0.1
+version: 1.0.2
