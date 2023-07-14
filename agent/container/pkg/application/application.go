@@ -42,7 +42,9 @@ func New() *Application {
 	apiServer.BindRequest(mux)
 
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf("0.0.0.0:%d", cfg.Port),
+		// TODO: remove hardcoding
+		// Addr:    fmt.Sprintf("0.0.0.0:%d", cfg.Port),
+		Addr:    fmt.Sprintf(":%d", 8082),
 		Handler: mux,
 	}
 
@@ -55,7 +57,9 @@ func New() *Application {
 }
 
 func (app *Application) Start() {
-	log.Printf("Starting server at %v", app.httpServer.Addr)
+	// TODO: remove hard coding
+	// log.Printf("Starting server at %v", app.httpServer.Addr)
+	log.Printf("Starting server at %v", 8082)
 	var err error
 	if err = app.httpServer.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("Unexpected server close: %v", err)
