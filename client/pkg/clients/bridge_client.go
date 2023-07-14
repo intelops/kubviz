@@ -34,6 +34,6 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 			log.Fatal(err)
 		}
 		conn.InsertGitEvent(string(data))
-		log.Println("Inserted metrics:", string(data))
+		log.Println("Inserted Git metrics:", string(data))
 	}, nats.Durable(string(bridgeConsumer)), nats.ManualAck())
 }
