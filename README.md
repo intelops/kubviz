@@ -49,7 +49,7 @@ kubectl create namespace kubviz
 helm repo add kubviz https://intelops.github.io/kubviz/
 helm repo update
 
-token=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+token=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token"
 ```
 **NOTE:** 
