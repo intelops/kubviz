@@ -2,11 +2,11 @@ package clients
 
 import (
 	"encoding/json"
+	"github.com/nats-io/nats.go"
 	"log"
 
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
 	"github.com/intelops/kubviz/model"
-	"github.com/nats-io/nats.go"
 )
 
 const (
@@ -22,6 +22,8 @@ const (
 	deletedConsumer    = "DELETED_API_CONSUMER"
 	kubvizSubject      = "METRICS.kubvizevent"
 	kubvizConsumer     = "KUBVIZ_EVENTS_CONSUMER"
+	kubscoreSubject    = "METRICS.kubescore"
+	kubscoreConsumer   = "KUBSCORE_CONSUMER"
 )
 
 type SubscriptionInfo struct {
@@ -123,6 +125,21 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 				}
 				log.Printf("Kubviz Metrics Received: %#v,", metrics)
 				conn.InsertKubvizEvent(metrics)
+				log.Println()
+			},
+		},
+		{
+			Subject:  kubscoreSubject,
+			Consumer: kubscoreConsumer,
+			Handler: func(msg *nats.Msg) {
+				msg.Ack()
+				var metrics model.KubeScoreRecommendations
+				err := json.Unmarshal(msg.Data, &metrics)
+				if err != nil {
+					log.Fatal(err)
+				}
+				log.Printf("Kubscore Metrics Received: %#v,", metrics)
+				conn.InsertKubeScoreMetrics(metrics)
 				log.Println()
 			},
 		},

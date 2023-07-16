@@ -5,12 +5,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/ClickHouse/clickhouse-go/v2"
 	"log"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/intelops/kubviz/client/pkg/config"
 	"github.com/intelops/kubviz/model"
 )
@@ -29,6 +29,7 @@ type DBInterface interface {
 	InsertKubvizEvent(model.Metrics)
 	InsertGitEvent(string)
 	InsertContainerEvent(string)
+	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
 	RetriveKubepugEvent() ([]model.Result, error)
@@ -61,7 +62,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		}
 		return nil, err
 	}
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerTable, gitTable}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerTable, gitTable, kubescoreTable}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -258,6 +259,26 @@ func (c *DBClient) InsertContainerEvent(event string) {
 		log.Fatal(err)
 	}
 }
+
+func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations) {
+	var (
+		tx, _   = c.conn.Begin()
+		stmt, _ = tx.Prepare(InsertKubeScore)
+	)
+	defer stmt.Close()
+	if _, err := stmt.Exec(
+		metrics.ID,
+		metrics.Namespace,
+		metrics.ClusterName,
+		metrics.Recommendations,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+}
+
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/nats-io/nats.go"
 	"log"
 	"os"
 	"strconv"
@@ -9,19 +10,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/intelops/kubviz/model"
-	"github.com/nats-io/nats.go"
-
 	"context"
+	"github.com/intelops/kubviz/model"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	// Uncomment to load all auth plugins
-	// _ "k8s.io/client-go/plugin/pkg/client/auth"
-	//
-	// Or uncomment to load specific auth plugins
 	"fmt"
 
 	"github.com/ghodss/yaml"
@@ -70,8 +65,13 @@ func main() {
 	kubePreUpgradeChan := make(chan error, 1)
 	getAllResourceChan := make(chan error, 1)
 	clusterMetricsChan := make(chan error, 1)
+	kubescoreMetricsChan := make(chan error, 1)
 	RakeesErrChan := make(chan error, 1)
-	var wg sync.WaitGroup
+	var (
+		wg        sync.WaitGroup
+		config    *rest.Config
+		clientset *kubernetes.Clientset
+	)
 	// waiting for 4 go routines
 	wg.Add(5)
 	// connecting with nats ...
@@ -83,40 +83,35 @@ func main() {
 	// creating a stream with stream name METRICS
 	err = createStream(js)
 	checkErr(err)
+	//setupAgent()
 	if env != Production {
-		config, err := clientcmd.BuildConfigFromFlags("", cluster_conf_loc)
+		config, err = clientcmd.BuildConfigFromFlags("", cluster_conf_loc)
 		if err != nil {
 			log.Fatal(err)
 		}
-		clientset := getK8sClient(config)
-		// starting all the go routines
-		go outDatedImages(config, js, &wg, outdatedErrChan)
-		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-		go GetAllResources(config, js, &wg, getAllResourceChan)
-		go RakeesOutput(config, js, &wg, RakeesErrChan)
-		go getK8sEvents(clientset)
-		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+		clientset = getK8sClient(config)
 	} else {
-		config, err := rest.InClusterConfig()
+		config, err = rest.InClusterConfig()
 		if err != nil {
 			log.Fatal(err)
 		}
-		clientset := getK8sClient(config)
-		// starting all the go routines
-		go outDatedImages(config, js, &wg, outdatedErrChan)
-		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-		go GetAllResources(config, js, &wg, getAllResourceChan)
-		go RakeesOutput(config, js, &wg, RakeesErrChan)
-		go getK8sEvents(clientset)
-		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+		clientset = getK8sClient(config)
 	}
-
+	// starting all the go routines
+	go outDatedImages(config, js, &wg, outdatedErrChan)
+	go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+	go GetAllResources(config, js, &wg, getAllResourceChan)
+	go RakeesOutput(config, js, &wg, RakeesErrChan)
+	go getK8sEvents(clientset)
+	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+	go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 	wg.Wait()
 	// once the go routines completes we will close the error channels
 	close(outdatedErrChan)
 	close(kubePreUpgradeChan)
 	close(getAllResourceChan)
 	close(clusterMetricsChan)
+	close(kubescoreMetricsChan)
 	close(RakeesErrChan)
 	// for loop will wait for the error channels
 	// logs if any error occurs
@@ -138,6 +133,10 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
+		case err := <-kubescoreMetricsChan:
+			if err != nil {
+				log.Println(err)
+			}
 		case err := <-RakeesErrChan:
 			if err != nil {
 				log.Println(err)
@@ -147,29 +146,28 @@ func main() {
 
 }
 
+//func setupAgent() {
+//	configurations, err := config.GetAgentConfigurations()
+//	if err != nil {
+//		log.Printf("Failed to get agent config: %v\n", err)
+//		panic(err)
+//	}
+//	//k8s := &K8sData{
+//	//	Namespace:          configurations.SANamespace,
+//	//	ServiceAccountName: configurations.SAName,
+//	//	KubeconfigFileName: constants.KUBECONFIG,
+//	//}
+//	//_, err = k8s.GenerateKubeConfiguration()
+//	if err != nil {
+//		log.Printf("Failed to generate kubeconfig: %v\n", err)
+//		panic(err)
+//	}
+//}
+
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
 func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
-	//Publish Nodes data
-	// for i := 1; i <= 10; i++ {
-	// 	shouldReturn, returnValue := publishK8sMetrics(i, "Node", getK8sNodes(clientset), js)
-	// 	if shouldReturn {
-	// 		return returnValue
-	// 	}
-	// 	time.Sleep(100 * time.Millisecond)
-	// }
-	//Publish Pods data
-	// for i := 1; i <= 10; i++ {
-
-	// 	shouldReturn, returnValue := publishK8sMetrics(i, "Pod", getK8sPods(clientset), js)
-	// 	if shouldReturn {
-	// 		return returnValue
-	// 	}
-	// 	time.Sleep(100 * time.Millisecond)
-	// }
-	//Publish events data
-	//publishK8sMetrics(1, "Event", getK8sEvents(clientset), js)
 	watchK8sEvents(clientset, js)
 
 	errCh <- nil
@@ -280,9 +278,6 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 			AddFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
 				fmt.Printf("Event namespace: %s \n", event.GetNamespace())
-				// j, err := json.MarshalIndent(obj, "", "  ")
-				// checkErr(err)
-				//fmt.Printf("Add event: %s \n", event)
 				y, err := yaml.Marshal(event)
 				if err != nil {
 					fmt.Printf("err: %v\n", err)

@@ -71,6 +71,14 @@ CREATE TABLE IF NOT EXISTS outdated_images (
 	VersionsBehind Int64
 ) engine=File(TabSeparated)
 `
+const kubescoreTable DBStatement = `
+	    CREATE TABLE IF NOT EXISTS kubescore (
+		    id UUID,
+			namespace String,
+			cluster_name String,
+			recommendations String
+	    ) engine=File(TabSeparated)
+	`
 const InsertRakees DBStatement = "INSERT INTO rakkess (ClusterName, Name, Create, Delete, List, Update) VALUES (?, ?, ?, ?, ?, ?)"
 const InsertKetall DBStatement = "INSERT INTO getall_resources (ClusterName, Namespace, Kind, Resource, Age) VALUES (?, ?, ?, ?, ?)"
 const InsertOutdated DBStatement = "INSERT INTO outdated_images (ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind) VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -80,3 +88,4 @@ const InsertKubvizEvent DBStatement = "INSERT INTO events (ClusterName, Id, Even
 const clickhouseExperimental DBStatement = `SET allow_experimental_object_type=1;`
 const containerTable DBStatement = `CREATE table IF NOT EXISTS container_bridge(event JSON) ENGINE = MergeTree ORDER BY tuple();`
 const gitTable DBStatement = `CREATE table IF NOT EXISTS git_json(event JSON) ENGINE = MergeTree ORDER BY tuple();`
+const InsertKubeScore string = "INSERT INTO kubescore (id, namespace, cluster_name, recommendations) VALUES (?, ?, ?, ?)"
