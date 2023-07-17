@@ -28,12 +28,13 @@ type DBInterface interface {
 	InsertDeletedAPI(model.DeletedAPI)
 	InsertKubvizEvent(model.Metrics)
 	InsertGitEvent(string)
-	InsertContainerEvent(string)
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
 	RetriveKubepugEvent() ([]model.Result, error)
 	RetrieveKubvizEvent() ([]model.DbEvent, error)
+	InsertContainerEventDockerHub(string)
+	InsertContainerEventGithub(string)
 	Close()
 }
 
@@ -62,7 +63,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		}
 		return nil, err
 	}
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerTable, gitTable, kubescoreTable}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, gitTable, kubescoreTable}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -376,4 +377,35 @@ func (c *DBClient) RetrieveKubvizEvent() ([]model.DbEvent, error) {
 		return nil, err
 	}
 	return events, nil
+}
+
+func (c *DBClient) InsertContainerEventDockerHub(event string) {
+	ctx := context.Background()
+	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO container_dockerhub")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Append(event); err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Send(); err != nil {
+		log.Fatal(err)
+	}
+}
+func (c *DBClient) InsertContainerEventGithub(event string) {
+	ctx := context.Background()
+	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO container_github")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Append(event); err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Send(); err != nil {
+		log.Fatal(err)
+	}
 }

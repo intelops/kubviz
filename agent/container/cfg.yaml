@@ -3,4 +3,4 @@ generate:
   chi-server: true
   models: true
   embedded-spec: true
-output: agent/api/agent.gen.go
+output: /Users/vijeshdeepan/Desktop/kubviz/agent/container/api/agent.gen.go

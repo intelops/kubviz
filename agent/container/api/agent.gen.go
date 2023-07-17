@@ -22,9 +22,12 @@ type ServerInterface interface {
 	// List of APIs provided by the service
 	// (GET /api-docs)
 	GetApiDocs(w http.ResponseWriter, r *http.Request)
-	// Post Docker artifactory events
-	// (POST /event/docker)
-	PostEventDocker(w http.ResponseWriter, r *http.Request)
+	// Post github Docker artifactory events
+	// (POST /event/docker/github)
+	PostEventDockerGithub(w http.ResponseWriter, r *http.Request)
+	// Post Dockerhub artifactory events
+	// (POST /event/docker/hub)
+	PostEventDockerHub(w http.ResponseWriter, r *http.Request)
 	// Kubernetes readiness and liveness probe endpoint
 	// (GET /status)
 	GetStatus(w http.ResponseWriter, r *http.Request)
@@ -54,12 +57,27 @@ func (siw *ServerInterfaceWrapper) GetApiDocs(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// PostEventDocker operation middleware
-func (siw *ServerInterfaceWrapper) PostEventDocker(w http.ResponseWriter, r *http.Request) {
+// PostEventDockerGithub operation middleware
+func (siw *ServerInterfaceWrapper) PostEventDockerGithub(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostEventDocker(w, r)
+		siw.Handler.PostEventDockerGithub(w, r)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PostEventDockerHub operation middleware
+func (siw *ServerInterfaceWrapper) PostEventDockerHub(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostEventDockerHub(w, r)
 	})
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -201,7 +219,10 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Get(options.BaseURL+"/api-docs", wrapper.GetApiDocs)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/event/docker", wrapper.PostEventDocker)
+		r.Post(options.BaseURL+"/event/docker/github", wrapper.PostEventDockerGithub)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/event/docker/hub", wrapper.PostEventDockerHub)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/status", wrapper.GetStatus)
@@ -213,12 +234,13 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/5ySz2obQQyHX0XovLWd9ja30IQSUkioews5zM5oHdH1aJC0C8bsu5dZQynpX3IaBD99",
-	"+jTojEmOVQoVNwznpUMug2A4YyZLytVZCgb8KMUjF1LolfOB4KFSgS+3+69w/XgHVinxwCmu8Q6dfaR/",
-	"t+1ftc2kdpl3tdltdrh0KJVKrIwBP2x2myvssEZ/aa64jZXfZUlrcSBvj1TSlXaXMeAn8uvKNy3SoZJV",
-	"KUZr/P1u9+uSD/e4LB3adDxGPWHAz2wOMjRXg6oyc6YM/Qn8hcBIZ07Uto0Hw/CEdepHTvjcIFuaqfg2",
-	"S/pG2kZVsd8YPor5bUveXIJv0mwQuAAgqvMQk4ueYFWwPwmaR5/++nf7S+J/nGxKicyGaYQfmFeW91NP",
-	"WsjJQClmLmQGsWQYeaa1qCo9AZVchYv/7K08R6cm3pCk7VAwPJ1x0hEDbnF5Xr4HAAD//4PQ6B3LAgAA",
+	"H4sIAAAAAAAC/6TSwWrcMBAG4FcZ5uzuOu1Nt9CENKSQ0O0t5CBL492hXknMjA3L4ncvsqGUtLTb5mQE",
+	"//zzCeuMIR9LTpRM0Z3nBjn1Gd0ZI2kQLsY5ocOPOZnnRAKdcNwTPBZK8OV29xWun+5BCwXuOfgl3qCx",
+	"DfT3sd2rsYlE131Xm3bT4txgLpR8YXT4YdNurrDB4u1Qrbj1hd/FHJbDnqx+ciFZ2u4jOrwjuy58UyMN",
+	"CmnJSWmJv2/bXy/5+IDz3KCOx6OXEzr8zGqQ+2pVKJInjhShO4EdCJRk4kD1tn6v6J6xjN3AAV9qyZYm",
+	"SraNOXwj2e7ZDmNXN5asv4E+ZbXbOnCz5O/W+H+ZaxWs+2BtAy/GvQ+W5QQLSy9C/4v405u4a0cVX05V",
+	"8zb+8dfv1sQlLB1DINV+HOBHzSvow9iRJDJSEPKRE6mCTxEGnmg5FMkdAaVYMif72S08eaMKr5Uk9Z2j",
+	"ez7jKAM63OL8Mn8PAAD//+plWf+KAwAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

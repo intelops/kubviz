@@ -72,7 +72,12 @@ func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		conn.InsertContainerEvent(string(data))
-		log.Println("Inserted Container metrics:", string(msg.Data))
+		if repoName == "Github_Registory" {
+			conn.InsertContainerEventGithub(string(data))
+			log.Println("Inserted Github Container metrics:", string(msg.Data))
+		} else if repoName == "Dockerhub_Registry" {
+			conn.InsertContainerEventDockerHub(string(data))
+			log.Println("Inserted DockerHub Container metrics:", string(msg.Data))
+		}
 	}, nats.Durable(string(containerConsumer)), nats.ManualAck())
 }
