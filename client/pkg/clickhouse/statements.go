@@ -79,6 +79,18 @@ const kubescoreTable DBStatement = `
 			recommendations String
 	    ) engine=File(TabSeparated)
 	`
+
+const dockerHubBuildTable DBStatement = `
+	CREATE TABLE IF NOT EXISTS dockerhubbuild (
+		PushedBy String,
+		ImageTag String,
+		RepositoryName String,
+		DateCreated String,
+		Owner String,
+		Event String
+	) engine=File(TabSeparated)
+	`
+const InsertDockerHubBuild DBStatement = "INSERT INTO dockerhubbuild (PushedBy, ImageTag, RepositoryName, DateCreated, Owner, Event) VALUES (?, ?, ?, ?, ?, ?)"
 const InsertRakees DBStatement = "INSERT INTO rakkess (ClusterName, Name, Create, Delete, List, Update) VALUES (?, ?, ?, ?, ?, ?)"
 const InsertKetall DBStatement = "INSERT INTO getall_resources (ClusterName, Namespace, Kind, Resource, Age) VALUES (?, ?, ?, ?, ?)"
 const InsertOutdated DBStatement = "INSERT INTO outdated_images (ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind) VALUES (?, ?, ?, ?, ?, ?, ?)"

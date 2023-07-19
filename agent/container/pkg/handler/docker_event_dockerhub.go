@@ -1,20 +1,32 @@
 package handler
 
 import (
+	"errors"
 	"io"
 	"log"
 	"net/http"
 )
 
-func (ah *APIHandler) PostEventDockerHub(w http.ResponseWriter, r *http.Request) {
-	event, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Printf("Event body read failed: %v", err)
-	}
+// parse errors
+var (
+	ErrReadingBody   = errors.New("error reading the request body")
+	ErrPublishToNats = errors.New("error while publishing to nats")
+)
 
-	log.Printf("Received event from docker artifactory: %v", string(event))
-	err = ah.conn.Publish(event, "docker registry")
+func (ah *APIHandler) PostEventDockerHub(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		_, _ = io.Copy(io.Discard, r.Body)
+		_ = r.Body.Close()
+	}()
+	payload, err := io.ReadAll(r.Body)
+	if err != nil || len(payload) == 0 {
+		log.Printf("%v: %v", ErrReadingBody, err)
+		return
+	}
+	log.Printf("Received event from docker artifactory: %v", string(payload))
+	err = ah.conn.Publish(payload, "Dockerhub_Registry")
 	if err != nil {
-		log.Printf("Publish failed for event: %v, reason: %v", string(event), err)
+		log.Printf("%v: %v", ErrPublishToNats, err)
+		return
 	}
 }
