@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "client.fullname" . }}-gitbridge-dashboard
+  name: {{ include "client.fullname" . }}-containerbridge-dockerhub-dashboard
   labels:
     {{ .Values.dashboards.label }}: {{ .Values.dashboards.labelValue | quote }}
 data:
-  gitbridge.json: |-
+  dockerhub.json: |-
     {
       "annotations": {
         "list": [
@@ -17,6 +17,12 @@ data:
             "hide": true,
             "iconColor": "rgba(0, 211, 255, 1)",
             "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
             "type": "dashboard"
           }
         ]
@@ -24,29 +30,16 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 3,
-      "links": [
-        {
-          "asDropdown": false,
-          "icon": "external link",
-          "includeVars": false,
-          "keepTime": false,
-          "tags": [],
-          "targetBlank": true,
-          "title": "JSON Formatter",
-          "tooltip": "",
-          "type": "link",
-          "url": "https://jsonformatter.org/"
-        }
-      ],
+      "id": 5,
+      "links": [],
       "liveNow": false,
       "panels": [
         {
           "datasource": {
-            "type": "grafana-clickhouse-datasource",
-            "uid": "ClickHouse"
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
           },
-          "description": "This panel displays all the Git metrics and its providers.",
+          "description": "This panel displays all the dockerhub webhook events",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -54,11 +47,8 @@ data:
               },
               "custom": {
                 "align": "center",
-                "cellOptions": {
-                  "type": "color-text"
-                },
-                "filterable": true,
-                "inspect": false
+                "displayMode": "color-text",
+                "filterable": true
               },
               "mappings": [],
               "thresholds": {
@@ -83,11 +73,9 @@ data:
             "x": 0,
             "y": 0
           },
-          "id": 1,
+          "id": 2,
           "options": {
-            "cellHeight": "sm",
             "footer": {
-              "countRows": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -96,34 +84,31 @@ data:
             },
             "showHeader": true
           },
-          "pluginVersion": "10.0.1",
+          "pluginVersion": "8.4.6",
           "targets": [
             {
               "datasource": {
-                "type": "grafana-clickhouse-datasource",
-                "uid": "ClickHouse"
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
               },
-              "format": 1,
-              "meta": {
-                "builderOptions": {
-                  "fields": [],
-                  "limit": 100,
-                  "mode": "list"
-                }
-              },
-              "queryType": "sql",
-              "rawSql": "SELECT event.metrics.commits.timestamp AS TimeStamp,\nevent.metrics.commits.id AS Id,\nevent.metrics.commits.url AS Url,\nevent.metrics.object_kind AS Action,\nevent.repo AS GitProvider,\nevent AS MetaData\nFROM default.git_json",
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT * FROM default.dockerhubbuild",
+              "rawQuery": "SELECT * FROM default.dockerhubbuild",
               "refId": "A",
-              "selectedFormat": 1
+              "round": "0s",
+              "skip_comments": true
             }
           ],
-          "title": "Git Bridge",
+          "title": "Container Dockerhub",
           "transparent": true,
           "type": "table"
         }
       ],
-      "refresh": "",
-      "schemaVersion": 38,
+      "schemaVersion": 35,
       "style": "dark",
       "tags": [],
       "templating": {
@@ -135,8 +120,8 @@ data:
       },
       "timepicker": {},
       "timezone": "",
-      "title": "Git Bridge",
-      "uid": "a1885f0a-0f8a-42f5-a4b9-5ac7f2665bc4",
+      "title": "Container Dockerhub",
+      "uid": "rY_9CwCVk",
       "version": 1,
       "weekStart": ""
     }
