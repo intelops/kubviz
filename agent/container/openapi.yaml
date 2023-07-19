@@ -28,11 +28,22 @@ paths:
         '200':
           description: OK
 
-  /event/docker:
+  /event/docker/hub:
     post:
       tags:
         - public
-      summary: Post Docker artifactory events
+      summary: Post Dockerhub artifactory events
       responses:
         '200':
           description: OK
+
+  /event/docker/github:
+    post:
+      tags:
+        - public
+      summary: Post github Docker artifactory events
+      responses:
+        '200':
+          description: OK
+
+# oapi-codegen -config ./cfg.yaml ./openapi.yaml

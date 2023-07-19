@@ -28,12 +28,13 @@ type DBInterface interface {
 	InsertDeletedAPI(model.DeletedAPI)
 	InsertKubvizEvent(model.Metrics)
 	InsertGitEvent(string)
-	InsertContainerEvent(string)
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
 	RetriveKubepugEvent() ([]model.Result, error)
 	RetrieveKubvizEvent() ([]model.DbEvent, error)
+	InsertContainerEventDockerHub(model.DockerHubBuild)
+	InsertContainerEventGithub(string)
 	Close()
 }
 
@@ -62,7 +63,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		}
 		return nil, err
 	}
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerTable, gitTable, kubescoreTable}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, gitTable, kubescoreTable, dockerHubBuildTable}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -376,4 +377,41 @@ func (c *DBClient) RetrieveKubvizEvent() ([]model.DbEvent, error) {
 		return nil, err
 	}
 	return events, nil
+}
+
+func (c *DBClient) InsertContainerEventDockerHub(build model.DockerHubBuild) {
+	var (
+		tx, _   = c.conn.Begin()
+		stmt, _ = tx.Prepare(string(InsertDockerHubBuild))
+	)
+	defer stmt.Close()
+	if _, err := stmt.Exec(
+		build.PushedBy,
+		build.ImageTag,
+		build.RepositoryName,
+		build.DateCreated,
+		build.Owner,
+		build.Event,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (c *DBClient) InsertContainerEventGithub(event string) {
+	ctx := context.Background()
+	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO container_github")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Append(event); err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Send(); err != nil {
+		log.Fatal(err)
+	}
 }
