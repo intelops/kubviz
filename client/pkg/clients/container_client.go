@@ -2,10 +2,17 @@ package clients
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
+	"time"
 
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
+	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
+)
+
+var (
+	ErrUnmarshalBuildPayload = errors.New("error while unmarshal the dockerhub build payload")
 )
 
 type Container string
@@ -18,61 +25,30 @@ const (
 	containerConsumer Container = "container-event-consumer"
 )
 
-// func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
-// 	n.stream.Subscribe(string(containerSubject), func(msg *nats.Msg) {
-// 		type events struct {
-// 			Events []json.RawMessage `json:"events"`
-// 		}
-
-// 		eventDocker := &events{}
-// 		err := json.Unmarshal(msg.Data, &eventDocker)
-// 		if err == nil {
-// 			log.Println(eventDocker)
-// 			msg.Ack()
-// 			repoName := msg.Header.Get("REPO_NAME")
-// 			type newEvent struct {
-// 				RepoName string          `json:"repoName"`
-// 				Event    json.RawMessage `json:"event"`
-// 			}
-
-// 			for _, event := range eventDocker.Events {
-// 				event := &newEvent{
-// 					RepoName: repoName,
-// 					Event:    event,
-// 				}
-
-// 				eventsJSON, err := json.Marshal(event)
-// 				if err != nil {
-// 					log.Printf("Failed to marshall with repo name going ahead with only event, %v", err)
-// 					eventsJSON = msg.Data
-// 				}
-// 				conn.InsertContainerEvent(string(eventsJSON))
-// 			}
-// 		} else {
-// 			log.Printf("Failed to unmarshal event, %v", err)
-// 			conn.InsertContainerEvent(string(msg.Data))
-// 		}
-
-//			log.Println("Inserted metrics:", string(msg.Data))
-//		}, nats.Durable(string(containerConsumer)), nats.ManualAck())
-//	}
 func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
 	n.stream.Subscribe(string(containerSubject), func(msg *nats.Msg) {
-		type pubData struct {
-			Metrics json.RawMessage `json:"event"`
-			Repo    string          `json:"repoName"`
-		}
 		msg.Ack()
 		repoName := msg.Header.Get("REPO_NAME")
-		metrics := &pubData{
-			Metrics: json.RawMessage(msg.Data),
-			Repo:    repoName,
+		if repoName == "Dockerhub_Registry" {
+			var pl model.BuildPayload
+			err := json.Unmarshal(msg.Data, &pl)
+			if err != nil {
+				log.Printf("%v", ErrUnmarshalBuildPayload)
+				return
+			}
+			var hub model.DockerHubBuild
+			t := time.Unix(int64(pl.Repository.DateCreated), 0)
+			hub.DateCreated = t.Format("2006-01-02 15:04:05")
+			hub.PushedBy = pl.PushData.Pusher
+			hub.ImageTag = pl.PushData.Tag
+			hub.RepositoryName = pl.Repository.Name
+			hub.Owner = pl.Repository.Owner
+			hub.Event = string(msg.Data)
+			conn.InsertContainerEventDockerHub(hub)
+			log.Println("Inserted DockerHub Container metrics:", string(msg.Data))
+		} else if repoName == "Github_Registry" {
+			conn.InsertContainerEventGithub(string(msg.Data))
+			log.Println("Inserted Github Container metrics:", string(msg.Data))
 		}
-		data, err := json.Marshal(metrics)
-		if err != nil {
-			log.Fatal(err)
-		}
-		conn.InsertContainerEvent(string(data))
-		log.Println("Inserted Container metrics:", string(msg.Data))
 	}, nats.Durable(string(containerConsumer)), nats.ManualAck())
 }
