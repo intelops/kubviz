@@ -9,7 +9,7 @@ You can create a webhook with your own customized data, and in the URL section, 
 ```bash
 https://<INGRESS HOSTNAME>/github
 ```
-Please replace the <INGRESS HOSTNAME> section with the specific ingress host name of your git bridge, and the path /gitlab may vary depending on the git platform being used.
+Please replace the <INGRESS HOSTNAME> section with the specific ingress host name of your git bridge, and the path `/github` may vary depending on the git platform being used.
 
 Possible values are:
 
@@ -34,6 +34,6 @@ Possible values are:
 Values | Platform |
 ------ | -------- | 
 `/event/docker/hub` | DockerHub |
-`/event/docker/github` | GitHub |
+
 
 

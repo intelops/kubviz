@@ -38,7 +38,7 @@ You need
 
 <a href="https://docs.docker.com/compose/install/standalone/" target="_blank">`Docker Compose`</a>
 
-All contributions are made via pull requests. To make a pull request, you will need a GitHub account; if you are unclear on this process, see GitHub's documentation on forking and pull requests. Pull requests should be targeted at the main branch. Before creating a pull request, go through this checklist:
+All contributions are made via pull requests. To make a pull request, you will need a GitHub account; if you are unclear on this process, see GitHub's documentation on [forking](https://help.github.com/articles/fork-a-repo) and [pull requests](https://help.github.com/articles/using-pull-requests). Pull requests should be targeted at the main branch. Before creating a pull request, go through this checklist:
 
 Clone Kubviz and run it in Docker
 
@@ -47,7 +47,7 @@ git clone https://github.com/intelops/kubviz.git
 
 cd kubviz
 ```
-1. Create a feature branch off of `main` so that changes do not get mixed up.
+1. Create a feature branch of `main` so that changes do not get mixed up.
 
 2. Rebase your local changes against the `main` branch.
 
@@ -81,16 +81,4 @@ git commit -a -m "fix: this is the subject line" -m "This is the body line. Clos
 # And the last step is pushing this to your fork
 git push -u fork my-feature-branch
 ```
-
 Now go to the project's GitHub Pull Request page and click "New pull request"
-
-## Conduct
-
-Whether you are a regular contributor or a newcomer, we care about making this
-community a safe place for you and we've got your back.
-
-[KubViz Community Code of Conduct](https://github.com/intelops/kubviz/blob/main/CODE_OF_CONDUCT.md)
-
-We welcome discussion about creating a welcoming, safe, and productive
-environment for the community. If you have any questions, feedback, or concerns
-[please let us know](https://intelops.ai/).

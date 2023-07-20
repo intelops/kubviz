@@ -53,7 +53,7 @@ KubViz also monitors changes in your container registry, providing visibility in
 
 #### Prepare Namespace
 
-This command will creates a new **name-space** for your cluster.
+This command will create a new **namespace** for your cluster.
 
 ```bash
 kubectl create namespace kubviz
@@ -76,13 +76,17 @@ token=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token"
 ```
 **NOTE:** 
-- If you want to enable Grafana with the client deployment, add --set grafana.enabled=true to the helm upgrade command.
+- If you want to enable Grafana with the client deployment, add `--set grafana.enabled=true` to the helm upgrade command.
 
 - If grafana already exist use the same upgrade command without --set grafana.enabled=true flag. 
 
 ```bash
 helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token" --set grafana.enabled=true
 ```
+
+Parameter | Description | Default
+--------- | ----------- | -------
+`grafana.enabled` | If true, create grafana | `false`
 
 - The KubViz client will also install NATS and Clickhouse. The NATS service is exposed as a LoadBalancer, and you need to note the external IP of the service **kubviz-client-nats-external** and pass it during the KubViz agent installation.
 
@@ -91,10 +95,7 @@ The following command will retrieve the IP address. Please make sure to take not
 ```bash
 kubectl get services kubviz-client-nats-external -n kubviz --output jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ```
-Parameter | Description | Default
---------- | ----------- | -------
-`grafana.enabled` | If true, create grafana | `false`
-
+- Kubviz-client pod is in a CrashLoopBackOff state, installing the Kubviz-agent will bring it back up and running.
 
 #### Agent Installation
 
@@ -113,6 +114,20 @@ helm upgrade -i kubviz-agent kubviz/agent -n kubviz \
 3. Replace "INGRESS HOSTNAME" with the desired hostname for the Git Bridge and Container Bridge Ingress configurations.
 4. Replace "SECRET-NAME" with the desired secretname for the Git Bridge and Container Bridge Ingress configurations.
 
+Parameter | Description | Default
+--------- | ----------- | -------
+`nats.host` | nats host | `kubviz-client-nats`
+`git_bridge.enabled` | If true, create git_bridge | `false`
+`git_bridge.ingress.hosts[0].host` | git_bridge ingress host name | `gitbridge.local`
+`git_bridge.ingress.hosts[0].paths[0].path` | git_bridge ingress host path | `/`
+`git_bridge.ingress.hosts[0].paths[0].pathType` | git_bridge ingress host path type | `Prefix`
+`container_bridge.enabled` | If true, create container_bridge | `false`
+`container_bridge.ingress.hosts[0].host` | container_bridge ingress host name | `containerbridge.local`
+`container_bridge.ingress.hosts[0].paths[0].path` | container_bridge ingress host path | `/`
+`container_bridge.ingress.hosts[0].paths[0].pathType` | container_bridge ingress host path type | `Prefix`
+`git_bridge.ingress.tls` | git_bridge ingress tls configuration | []
+`container_bridge.ingress.tls` | container_bridge ingress tls configuration | []
+
 **NOTE:** 
 
 - Default Annotations for Ingress
@@ -128,13 +143,11 @@ annotations:
 ...
 ```
 
-If you do not want to use the default value, you have the option to modify the annotation and use your own desired value. To accomplish this, you can execute the following command:
+If you do not want to use the default value, you can modify the annotation in [values.yaml](https://github.com/intelops/kubviz/blob/main/charts/agent/values.yaml#L60) and execute the following command:
 
 ```bash
 helm upgrade -i kubviz-agent kubviz/agent -f values.yaml -n kubviz
 ```
-
-> **Tip**: You can use the default [values.yaml](https://github.com/intelops/kubviz/blob/main/charts/agent/values.yaml#L60)
 
 ##### Deploying Agent on a Different Kubernetes Cluster:
 1. Run the following command to deploy the KubViz agent:
@@ -142,39 +155,23 @@ helm upgrade -i kubviz-agent kubviz/agent -f values.yaml -n kubviz
 ```bash
 helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token"   
 ```
-2. Replace "NATS IP Address" with the IP address of your NATS server.
-
-Parameter | Description | Default
---------- | ----------- | -------
-`nats.host` | nats host | `kubviz-client-nats`
-`git_bridge.enabled` | If true, create git_bridge | `false`
-`git_bridge.ingress.hosts[0].host` | git_bridge ingress host name | `gitbridge.local`
-`git_bridge.ingress.hosts[0].paths[0].path` | git_bridge ingress host path | `/`
-`git_bridge.ingress.hosts[0].paths[0].pathType` | git_bridge ingress host path type | `Prefix`
-`container_bridge.enabled` | If true, create container_bridge | `false`
-`container_bridge.ingress.hosts[0].host` | container_bridge ingress host name | `containerbridge.local`
-`container_bridge.ingress.hosts[0].paths[0].path` | container_bridge ingress host path | `/`
-`container_bridge.ingress.hosts[0].paths[0].pathType` | container_bridge ingress host path type | `Prefix`
-`git_bridge.ingress.tls` | git_bridge ingress tls configuration | []
-`container_bridge.ingress.tls` | container_bridge ingress tls configuration | []
+2. Replace "<NATS IP Address>" with the IP address of your NATS service **kubviz-client-nats-external**.
 
 #### How to Verify if Everything is Up and Running
 
 After completing the installation of both the client and agent, you can use the following command to verify if they are up and running.
 
 ```bash
-kubectl get pods -n kubviz
+kubectl get all -n kubviz
 ```
 
 #### Configuration
 
 Once everything is up and running, you need to perform additional configurations to monitor git repository events and container registry events.
 
-The platform servers (such as GitHub, GitLab, DockerHub, etc.) will collect these events.
+To ensure that these events are sent to KubViz, you need to create a webhook for your repository. This webhook will transmit the event data of the specific repository or registry to KubViz.
 
-To ensure that these events are sent to KubViz, you need to create a webhook for your repository. This webhook will transmit the event data of the specific repository to KubViz.
-
-To set up a webhook in your repository, [please follow these steps](docs/configuration.md)
+To set up a webhook in your repository, [please follow these steps](docs/CONFIGURATION.md)
 
 #### How to View Event Data in Grafana
 
@@ -193,7 +190,7 @@ export POD_NAME=$(kubectl get pods --namespace kubviz -l "app.kubernetes.io/name
 kubectl --namespace kubviz port-forward $POD_NAME 3000
 ```
 
-3. Please access "localhost:3000" in your web browser, where you will be prompted to enter your credentials. Please use the username "admin" and the password obtained from step 1 to proceed.   
+3. Access "localhost:3000" in your web browser, where you'll be prompted to enter your credentials. Utilize the username "admin" and the password obtained from step 1 to proceed.   
 
 ## Use Cases
 
@@ -203,7 +200,7 @@ kubectl --namespace kubviz port-forward $POD_NAME 3000
 
 <br>
 
-Use kubviz to monitor your cluster events, including:
+Use KubViz to monitor your cluster events, including:
 
 - State changes 
 - Errors
@@ -245,7 +242,7 @@ Use kubviz to monitor your cluster events, including:
 
 <br>
 
-- Using KubViz you can also monitors changes in your container registry, providing visibility into image updates. By tracking these changes, KubViz helps you proactively manage container.
+- Using KubViz you can also monitors changes in your container registry, providing visibility into image updates. By tracking these changes, KubViz helps you proactively manage container registries.
 
 <br>
 
@@ -253,24 +250,18 @@ Use kubviz to monitor your cluster events, including:
 
 ## Contributing
 
-You are warmly welcome to contribute to Compage.
+You are warmly welcome to contribute to KubViz.
 Please refer the detailed guide [CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## Code of Conduct
 
 See [CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md)
 
-## Support
+## Community
 
-Reach out to me at one of the following places!
-
-- Website at <a href="https://intelops.ai/" target="_blank">`Intelops`</a>
-- Linkedin at <a href="https://www.linkedin.com/company/intelopsai/?originalSubdomain=in" target="_blank">`@Intelops`</a>
-- Insert more social links here.
+Active communication channels
+- Discord
 
 ## License
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-
-- **[Apache-2.0 license](https://opensource.org/licenses/Apache-2.0)**
-- Copyright 2023 © <a href="https://intelops.ai/" target="_blank">Intelops</a>.
+Refer the licence - [LICENCE](docs/LICENSE.md).
