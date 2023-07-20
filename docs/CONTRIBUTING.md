@@ -4,8 +4,6 @@
 - [Reporting Issues](#reporting-issues)
 - [Feature Requests](#feature-requests)
 - [Contribute code](#contribute-code)
-- [Conduct](#conduct)
-
 
 ## Introduction
 

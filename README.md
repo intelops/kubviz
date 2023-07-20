@@ -25,9 +25,8 @@ Visualize Kubernetes & DevSecOps Workflows. Tracks changes/events real-time acro
 - [Use Cases](#use-cases)
 - [Contributing](#contributing)
 - [Code of Conduct](#code-of-conduct)
-- [Support](#support)
+- [Community](#community)
 - [License](#license)
-- [Join our Slack channel](#join-our-slack-channel)
 
 ## How KubViz works
 
