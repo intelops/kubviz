@@ -95,6 +95,7 @@ The following command will retrieve the IP address. Please make sure to take not
 ```bash
 kubectl get services kubviz-client-nats-external -n kubviz --output jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ```
+**NOTE:**
 - Kubviz-client pod is in a CrashLoopBackOff state, installing the Kubviz-agent will bring it back up and running.
 
 #### Agent Installation
