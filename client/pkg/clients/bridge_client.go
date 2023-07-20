@@ -21,12 +21,15 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 		type pubData struct {
 			Metrics json.RawMessage `json:"metrics"`
 			Repo    string          `json:"repo"`
+			Event   string          `json:"event"`
 		}
 		msg.Ack()
 		repo := msg.Header.Get("repo")
+		event := msg.Header.Get("event")
 		metrics := &pubData{
 			Metrics: json.RawMessage(msg.Data),
 			Repo:    repo,
+			Event:   event,
 		}
 		// metrics := &models.Gitevent{}
 		data, err := json.Marshal(metrics)
