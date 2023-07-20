@@ -87,10 +87,11 @@ func (n *NATSContext) Close() {
 	n.conn.Close()
 }
 
-func (n *NATSContext) Publish(event []byte, repo string) error {
+func (n *NATSContext) Publish(metric []byte, repo, event string) error {
 	msg := nats.NewMsg(eventSubject)
-	msg.Data = event
+	msg.Data = metric
 	msg.Header.Set("repo", repo)
+	msg.Header.Set("event", event)
 	_, err := n.stream.PublishMsgAsync(msg)
 
 	return err
