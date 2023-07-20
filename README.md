@@ -31,9 +31,9 @@ Visualize Kubernetes & DevSecOps Workflows. Tracks changes/events real-time acro
 
 ## How KubViz works
 
-Kubviz client can be installed on any Kubernetes cluster. Kubviz agent runs in a kubernetes cluster where the changes/events need to be tracked. The agent detects the changes in real time and send those events via NATS JetStream and the same is received in the kubviz client. 
+KubViz client can be installed on any Kubernetes cluster. KubViz agent runs in a kubernetes cluster where the changes/events need to be tracked. The agent detects the changes in real time and send those events via NATS JetStream and the same is received in the KubViz client. 
 
-Kubviz client receives the events and passes it to Clickhouse database. The events present in the Clickhouse database can be visualized through Grafana.
+KubViz client receives the events and passes it to Clickhouse database. The events present in the Clickhouse database can be visualized through Grafana.
 
 KubViz's event tracking component provides comprehensive visibility into the changes and events occurring within your Kubernetes clusters.
 
@@ -84,7 +84,7 @@ helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$to
 helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token" --set grafana.enabled=true
 ```
 
-- The kubviz client will also install NATS and Clickhouse. The NATS service is exposed as a LoadBalancer, and you need to note the external IP of the service **kubviz-client-nats-external** and pass it during the kubviz agent installation.
+- The KubViz client will also install NATS and Clickhouse. The NATS service is exposed as a LoadBalancer, and you need to note the external IP of the service **kubviz-client-nats-external** and pass it during the KubViz agent installation.
 
 The following command will retrieve the IP address. Please make sure to take note of this IP address as it will be used for agent installation if your agent is located in a different cluster.
 
@@ -99,8 +99,8 @@ Parameter | Description | Default
 #### Agent Installation
 
 ##### Deploying Agent on the Same Kubernetes Cluster as kubeviz Client:
-1. Make sure you have the kubeviz client running on your Kubernetes cluster.
-2. Run the following command to deploy the kubeviz agent:
+1. Make sure you have the KubViz client running on your Kubernetes cluster.
+2. Run the following command to deploy the KubViz agent:
 
 ```bash
 helm upgrade -i kubviz-agent kubviz/agent -n kubviz \
@@ -137,7 +137,7 @@ helm upgrade -i kubviz-agent kubviz/agent -f values.yaml -n kubviz
 > **Tip**: You can use the default [values.yaml](https://github.com/intelops/kubviz/blob/main/charts/agent/values.yaml#L60)
 
 ##### Deploying Agent on a Different Kubernetes Cluster:
-1. Run the following command to deploy the kubeviz agent:
+1. Run the following command to deploy the KubViz agent:
 
 ```bash
 helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token"   
@@ -172,7 +172,7 @@ Once everything is up and running, you need to perform additional configurations
 
 The platform servers (such as GitHub, GitLab, DockerHub, etc.) will collect these events.
 
-To ensure that these events are sent to Kubviz, you need to create a webhook for your repository. This webhook will transmit the event data of the specific repository to Kubviz.
+To ensure that these events are sent to KubViz, you need to create a webhook for your repository. This webhook will transmit the event data of the specific repository to KubViz.
 
 To set up a webhook in your repository, [please follow these steps](docs/configuration.md)
 
@@ -217,8 +217,8 @@ Use kubviz to monitor your cluster events, including:
 
 <br>
 
-- Visualize Deprecated Kubernetes APIs: KubeViz provides a clear visualization of deprecated Kubernetes APIs, allowing users to easily identify and update their usage to comply with the latest Kubernetes versions
-- Track Outdated Images: With KubeViz, you can track and monitor outdated images within your clusters, ensuring that you are using the most up-to-date and secure versions.
+- Visualize Deprecated Kubernetes APIs: KubViz provides a clear visualization of deprecated Kubernetes APIs, allowing users to easily identify and update their usage to comply with the latest Kubernetes versions
+- Track Outdated Images: With KubViz, you can track and monitor outdated images within your clusters, ensuring that you are using the most up-to-date and secure versions.
 - Identify Deleted APIs: KubeViz helps you identify any deleted APIs in your clusters, guiding you to find alternative approaches or replacements to adapt to changes in Kubernetes APIs.
 
 <br>
@@ -231,7 +231,7 @@ Use kubviz to monitor your cluster events, including:
 
 <br>
 
-- Kubviz allows you to track and observe all the events in your git repository..
+- KubViz allows you to track and observe all the events in your git repository..
 
 - By capturing events such as commits, merges, and other Git activities, KubViz provides valuable insights into the evolution of your code. This comprehensive change tracking capability allows you to analyze the effects of code modifications on your development and deployment workflows, facilitating efficient collaboration among teams.With this feature, you can easily identify the root causes of issues, ensure code integrity, and maintain a clear understanding of the changes happening within your Git repositories
 
@@ -245,7 +245,7 @@ Use kubviz to monitor your cluster events, including:
 
 <br>
 
-- Using Kubviz you can also monitors changes in your container registry, providing visibility into image updates. By tracking these changes, KubViz helps you proactively manage container.
+- Using KubViz you can also monitors changes in your container registry, providing visibility into image updates. By tracking these changes, KubViz helps you proactively manage container.
 
 <br>
 
