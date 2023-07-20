@@ -1,4 +1,4 @@
-![KubViz](.readme_assets/logo.png)
+![KubViz](.readme_assets/logowithName.png)
 
 The open-source platform for Visualize Kubernetes & DevSecOps Workflows
 
@@ -14,7 +14,7 @@ The open-source platform for Visualize Kubernetes & DevSecOps Workflows
 
 <hr>
 
-# KubViz
+## KubViz
 
 Visualize Kubernetes & DevSecOps Workflows. Tracks changes/events real-time across your entire K8s clusters, git repos, container registries, etc. , analyzing their effects and providing you with the context you need to troubleshoot efficiently. Get the Observability you need, easily.
 
@@ -193,7 +193,7 @@ export POD_NAME=$(kubectl get pods --namespace kubviz -l "app.kubernetes.io/name
 kubectl --namespace kubviz port-forward $POD_NAME 3000
 ```
 
-3. Login with the password from step 1 and the username: admin    
+3. Please access "localhost:3000" in your web browser, where you will be prompted to enter your credentials. Please use the username "admin" and the password obtained from step 1 to proceed.   
 
 ## Use Cases
 
@@ -254,11 +254,11 @@ Use kubviz to monitor your cluster events, including:
 ## Contributing
 
 You are warmly welcome to contribute to Compage.
-Please refer the detailed guide [CONTRIBUTING.md](./CONTRIBUTING.md).
+Please refer the detailed guide [CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## Code of Conduct
 
-See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+See [CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md)
 
 ## Support
 
@@ -274,5 +274,3 @@ Reach out to me at one of the following places!
 
 - **[Apache-2.0 license](https://opensource.org/licenses/Apache-2.0)**
 - Copyright 2023 © <a href="https://intelops.ai/" target="_blank">Intelops</a>.
-
-## Join our Slack channel

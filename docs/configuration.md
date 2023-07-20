@@ -7,9 +7,9 @@ You can create a webhook with your own customized data, and in the URL section, 
 1. The URL for a git repository will appear in the following format:
 
 ```bash
-https://<gitbridge.example>/github
+https://<ingress host>/github
 ```
-Please replace the <gitbridge.example> section with your specific ingress host, and /gitlab may vary depending on the git platform being used.
+Please replace the <ingress host> section with your specific ingress host, and /gitlab may vary depending on the git platform being used.
 
 Possible values are:
 
@@ -19,14 +19,15 @@ Values | Platform |
 `/gitlab` | GitLab |
 `/gitea` | Gitea |
 `/bitbucket` | BitBucket | 
+`/azure` | Azure |
 
 2. The URL for a Container Registry will appear in the following format:
 
 ```bash
-http://<containerbridge.example>/event/docker/hub
+http://<ingress host>/event/docker/hub
 ```
 
-Please replace the <containerbridge.example> section with your specific ingress host, and /event/docker/hub may vary depending on the container registry platform being used.
+Please replace the <ingress host> section with your specific ingress host, and /event/docker/hub may vary depending on the container registry platform being used.
 
 Possible values are:
 
