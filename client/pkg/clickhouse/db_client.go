@@ -5,14 +5,16 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/ClickHouse/clickhouse-go/v2"
 	"log"
 	"strings"
 	"time"
 
+	"github.com/ClickHouse/clickhouse-go/v2"
+
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 
 	"github.com/intelops/kubviz/client/pkg/config"
+	"github.com/intelops/kubviz/gitmodels/dbstatement"
 	"github.com/intelops/kubviz/model"
 )
 
@@ -29,13 +31,15 @@ type DBInterface interface {
 	InsertDeletedAPI(model.DeletedAPI)
 	InsertKubvizEvent(model.Metrics)
 	InsertGitEvent(string)
-	InsertContainerEvent(string)
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
 	InsertTrivyMetrics(metrics model.Trivy)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
 	RetriveKubepugEvent() ([]model.Result, error)
 	RetrieveKubvizEvent() ([]model.DbEvent, error)
+	InsertContainerEventDockerHub(model.DockerHubBuild)
+	InsertContainerEventGithub(string)
+	InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement)
 	Close()
 }
 
@@ -64,7 +68,8 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		}
 		return nil, err
 	}
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerTable, gitTable, kubescoreTable, trivyTableVul, trivyTableMisconfig}
+
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -445,4 +450,65 @@ func (c *DBClient) RetrieveKubvizEvent() ([]model.DbEvent, error) {
 		return nil, err
 	}
 	return events, nil
+}
+
+func (c *DBClient) InsertContainerEventDockerHub(build model.DockerHubBuild) {
+	var (
+		tx, _   = c.conn.Begin()
+		stmt, _ = tx.Prepare(string(InsertDockerHubBuild))
+	)
+	defer stmt.Close()
+	if _, err := stmt.Exec(
+		build.PushedBy,
+		build.ImageTag,
+		build.RepositoryName,
+		build.DateCreated,
+		build.Owner,
+		build.Event,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (c *DBClient) InsertContainerEventGithub(event string) {
+	ctx := context.Background()
+	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO container_github")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Append(event); err != nil {
+		log.Fatal(err)
+	}
+
+	if err = batch.Send(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (c *DBClient) InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) {
+	var (
+		tx, _   = c.conn.Begin()
+		stmt, _ = tx.Prepare(string(statement))
+	)
+	defer stmt.Close()
+	if _, err := stmt.Exec(
+		metrics.RepositoryName,
+		metrics.Author,
+		metrics.GitProvider,
+		metrics.CommitID,
+		metrics.CommitUrl,
+		metrics.EventType,
+		metrics.RepoName,
+		metrics.TimeStamp,
+		metrics.Event,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
 }

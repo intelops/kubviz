@@ -2,7 +2,10 @@ package clients
 
 import (
 	"fmt"
+
 	"github.com/intelops/kubviz/agent/git/pkg/config"
+	"github.com/intelops/kubviz/model"
+
 	"log"
 	"time"
 
@@ -87,10 +90,11 @@ func (n *NATSContext) Close() {
 	n.conn.Close()
 }
 
-func (n *NATSContext) Publish(event []byte, repo string) error {
+func (n *NATSContext) Publish(metric []byte, repo string, eventkey model.EventKey, eventvalue model.EventValue) error {
 	msg := nats.NewMsg(eventSubject)
-	msg.Data = event
-	msg.Header.Set("repo", repo)
+	msg.Data = metric
+	msg.Header.Set("GitProvider", repo)
+	msg.Header.Set(string(eventkey), string(eventvalue))
 	_, err := n.stream.PublishMsgAsync(msg)
 
 	return err

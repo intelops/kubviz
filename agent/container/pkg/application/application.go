@@ -40,7 +40,10 @@ func New() *Application {
 
 	mux := chi.NewMux()
 	apiServer.BindRequest(mux)
-
+	chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+		fmt.Printf("[%s]: '%s' has %d middlewares.\n", method, route, len(middlewares))
+		return nil
+	})
 	httpServer := &http.Server{
 		// TODO: remove hardcoding
 		// Addr:    fmt.Sprintf("0.0.0.0:%d", cfg.Port),
