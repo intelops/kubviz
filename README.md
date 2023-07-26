@@ -1,6 +1,13 @@
-![KubViz](.readme_assets/logowithName.png)
+<p align="center">
+  <img src=".readme_assets/logowithName.png" alt="KubViz" />
+</p>
 
-The open-source platform for Visualize Kubernetes & DevSecOps Workflows
+
+<p align="center">
+  The open-source platform for Visualize Kubernetes & DevSecOps Workflows
+</p>
+
+<div align="center">
 
 [![Docker Image CI](https://github.com/kube-tarian/kubviz/actions/workflows/agent-docker-image.yml/badge.svg)](https://github.com/kube-tarian/kubviz/actions/workflows/agent-docker-image.yml)
 [![Client Docker Image CI](https://github.com/kube-tarian/kubviz/actions/workflows/client-image.yml/badge.svg)](https://github.com/kube-tarian/kubviz/actions/workflows/client-image.yml)
@@ -12,7 +19,10 @@ The open-source platform for Visualize Kubernetes & DevSecOps Workflows
 [![Code of Conduct](https://badgen.net/badge/icon/code-of-conduct?label=open)](./code-of-conduct.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+</div>
+
 <hr>
+
 
 ## KubViz
 
