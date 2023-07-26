@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/intelops/kubviz/constants"
 	"sync"
 	"time"
 
@@ -15,15 +16,11 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-const (
-	eventSubject_getall_resource = "METRICS.ketall"
-)
-
 func PublishAllResources(result model.Resource, js nats.JetStreamContext) error {
 	metrics := result
 	metrics.ClusterName = ClusterName
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(eventSubject_getall_resource, metricsJson)
+	_, err := js.Publish(constants.EventSubject_getall_resource, metricsJson)
 	if err != nil {
 		return err
 	}

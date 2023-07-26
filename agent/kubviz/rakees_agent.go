@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/intelops/kubviz/constants"
 	"log"
 	"os"
 	"os/signal"
@@ -16,8 +17,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
-
-const eventSubject_rakees = "METRICS.rakees"
 
 func accessToOutcome(access rakkess.Access) (rakkess.Outcome, error) {
 	switch access {
@@ -86,7 +85,7 @@ func RakeesOutput(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGr
 			Update:      rakkess.HumanreadableAccessCode(updateOutcome),
 		}
 		metricsJson, _ := json.Marshal(metrics)
-		_, err = js.Publish(eventSubject_rakees, metricsJson)
+		_, err = js.Publish(constants.EventSubject_rakees, metricsJson)
 		if err != nil {
 			errCh <- err
 		}

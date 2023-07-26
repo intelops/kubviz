@@ -55,7 +55,7 @@ func publishKubescoreMetrics(id string, ns string, recommendations string, js na
 		ClusterName:     ClusterName,
 	}
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.SUBJECT, metricsJson)
+	_, err := js.Publish(constants.KUBESCORE_SUBJECT, metricsJson)
 	if err != nil {
 		return err
 	}

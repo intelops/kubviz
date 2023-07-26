@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/intelops/kubviz/constants"
 	"github.com/nats-io/nats.go"
 	"log"
 	"os"
@@ -31,14 +32,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// constants for jetstream
-const (
-	streamName     = "METRICS"
-	streamSubjects = "METRICS.*"
-	eventSubject   = "METRICS.kubvizevent"
-	allSubject     = "METRICS.all"
-)
-
 type RuningEnv int
 
 const (
@@ -66,14 +59,15 @@ func main() {
 	getAllResourceChan := make(chan error, 1)
 	clusterMetricsChan := make(chan error, 1)
 	kubescoreMetricsChan := make(chan error, 1)
+	trivyK8sMetricsChan := make(chan error, 1)
 	RakeesErrChan := make(chan error, 1)
 	var (
 		wg        sync.WaitGroup
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
-	// waiting for 4 go routines
-	wg.Add(5)
+	// waiting for 7 go routines
+	wg.Add(7)
 	// connecting with nats ...
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
@@ -105,6 +99,7 @@ func main() {
 	go getK8sEvents(clientset)
 	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
 	go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
+	go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
 	wg.Wait()
 	// once the go routines completes we will close the error channels
 	close(outdatedErrChan)
@@ -113,6 +108,7 @@ func main() {
 	close(clusterMetricsChan)
 	close(kubescoreMetricsChan)
 	close(RakeesErrChan)
+	close(trivyK8sMetricsChan)
 	// for loop will wait for the error channels
 	// logs if any error occurs
 	for {
@@ -141,28 +137,14 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
+		case err := <-trivyK8sMetricsChan:
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 
 }
-
-//func setupAgent() {
-//	configurations, err := config.GetAgentConfigurations()
-//	if err != nil {
-//		log.Printf("Failed to get agent config: %v\n", err)
-//		panic(err)
-//	}
-//	//k8s := &K8sData{
-//	//	Namespace:          configurations.SANamespace,
-//	//	ServiceAccountName: configurations.SAName,
-//	//	KubeconfigFileName: constants.KUBECONFIG,
-//	//}
-//	//_, err = k8s.GenerateKubeConfiguration()
-//	if err != nil {
-//		log.Printf("Failed to generate kubeconfig: %v\n", err)
-//		panic(err)
-//	}
-//}
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
@@ -181,7 +163,7 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 		ClusterName: ClusterName,
 	}
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(eventSubject, metricsJson)
+	_, err := js.Publish(constants.EventSubject, metricsJson)
 	if err != nil {
 		return true, err
 	}
@@ -192,16 +174,16 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 // createStream creates a stream by using JetStreamContext
 func createStream(js nats.JetStreamContext) error {
 	// Check if the METRICS stream already exists; if not, create it.
-	stream, err := js.StreamInfo(streamName)
+	stream, err := js.StreamInfo(constants.StreamName)
 	log.Printf("Retrieved stream %s", fmt.Sprintf("%v", stream))
 	if err != nil {
 		log.Printf("Error getting stream %s", err)
 	}
 	if stream == nil {
-		log.Printf("creating stream %q and subjects %q", streamName, streamSubjects)
+		log.Printf("creating stream %q and subjects %q", constants.StreamName, constants.StreamSubjects)
 		_, err = js.AddStream(&nats.StreamConfig{
-			Name:     streamName,
-			Subjects: []string{streamSubjects},
+			Name:     constants.StreamName,
+			Subjects: []string{constants.StreamSubjects},
 		})
 		checkErr(err)
 	}
