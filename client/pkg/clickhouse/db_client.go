@@ -322,7 +322,7 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 			for _, misconfiguration := range result.Misconfigurations {
 				var (
 					tx, _   = c.conn.Begin()
-					stmt, _ = tx.Prepare(InsertTrivyVul)
+					stmt, _ = tx.Prepare(InsertTrivyMisconfig)
 				)
 				if _, err := stmt.Exec(
 					metrics.ID,
