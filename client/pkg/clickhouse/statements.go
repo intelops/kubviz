@@ -90,6 +90,18 @@ const dockerHubBuildTable DBStatement = `
 		Event String
 	) engine=File(TabSeparated)
 	`
+const gitCommonTable DBStatement = `
+	CREATE TABLE IF NOT EXISTS git_common (
+		Provider String,
+		CommitID String,
+		CommitUrl String,
+		EventType String,
+		RepoName String,
+		TimeStamp String,
+		Event String
+	) engine=File(TabSeparated)
+	`
+
 const InsertDockerHubBuild DBStatement = "INSERT INTO dockerhubbuild (PushedBy, ImageTag, RepositoryName, DateCreated, Owner, Event) VALUES (?, ?, ?, ?, ?, ?)"
 const InsertRakees DBStatement = "INSERT INTO rakkess (ClusterName, Name, Create, Delete, List, Update) VALUES (?, ?, ?, ?, ?, ?)"
 const InsertKetall DBStatement = "INSERT INTO getall_resources (ClusterName, Namespace, Kind, Resource, Age) VALUES (?, ?, ?, ?, ?)"
@@ -102,3 +114,4 @@ const containerDockerhubTable DBStatement = `CREATE table IF NOT EXISTS containe
 const gitTable DBStatement = `CREATE table IF NOT EXISTS git_json(event JSON) ENGINE = MergeTree ORDER BY tuple();`
 const containerGithubTable DBStatement = `CREATE table IF NOT EXISTS container_github(event JSON) ENGINE = MergeTree ORDER BY tuple();`
 const InsertKubeScore string = "INSERT INTO kubescore (id, namespace, cluster_name, recommendations) VALUES (?, ?, ?, ?)"
+const InsertGitCommon DBStatement = "INSERT INTO git_common (Provider, CommitID, CommitUrl, EventType, RepoName, TimeStamp, Event) VALUES (?, ?, ?, ?, ?, ?, ?)"
