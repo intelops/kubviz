@@ -15,7 +15,7 @@ import (
 func RunTrivyK8sClusterScan(wg *sync.WaitGroup, js nats.JetStreamContext, errCh chan error) {
 	defer wg.Done()
 	var report report.ConsolidatedReport
-	out, err := executeCommand("trivy k8s --report summary cluster --timeout 60m -f json -q")
+	out, err := executeCommand("trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache")
 	parts := strings.SplitN(out, "{", 2)
 	if len(parts) <= 1 {
 		log.Println("No output from command", err)
