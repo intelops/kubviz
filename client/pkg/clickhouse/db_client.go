@@ -426,7 +426,6 @@ func (c *DBClient) InsertGitCommon(metrics model.GitCommonAttribute, statement d
 	)
 	defer stmt.Close()
 	if _, err := stmt.Exec(
-		metrics.RepositoryName,
 		metrics.Author,
 		metrics.GitProvider,
 		metrics.CommitID,

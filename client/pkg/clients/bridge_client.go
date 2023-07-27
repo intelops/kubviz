@@ -112,6 +112,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 			default:
 				var gca model.GitCommonAttribute
 				gca.GitProvider = string(model.AzureDevopsProvider)
+				gca.RepoName = ""
 				gca.Author = ""
 				gca.CommitID = ""
 				gca.CommitUrl = ""
@@ -166,6 +167,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				}
 			default:
 				var gca model.GitCommonAttribute
+				gca.RepoName = ""
 				gca.Author = ""
 				gca.GitProvider = string(model.GithubProvider)
 				gca.CommitID = ""
@@ -226,6 +228,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitUrl = ""
 				gca.EventType = event
 				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.RepoName = ""
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertGitea)
 				log.Println("Inserted Gitea metrics:", string(msg.Data))
@@ -281,6 +284,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitUrl = ""
 				gca.EventType = event
 				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.RepoName = ""
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
 				log.Println("Inserted Gitlab metrics:", string(msg.Data))
@@ -334,6 +338,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitUrl = ""
 				gca.EventType = event
 				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.RepoName = ""
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
 				log.Println("Inserted BitBucket metrics:", string(msg.Data))

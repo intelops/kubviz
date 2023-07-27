@@ -34,13 +34,12 @@ type BasicEvent struct {
 	CreatedDate Date   `json:"createdDate"`
 }
 type GitCommonAttribute struct {
-	RepositoryName string
-	Author         string
-	GitProvider    string
-	CommitID       string
-	CommitUrl      string
-	EventType      string
-	RepoName       string
-	TimeStamp      string
-	Event          string
+	Author      string
+	GitProvider string
+	CommitID    string
+	CommitUrl   string
+	EventType   string
+	RepoName    string
+	TimeStamp   string
+	Event       string
 }
