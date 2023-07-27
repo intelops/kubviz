@@ -37,7 +37,7 @@ type DBInterface interface {
 	RetrieveKubvizEvent() ([]model.DbEvent, error)
 	InsertContainerEventDockerHub(model.DockerHubBuild)
 	InsertContainerEventGithub(string)
-	InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement)
+	InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) error
 	Close()
 }
 
@@ -419,11 +419,15 @@ func (c *DBClient) InsertContainerEventGithub(event string) {
 	}
 }
 
-func (c *DBClient) InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) {
-	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(statement))
-	)
+func (c *DBClient) InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) error {
+	tx, err := c.conn.Begin()
+	if err != nil {
+		return err
+	}
+	stmt, err := tx.Prepare(string(statement))
+	if err != nil {
+		return err
+	}
 	defer stmt.Close()
 	if _, err := stmt.Exec(
 		metrics.Author,
@@ -435,9 +439,10 @@ func (c *DBClient) InsertGitCommon(metrics model.GitCommonAttribute, statement d
 		metrics.TimeStamp,
 		metrics.Event,
 	); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
