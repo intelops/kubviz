@@ -7,6 +7,7 @@ type EventValue string
 type GitEvent string
 type GitProvider string
 
+// git headers
 var (
 	GithubHeader    EventKey = "X-GitHub-Event"
 	GitlabHeader    EventKey = "X-Gitlab-Event"
