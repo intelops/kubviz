@@ -9,7 +9,7 @@ type GitProvider string
 
 var (
 	GithubHeader    EventKey = "X-GitHub-Event"
-	GitlabHeader    EventKey = "X-Gitlab-Token"
+	GitlabHeader    EventKey = "X-Gitlab-Event"
 	BitBucketHeader EventKey = "X-Event-Key"
 	GiteaHeader     EventKey = "X-Gitea-Event"
 	AzureHeader     EventKey = "X-Azure_Event"
