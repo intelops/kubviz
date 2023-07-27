@@ -16,6 +16,7 @@ var (
 	AzureHeader     EventKey = "X-Azure_Event"
 )
 
+// Git Provider names
 const (
 	GithubProvider      GitProvider = "Github"
 	GitlabProvider      GitProvider = "Gitlab"
