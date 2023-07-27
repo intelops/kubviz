@@ -3,6 +3,16 @@ entries:
   agent:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-07-27T17:04:51.380814596Z"
+    description: A Helm chart for kubeviz agent
+    digest: 7ac6a04ae843d7f072f0c89b83fa28ea95e46c24b965b9aa293154508d1d82dc
+    name: agent
+    type: application
+    urls:
+    - https://github.com/intelops/kubviz/releases/download/agent-0.2.6/agent-0.2.6.tgz
+    version: 0.2.6
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-07-19T14:17:21.160473072Z"
     description: A Helm chart for kubeviz agent
     digest: cedf7aa0a2a4f8ac39e849fdc8715eca6790affcf9fffaa790ed89b28cf5a763
@@ -741,6 +751,31 @@ entries:
     - https://github.com/kube-tarian/kubviz/releases/download/grafana-6.26.5/grafana-6.26.5.tgz
     version: 6.26.5
   nats:
+  - apiVersion: v2
+    appVersion: 2.7.2
+    created: "2023-07-27T17:04:51.517261268Z"
+    description: A Helm chart for the NATS.io High Speed Cloud Native Distributed Communications Technology.
+    digest: ec300239e956ac07d4ae8660a9dc5faab505833444ec2069cf0a0cc8239152c5
+    home: http://github.com/nats-io/k8s
+    icon: https://nats.io/img/nats-icon-color.png
+    keywords:
+    - nats
+    - messaging
+    - cncf
+    maintainers:
+    - email: wally@nats.io
+      name: Waldemar Quevedo
+      url: https://github.com/wallyqs
+    - email: colin@nats.io
+      name: Colin Sullivan
+      url: https://github.com/ColinSullivan1
+    - email: jaime@nats.io
+      name: Jaime Piña
+      url: https://github.com/variadico
+    name: nats
+    urls:
+    - https://github.com/intelops/kubviz/releases/download/nats-0.13.4/nats-0.13.4.tgz
+    version: 0.13.4
   - apiVersion: v2
     appVersion: 2.7.2
     created: "2022-05-03T08:33:00.342132324Z"
