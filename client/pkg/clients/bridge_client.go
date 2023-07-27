@@ -35,24 +35,16 @@ const (
 // SubscribeGitBridgeNats subscribes to nats jetstream and calls
 // the respective funcs to insert data into clickhouse DB
 func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
-	var sub *nats.Subscription
-	sub, _ = n.stream.Subscribe(string(bridgeSubject), func(msg *nats.Msg) {
-		 // Recover from a panic
-		 defer func() {
-            if r := recover(); r != nil {
-                log.Println("Recovered from panic:", r)
+	n.stream.Subscribe(string(bridgeSubject), func(msg *nats.Msg) {
+		// Recover from a panic
+		defer func() {
+			if r := recover(); r != nil {
+				log.Println("Recovered from panic:", r)
 
-                // Acknowledge all messages
-                for {
-                    msg, err := sub.NextMsg(0)
-                    if err != nil {
-                        break
-                    }
-                    msg.Ack()
-                }
-            }
-        }()
-
+				// Acknowledge the message
+				msg.Ack()
+			}
+		}()
 		msg.Ack()
 		gitprovider := msg.Header.Get("GitProvider")
 		repo := model.GitProvider(gitprovider)
