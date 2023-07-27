@@ -110,7 +110,7 @@ nats:
     maxConnections:
     maxSubscriptions:
     maxControlLine:
-    maxPayload:
+    maxPayload: "64MB"
 
     writeDeadline:
     maxPending:
