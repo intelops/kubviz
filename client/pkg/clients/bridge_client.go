@@ -133,10 +133,22 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					return
 				}
 				var gca model.GitCommonAttribute
-				gca.Author = pl.Commits[0].Author.Name
+				if len(pl.Commits) > 0 {
+					gca.Author = pl.Commits[0].Author.Name
+				} else {
+					gca.Author = ""
+				}
 				gca.GitProvider = string(model.GithubProvider)
-				gca.CommitID = pl.HeadCommit.ID
-				gca.CommitUrl = pl.HeadCommit.URL
+				if len(pl.Commits) > 0 {
+					gca.CommitID = pl.Commits[0].ID
+				} else {
+					gca.CommitID = pl.HeadCommit.ID
+				}
+				if len(pl.Commits) > 0 {
+					gca.CommitUrl = pl.Commits[0].URL
+				} else {
+					gca.CommitUrl = pl.HeadCommit.URL
+				}
 				gca.EventType = string(github.PushEvent)
 				gca.RepoName = pl.Repository.Name
 				gca.TimeStamp = time.Now().Format(time.DateTime)
@@ -155,7 +167,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					var gca model.GitCommonAttribute
 					gca.Author = pl.PullRequest.User.Login
 					gca.GitProvider = string(model.GithubProvider)
-					gca.CommitID = *pl.PullRequest.MergeCommitSha
+					if pl.PullRequest.MergeCommitSha != nil {
+						gca.CommitID = *pl.PullRequest.MergeCommitSha
+					} else {
+						gca.CommitID = ""
+					}
 					gca.CommitUrl = pl.PullRequest.HTMLURL
 					gca.EventType = string(github.PullRequestEvent)
 					gca.RepoName = pl.Repository.Name
@@ -189,7 +205,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					return
 				}
 				var gca model.GitCommonAttribute
-				gca.Author = pl.Commits[0].Author.Name
+				if len(pl.Commits) > 0 {
+					gca.Author = pl.Commits[0].Author.Name
+				} else {
+					gca.Author = ""
+				}
 				gca.GitProvider = string(model.GiteaProvider)
 				gca.CommitID = pl.After
 				gca.CommitUrl = pl.CompareURL
@@ -209,12 +229,26 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				}
 				if pl.Action == "merged" {
 					var gca model.GitCommonAttribute
-					gca.Author = pl.Sender.FullName
+					if pl.Sender != nil {
+						gca.Author = pl.Sender.FullName
+					} else {
+						gca.Author = ""
+					}
 					gca.GitProvider = string(model.GiteaProvider)
-					gca.CommitID = *pl.PullRequest.MergedCommitID
-					gca.CommitUrl = pl.PullRequest.HTMLURL
+					if pl.PullRequest != nil {
+						gca.CommitID = *pl.PullRequest.MergedCommitID
+						gca.CommitUrl = pl.PullRequest.HTMLURL
+					} else {
+						gca.CommitID = ""
+						gca.CommitUrl = ""
+					}
+
 					gca.EventType = string(gitea.PullRequestEvent)
-					gca.RepoName = pl.Repository.Name
+					if pl.Repository != nil {
+						gca.RepoName = pl.Repository.Name
+					} else {
+						gca.RepoName = ""
+					}
 					gca.TimeStamp = time.Now().Format(time.DateTime)
 					gca.Event = string(msg.Data)
 					conn.InsertGitCommon(gca, dbstatement.InsertGitea)
@@ -244,7 +278,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					return
 				}
 				var gca model.GitCommonAttribute
-				gca.Author = pl.Commits[0].Author.Name
+				if len(pl.Commits) > 0 {
+					gca.Author = pl.Commits[0].Author.Name
+				} else {
+					gca.Author = ""
+				}
 				gca.GitProvider = string(model.GitlabProvider)
 				gca.CommitID = pl.After
 				gca.CommitUrl = pl.Project.WebURL + "/commit/" + pl.After
@@ -302,8 +340,13 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				var gca model.GitCommonAttribute
 				gca.Author = pl.Actor.DisplayName
 				gca.GitProvider = string(model.BitBucketProvider)
-				gca.CommitID = pl.Push.Changes[0].New.Target.Hash
-				gca.CommitUrl = pl.Repository.Links.HTML.Href + "/commits/" + pl.Push.Changes[0].New.Target.Hash
+				if len(pl.Push.Changes) > 0 {
+					gca.CommitID = pl.Push.Changes[0].New.Target.Hash
+					gca.CommitUrl = pl.Repository.Links.HTML.Href + "/commits/" + pl.Push.Changes[0].New.Target.Hash
+				} else {
+					gca.CommitID = ""
+					gca.CommitUrl = ""
+				}
 				gca.EventType = string(bitbucket.RepoPushEvent)
 				gca.RepoName = pl.Repository.Name
 				gca.TimeStamp = time.Now().Format(time.DateTime)
