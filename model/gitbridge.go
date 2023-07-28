@@ -9,7 +9,7 @@ type GitProvider string
 
 var (
 	GithubHeader    EventKey = "X-GitHub-Event"
-	GitlabHeader    EventKey = "X-Gitlab-Token"
+	GitlabHeader    EventKey = "X-Gitlab-Event"
 	BitBucketHeader EventKey = "X-Event-Key"
 	GiteaHeader     EventKey = "X-Gitea-Event"
 	AzureHeader     EventKey = "X-Azure_Event"
@@ -34,13 +34,12 @@ type BasicEvent struct {
 	CreatedDate Date   `json:"createdDate"`
 }
 type GitCommonAttribute struct {
-	RepositoryName string
-	Author         string
-	GitProvider    string
-	CommitID       string
-	CommitUrl      string
-	EventType      string
-	RepoName       string
-	TimeStamp      string
-	Event          string
+	Author      string
+	GitProvider string
+	CommitID    string
+	CommitUrl   string
+	EventType   string
+	RepoName    string
+	TimeStamp   string
+	Event       string
 }
