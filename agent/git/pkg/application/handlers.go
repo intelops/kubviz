@@ -22,6 +22,7 @@ func (app *Application) PostGitea(c *gin.Context) {
 	if err != nil {
 		log.Println("Error Reading Request Body")
 	}
+	log.Println("postgitea handler data: ",string(jsonData))
 	app.conn.Publish(jsonData, string(model.GiteaProvider), model.GiteaHeader, model.EventValue(event))
 }
 
@@ -33,6 +34,7 @@ func (app *Application) PostAzure(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
+	log.Println("postazure handler data: ",string(jsonData))
 	var pl azuremodel.BasicEvent
 	err = json.Unmarshal([]byte(jsonData), &pl)
 	if err != nil {
@@ -63,6 +65,7 @@ func (app *Application) PostGithub(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
+	log.Println("postgithub handler data: ",string(jsonData))
 	app.conn.Publish(jsonData, string(model.GithubProvider), model.GithubHeader, model.EventValue(event))
 }
 
@@ -81,6 +84,7 @@ func (app *Application) PostGitlab(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
+	log.Println("postgitlab handler data: ",string(jsonData))
 	app.conn.Publish(jsonData, string(model.GitlabProvider), model.GitlabHeader, model.EventValue(event))
 }
 
@@ -99,6 +103,7 @@ func (app *Application) PostBitbucket(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
+	log.Println("postbitbucket handler data: ",string(jsonData))
 	app.conn.Publish(jsonData, string(model.BitBucketProvider), model.BitBucketHeader, model.EventValue(event))
 }
 
