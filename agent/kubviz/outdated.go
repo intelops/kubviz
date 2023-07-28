@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/intelops/kubviz/constants"
 	"log"
 	"os"
 	"regexp"
@@ -27,9 +28,8 @@ import (
 )
 
 const (
-	maxImageLength               = 50
-	maxTagLength                 = 50
-	eventSubject_outdated_images = "METRICS.outdated"
+	maxImageLength = 50
+	maxTagLength   = 50
 )
 
 var (
@@ -58,7 +58,7 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 	metrics := out
 	metrics.ClusterName = ClusterName
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(eventSubject_outdated_images, metricsJson)
+	_, err := js.Publish(constants.EventSubject_outdated_images, metricsJson)
 	if err != nil {
 		return err
 	}

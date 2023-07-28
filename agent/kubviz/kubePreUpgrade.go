@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/intelops/kubviz/constants"
 	"io"
 	"net/http"
 	"os"
@@ -25,13 +26,10 @@ import (
 )
 
 const (
-	baseURL                 = "https://raw.githubusercontent.com/kubernetes/kubernetes"
-	fileURL                 = "api/openapi-spec/swagger.json"
-	crdGroup                = "apiextensions.k8s.io"
-	apiRegistration         = "apiregistration.k8s.io"
-	kubeConfigFileName      = "dev-config"
-	eventSubject_deleted    = "METRICS.deletedAPI"
-	eventSubject_depricated = "METRICS.deprecatedAPI"
+	baseURL         = "https://raw.githubusercontent.com/kubernetes/kubernetes"
+	fileURL         = "api/openapi-spec/swagger.json"
+	crdGroup        = "apiextensions.k8s.io"
+	apiRegistration = "apiregistration.k8s.io"
 )
 
 type ignoreStruct map[string]struct{}
@@ -61,7 +59,7 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 		deprecatedAPI.ClusterName = ClusterName
 		fmt.Println("deprecatedAPI", deprecatedAPI)
 		deprecatedAPIJson, _ := json.Marshal(deprecatedAPI)
-		_, err := js.Publish(eventSubject_depricated, deprecatedAPIJson)
+		_, err := js.Publish(constants.EventSubject_depricated, deprecatedAPIJson)
 		if err != nil {
 			return err
 		}
@@ -71,7 +69,7 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 		deletedAPI.ClusterName = ClusterName
 		fmt.Println("deletedAPI", deletedAPI)
 		deletedAPIJson, _ := json.Marshal(deletedAPI)
-		_, err := js.Publish(eventSubject_deleted, deletedAPIJson)
+		_, err := js.Publish(constants.EventSubject_deleted, deletedAPIJson)
 		if err != nil {
 			return err
 		}

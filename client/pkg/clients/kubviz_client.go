@@ -2,28 +2,12 @@ package clients
 
 import (
 	"encoding/json"
+	"github.com/intelops/kubviz/constants"
 	"github.com/nats-io/nats.go"
 	"log"
 
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
 	"github.com/intelops/kubviz/model"
-)
-
-const (
-	ketallSubject      = "METRICS.ketall"
-	ketallConsumer     = "KETALL_EVENTS_CONSUMER"
-	rakeesSubject      = "METRICS.rakees"
-	rakeesConsumer     = "RAKEES_METRICS_CONSUMER"
-	outdatedSubject    = "METRICS.outdated"
-	outdatedConsumer   = "OUTDATED_EVENTS_CONSUMER"
-	deprecatedSubject  = "METRICS.deprecatedAPI"
-	deprecatedConsumer = "DEPRECATED_API_CONSUMER"
-	deletedSubject     = "METRICS.deletedAPI"
-	deletedConsumer    = "DELETED_API_CONSUMER"
-	kubvizSubject      = "METRICS.kubvizevent"
-	kubvizConsumer     = "KUBVIZ_EVENTS_CONSUMER"
-	kubscoreSubject    = "METRICS.kubescore"
-	kubscoreConsumer   = "KUBSCORE_CONSUMER"
 )
 
 type SubscriptionInfo struct {
@@ -39,8 +23,8 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 
 	subscriptions := []SubscriptionInfo{
 		{
-			Subject:  ketallSubject,
-			Consumer: ketallConsumer,
+			Subject:  constants.KetallSubject,
+			Consumer: constants.KetallConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.Resource
@@ -54,8 +38,8 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			},
 		},
 		{
-			Subject:  rakeesSubject,
-			Consumer: rakeesConsumer,
+			Subject:  constants.RakeesSubject,
+			Consumer: constants.RakeesConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.RakeesMetrics
@@ -69,8 +53,8 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			},
 		},
 		{
-			Subject:  outdatedSubject,
-			Consumer: outdatedConsumer,
+			Subject:  constants.OutdatedSubject,
+			Consumer: constants.OutdatedConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.CheckResultfinal
@@ -84,8 +68,8 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			},
 		},
 		{
-			Subject:  deprecatedSubject,
-			Consumer: deprecatedConsumer,
+			Subject:  constants.DeprecatedSubject,
+			Consumer: constants.DeprecatedConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.DeprecatedAPI
@@ -99,8 +83,8 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			},
 		},
 		{
-			Subject:  deletedSubject,
-			Consumer: deletedConsumer,
+			Subject:  constants.DeletedSubject,
+			Consumer: constants.DeletedConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.DeletedAPI
@@ -114,8 +98,8 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			},
 		},
 		{
-			Subject:  kubvizSubject,
-			Consumer: kubvizConsumer,
+			Subject:  constants.KubvizSubject,
+			Consumer: constants.KubvizConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.Metrics
@@ -129,8 +113,8 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			},
 		},
 		{
-			Subject:  kubscoreSubject,
-			Consumer: kubscoreConsumer,
+			Subject:  constants.KUBESCORE_SUBJECT,
+			Consumer: constants.KubscoreConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.KubeScoreRecommendations
@@ -143,9 +127,25 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 				log.Println()
 			},
 		},
+		{
+			Subject:  constants.TRIVY_K8S_SUBJECT,
+			Consumer: constants.TrivyConsumer,
+			Handler: func(msg *nats.Msg) {
+				msg.Ack()
+				var metrics model.Trivy
+				err := json.Unmarshal(msg.Data, &metrics)
+				if err != nil {
+					log.Fatal(err)
+				}
+				log.Printf("Trivy Metrics Received: %#v,", metrics)
+				conn.InsertTrivyMetrics(metrics)
+				log.Println()
+			},
+		},
 	}
 
 	for _, sub := range subscriptions {
+		log.Printf("Creating nats consumer %s with subject: %s \n", sub.Consumer, sub.Subject)
 		subscribe(sub)
 	}
 }

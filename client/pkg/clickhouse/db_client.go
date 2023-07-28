@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
@@ -31,6 +32,7 @@ type DBInterface interface {
 	InsertKubvizEvent(model.Metrics)
 	InsertGitEvent(string)
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
+	InsertTrivyMetrics(metrics model.Trivy)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
 	RetriveKubepugEvent() ([]model.Result, error)
@@ -66,7 +68,8 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		}
 		return nil, err
 	}
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, dockerHubBuildTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
+
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -281,6 +284,73 @@ func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
+	for _, finding := range metrics.Report.Findings {
+		for _, result := range finding.Results {
+			for _, vulnerability := range result.Vulnerabilities {
+				var (
+					tx, _   = c.conn.Begin()
+					stmt, _ = tx.Prepare(InsertTrivyVul)
+				)
+				if _, err := stmt.Exec(
+					metrics.ID,
+					metrics.ClusterName,
+					finding.Namespace,
+					finding.Kind,
+					finding.Name,
+					vulnerability.VulnerabilityID,
+					strings.Join(vulnerability.VendorIDs, " "),
+					vulnerability.PkgID,
+					vulnerability.PkgName,
+					vulnerability.PkgPath,
+					vulnerability.InstalledVersion,
+					vulnerability.FixedVersion,
+					vulnerability.Title,
+					vulnerability.Severity,
+					vulnerability.PublishedDate,
+					vulnerability.LastModifiedDate,
+				); err != nil {
+					log.Fatal(err)
+				}
+				if err := tx.Commit(); err != nil {
+					log.Fatal(err)
+				}
+				stmt.Close()
+			}
+			for _, misconfiguration := range result.Misconfigurations {
+				var (
+					tx, _   = c.conn.Begin()
+					stmt, _ = tx.Prepare(InsertTrivyMisconfig)
+				)
+				if _, err := stmt.Exec(
+					metrics.ID,
+					metrics.ClusterName,
+					finding.Namespace,
+					finding.Kind,
+					finding.Name,
+					misconfiguration.ID,
+					misconfiguration.AVDID,
+					misconfiguration.Type,
+					misconfiguration.Title,
+					misconfiguration.Description,
+					misconfiguration.Message,
+					misconfiguration.Query,
+					misconfiguration.Resolution,
+					misconfiguration.Severity,
+					string(misconfiguration.Status),
+				); err != nil {
+					log.Fatal(err)
+				}
+				if err := tx.Commit(); err != nil {
+					log.Fatal(err)
+				}
+				stmt.Close()
+			}
+		}
+	}
+
 }
 
 func (c *DBClient) Close() {
