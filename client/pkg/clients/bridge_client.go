@@ -167,7 +167,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					var gca model.GitCommonAttribute
 					gca.Author = pl.PullRequest.User.Login
 					gca.GitProvider = string(model.GithubProvider)
-					gca.CommitID = *pl.PullRequest.MergeCommitSha
+					if pl.PullRequest.MergeCommitSha != nil {
+						gca.CommitID = *pl.PullRequest.MergeCommitSha
+					} else {
+						gca.CommitID = ""
+					}
 					gca.CommitUrl = pl.PullRequest.HTMLURL
 					gca.EventType = string(github.PullRequestEvent)
 					gca.RepoName = pl.Repository.Name
