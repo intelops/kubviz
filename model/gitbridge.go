@@ -12,7 +12,7 @@ var (
 	GitlabHeader    EventKey = "X-Gitlab-Event"
 	BitBucketHeader EventKey = "X-Event-Key"
 	GiteaHeader     EventKey = "X-Gitea-Event"
-	AzureHeader     EventKey = "X-Azure_Event"
+	AzureHeader     EventKey = "X-Azure-Event"
 )
 
 const (
