@@ -145,6 +145,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 	}
 
 	for _, sub := range subscriptions {
+		log.Printf("Creating nats consumer %s with subject: %s \n", sub.Consumer, sub.Subject)
 		subscribe(sub)
 	}
 }
