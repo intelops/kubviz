@@ -12,6 +12,8 @@ import (
 )
 
 func (app *Application) PostGitea(c *gin.Context) {
+	log.Println("gitea handler called...")
+	defer log.Println("gitea handler exited...")
 
 	event := c.Request.Header.Get(string(model.GiteaHeader))
 	if len(event) == 0 {
@@ -22,10 +24,13 @@ func (app *Application) PostGitea(c *gin.Context) {
 	if err != nil {
 		log.Println("Error Reading Request Body")
 	}
+	log.Printf("GITEA DATA: %#v", string(jsonData))
 	app.conn.Publish(jsonData, string(model.GiteaProvider), model.GiteaHeader, model.EventValue(event))
 }
 
 func (app *Application) PostAzure(c *gin.Context) {
+	log.Println("azure handler called...")
+	defer log.Println("azure handler exited...")
 
 	jsonData, err := c.GetRawData()
 	if err != nil {
@@ -33,6 +38,7 @@ func (app *Application) PostAzure(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
+	log.Printf("AZURE DATA: %#v", string(jsonData))
 	var pl azuremodel.BasicEvent
 	err = json.Unmarshal([]byte(jsonData), &pl)
 	if err != nil {
@@ -51,6 +57,9 @@ func (app *Application) PostAzure(c *gin.Context) {
 
 // githubHandler handles the github webhooks post requests.
 func (app *Application) PostGithub(c *gin.Context) {
+	log.Println("github handler called...")
+	defer log.Println("github handler exited...")
+	
 	event := c.Request.Header.Get(string(model.GithubHeader))
 	if len(event) == 0 {
 		log.Println("error getting the github event from header")
@@ -63,11 +72,14 @@ func (app *Application) PostGithub(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
+	log.Printf("GITHUB DATA: %#v", string(jsonData))
 	app.conn.Publish(jsonData, string(model.GithubProvider), model.GithubHeader, model.EventValue(event))
 }
 
 // gitlabHandler handles the github webhooks post requests.
 func (app *Application) PostGitlab(c *gin.Context) {
+	log.Println("gitlab handler called...")
+	defer log.Println("gitlab handler exited...")
 
 	event := c.Request.Header.Get(string(model.GitlabHeader))
 	if len(event) == 0 {
@@ -81,11 +93,14 @@ func (app *Application) PostGitlab(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
+	log.Printf("GITLAB DATA: %#v", string(jsonData))
 	app.conn.Publish(jsonData, string(model.GitlabProvider), model.GitlabHeader, model.EventValue(event))
 }
 
 // bitBucketHandler handles the github webhooks post requests.
 func (app *Application) PostBitbucket(c *gin.Context) {
+	log.Println("bitbucket handler called...")
+	defer log.Println("bitbucket handler exited...")
 
 	event := c.Request.Header.Get(string(model.BitBucketHeader))
 	if len(event) == 0 {
@@ -99,6 +114,7 @@ func (app *Application) PostBitbucket(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
+	log.Printf("BITBUCKET DATA: %#v", string(jsonData))
 	app.conn.Publish(jsonData, string(model.BitBucketProvider), model.BitBucketHeader, model.EventValue(event))
 }
 
