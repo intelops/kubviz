@@ -339,7 +339,7 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 					misconfiguration.Query,
 					misconfiguration.Resolution,
 					misconfiguration.Severity,
-					misconfiguration.Status,
+					string(misconfiguration.Status),
 				); err != nil {
 					log.Fatal(err)
 				}
