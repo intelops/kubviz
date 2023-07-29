@@ -363,6 +363,7 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 			if _, err := stmt.Exec(
 				metrics.ID,
 				metrics.ClusterName,
+				metrics.Report.ArtifactName,
 				vulnerability.VulnerabilityID,
 				vulnerability.PkgID,
 				vulnerability.PkgName,
