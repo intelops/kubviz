@@ -46,16 +46,16 @@ func NewNATSContext(conf *config.Config, dbClient clickhouse.DBInterface) (*NATS
 	}
 	ctx.SubscribeGitBridgeNats(dbClient)
 
-	// _, err = stream.StreamInfo("CONTAINERMETRICS")
-	// if err != nil {
-	// 	return nil, fmt.Errorf("container metrics stream not found %w", err)
-	// }
-	// ctx.SubscribeContainerNats(dbClient)
-	// _, err = stream.StreamInfo("METRICS")
-	// if err != nil {
-	// 	return nil, fmt.Errorf("kubeviz metrics stream not found %w", err)
-	// }
-	// ctx.SubscribeAllKubvizNats(dbClient)
+	_, err = stream.StreamInfo("CONTAINERMETRICS")
+	if err != nil {
+		return nil, fmt.Errorf("container metrics stream not found %w", err)
+	}
+	ctx.SubscribeContainerNats(dbClient)
+	_, err = stream.StreamInfo("METRICS")
+	if err != nil {
+		return nil, fmt.Errorf("kubeviz metrics stream not found %w", err)
+	}
+	ctx.SubscribeAllKubvizNats(dbClient)
 
 	return ctx, nil
 }
