@@ -22,7 +22,7 @@ type Container string
 const (
 	containerSubjects Container = "CONTAINERMETRICS.*"
 	containerSubject  Container = "CONTAINERMETRICS.git"
-	containerConsumer Container = "container-event-consumer"
+	containerConsumer Container = "CONTAINER_EVENT_CONSUMER"
 )
 
 func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
