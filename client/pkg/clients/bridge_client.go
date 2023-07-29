@@ -29,12 +29,13 @@ type GitNats string
 const (
 	bridgeSubjects GitNats = "GITMETRICS.*"
 	bridgeSubject  GitNats = "GITMETRICS.git"
-	bridgeConsumer GitNats = "GIT_CONSUMER"
+	bridgeConsumer GitNats = "Git-Consumer"
 )
 
 // SubscribeGitBridgeNats subscribes to nats jetstream and calls
 // the respective funcs to insert data into clickhouse DB
 func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
+	log.Printf("Creating nats consumer %s with subject: %s \n", bridgeConsumer, bridgeSubject)
 	n.stream.Subscribe(string(bridgeSubject), func(msg *nats.Msg) {
 		msg.Ack()
 		gitprovider := msg.Header.Get("GitProvider")
