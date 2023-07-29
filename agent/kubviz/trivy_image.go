@@ -6,7 +6,6 @@ import (
 	"strings"
 	"sync"
 
-	//"github.com/aquasecurity/trivy/pkg/k8s/report"
 	"github.com/aquasecurity/trivy/pkg/types"
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
@@ -17,7 +16,6 @@ import (
 
 func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
-	//kubeconfigPath := "/home/nithu/JAD/config" // Set the correct kubeconfig file path or pass nil
 	images, err := ListImages(config)
 	if err != nil {
 		log.Fatal(err)
