@@ -32,6 +32,7 @@ type DBInterface interface {
 	InsertKubvizEvent(model.Metrics)
 	InsertGitEvent(string)
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
+	InsertTrivyImageMetrics(metrics model.TrivyImage)
 	InsertTrivyMetrics(metrics model.Trivy)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
@@ -69,7 +70,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -352,7 +353,36 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 	}
 
 }
+func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
+	for _, result := range metrics.Report.Results {
+		for _, vulnerability := range result.Vulnerabilities {
+			var (
+				tx, _   = c.conn.Begin()
+				stmt, _ = tx.Prepare(InsertTrivyImage)
+			)
+			if _, err := stmt.Exec(
+				metrics.ID,
+				metrics.ClusterName,
+				vulnerability.VulnerabilityID,
+				vulnerability.PkgID,
+				vulnerability.PkgName,
+				vulnerability.InstalledVersion,
+				vulnerability.FixedVersion,
+				vulnerability.Title,
+				vulnerability.Severity,
+				vulnerability.PublishedDate,
+				vulnerability.LastModifiedDate,
+			); err != nil {
+				log.Fatal(err)
+			}
+			if err := tx.Commit(); err != nil {
+				log.Fatal(err)
+			}
+			stmt.Close()
+		}
 
+	}
+}
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
 }

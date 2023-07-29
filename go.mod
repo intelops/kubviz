@@ -14,7 +14,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-chi/chi/v5 v5.0.8
-	github.com/go-playground/webhooks/v6 v6.2.0
+	github.com/go-co-op/gocron v1.30.1
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -105,6 +105,7 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/samber/lo v1.38.1 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect

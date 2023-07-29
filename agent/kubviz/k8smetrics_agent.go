@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/intelops/kubviz/constants"
-	"github.com/nats-io/nats.go"
 	"log"
 	"os"
 	"strconv"
@@ -11,7 +9,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-co-op/gocron"
+	"github.com/nats-io/nats.go"
+
 	"context"
+
 	"github.com/intelops/kubviz/model"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,6 +34,14 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// constants for jetstream
+const (
+	streamName     = "METRICS"
+	streamSubjects = "METRICS.*"
+	eventSubject   = "METRICS.kubvizevent"
+	allSubject     = "METRICS.all"
+)
+
 type RuningEnv int
 
 const (
@@ -48,7 +58,8 @@ var (
 	//for local testing provide the location of kubeconfig
 	// inside the civo file paste your kubeconfig
 	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)
-	cluster_conf_loc string = os.Getenv("CONFIG_LOCATION")
+	cluster_conf_loc      string = os.Getenv("CONFIG_LOCATION")
+	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
 func main() {
@@ -57,17 +68,18 @@ func main() {
 	outdatedErrChan := make(chan error, 1)
 	kubePreUpgradeChan := make(chan error, 1)
 	getAllResourceChan := make(chan error, 1)
+	trivyK8sMetricsChan := make(chan error, 1)
 	clusterMetricsChan := make(chan error, 1)
 	kubescoreMetricsChan := make(chan error, 1)
-	trivyK8sMetricsChan := make(chan error, 1)
+	trivyImagescanChan := make(chan error, 1)
 	RakeesErrChan := make(chan error, 1)
 	var (
 		wg        sync.WaitGroup
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
-	// waiting for 7 go routines
-	wg.Add(7)
+	// waiting for 4 go routines
+	wg.Add(6)
 	// connecting with nats ...
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
@@ -92,23 +104,35 @@ func main() {
 		clientset = getK8sClient(config)
 	}
 	// starting all the go routines
-	go outDatedImages(config, js, &wg, outdatedErrChan)
-	go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-	go GetAllResources(config, js, &wg, getAllResourceChan)
-	go RakeesOutput(config, js, &wg, RakeesErrChan)
-	go getK8sEvents(clientset)
-	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
-	go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
-	go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
-	wg.Wait()
-	// once the go routines completes we will close the error channels
-	close(outdatedErrChan)
-	close(kubePreUpgradeChan)
-	close(getAllResourceChan)
-	close(clusterMetricsChan)
-	close(kubescoreMetricsChan)
-	close(RakeesErrChan)
-	close(trivyK8sMetricsChan)
+	collectAndPublishMetrics := func() {
+		go outDatedImages(config, js, &wg, outdatedErrChan)
+		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+		go GetAllResources(config, js, &wg, getAllResourceChan)
+		go RakeesOutput(config, js, &wg, RakeesErrChan)
+		go getK8sEvents(clientset)
+		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
+		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
+		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
+		wg.Wait()
+		// once the go routines completes we will close the error channels
+		close(outdatedErrChan)
+		close(kubePreUpgradeChan)
+		close(getAllResourceChan)
+		close(clusterMetricsChan)
+		close(kubescoreMetricsChan)
+		close(trivyImagescanChan)
+		close(trivyK8sMetricsChan)
+		close(RakeesErrChan)
+	}
+	collectAndPublishMetrics()
+	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
+	if err != nil {
+		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+	}
+	s := gocron.NewScheduler(time.UTC)
+	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Adjust the interval as needed
+	s.StartAsync()
 	// for loop will wait for the error channels
 	// logs if any error occurs
 	for {
@@ -133,7 +157,7 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
-		case err := <-RakeesErrChan:
+		case err := <-trivyImagescanChan:
 			if err != nil {
 				log.Println(err)
 			}
@@ -141,10 +165,32 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
+		case err := <-RakeesErrChan:
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 
 }
+
+//func setupAgent() {
+//	configurations, err := config.GetAgentConfigurations()
+//	if err != nil {
+//		log.Printf("Failed to get agent config: %v\n", err)
+//		panic(err)
+//	}
+//	//k8s := &K8sData{
+//	//	Namespace:          configurations.SANamespace,
+//	//	ServiceAccountName: configurations.SAName,
+//	//	KubeconfigFileName: constants.KUBECONFIG,
+//	//}
+//	//_, err = k8s.GenerateKubeConfiguration()
+//	if err != nil {
+//		log.Printf("Failed to generate kubeconfig: %v\n", err)
+//		panic(err)
+//	}
+//}
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
@@ -163,7 +209,7 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 		ClusterName: ClusterName,
 	}
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.EventSubject, metricsJson)
+	_, err := js.Publish(eventSubject, metricsJson)
 	if err != nil {
 		return true, err
 	}
@@ -174,16 +220,16 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 // createStream creates a stream by using JetStreamContext
 func createStream(js nats.JetStreamContext) error {
 	// Check if the METRICS stream already exists; if not, create it.
-	stream, err := js.StreamInfo(constants.StreamName)
+	stream, err := js.StreamInfo(streamName)
 	log.Printf("Retrieved stream %s", fmt.Sprintf("%v", stream))
 	if err != nil {
 		log.Printf("Error getting stream %s", err)
 	}
 	if stream == nil {
-		log.Printf("creating stream %q and subjects %q", constants.StreamName, constants.StreamSubjects)
+		log.Printf("creating stream %q and subjects %q", streamName, streamSubjects)
 		_, err = js.AddStream(&nats.StreamConfig{
-			Name:     constants.StreamName,
-			Subjects: []string{constants.StreamSubjects},
+			Name:     streamName,
+			Subjects: []string{streamSubjects},
 		})
 		checkErr(err)
 	}
