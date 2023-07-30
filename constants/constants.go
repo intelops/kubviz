@@ -25,4 +25,6 @@ const (
 	KubvizConsumer               = "KUBVIZ_EVENTS_CONSUMER"
 	KubscoreConsumer             = "KUBSCORE_CONSUMER"
 	TrivyConsumer                = "TRIVY_CONSUMER"
+	TRIVY_IMAGE_SUBJECT          = "METRICS.trivyimage"
+	Trivy_Image_Consumer         = "TRIVY_IMAGE_CONSUMER"
 )

@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/intelops/kubviz/constants"
-	"github.com/nats-io/nats.go"
 	"log"
 	"os"
 	"strconv"
@@ -11,7 +9,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-co-op/gocron"
+	"github.com/nats-io/nats.go"
+
 	"context"
+
+	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,6 +35,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// constants for jetstream
+
 type RuningEnv int
 
 const (
@@ -48,7 +53,8 @@ var (
 	//for local testing provide the location of kubeconfig
 	// inside the civo file paste your kubeconfig
 	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)
-	cluster_conf_loc string = os.Getenv("CONFIG_LOCATION")
+	cluster_conf_loc      string = os.Getenv("CONFIG_LOCATION")
+	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
 func main() {
@@ -57,17 +63,18 @@ func main() {
 	outdatedErrChan := make(chan error, 1)
 	kubePreUpgradeChan := make(chan error, 1)
 	getAllResourceChan := make(chan error, 1)
+	trivyK8sMetricsChan := make(chan error, 1)
 	clusterMetricsChan := make(chan error, 1)
 	kubescoreMetricsChan := make(chan error, 1)
-	trivyK8sMetricsChan := make(chan error, 1)
+	trivyImagescanChan := make(chan error, 1)
 	RakeesErrChan := make(chan error, 1)
 	var (
 		wg        sync.WaitGroup
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
-	// waiting for 7 go routines
-	wg.Add(7)
+	// waiting for 4 go routines
+	wg.Add(8)
 	// connecting with nats ...
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
@@ -92,23 +99,35 @@ func main() {
 		clientset = getK8sClient(config)
 	}
 	// starting all the go routines
-	go outDatedImages(config, js, &wg, outdatedErrChan)
-	go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-	go GetAllResources(config, js, &wg, getAllResourceChan)
-	go RakeesOutput(config, js, &wg, RakeesErrChan)
-	go getK8sEvents(clientset)
-	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
-	go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
-	go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
-	wg.Wait()
-	// once the go routines completes we will close the error channels
-	close(outdatedErrChan)
-	close(kubePreUpgradeChan)
-	close(getAllResourceChan)
-	close(clusterMetricsChan)
-	close(kubescoreMetricsChan)
-	close(RakeesErrChan)
-	close(trivyK8sMetricsChan)
+	collectAndPublishMetrics := func() {
+		go outDatedImages(config, js, &wg, outdatedErrChan)
+		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+		go GetAllResources(config, js, &wg, getAllResourceChan)
+		go RakeesOutput(config, js, &wg, RakeesErrChan)
+		go getK8sEvents(clientset)
+		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
+		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
+		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
+		wg.Wait()
+		// once the go routines completes we will close the error channels
+		close(outdatedErrChan)
+		close(kubePreUpgradeChan)
+		close(getAllResourceChan)
+		close(clusterMetricsChan)
+		close(kubescoreMetricsChan)
+		close(trivyImagescanChan)
+		close(trivyK8sMetricsChan)
+		close(RakeesErrChan)
+	}
+	collectAndPublishMetrics()
+	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
+	if err != nil {
+		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+	}
+	s := gocron.NewScheduler(time.UTC)
+	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Adjust the interval as needed
+	s.StartAsync()
 	// for loop will wait for the error channels
 	// logs if any error occurs
 	for {
@@ -133,11 +152,15 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
-		case err := <-RakeesErrChan:
+		case err := <-trivyImagescanChan:
 			if err != nil {
 				log.Println(err)
 			}
 		case err := <-trivyK8sMetricsChan:
+			if err != nil {
+				log.Println(err)
+			}
+		case err := <-RakeesErrChan:
 			if err != nil {
 				log.Println(err)
 			}
