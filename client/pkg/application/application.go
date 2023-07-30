@@ -16,7 +16,7 @@ type Application struct {
 }
 
 func Start() *Application {
-	log.Println("Client Application started With New Code...")
+	log.Println("Client Application started...")
 	cfg := &config.Config{}
 	if err := envconfig.Process("", cfg); err != nil {
 		log.Fatalf("Could not parse env Config: %v", err)
