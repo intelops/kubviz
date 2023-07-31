@@ -50,6 +50,7 @@ KubViz offers a seamless integration with Git repositories, empowering you to ef
 
 KubViz also monitors changes in your container registry, providing visibility into image updates. By tracking these changes, KubViz helps you proactively manage container security and compliance.
 
+It comprehensively scans the kubernetes containers for the security flaws such as vulnerabilities and misconfigurations.
 ## Architecture diagram
 
 ![Arch. Diagram](.readme_assets/kubviz.png)
@@ -254,6 +255,17 @@ Use KubViz to monitor your cluster events, including:
 
 - Using KubViz you can also monitors changes in your container registry, providing visibility into image updates. By tracking these changes, KubViz helps you proactively manage container registries.
 
+<br>
+
+<br clear="all">
+
+### Kubernetes Container Security Tracking
+
+<img src=".readme_assets/TrivyK8s.jpeg" alt="Kubernetes Container Security Tracking" width="525" align="right">
+
+<br>
+
+- Using KubViz you can comprehensively scan the kubernetes containers for the security flaws such as vulnerabilities and misconfigurations.
 <br>
 
 <br clear="all">
