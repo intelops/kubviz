@@ -79,6 +79,22 @@ const kubescoreTable DBStatement = `
 			recommendations String
 	    ) engine=File(TabSeparated)
 	`
+const trivyTableImage DBStatement = `
+	CREATE TABLE IF NOT EXISTS trivyimage (
+		id UUID,
+		cluster_name String,
+		artifact_name String,
+		vul_id String,
+		vul_pkg_id String,
+		vul_pkg_name String,
+		vul_installed_version String,
+		vul_fixed_version String,
+		vul_title String,
+		vul_severity String,
+		vul_published_date DateTime('UTC'),
+		vul_last_modified_date DateTime('UTC')
+	) engine=File(TabSeparated)
+	`
 const trivyTableVul DBStatement = `
 	    CREATE TABLE IF NOT EXISTS trivy_vul (
 		    id UUID,
@@ -143,4 +159,5 @@ const containerDockerhubTable DBStatement = `CREATE table IF NOT EXISTS containe
 const containerGithubTable DBStatement = `CREATE table IF NOT EXISTS container_github(event JSON) ENGINE = MergeTree ORDER BY tuple();`
 const InsertKubeScore string = "INSERT INTO kubescore (id, namespace, cluster_name, recommendations) VALUES (?, ?, ?, ?)"
 const InsertTrivyVul string = "INSERT INTO trivy_vul (id, cluster_name, namespace, kind, name, vul_id, vul_vendor_ids, vul_pkg_id, vul_pkg_name, vul_pkg_path, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?. ?)"
+const InsertTrivyImage string = "INSERT INTO trivyimage (id, cluster_name, artifact_name, vul_id,  vul_pkg_id, vul_pkg_name,  vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date) VALUES ( ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertTrivyMisconfig string = "INSERT INTO trivy_misconfig (id, cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?. ?, ?)"
