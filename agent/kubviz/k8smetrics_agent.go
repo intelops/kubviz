@@ -52,7 +52,7 @@ var (
 	// inside the civo file paste your kubeconfig
 	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)
 	cluster_conf_loc      string = os.Getenv("CONFIG_LOCATION")
-	schedulingIntervalStr        = "20m"
+	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
 func main() {
@@ -105,7 +105,6 @@ func main() {
 		go RakeesOutput(config, js, &wg, RakeesErrChan)
 		go getK8sEvents(clientset)
 		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
-		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
 		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
 		wg.Wait()
@@ -113,22 +112,25 @@ func main() {
 		close(outdatedErrChan)
 		close(kubePreUpgradeChan)
 		close(getAllResourceChan)
-		close(clusterMetricsChan)
 		close(kubescoreMetricsChan)
 		close(trivyImagescanChan)
 		close(trivyK8sMetricsChan)
 		close(RakeesErrChan)
 	}
 	collectAndPublishMetrics()
+	go publishMetrics(clientset, js, &wg, clusterMetricsChan)
+	wg.Wait()
+	close(clusterMetricsChan)
 	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
 	if err != nil {
 		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
 	}
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Adjust the interval as needed
-	s.StartAsync()
+	s.StartBlocking()
 	// for loop will wait for the error channels
 	// logs if any error occurs
+
 	for {
 		select {
 		case err := <-outdatedErrChan:
