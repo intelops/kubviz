@@ -231,7 +231,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					log.Println("error occurred while unmarshal the payload Error:", err.Error())
 					return
 				}
-				if pl.Action == "merged" {
+				if pl.Action == "closed" {
 					var gca model.GitCommonAttribute
 					if pl.Sender != nil {
 						gca.Author = pl.Sender.FullName
