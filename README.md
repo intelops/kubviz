@@ -266,6 +266,8 @@ Use KubViz to monitor your cluster events, including:
 <br>
 
 - Using KubViz you can comprehensively scan the kubernetes containers for the security flaws such as vulnerabilities and misconfigurations.
+- Detects comprehensive vulnerabilities in OS packages (Alpine, Red Hat Universal Base Image, Red Hat Enterprise Linux, CentOS, Oracle Linux, Debian, Ubuntu, Amazon Linux, openSUSE Leap, SUSE Enterprise Linux, Photon OS and Distroless).
+- Detects configuration issues in Kubernetes cluster
 <br>
 
 <br clear="all">
