@@ -37,13 +37,5 @@ paths:
         '200':
           description: OK
 
-  /event/docker/github:
-    post:
-      tags:
-        - public
-      summary: Post github Docker artifactory events
-      responses:
-        '200':
-          description: OK
 
 # oapi-codegen -config ./cfg.yaml ./openapi.yaml
