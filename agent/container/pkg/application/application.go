@@ -69,7 +69,6 @@ func (app *Application) Start() {
 	// log.Printf("Starting server at %v", app.httpServer.Addr)
 	log.Printf("Starting server at %v", 8082)
 	var err error
-	app.GithubContainerWatch()
 	if err = app.httpServer.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("Unexpected server close: %v", err)
 	}

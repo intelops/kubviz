@@ -10,6 +10,7 @@ import (
 
 func main() {
 	app := application.New()
+	go app.GithubContainerWatch()
 	go app.Start()
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
