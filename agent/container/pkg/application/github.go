@@ -1,6 +1,7 @@
 package application
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -31,7 +32,15 @@ func (app *Application) GithubContainerWatch() {
 		}
 		for _, version := range versions {
 			image := BuildImageDetails(pkg, version)
-			// Do something with the image...
+			data, err := json.Marshal(image)
+			if err != nil {
+				log.Printf("unable to marshal the image details %v", err)
+				return
+			}
+			err = app.conn.Publish(data, "github")
+			if err != nil {
+				log.Printf("Publish failed for event: %v, reason: %v", string(data), err)
+			}
 		}
 	}
 }
