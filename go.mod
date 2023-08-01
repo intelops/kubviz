@@ -22,6 +22,7 @@ require (
 	github.com/nats-io/nats.go v1.27.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
+	github.com/vijeyash1/go-github-container v1.0.0
 	golang.org/x/term v0.10.0
 	k8s.io/api v0.27.3
 	k8s.io/apimachinery v0.27.3
