@@ -24,9 +24,12 @@ type Application struct {
 func New() *Application {
 	cfg := &config.Config{}
 	if err := envconfig.Process("", cfg); err != nil {
-		log.Fatalf("Could not parse env Config: %v", err)
+		log.Fatalf("Could not parse nats env Config: %v", err)
 	}
-
+	githubcfg := &config.GithubConfig{}
+	if err := envconfig.Process("", githubcfg); err != nil {
+		log.Fatalf("Could not parse github env Config: %v", err)
+	}
 	// Connect to NATS
 	natsContext, err := clients.NewNATSContext(cfg)
 	if err != nil {
