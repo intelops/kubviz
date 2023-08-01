@@ -15,18 +15,22 @@ import (
 )
 
 type Application struct {
-	Config     *config.Config
-	apiServer  *handler.APIHandler
-	conn       *clients.NATSContext
-	httpServer *http.Server
+	Config       *config.Config
+	apiServer    *handler.APIHandler
+	conn         *clients.NATSContext
+	httpServer   *http.Server
+	GithubConfig *config.GithubConfig
 }
 
 func New() *Application {
 	cfg := &config.Config{}
 	if err := envconfig.Process("", cfg); err != nil {
-		log.Fatalf("Could not parse env Config: %v", err)
+		log.Fatalf("Could not parse nats env Config: %v", err)
 	}
-
+	githubcfg := &config.GithubConfig{}
+	if err := envconfig.Process("", githubcfg); err != nil {
+		log.Fatalf("Could not parse github env Config: %v", err)
+	}
 	// Connect to NATS
 	natsContext, err := clients.NewNATSContext(cfg)
 	if err != nil {
@@ -52,10 +56,11 @@ func New() *Application {
 	}
 
 	return &Application{
-		Config:     cfg,
-		conn:       natsContext,
-		apiServer:  apiServer,
-		httpServer: httpServer,
+		Config:       cfg,
+		conn:         natsContext,
+		apiServer:    apiServer,
+		httpServer:   httpServer,
+		GithubConfig: githubcfg,
 	}
 }
 
