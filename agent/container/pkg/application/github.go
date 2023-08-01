@@ -52,7 +52,7 @@ func (app *Application) GithubContainerWatch() {
 			}
 
 			// Publish the JSON-encoded image details to the "github" topic.
-			err = app.conn.Publish(data, "github")
+			err = app.conn.Publish(data, "Github_Registry")
 			if err != nil {
 				log.Printf("Publish failed for event: %v, reason: %v", string(data), err)
 			}

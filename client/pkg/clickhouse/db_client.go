@@ -505,17 +505,39 @@ func (c *DBClient) InsertContainerEventDockerHub(build model.DockerHubBuild) {
 }
 
 func (c *DBClient) InsertContainerEventGithub(event string) {
-	ctx := context.Background()
-	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO container_github")
+	var image model.GithubImage
+	err := json.Unmarshal([]byte(event), &image)
+	if err != nil {
+		log.Printf("Unable to unmarshal the Github image details: %v", err)
+		return
+	}
+
+	tx, err := c.conn.Begin()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err = batch.Append(event); err != nil {
+	query := "INSERT INTO container_github (package_id, created_at, image_name, organisation, updated_at, visibility, sha_id, image_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	if _, err := stmt.Exec(
+		image.PackageId,
+		image.CreatedAt,
+		image.ImageName,
+		image.Organisation,
+		image.UpdatedAt,
+		image.Visibility,
+		image.ShaID,
+		image.ImageId,
+	); err != nil {
 		log.Fatal(err)
 	}
 
-	if err = batch.Send(); err != nil {
+	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
 }
