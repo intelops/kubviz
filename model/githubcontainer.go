@@ -1,6 +1,6 @@
 package model
 
-// GithubImage represents basic details about docker image from github.
+// GithubImage represents basic details about docker image from github...
 type GithubImage struct {
 	PackageId    string `json:"package_id"`
 	CreatedAt    string `json:"created_at"`
