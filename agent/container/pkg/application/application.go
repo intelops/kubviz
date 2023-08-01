@@ -15,10 +15,11 @@ import (
 )
 
 type Application struct {
-	Config     *config.Config
-	apiServer  *handler.APIHandler
-	conn       *clients.NATSContext
-	httpServer *http.Server
+	Config       *config.Config
+	apiServer    *handler.APIHandler
+	conn         *clients.NATSContext
+	httpServer   *http.Server
+	GithubConfig *config.GithubConfig
 }
 
 func New() *Application {
@@ -55,10 +56,11 @@ func New() *Application {
 	}
 
 	return &Application{
-		Config:     cfg,
-		conn:       natsContext,
-		apiServer:  apiServer,
-		httpServer: httpServer,
+		Config:       cfg,
+		conn:         natsContext,
+		apiServer:    apiServer,
+		httpServer:   httpServer,
+		GithubConfig: githubcfg,
 	}
 }
 
