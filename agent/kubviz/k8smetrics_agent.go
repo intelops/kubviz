@@ -58,6 +58,7 @@ var (
 )
 
 func main() {
+	log.Println("new image running")
 	env := Production
 	// error channels declared for the go routines
 	outdatedErrChan := make(chan error, 1)
