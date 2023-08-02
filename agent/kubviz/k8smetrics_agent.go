@@ -170,6 +170,9 @@ func main() {
 		doneChan <- true
 		close(doneChan)
 	}
+	if schedulingIntervalStr == "" {
+		schedulingIntervalStr = "20m" // Default value, e.g., 20 minutes
+	}
 	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
 	if err != nil {
 		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
