@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -9,6 +10,7 @@ import (
 )
 
 func main() {
+	log.Println("new client running")
 	app := application.Start()
 
 	signals := make(chan os.Signal, 1)
