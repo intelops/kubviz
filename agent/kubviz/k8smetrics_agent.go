@@ -58,7 +58,6 @@ var (
 )
 
 func main() {
-	log.Println("new image running")
 	env := Production
 	// error channels declared for the go routines
 	outdatedErrChan := make(chan error, 1)
@@ -74,8 +73,6 @@ func main() {
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
-	// waiting for 4 go routines
-	wg.Add(8)
 	// connecting with nats ...
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
@@ -99,15 +96,64 @@ func main() {
 		}
 		clientset = getK8sClient(config)
 	}
+
+	// starting the endless go routine to monitor the cluster
+	go publishMetrics(clientset, js, clusterMetricsChan)
+
 	// starting all the go routines
 	collectAndPublishMetrics := func() {
+		// Start a goroutine to handle errors
+		doneChan := make(chan bool)
+		go func() {
+			// for loop will wait for the error channels
+			// logs if any error occurs
+			for {
+				select {
+				case err := <-outdatedErrChan:
+					if err != nil {
+						log.Println(err)
+					}
+				case err := <-kubePreUpgradeChan:
+					if err != nil {
+						log.Println(err)
+					}
+				case err := <-getAllResourceChan:
+					if err != nil {
+						log.Println(err)
+					}
+				case err := <-clusterMetricsChan:
+					if err != nil {
+						log.Println(err)
+					}
+				case err := <-kubescoreMetricsChan:
+					if err != nil {
+						log.Println(err)
+					}
+				case err := <-trivyImagescanChan:
+					if err != nil {
+						log.Println(err)
+					}
+				case err := <-trivyK8sMetricsChan:
+					if err != nil {
+						log.Println(err)
+					}
+				case err := <-RakeesErrChan:
+					if err != nil {
+						log.Println(err)
+					}
+				case <-doneChan:
+					return // All other goroutines have finished, so exit the goroutine
+				}
+			}
+		}()
+		wg.Add(7) // Initialize the WaitGroup for the seven goroutines
+		// ... start other goroutines ...
 		go outDatedImages(config, js, &wg, outdatedErrChan)
 		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
 		go GetAllResources(config, js, &wg, getAllResourceChan)
 		go RakeesOutput(config, js, &wg, RakeesErrChan)
 		go getK8sEvents(clientset)
 		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
-		go publishMetrics(clientset, js, &wg, clusterMetricsChan)
 		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
 		wg.Wait()
@@ -120,60 +166,22 @@ func main() {
 		close(trivyImagescanChan)
 		close(trivyK8sMetricsChan)
 		close(RakeesErrChan)
+		// Signal that all other goroutines have finished
+		doneChan <- true
+		close(doneChan)
 	}
-	collectAndPublishMetrics()
 	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
 	if err != nil {
 		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
 	}
 	s := gocron.NewScheduler(time.UTC)
-	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Adjust the interval as needed
-	s.StartAsync()
-	// for loop will wait for the error channels
-	// logs if any error occurs
-	for {
-		select {
-		case err := <-outdatedErrChan:
-			if err != nil {
-				log.Println(err)
-			}
-		case err := <-kubePreUpgradeChan:
-			if err != nil {
-				log.Println(err)
-			}
-		case err := <-getAllResourceChan:
-			if err != nil {
-				log.Println(err)
-			}
-		case err := <-clusterMetricsChan:
-			if err != nil {
-				log.Println(err)
-			}
-		case err := <-kubescoreMetricsChan:
-			if err != nil {
-				log.Println(err)
-			}
-		case err := <-trivyImagescanChan:
-			if err != nil {
-				log.Println(err)
-			}
-		case err := <-trivyK8sMetricsChan:
-			if err != nil {
-				log.Println(err)
-			}
-		case err := <-RakeesErrChan:
-			if err != nil {
-				log.Println(err)
-			}
-		}
-	}
-
+	s.Every(schedulingInterval).StartAt(time.Now()).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
+	s.StartBlocking()                                                            // Blocks the main function
 }
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
-func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
-	defer wg.Done()
+func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
 	watchK8sEvents(clientset, js)
 
 	errCh <- nil
