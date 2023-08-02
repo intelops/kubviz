@@ -1,0 +1,2526 @@
+{{- if .Values.dashboards.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "client.fullname" . }}-kubviz-dashboard
+  labels:
+    {{ .Values.dashboards.label }}: {{ .Values.dashboards.labelValue | quote }}
+data:
+  kubviz.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 5,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays all the names of the cluster monitoring the kubernetes events and features",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "lcd-gauge",
+                "filterable": true
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 14,
+            "x": 0,
+            "y": 0
+          },
+          "id": 48,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT DISTINCT ClusterName from(SELECT distinct ClusterName FROM default.DeletedAPIs\nUNION ALL\nSELECT DISTINCT ClusterName FROM default.DeprecatedAPIs\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.events\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.getall_resources\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.outdated_images)",
+              "rawQuery": "SELECT DISTINCT ClusterName from(SELECT distinct ClusterName FROM default.DeletedAPIs\nUNION ALL\nSELECT DISTINCT ClusterName FROM default.DeprecatedAPIs\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.events\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.getall_resources\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.outdated_images)",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Monitoring Clusters",
+          "transparent": true,
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the which cluster has the highest events.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 10,
+            "x": 14,
+            "y": 0
+          },
+          "id": 52,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "/.*/",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName,count(*) AS Events From default.events\nGROUP BY ClusterName\nORDER BY Events DESC\nLIMIT 1",
+              "rawQuery": "SELECT ClusterName,count(*) AS Events From default.events\nGROUP BY ClusterName\nORDER BY Events DESC\nLIMIT 1",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Clusters with Most Activity",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of outdated images from all cluster.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "Outdated Images",
+                  "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 0,
+            "y": 6
+          },
+          "id": 18,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.outdated_images\nWHERE VersionsBehind > 0",
+              "rawQuery": "SELECT count(*) FROM default.outdated_images\nWHERE VersionsBehind > 0",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of Outdated Images Across All Clusters",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of events from all cluster.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "Kubedata",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1689917173495&to=1689918073495"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 5,
+            "y": 6
+          },
+          "id": 20,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.events",
+              "rawQuery": "SELECT count(*) FROM default.events",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of Events across all Clusters",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of DeletedAPIs from all the cluster.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "DeletedAPIs",
+                  "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 10,
+            "y": 6
+          },
+          "id": 22,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.DeletedAPIs",
+              "rawQuery": "SELECT count(*) FROM default.DeletedAPIs",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of DeletedAPIs across all Clusters",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of DeprecatedAPIs in all cluster.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "DeprecatedAPIs",
+                  "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 15,
+            "y": 6
+          },
+          "id": 24,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.DeprecatedAPIs",
+              "rawQuery": "SELECT count(*) FROM default.DeprecatedAPIs",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of DeprecatedAPIs across all Clusters",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "Thos panel displays the total count of resources running in all kubernetes cluster.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "Kubernetes Resources",
+                  "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 20,
+            "y": 6
+          },
+          "id": 26,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.getall_resources",
+              "rawQuery": "SELECT count(*) FROM default.getall_resources",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of k8s_Resources across all Clusters",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count events related to Pod.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "#249b6a",
+                "mode": "fixed"
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 0,
+            "y": 10
+          },
+          "id": 57,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "value"
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of Pod creation events",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of pods with Created state.",
+          "fieldConfig": {
+            "defaults": {
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 6,
+            "y": 10
+          },
+          "id": 63,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'Created'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'Created'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of pods with Created state",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of pods with backOff state.",
+          "fieldConfig": {
+            "defaults": {
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 12,
+            "y": 10
+          },
+          "id": 61,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'BackOff'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'BackOff'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of pods with BackOff state",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of pods with Unhealthy state.",
+          "fieldConfig": {
+            "defaults": {
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 18,
+            "y": 10
+          },
+          "id": 62,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'Unhealthy'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'Unhealthy'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of pods with Unhealthy state",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count events related to node.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "#249b6a",
+                "mode": "fixed"
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 0,
+            "y": 14
+          },
+          "id": 56,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "value"
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of Node creation events",
+          "transparent": true,
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of nodes which is in not ready state",
+          "fieldConfig": {
+            "defaults": {
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 6,
+            "y": 14
+          },
+          "id": 58,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeNotReady'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeNotReady'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of Nodes with NotReady State",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of nodes which is in ready state",
+          "fieldConfig": {
+            "defaults": {
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 12,
+            "y": 14
+          },
+          "id": 59,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeReady'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeReady'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of Nodes with Ready State",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of nodes which is in NodeHasNoDiskPressure state",
+          "fieldConfig": {
+            "defaults": {
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 18,
+            "y": 14
+          },
+          "id": 60,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeHasNoDiskPressure'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeHasNoDiskPressure'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of Nodes with  NodeHasNoDiskPressure State",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of events per cluster seperated by namespace.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "gradient-gauge",
+                "filterable": true
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "Kubedata",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1689917173495&to=1689918073495"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "light-yellow",
+                    "value": 80
+                  },
+                  {
+                    "color": "light-red",
+                    "value": 150
+                  },
+                  {
+                    "color": "semi-dark-red",
+                    "value": 1000
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 425
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 18
+          },
+          "id": 44,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true,
+            "sortBy": []
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName, Namespace, count(Event) AS Events FROM default.events\nGROUP BY ClusterName,Namespace\nORDER BY Events DESC",
+              "rawQuery": "SELECT ClusterName, Namespace, count(Event) AS Events FROM default.events\nGROUP BY ClusterName,Namespace\nORDER BY Events DESC",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Events per cluster by Namespace",
+          "transparent": true,
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number of clusters containing activity uniquely.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 26
+          },
+          "id": 40,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT COUNT(DISTINCT ClusterName) AS DeletedAPIs\nFROM default.DeletedAPIs",
+              "rawQuery": "SELECT COUNT(DISTINCT ClusterName) AS DeletedAPIs\nFROM default.DeletedAPIs",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT COUNT(DISTINCT ClusterName) AS DeprecatedAPIs\nFROM default.DeprecatedAPIs",
+              "rawQuery": "SELECT COUNT(DISTINCT ClusterName) AS DeprecatedAPIs\nFROM default.DeprecatedAPIs",
+              "refId": "B",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(DISTINCT(ClusterName)) AS Events\nFROM default.events",
+              "rawQuery": "SELECT count(DISTINCT(ClusterName)) AS Events\nFROM default.events",
+              "refId": "C",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images",
+              "rawQuery": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images",
+              "refId": "D",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of Clusters Containing Activity",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of pods grouped by reason.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "KubeData",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 31
+          },
+          "id": 64,
+          "options": {
+            "displayMode": "lcd",
+            "minVizHeight": 10,
+            "minVizWidth": 0,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showUnfilled": true,
+            "valueMode": "color"
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(Kind) AS Pods,ClusterName, Reason FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
+              "rawQuery": "SELECT count(Kind) AS Pods,ClusterName, Reason FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Count of Pods grouped by Reason",
+          "transparent": true,
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of DeprecatedAPIs for each clusters respectively.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "light-green",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "DeprecatedAPIs",
+                  "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 39
+          },
+          "id": 34,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nGROUP BY ClusterName",
+              "rawQuery": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nGROUP BY ClusterName",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Count of DeprecatedAPIs per cluster",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of DeletedAPIs form each clusters respectively.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "light-green",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "DeletedAPIs",
+                  "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 39
+          },
+          "id": 36,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nGROUP BY ClusterName",
+              "rawQuery": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nGROUP BY ClusterName",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Count of DeletedAPIs per cluster",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of outdated images from each cluster respectively.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "light-green",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "Outdated Images",
+                  "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 48
+          },
+          "id": 28,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nGROUP BY ClusterName",
+              "rawQuery": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nGROUP BY ClusterName",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Count of Outdated Images per cluster",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of Events for each cluster respectively",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "Kubedata",
+                  "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1689917173495&to=1689918073495"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 48
+          },
+          "id": 32,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "select ClusterName,count(Id) AS Events from default.events\ngroup by ClusterName",
+              "rawQuery": "select ClusterName,count(Id) AS Events from default.events\ngroup by ClusterName",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Count of Events per cluster",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of resources for each clusters respectively",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "light-green",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "Kubernetes Resources",
+                  "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 48
+          },
+          "id": 30,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName",
+              "rawQuery": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Count of Resources per cluster",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number resources for each Clusters seperated by Kind.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "gradient-gauge",
+                "filterable": true
+              },
+              "links": [
+                {
+                  "targetBlank": true,
+                  "title": "Kubernetes Resources",
+                  "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+                }
+              ],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "light-yellow",
+                    "value": 100
+                  },
+                  {
+                    "color": "semi-dark-red",
+                    "value": 200
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 24,
+            "x": 0,
+            "y": 56
+          },
+          "id": 42,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
+              "rawQuery": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": " Resources per Cluster by Kind",
+          "transparent": true,
+          "type": "table"
+        },
+        {
+          "collapsed": true,
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 63
+          },
+          "id": 16,
+          "panels": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "description": "This panel displays all the resources running in the kubernetes cluster.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "center",
+                    "cellOptions": {
+                      "type": "color-text"
+                    },
+                    "filterable": true,
+                    "inspect": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 16,
+                "w": 24,
+                "x": 0,
+                "y": 217
+              },
+              "id": 14,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true
+              },
+              "pluginVersion": "9.3.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "vertamedia-clickhouse-datasource",
+                    "uid": "{{ .Values.datasources.uid }}"
+                  },
+                  "dateTimeType": "DATETIME",
+                  "extrapolate": true,
+                  "format": "table",
+                  "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+                  "intervalFactor": 1,
+                  "query": "SELECT * FROM default.getall_resources",
+                  "rawQuery": "SELECT * FROM default.getall_resources",
+                  "refId": "A",
+                  "round": "0s",
+                  "skip_comments": true
+                }
+              ],
+              "title": "Kubernetes Resources",
+              "transparent": true,
+              "type": "table"
+            }
+          ],
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "refId": "A"
+            }
+          ],
+          "title": "Kubernetes Resources",
+          "type": "row"
+        },
+        {
+          "collapsed": true,
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 64
+          },
+          "id": 12,
+          "panels": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "description": "This panel displays all the out-of-date images from the cluster.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "center",
+                    "cellOptions": {
+                      "type": "color-text"
+                    },
+                    "inspect": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      },
+                      {
+                        "color": "red",
+                        "value": 10
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 16,
+                "w": 24,
+                "x": 0,
+                "y": 218
+              },
+              "id": 10,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true
+              },
+              "pluginVersion": "9.3.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "vertamedia-clickhouse-datasource",
+                    "uid": "{{ .Values.datasources.uid }}"
+                  },
+                  "dateTimeType": "DATETIME",
+                  "extrapolate": true,
+                  "format": "table",
+                  "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+                  "intervalFactor": 1,
+                  "query": "SELECT * FROM default.outdated_images\nWHERE VersionsBehind > 0",
+                  "rawQuery": "SELECT * FROM default.outdated_images\nWHERE VersionsBehind > 0",
+                  "refId": "A",
+                  "round": "0s",
+                  "skip_comments": true
+                }
+              ],
+              "title": "Outdated Images",
+              "transparent": true,
+              "type": "table"
+            }
+          ],
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "refId": "A"
+            }
+          ],
+          "title": "Outdated Images",
+          "type": "row"
+        },
+        {
+          "collapsed": true,
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 65
+          },
+          "id": 8,
+          "panels": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "description": "This panel displays all the DeletedAPIs from the cluster.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "center",
+                    "cellOptions": {
+                      "type": "color-text"
+                    },
+                    "filterable": true,
+                    "inspect": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 11,
+                "w": 24,
+                "x": 0,
+                "y": 219
+              },
+              "id": 6,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true
+              },
+              "pluginVersion": "9.3.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "vertamedia-clickhouse-datasource",
+                    "uid": "{{ .Values.datasources.uid }}"
+                  },
+                  "dateTimeType": "DATETIME",
+                  "extrapolate": true,
+                  "format": "table",
+                  "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+                  "intervalFactor": 1,
+                  "query": "SELECT * FROM default.DeletedAPIs",
+                  "rawQuery": "SELECT * FROM default.DeletedAPIs",
+                  "refId": "A",
+                  "round": "0s",
+                  "skip_comments": true
+                }
+              ],
+              "title": "DeletedAPIs",
+              "transparent": true,
+              "type": "table"
+            }
+          ],
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "refId": "A"
+            }
+          ],
+          "title": "DeletedAPIs",
+          "type": "row"
+        },
+        {
+          "collapsed": true,
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 66
+          },
+          "id": 4,
+          "panels": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "description": "This panel displays all the DeprecatedAPIs from the cluster.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "center",
+                    "cellOptions": {
+                      "type": "color-text"
+                    },
+                    "filterable": true,
+                    "inspect": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green"
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 220
+              },
+              "id": 2,
+              "options": {
+                "footer": {
+                  "fields": "",
+                  "reducer": [
+                    "sum"
+                  ],
+                  "show": false
+                },
+                "showHeader": true
+              },
+              "pluginVersion": "9.3.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "vertamedia-clickhouse-datasource",
+                    "uid": "{{ .Values.datasources.uid }}"
+                  },
+                  "dateTimeType": "DATETIME",
+                  "extrapolate": true,
+                  "format": "table",
+                  "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+                  "intervalFactor": 1,
+                  "query": "SELECT * FROM default.DeprecatedAPIs",
+                  "rawQuery": "SELECT * FROM default.DeprecatedAPIs",
+                  "refId": "A",
+                  "round": "0s",
+                  "skip_comments": true
+                }
+              ],
+              "title": "DeprecatedAPIs",
+              "transparent": true,
+              "type": "table"
+            }
+          ],
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "refId": "A"
+            }
+          ],
+          "title": "DeprecatedAPIs",
+          "type": "row"
+        }
+      ],
+      "refresh": "",
+      "schemaVersion": 35,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "Kubviz Dashboard",
+      "uid": "eT4fox94z",
+      "version": 8,
+      "weekStart": ""
+    }
+{{- end }}

@@ -1,0 +1,1166 @@
+{{- if .Values.dashboards.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "client.fullname" . }}-trivy-dashboard
+  labels:
+    {{ .Values.dashboards.label }}: {{ .Values.dashboards.labelValue | quote }}
+data:
+  trivy.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 6,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel illustrates the distribution of vulnerability severities across different clusters. It provides an overview of the count of vulnerabilities categorized by severity levels within each cluster.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 0
+          },
+          "id": 20,
+          "options": {
+            "displayMode": "gradient",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showUnfilled": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT cluster_name, vul_severity, count(*) \nFROM default.trivy_vul\nGROUP BY cluster_name, vul_severity",
+              "rawQuery": "SELECT cluster_name, vul_severity, count(*) \nFROM default.trivy_vul\nGROUP BY cluster_name, vul_severity",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Vulnerability Severity counts grouped by Cluster",
+          "transparent": true,
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel illustrates the distribution of misconfiguration severities across different clusters. It provides an overview of the count of misconfigurations categorized by severity levels within each cluster. ",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "id": 22,
+          "options": {
+            "displayMode": "gradient",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showUnfilled": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT cluster_name, misconfig_severity, count(*)\nFROM default.trivy_misconfig\nGROUP BY cluster_name, misconfig_severity",
+              "rawQuery": "SELECT cluster_name, misconfig_severity, count(*)\nFROM default.trivy_misconfig\nGROUP BY cluster_name, misconfig_severity",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Misconfiguration Severity counts grouped by Cluster",
+          "transparent": true,
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total of misconfigurations from each clusters.",
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 0,
+            "y": 8
+          },
+          "id": 16,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT cluster_name, count(*) FROM default.trivy_misconfig\nGROUP BY cluster_name",
+              "rawQuery": "SELECT cluster_name, count(*) FROM default.trivy_misconfig\nGROUP BY cluster_name",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Misconfiguration Count by Cluster",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number Vulnerabilities under each namespace",
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 8
+          },
+          "id": 18,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT cluster_name, count(*) FROM default.trivy_vul\nGROUP BY cluster_name",
+              "rawQuery": "SELECT cluster_name, count(*) FROM default.trivy_vul\nGROUP BY cluster_name",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Vulnerability Count by Cluster",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel provides a count of critical vulnerabilities categorized by namespace. It helps to monitor and prioritize critical security issues across different namespaces.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 13
+          },
+          "id": 12,
+          "options": {
+            "displayMode": "basic",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showUnfilled": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT cluster_name, namespace, count(vul_severity) AS Critical_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'CRITICAL'\nGROUP BY cluster_name, namespace\n",
+              "rawQuery": "SELECT cluster_name, namespace, count(vul_severity) AS Critical_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'CRITICAL'\nGROUP BY cluster_name, namespace",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Critical Vulnerability Count by Namespace and ClusterName",
+          "transparent": true,
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel provides a count of critical misconfigurations categorized by namespace. It helps to monitor and prioritize critical security issues across different namespaces.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 13
+          },
+          "id": 14,
+          "options": {
+            "displayMode": "basic",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showUnfilled": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "interval": "",
+              "intervalFactor": 1,
+              "query": "SELECT cluster_name, namespace, count(misconfig_severity) AS Critical_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'CRITICAL'\nGROUP BY cluster_name, namespace\n",
+              "rawQuery": "SELECT cluster_name, namespace, count(misconfig_severity) AS Critical_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'CRITICAL'\nGROUP BY cluster_name, namespace",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Critical  Misconfiguration Count by Namespace and ClusterName",
+          "transparent": true,
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of Misconfiguration severity for each level",
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 20
+          },
+          "id": 8,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS High_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'HIGH'",
+              "rawQuery": "SELECT count(*) AS High_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'HIGH'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS Medium_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'MEDIUM'",
+              "rawQuery": "SELECT count(*) AS Medium_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'MEDIUM'",
+              "refId": "B",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS Low_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'LOW'",
+              "rawQuery": "SELECT count(*) AS Low_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'LOW'",
+              "refId": "C",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS Critical_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'CRITICAL'",
+              "rawQuery": "SELECT count(*) AS Critical_Severity\nFROM default.trivy_misconfig\nWHERE misconfig_severity = 'CRITICAL'",
+              "refId": "D",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Count of Misconfiguration Severity Level",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total count of Vulnerability severity for each level",
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 20
+          },
+          "id": 10,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS High_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'HIGH'",
+              "rawQuery": "SELECT count(*) AS High_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'HIGH'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS Medium_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'MEDIUM'",
+              "rawQuery": "SELECT count(*) AS Medium_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'MEDIUM'",
+              "refId": "B",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS Low_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'LOW'",
+              "rawQuery": "SELECT count(*) AS Low_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'LOW'",
+              "refId": "C",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS Critical_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'CRITICAL'",
+              "rawQuery": "SELECT count(*) AS Critical_Severity\nFROM default.trivy_vul\nWHERE vul_severity = 'CRITICAL'",
+              "refId": "D",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Count of Vulnereability  Severity level",
+          "transparent": true,
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the count of Misconfigurations in different clusters and namespaces.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 26
+          },
+          "id": 4,
+          "options": {
+            "displayMode": "lcd",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showUnfilled": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT cluster_name, namespace, count(*) AS Misconfigurations\nFROM default.trivy_misconfig\nGROUP BY cluster_name, namespace",
+              "rawQuery": "SELECT cluster_name, namespace, count(*) AS Misconfigurations\nFROM default.trivy_misconfig\nGROUP BY cluster_name, namespace",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Misconfiguration Count by Cluster and Namespace",
+          "transparent": true,
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the count of vulnerabilities in different clusters and namespaces.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 26
+          },
+          "id": 6,
+          "options": {
+            "displayMode": "lcd",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showUnfilled": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT cluster_name, namespace, count(*) AS Vulnerabilities\nFROM default.trivy_vul\nGROUP BY cluster_name, namespace",
+              "rawQuery": "SELECT cluster_name, namespace, count(*) AS Vulnerabilities\nFROM default.trivy_vul\nGROUP BY cluster_name, namespace",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Vulnerability Count by Cluster and Namespace",
+          "transparent": true,
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "color-text",
+                "filterable": true
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 34
+          },
+          "id": 2,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "default",
+                "fields": [
+                  "cluster_name",
+                  "namespace",
+                  "kind",
+                  "name",
+                  "vul_id",
+                  "vul_vendor_ids",
+                  "vul_pkg_id",
+                  "vul_pkg_name",
+                  "vul_pkg_path",
+                  "vul_installed_version",
+                  "vul_fixed_version",
+                  "vul_title",
+                  "vul_severity",
+                  "vul_published_date",
+                  "vul_last_modified_date"
+                ],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "trivy_vul"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "queryType": "builder",
+              "rawSql": "SELECT cluster_name, namespace, kind, name, vul_id, vul_vendor_ids, vul_pkg_id, vul_pkg_name, vul_pkg_path, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date FROM default.\"trivy_vul\" LIMIT 100",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "Trivy Vulnerabilities",
+          "transparent": true,
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "color-text",
+                "filterable": true
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 42
+          },
+          "id": 1,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "default",
+                "fields": [
+                  "cluster_name",
+                  "namespace",
+                  "kind",
+                  "name",
+                  "misconfig_id",
+                  "misconfig_avdid",
+                  "misconfig_type",
+                  "misconfig_title",
+                  "misconfig_desc",
+                  "misconfig_msg",
+                  "misconfig_query",
+                  "misconfig_resolution",
+                  "misconfig_severity",
+                  "misconfig_status"
+                ],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "trivy_misconfig"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "queryType": "builder",
+              "rawSql": "SELECT cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status FROM default.\"trivy_misconfig\" LIMIT 100",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "Trivy Misconfiguration",
+          "transparent": true,
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "color-text",
+                "filterable": true
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 52
+          },
+          "id": 24,
+          "options": {
+            "footer": {
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "builderOptions": {
+                "0": "T",
+                "1": "h",
+                "2": "e",
+                "3": " ",
+                "4": "q",
+                "5": "u",
+                "6": "e",
+                "7": "r",
+                "8": "y",
+                "9": " ",
+                "10": "i",
+                "11": "s",
+                "12": " ",
+                "13": "n",
+                "14": "o",
+                "15": "t",
+                "16": " ",
+                "17": "a",
+                "18": " ",
+                "19": "s",
+                "20": "e",
+                "21": "l",
+                "22": "e",
+                "23": "c",
+                "24": "t",
+                "25": " ",
+                "26": "s",
+                "27": "t",
+                "28": "a",
+                "29": "t",
+                "30": "e",
+                "31": "m",
+                "32": "e",
+                "33": "n",
+                "34": "t",
+                "35": ".",
+                "database": "default",
+                "fields": [
+                  "cluster_name",
+                  "artifact_name",
+                  "vul_id",
+                  "vul_pkg_id",
+                  "vul_pkg_name",
+                  "vul_installed_version",
+                  "vul_fixed_version",
+                  "vul_title",
+                  "vul_severity",
+                  "vul_published_date",
+                  "vul_last_modified_date"
+                ],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "trivyimage"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "builder",
+              "rawSql": "SELECT cluster_name, artifact_name, vul_id, vul_pkg_id, vul_pkg_name, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date FROM default.\"trivyimage\" LIMIT 100",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "Trivy Image",
+          "transparent": true,
+          "type": "table"
+        }
+      ],
+      "refresh": "",
+      "schemaVersion": 35,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "Trivy",
+      "uid": "f9b0a865-f419-410a-b7d9-9a3f79a70d47",
+      "version": 15,
+      "weekStart": ""
+    }
+{{- end }}
