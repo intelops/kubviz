@@ -17,6 +17,12 @@ data:
             "hide": true,
             "iconColor": "rgba(0, 211, 255, 1)",
             "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
             "type": "dashboard"
           }
         ]
@@ -24,41 +30,20 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 3,
-      "links": [
-        {
-          "asDropdown": false,
-          "icon": "external link",
-          "includeVars": false,
-          "keepTime": false,
-          "tags": [],
-          "targetBlank": true,
-          "title": "JSON Formatter",
-          "tooltip": "",
-          "type": "link",
-          "url": "https://jsonformatter.org/"
-        }
-      ],
+      "id": 8,
+      "links": [],
       "liveNow": false,
       "panels": [
         {
           "datasource": {
-            "type": "grafana-clickhouse-datasource",
-            "uid": "ClickHouse"
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
           },
-          "description": "This panel displays all the Git metrics and its providers.",
+          "description": "This panel displays the total number of merge request done from all the Git providers",
           "fieldConfig": {
             "defaults": {
               "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "center",
-                "cellOptions": {
-                  "type": "color-text"
-                },
-                "filterable": true,
-                "inspect": false
+                "mode": "palette-classic"
               },
               "mappings": [],
               "thresholds": {
@@ -78,25 +63,330 @@ data:
             "overrides": []
           },
           "gridPos": {
-            "h": 15,
-            "w": 24,
+            "h": 5,
+            "w": 12,
             "x": 0,
             "y": 0
           },
-          "id": 1,
+          "id": 4,
           "options": {
-            "cellHeight": "sm",
-            "footer": {
-              "countRows": false,
-              "fields": "",
-              "reducer": [
-                "sum"
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
               ],
-              "show": false
+              "fields": "",
+              "values": false
             },
-            "showHeader": true
+            "textMode": "auto"
           },
-          "pluginVersion": "10.0.1",
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS GitHub FROM default.github\nWHERE EventType = 'pull_request'",
+              "rawQuery": "SELECT count(*) AS GitHub FROM default.github\nWHERE EventType = 'pull_request'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS GitLab FROM default.gitlab\nWHERE EventType = 'Merge Request Hook'",
+              "rawQuery": "SELECT count(*) AS GitLab FROM default.gitlab\nWHERE EventType = 'Merge Request Hook'",
+              "refId": "B",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS BitBucket FROM default.bitbucket\nWHERE EventType = 'pullrequest:fulfilled'",
+              "rawQuery": "SELECT count(*) AS BitBucket FROM default.bitbucket\nWHERE EventType = 'pullrequest:fulfilled'",
+              "refId": "C",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS Gitea FROM default.gitea\nWHERE EventType = 'pull_request'",
+              "rawQuery": "SELECT count(*) AS Gitea FROM default.gitea\nWHERE EventType = 'pull_request'",
+              "refId": "D",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS Azure FROM default.azure_devops\nWHERE EventType = 'git.pullrequest.merged'",
+              "rawQuery": "SELECT count(*) AS Azure FROM default.azure_devops\nWHERE EventType = 'git.pullrequest.merged'",
+              "refId": "E",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of Merge events from all Git providers",
+          "transparent": true,
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "description": "This panel displays the total number push events triggered from different Git Providers",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "#7c766c",
+                "mode": "palette-classic"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "id": 2,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS GitHub FROM default.github\nWHERE EventType = 'push'",
+              "rawQuery": "SELECT count(*) AS GitHub FROM default.github\nWHERE EventType = 'push'",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) Gitlab FROM default.gitlab\nWHERE EventType = 'Push Hook'",
+              "rawQuery": "SELECT count(*) Gitlab FROM default.gitlab\nWHERE EventType = 'Push Hook'",
+              "refId": "B",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS GiTea FROM default.gitea\nWHERE EventType = 'push'",
+              "rawQuery": "SELECT count(*) AS GiTea FROM default.gitea\nWHERE EventType = 'push'",
+              "refId": "C",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS BitBucket FROM default.bitbucket\nWHERE EventType = 'repo:push'",
+              "rawQuery": "SELECT count(*) AS BitBucket FROM default.bitbucket\nWHERE EventType = 'repo:push'",
+              "refId": "D",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT count(*) AS Azure FROM default.azure_devops\nWHERE EventType = 'git.push'",
+              "rawQuery": "SELECT count(*) AS Azure FROM default.azure_devops\nWHERE EventType = 'git.push'",
+              "refId": "E",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Number of  Push Events from all  Git Providers",
+          "transparent": true,
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of Push events on Azure by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "#17bcc1",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 5
+          },
+          "id": 36,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
           "targets": [
             {
               "datasource": {
@@ -112,18 +402,1337 @@ data:
                 }
               },
               "queryType": "sql",
-              "rawSql": "SELECT event.metrics.commits.timestamp AS TimeStamp,\nevent.metrics.commits.id AS Id,\nevent.metrics.commits.url AS Url,\nevent.metrics.object_kind AS Action,\nevent.repo AS GitProvider,\nevent AS MetaData\nFROM default.git_json",
+              "rawSql": "SELECT Author, count(*) AS Azure_Push_Events\nFROM default.azure_devops\nWHERE EventType = 'git.push'\nGROUP BY Author",
               "refId": "A",
               "selectedFormat": 1
             }
           ],
-          "title": "Git Bridge",
+          "title": "Azure Push Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of Merge events on Azure by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "#17bcc1",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 5
+          },
+          "id": 34,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT Author, count(*) AS Azure_Merge_Events\nFROM default.azure_devops\nWHERE EventType = 'git.pullrequest.merged'\nGROUP BY Author",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "Azure Merge Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of Push events on BitBucket by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "#e8f808",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 13
+          },
+          "id": 28,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT Author, count(*) AS Push_Events\nFROM default.bitbucket\nWHERE EventType = 'repo:push'\nGROUP BY Author",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "BitBucket Push Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of Merge events on BitBucket by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "#e8f808",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 13
+          },
+          "id": 30,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT Author, count(*) AS Merge_Events\nFROM default.bitbucket\nWHERE EventType = 'pullrequest:fulfilled'\nGROUP BY Author",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "BitBucket Merge Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of Push events on GiTea by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "#f46565",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 21
+          },
+          "id": 24,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT Author, count(*) AS Push_Events\nFROM default.gitea\nWHERE EventType = 'push'\nGROUP BY Author",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "GiTea Push Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of Merge events on GiTea by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "#f46565",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 21
+          },
+          "id": 26,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "default",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": ""
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "database": "default",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": ""
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT Author, count(*) AS Merge_Events\nFROM default.gitea\nWHERE EventType = 'pull_request'\nGROUP BY Author",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "GiTea Merge Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of push events on GitLab by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "light-blue",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 0,
+            "y": 29
+          },
+          "id": 20,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT Author, count(*) AS Push_Events\nFROM default.gitlab\nWHERE EventType = 'Push Hook'\nGROUP BY Author",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "GitLab Push Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of merge events on GitLab by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "light-blue",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 12,
+            "y": 29
+          },
+          "id": 22,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT Author, count(*) AS Merge_Events\nFROM default.gitlab\nWHERE EventType = 'Merge Request Hook'\nGROUP BY Author",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "GitLab Merge Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of push events on Github by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "left",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 0,
+            "y": 39
+          },
+          "id": 16,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT Author, count(*) AS Push_Events\nFROM default.github\nWHERE EventType = 'push'\nGROUP BY Author",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "Github Push Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "The panel displays the count of merge events on Github by each author. It provides insights into the contribution activity of different authors within the specified repository.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 12,
+            "y": 39
+          },
+          "id": 18,
+          "options": {
+            "barRadius": 0.2,
+            "barWidth": 0.3,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT Author, count(*) AS Merge_Events\nFROM default.github\nWHERE EventType = 'pull_request'\nGROUP BY Author",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "Github Merge Events by Author",
+          "transparent": true,
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "This panel displays all the events occured in the Azure Procider",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "color-text",
+                "filterable": true
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 24,
+            "x": 0,
+            "y": 49
+          },
+          "id": 14,
+          "options": {
+            "footer": {
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "default",
+                "fields": [
+                  "Author",
+                  "CommitID",
+                  "CommitUrl",
+                  "EventType",
+                  "RepoName",
+                  "TimeStamp"
+                ],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [
+                  {
+                    "dir": "DESC",
+                    "name": "TimeStamp"
+                  }
+                ],
+                "table": "azure_devops"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "queryType": "builder",
+              "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"azure_devops\" ORDER BY TimeStamp DESC LIMIT 100",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "Azure",
+          "transparent": true,
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "This panel displays all the events occured in the BitBucket Providers",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "color-text",
+                "filterable": true
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 56
+          },
+          "id": 12,
+          "options": {
+            "footer": {
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "default",
+                "fields": [
+                  "Author",
+                  "CommitID",
+                  "CommitUrl",
+                  "EventType",
+                  "RepoName",
+                  "TimeStamp"
+                ],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [
+                  {
+                    "dir": "DESC",
+                    "name": "TimeStamp"
+                  }
+                ],
+                "table": "bitbucket"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "queryType": "builder",
+              "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"bitbucket\" ORDER BY TimeStamp DESC LIMIT 100",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "BitBucket",
+          "transparent": true,
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "This panel displays all the events occured in the GiTea provider",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "color-text",
+                "filterable": true
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 64
+          },
+          "id": 10,
+          "options": {
+            "footer": {
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "default",
+                "fields": [
+                  "Author",
+                  "CommitID",
+                  "CommitUrl",
+                  "EventType",
+                  "RepoName",
+                  "TimeStamp"
+                ],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [
+                  {
+                    "dir": "DESC",
+                    "name": "TimeStamp"
+                  }
+                ],
+                "table": "gitea"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "queryType": "builder",
+              "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"gitea\" ORDER BY TimeStamp DESC LIMIT 100",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "GiTea",
+          "transparent": true,
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "This panel displays all the events occured in the GitLab provider.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "color-text",
+                "filterable": true
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 73
+          },
+          "id": 8,
+          "options": {
+            "footer": {
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "default",
+                "fields": [
+                  "Author",
+                  "CommitID",
+                  "CommitUrl",
+                  "EventType",
+                  "RepoName",
+                  "TimeStamp"
+                ],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [
+                  {
+                    "dir": "DESC",
+                    "name": "TimeStamp"
+                  }
+                ],
+                "table": "gitlab"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "queryType": "builder",
+              "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"gitlab\" ORDER BY TimeStamp DESC LIMIT 100",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "GitLab",
+          "transparent": true,
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "This panel displays all the events occured in the GitHub provider.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "displayMode": "color-text",
+                "filterable": true
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 81
+          },
+          "id": 6,
+          "options": {
+            "footer": {
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "8.4.6",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "default",
+                "fields": [
+                  "Author",
+                  "CommitID",
+                  "CommitUrl",
+                  "EventType",
+                  "RepoName",
+                  "TimeStamp"
+                ],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [
+                  {
+                    "dir": "DESC",
+                    "name": "TimeStamp"
+                  }
+                ],
+                "table": "github"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "queryType": "builder",
+              "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"github\" ORDER BY TimeStamp DESC LIMIT 100",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "GitHub",
           "transparent": true,
           "type": "table"
         }
       ],
-      "refresh": "",
-      "schemaVersion": 38,
+      "schemaVersion": 35,
       "style": "dark",
       "tags": [],
       "templating": {
@@ -135,9 +1744,9 @@ data:
       },
       "timepicker": {},
       "timezone": "",
-      "title": "Git Bridge",
-      "uid": "a1885f0a-0f8a-42f5-a4b9-5ac7f2665bc4",
-      "version": 1,
+      "title": "GitBridge",
+      "uid": "u3EJcUqVk",
+      "version": 15,
       "weekStart": ""
     }
 {{- end }}
