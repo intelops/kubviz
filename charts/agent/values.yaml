@@ -142,6 +142,8 @@ tolerations: []
 
 affinity: {}
 
+schedulingInterval: "24h"
+
 clusterName: "kubviz"
 nats:
   host: kubviz-client-nats 

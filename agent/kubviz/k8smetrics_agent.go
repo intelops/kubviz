@@ -59,15 +59,7 @@ var (
 
 func main() {
 	env := Production
-	// error channels declared for the go routines
-	outdatedErrChan := make(chan error, 1)
-	kubePreUpgradeChan := make(chan error, 1)
-	getAllResourceChan := make(chan error, 1)
-	trivyK8sMetricsChan := make(chan error, 1)
 	clusterMetricsChan := make(chan error, 1)
-	kubescoreMetricsChan := make(chan error, 1)
-	trivyImagescanChan := make(chan error, 1)
-	RakeesErrChan := make(chan error, 1)
 	var (
 		wg        sync.WaitGroup
 		config    *rest.Config
@@ -102,6 +94,14 @@ func main() {
 
 	// starting all the go routines
 	collectAndPublishMetrics := func() {
+		// error channels declared for the go routines
+		outdatedErrChan := make(chan error, 1)
+		kubePreUpgradeChan := make(chan error, 1)
+		getAllResourceChan := make(chan error, 1)
+		trivyK8sMetricsChan := make(chan error, 1)
+		kubescoreMetricsChan := make(chan error, 1)
+		trivyImagescanChan := make(chan error, 1)
+		RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
 		doneChan := make(chan bool)
 		go func() {
@@ -161,7 +161,7 @@ func main() {
 		close(outdatedErrChan)
 		close(kubePreUpgradeChan)
 		close(getAllResourceChan)
-		close(clusterMetricsChan)
+		// close(clusterMetricsChan)
 		close(kubescoreMetricsChan)
 		close(trivyImagescanChan)
 		close(trivyK8sMetricsChan)
@@ -170,6 +170,7 @@ func main() {
 		doneChan <- true
 		close(doneChan)
 	}
+	collectAndPublishMetrics()
 	if schedulingIntervalStr == "" {
 		schedulingIntervalStr = "20m" // Default value, e.g., 20 minutes
 	}
@@ -178,8 +179,8 @@ func main() {
 		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
 	}
 	s := gocron.NewScheduler(time.UTC)
-	s.Every(schedulingInterval).StartAt(time.Now()).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
-	s.StartBlocking()                                                            // Blocks the main function
+	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
+	s.StartBlocking()                                        // Blocks the main function
 }
 
 // publishMetrics publishes stream of events
