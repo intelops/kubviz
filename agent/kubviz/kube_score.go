@@ -3,15 +3,17 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
+	exec "os/exec"
+	"sync"
+
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
+	"github.com/zegl/kube-score/renderer/json_v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"log"
-	exec "os/exec"
-	"sync"
 )
 
 func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
@@ -33,26 +35,34 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg 
 }
 
 func publish(ns string, js nats.JetStreamContext, errCh chan error) {
-	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - "
+	var report []json_v2.ScoredObject
+
+	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - -o json"
 	log.Printf("Command:  %#v,", cmd)
 	out, err := executeCommand(cmd)
+
+	err = json.Unmarshal([]byte(out), &report)
+	if err != nil {
+		log.Printf("Error occurred while Unmarshalling json: %v", err)
+		errCh <- err
+	}
+
 	if err != nil {
 		log.Println("Error occurred while running kube-score: ", err)
 		errCh <- err
 	}
-	err = publishKubescoreMetrics(uuid.New().String(), ns, out, js)
+	err = publishKubescoreMetrics(uuid.New().String(), report, js)
 	if err != nil {
 		errCh <- err
 	}
 	errCh <- nil
 }
 
-func publishKubescoreMetrics(id string, ns string, recommendations string, js nats.JetStreamContext) error {
+func publishKubescoreMetrics(id string, report []json_v2.ScoredObject, js nats.JetStreamContext) error {
 	metrics := model.KubeScoreRecommendations{
-		ID:              id,
-		Namespace:       ns,
-		Recommendations: recommendations,
-		ClusterName:     ClusterName,
+		ID:          id,
+		ClusterName: ClusterName,
+		Report:      report,
 	}
 	metricsJson, _ := json.Marshal(metrics)
 	_, err := js.Publish(constants.KUBESCORE_SUBJECT, metricsJson)
@@ -60,7 +70,7 @@ func publishKubescoreMetrics(id string, ns string, recommendations string, js na
 		return err
 	}
 	log.Printf("Recommendations with ID:%s has been published\n", id)
-	log.Printf("Recommendations  :%#v", recommendations)
+	log.Printf("Recommendations  :%#v", report)
 	return nil
 }
 

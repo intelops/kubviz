@@ -269,24 +269,48 @@ func (c *DBClient) InsertContainerEvent(event string) {
 }
 
 func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations) {
-	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(InsertKubeScore)
-	)
-	defer stmt.Close()
-	if _, err := stmt.Exec(
-		metrics.ID,
-		metrics.Namespace,
-		metrics.ClusterName,
-		metrics.Recommendations,
-	); err != nil {
+	tx, err := c.conn.Begin()
+	if err != nil {
 		log.Fatal(err)
 	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare(InsertKubeScore)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	for _, result := range metrics.Report {
+		for _, check := range result.Checks {
+			for _, comments := range check.Comments {
+
+				if _, err := stmt.Exec(
+					metrics.ID,
+					metrics.ClusterName,
+					result.ObjectName,
+					result.TypeMeta.Kind,
+					result.TypeMeta.APIVersion,
+					result.ObjectMeta.Name,
+					result.ObjectMeta.Namespace,
+					check.Check.TargetType,
+					comments.Description,
+					comments.Path,
+					comments.Summary,
+					result.FileName,
+					result.FileRow,
+				); err != nil {
+					log.Println("Error while inserting KubeScore metrics:", err)
+				}
+			}
+
+		}
+	}
+	// Commit the transaction after the loop finishes.
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
 }
-
 func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 	for _, finding := range metrics.Report.Findings {
 		for _, result := range finding.Results {
