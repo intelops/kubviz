@@ -59,7 +59,7 @@ var (
 
 func main() {
 	env := Production
-	
+	clusterMetricsChan := make(chan error, 1)
 	var (
 		wg        sync.WaitGroup
 		config    *rest.Config
@@ -99,7 +99,6 @@ func main() {
 		kubePreUpgradeChan := make(chan error, 1)
 		getAllResourceChan := make(chan error, 1)
 		trivyK8sMetricsChan := make(chan error, 1)
-		clusterMetricsChan := make(chan error, 1)
 		kubescoreMetricsChan := make(chan error, 1)
 		trivyImagescanChan := make(chan error, 1)
 		RakeesErrChan := make(chan error, 1)
@@ -162,7 +161,7 @@ func main() {
 		close(outdatedErrChan)
 		close(kubePreUpgradeChan)
 		close(getAllResourceChan)
-		close(clusterMetricsChan)
+		// close(clusterMetricsChan)
 		close(kubescoreMetricsChan)
 		close(trivyImagescanChan)
 		close(trivyK8sMetricsChan)
@@ -181,7 +180,7 @@ func main() {
 	}
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
-	s.StartBlocking()                                                            // Blocks the main function
+	s.StartBlocking()                                        // Blocks the main function
 }
 
 // publishMetrics publishes stream of events
