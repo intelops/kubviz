@@ -34,6 +34,7 @@ type DBInterface interface {
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
 	InsertTrivyImageMetrics(metrics model.TrivyImage)
 	InsertTrivyMetrics(metrics model.Trivy)
+	InsertTrivySbomMetrics(metrics model.Reports)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
 	RetriveKubepugEvent() ([]model.Result, error)
@@ -208,6 +209,31 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
+}
+func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
+	result := metrics.Report
+
+	var (
+		tx, _   = c.conn.Begin()
+		stmt, _ = tx.Prepare(InsertTrivySbom)
+	)
+	if _, err := stmt.Exec(
+		metrics.ID,
+		result.Schema,
+		result.BomFormat,
+		result.SpecVersion,
+		result.SerialNumber,
+		result.Version,
+		result.Metadata.Timestamp,
+		result.Vulnerabilities,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	stmt.Close()
+
 }
 func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	var (

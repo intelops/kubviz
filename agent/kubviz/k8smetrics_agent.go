@@ -101,6 +101,7 @@ func main() {
 		trivyK8sMetricsChan := make(chan error, 1)
 		kubescoreMetricsChan := make(chan error, 1)
 		trivyImagescanChan := make(chan error, 1)
+		trivySbomcanChan := make(chan error, 1)
 		RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
 		doneChan := make(chan bool)
@@ -133,6 +134,10 @@ func main() {
 					if err != nil {
 						log.Println(err)
 					}
+				case err := <-trivySbomcanChan:
+					if err != nil {
+						log.Println(err)
+					}
 				case err := <-trivyK8sMetricsChan:
 					if err != nil {
 						log.Println(err)
@@ -146,7 +151,7 @@ func main() {
 				}
 			}
 		}()
-		wg.Add(7) // Initialize the WaitGroup for the seven goroutines
+		wg.Add(8) // Initialize the WaitGroup for the seven goroutines
 		// ... start other goroutines ...
 		go outDatedImages(config, js, &wg, outdatedErrChan)
 		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
@@ -154,6 +159,7 @@ func main() {
 		go RakeesOutput(config, js, &wg, RakeesErrChan)
 		go getK8sEvents(clientset)
 		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
+		go RunTrivySbomScan(config, js, &wg, trivySbomcanChan)
 		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
 		wg.Wait()
@@ -165,6 +171,7 @@ func main() {
 		close(kubescoreMetricsChan)
 		close(trivyImagescanChan)
 		close(trivyK8sMetricsChan)
+		close(trivySbomcanChan)
 		close(RakeesErrChan)
 		// Signal that all other goroutines have finished
 		doneChan <- true

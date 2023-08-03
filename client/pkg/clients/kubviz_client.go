@@ -114,6 +114,22 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			},
 		},
 		{
+			Subject:  constants.TRIVY_SBOM_SUBJECT,
+			Consumer: constants.Trivy_Sbom_Consumer,
+			Handler: func(msg *nats.Msg) {
+				msg.Ack()
+				var metrics model.Reports
+				err := json.Unmarshal(msg.Data, &metrics)
+				if err != nil {
+					log.Fatal(err)
+				}
+				log.Printf("Trivy sbom Metrics Received: %#v,", metrics)
+				conn.InsertTrivySbomMetrics(metrics)
+				log.Println()
+			},
+		},
+
+		{
 			Subject:  constants.KubvizSubject,
 			Consumer: constants.KubvizConsumer,
 			Handler: func(msg *nats.Msg) {
