@@ -28,13 +28,16 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg 
 	}
 
 	log.Printf("Namespace size: %d", len(nsList.Items))
+	var wgNamespaces sync.WaitGroup
 	for _, n := range nsList.Items {
+		wgNamespaces.Add(1)
 		log.Printf("Publishing kube-score recommendations for namespace: %s\n", n.Name)
-		publish(n.Name, js, errCh)
+		go publish(n.Name, js, &wgNamespaces, errCh)
 	}
 }
 
-func publish(ns string, js nats.JetStreamContext, errCh chan error) {
+func publish(ns string, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+	defer wg.Done()
 	var report []json_v2.ScoredObject
 
 	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - -o json"
