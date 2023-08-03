@@ -170,6 +170,7 @@ func main() {
 		doneChan <- true
 		close(doneChan)
 	}
+	collectAndPublishMetrics()
 	if schedulingIntervalStr == "" {
 		schedulingIntervalStr = "20m" // Default value, e.g., 20 minutes
 	}
@@ -178,7 +179,7 @@ func main() {
 		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
 	}
 	s := gocron.NewScheduler(time.UTC)
-	s.Every(schedulingInterval).StartAt(time.Now()).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
+	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
 	s.StartBlocking()                                                            // Blocks the main function
 }
 
