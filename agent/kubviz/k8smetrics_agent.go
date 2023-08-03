@@ -59,15 +59,7 @@ var (
 
 func main() {
 	env := Production
-	// error channels declared for the go routines
-	outdatedErrChan := make(chan error, 1)
-	kubePreUpgradeChan := make(chan error, 1)
-	getAllResourceChan := make(chan error, 1)
-	trivyK8sMetricsChan := make(chan error, 1)
-	clusterMetricsChan := make(chan error, 1)
-	kubescoreMetricsChan := make(chan error, 1)
-	trivyImagescanChan := make(chan error, 1)
-	RakeesErrChan := make(chan error, 1)
+	
 	var (
 		wg        sync.WaitGroup
 		config    *rest.Config
@@ -102,6 +94,15 @@ func main() {
 
 	// starting all the go routines
 	collectAndPublishMetrics := func() {
+		// error channels declared for the go routines
+		outdatedErrChan := make(chan error, 1)
+		kubePreUpgradeChan := make(chan error, 1)
+		getAllResourceChan := make(chan error, 1)
+		trivyK8sMetricsChan := make(chan error, 1)
+		clusterMetricsChan := make(chan error, 1)
+		kubescoreMetricsChan := make(chan error, 1)
+		trivyImagescanChan := make(chan error, 1)
+		RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
 		doneChan := make(chan bool)
 		go func() {
