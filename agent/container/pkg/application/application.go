@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/gin-gonic/gin"
 	"github.com/intelops/kubviz/agent/container/pkg/clients"
 	"github.com/intelops/kubviz/agent/container/pkg/config"
 	"github.com/intelops/kubviz/agent/container/pkg/handler"
@@ -42,17 +42,12 @@ func New() *Application {
 		log.Fatalf("API Handler initialisation failed: %v", err)
 	}
 
-	mux := chi.NewMux()
-	apiServer.BindRequest(mux)
-	chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-		fmt.Printf("[%s]: '%s' has %d middlewares.\n", method, route, len(middlewares))
-		return nil
-	})
+	r := gin.Default()
+	apiServer.BindRequest(r)
+
 	httpServer := &http.Server{
-		// TODO: remove hardcoding
-		// Addr:    fmt.Sprintf("0.0.0.0:%d", cfg.Port),
 		Addr:    fmt.Sprintf(":%d", 8082),
-		Handler: mux,
+		Handler: r,
 	}
 
 	return &Application{
@@ -65,8 +60,6 @@ func New() *Application {
 }
 
 func (app *Application) Start() {
-	// TODO: remove hard coding
-	// log.Printf("Starting server at %v", app.httpServer.Addr)
 	log.Printf("Starting server at %v", 8082)
 	var err error
 	if err = app.httpServer.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {

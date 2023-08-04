@@ -1,6 +1,6 @@
 package: api
 generate:
-  chi-server: true
+  gin-server: true
   models: true
   embedded-spec: true
 output: agent/container/api/agent.gen.go
