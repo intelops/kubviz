@@ -145,7 +145,7 @@ const dockerHubBuildTable DBStatement = `
 		Event String
 	) engine=File(TabSeparated)
 	`
-	const CreatetrivySbomTable DBStatement = `
+const CreatetrivySbomTable DBStatement = `
 	CREATE TABLE IF NOT EXISTS trivysbom (
 		id UUID,
 		schema String,
@@ -154,7 +154,20 @@ const dockerHubBuildTable DBStatement = `
 		serial_number String,
 		version BIGINT,
 		metadata_timestamp DateTime('UTC'),
-		vulnerabilities Array(String)
+		metatool_vendor String,
+		metatool_name String,
+		metatool_version String,
+		component_bom_ref String,
+		component_type String,
+		component_name String,
+		component_version String,
+		component_property_name String,
+		component_property_value String,
+		component_hash_alg String,
+		component_hash_content String,
+		component_license_exp String,
+		component_purl String,
+		dependency_ref String
 	) engine=File(TabSeparated)
 	`
 
@@ -172,4 +185,4 @@ const InsertKubeScore string = "INSERT INTO kubescore (id, namespace, cluster_na
 const InsertTrivyVul string = "INSERT INTO trivy_vul (id, cluster_name, namespace, kind, name, vul_id, vul_vendor_ids, vul_pkg_id, vul_pkg_name, vul_pkg_path, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?. ?)"
 const InsertTrivyImage string = "INSERT INTO trivyimage (id, cluster_name, artifact_name, vul_id,  vul_pkg_id, vul_pkg_name,  vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date) VALUES ( ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertTrivyMisconfig string = "INSERT INTO trivy_misconfig (id, cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?. ?, ?)"
-const InsertTrivySbom string = "INSERT INTO trivysbom (id, schema, bom_format,spec_version,serial_number,  version, metadata_timestamp,vulnerabilities) VALUES ( ?, ?,?,?, ?, ?, ?,?)"
+const InsertTrivySbom string = "INSERT INTO trivysbom (id, schema, bom_format,spec_version,serial_number,  version, metadata_timestamp,metatool_vendor,metatool_name,metatool_version,component_bom_ref,component_type,component_name,component_version,component_property_name,component_property_value,component_hash_alg,component_hash_content,component_license_exp,component_purl,dependency_ref) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?,?)"

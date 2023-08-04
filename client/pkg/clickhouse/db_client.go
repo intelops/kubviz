@@ -210,31 +210,83 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 		log.Fatal(err)
 	}
 }
+
+// func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
+// 	result := metrics.Report
+
+// 	var (
+// 		tx, _   = c.conn.Begin()
+// 		stmt, _ = tx.Prepare(InsertTrivySbom)
+// 	)
+// 	if _, err := stmt.Exec(
+// 		metrics.ID,
+// 		result.Schema,
+// 		result.BomFormat,
+// 		result.SpecVersion,
+// 		result.SerialNumber,
+// 		result.Version,
+// 		result.Metadata.Timestamp,
+// 		result.Vulnerabilities,
+// 	); err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	if err := tx.Commit(); err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	stmt.Close()
+
+// }
 func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
 	result := metrics.Report
+	for _, metaTool := range result.Metadata.Tools {
+		for _, com := range result.Components {
+			for _, comPro := range com.Properties {
+				for _, comHash := range com.Hashes {
+					for _, comLicense := range com.Licenses {
+						for _, depend := range result.Dependencies {
+							var (
+								tx, _   = c.conn.Begin()
+								stmt, _ = tx.Prepare(InsertTrivySbom)
+							)
+							if _, err := stmt.Exec(
+								metrics.ID,
+								result.Schema,
+								result.BomFormat,
+								result.SpecVersion,
+								result.SerialNumber,
+								result.Version,
+								result.Metadata.Timestamp,
+								metaTool.Vendor,
+								metaTool.Name,
+								metaTool.Version,
+								com.BomRef,
+								com.Type,
+								com.Name,
+								com.Version,
+								comPro.Name,
+								comPro.Value,
+								comHash.Alg,
+								comHash.Content,
+								comLicense.Expression,
+								com.Purl,
+								depend.Ref,
+							); err != nil {
+								log.Fatal(err)
+							}
+							if err := tx.Commit(); err != nil {
+								log.Fatal(err)
+							}
+							stmt.Close()
+						}
+					}
 
-	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(InsertTrivySbom)
-	)
-	if _, err := stmt.Exec(
-		metrics.ID,
-		result.Schema,
-		result.BomFormat,
-		result.SpecVersion,
-		result.SerialNumber,
-		result.Version,
-		result.Metadata.Timestamp,
-		result.Vulnerabilities,
-	); err != nil {
-		log.Fatal(err)
+				}
+			}
+		}
 	}
-	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
-	}
-	stmt.Close()
 
 }
+
 func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	var (
 		tx, _   = c.conn.Begin()

@@ -9,10 +9,6 @@ import (
 	"sync"
 	"time"
 
-	//"github.com/aquasecurity/trivy/pkg/k8s/report"
-	// "github.com/aquasecurity/trivy/pkg/types"
-	//"github.com/aquasecurity/trivy/pkg/fanal/types"
-	// "github.com/aquasecurity/trivy/pkg/sbom/cyclonedx/core"
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
@@ -30,7 +26,7 @@ func publishTrivySbomReport(report model.Sbom, js nats.JetStreamContext, errCh c
 	if err != nil {
 		errCh <- err
 	}
-	//log.Println("Report", report)
+
 	log.Printf("Trivy report with BomFormat:%v has been published\n", metrics.Report.BomFormat)
 	errCh <- nil
 }
@@ -42,21 +38,20 @@ func executeCommandSbom(ctx context.Context, command string) ([]byte, error) {
 	if err != nil {
 		log.Println("Execute Command Error", err.Error())
 	}
-	// Print the output
-	// log.Println(string(stdout))
+
 	return stdout, nil
 }
 
-func RunTrivySbomScan(config *rest.Config,js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	defer wg.Done()
-    images, err := ListImages(config)
+	images, err := ListImages(config)
 	log.Println("length of images", len(images))
 
 	if err != nil {
-		log.Fatalf("failed to list images: %v", err)
+		log.Printf("failed to list images: %v", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
 	defer cancel()
 
 	var wgc sync.WaitGroup
@@ -74,18 +69,18 @@ func RunTrivySbomScan(config *rest.Config,js nats.JetStreamContext, wg *sync.Wai
 			out, err := executeCommandSbom(ctx, command)
 
 			if ctx.Err() == context.DeadlineExceeded {
-				log.Printf("*************Command execution timeout for image %s", image.PullableImage)
+				log.Printf("Command execution timeout for image %s", image.PullableImage)
 				return // Move on to the next image
 			}
 
 			if err != nil {
-				log.Printf("*************Error executing Trivy for image %s: %v", image.PullableImage, err)
+				log.Printf("Error executing Trivy for image %s: %v", image.PullableImage, err)
 				return // Move on to the next image in case of an error
 			}
 
 			// Check if the output is empty or invalid JSON
 			if len(out) == 0 {
-				log.Printf("*************Trivy output is empty for image %s", image.PullableImage)
+				log.Printf("Trivy output is empty for image %s", image.PullableImage)
 				return // Move on to the next image
 			}
 

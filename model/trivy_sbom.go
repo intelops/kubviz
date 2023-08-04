@@ -6,8 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-//import "github.com/aquasecurity/trivy/pkg/types"
-
 type Reports struct {
 	ID     uuid.UUID
 	Report Sbom
