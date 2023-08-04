@@ -18,12 +18,25 @@ const (
 	eventSubject   = "CONTAINERMETRICS.git"
 )
 
+// NATSContext encapsulates the connection and context for interacting with a NATS server
+// and its associated JetStream. It includes the following fields:
+//   - conf: The configuration used to establish the connection, including server address, tokens, etc.
+//   - conn: The active connection to the NATS server, allowing for basic NATS operations.
+//   - stream: The JetStream context, enabling more advanced stream-based operations such as publishing and subscribing to messages.
+//
+// NATSContext is used throughout the application to send and receive messages via NATS, and to manage streams within JetStream.
 type NATSContext struct {
 	conf   *config.Config
 	conn   *nats.Conn
 	stream nats.JetStreamContext
 }
 
+// NewNATSContext establishes a connection to a NATS server using the provided configuration
+// and initializes a JetStream context. It checks for the existence of a specific stream
+// and creates the stream if it is not found. The function returns a NATSContext object,
+// which encapsulates the NATS connection and JetStream context, allowing for publishing
+// and subscribing to messages within the application. An error is returned if the connection
+// or stream initialization fails.
 func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	fmt.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
@@ -48,6 +61,11 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	return ctx, nil
 }
 
+// CreateStream initializes a new JetStream within the NATS server, using the configuration
+// stored in the NATSContext. It returns the JetStream context, allowing for further interaction
+// with the stream, such as publishing and subscribing to messages. If the stream creation fails,
+// an error is returned. This method is typically called during initialization to ensure that
+// the required stream is available for the application's messaging needs.
 func (n *NATSContext) CreateStream() (nats.JetStreamContext, error) {
 	// Creates JetStreamContext
 	stream, err := n.conn.JetStream()
@@ -88,11 +106,15 @@ func (n *NATSContext) Close() {
 	n.conn.Close()
 }
 
+// Publish sends a given event to the JetStream within the NATS server, including the repository information in the header.
+// The event is provided as a byte slice, and the target repository information is identified by the repo string.
+// This method leverages the JetStream context within the NATSContext to publish the event, ensuring that it is sent with the correct headers and to the appropriate stream within the NATS server.
+// The repository information in the header can be used by subscribers to filter or route the event based on its origin or destination.
+// An error is returned if the publishing process fails, such as if the connection is lost or if there are issues with the JetStream.
 func (n *NATSContext) Publish(event []byte, repo string) error {
 	msg := nats.NewMsg(eventSubject)
 	msg.Data = event
 	msg.Header.Set("REPO_NAME", repo)
 	_, err := n.stream.PublishMsgAsync(msg)
-
 	return err
 }

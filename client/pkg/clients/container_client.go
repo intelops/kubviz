@@ -49,6 +49,17 @@ func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
 		} else if repoName == "Github_Registry" {
 			conn.InsertContainerEventGithub(string(msg.Data))
 			log.Println("Inserted Github Container metrics:", string(msg.Data))
+		} else if repoName == "Azure_Container_Registry" {
+			var pushEvent model.AzureContainerPushEventPayload
+			err := json.Unmarshal(msg.Data, &pushEvent)
+			if err != nil {
+				log.Printf("Error while unmarshaling Azure Container Registry payload: %v", err)
+				return
+			}
+			// Extract the necessary information from pushEvent and insert into ClickHouse
+			conn.InsertContainerEventAzure(pushEvent)
+			log.Println("Inserted Azure Container Registry metrics:", string(msg.Data))
 		}
+
 	}, nats.Durable(string(containerConsumer)), nats.ManualAck())
 }

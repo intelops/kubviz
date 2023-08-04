@@ -8,218 +8,129 @@ import (
 	"compress/gzip"
 	"encoding/base64"
 	"fmt"
-	"net/http"
 	"net/url"
 	"path"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
-	"github.com/go-chi/chi/v5"
+	"github.com/gin-gonic/gin"
 )
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// List of APIs provided by the service
 	// (GET /api-docs)
-	GetApiDocs(w http.ResponseWriter, r *http.Request)
+	GetApiDocs(c *gin.Context)
+	// Post Azure Container Registry webhook events
+	// (POST /event/azure/container)
+	PostEventAzureContainer(c *gin.Context)
 	// Post Dockerhub artifactory events
 	// (POST /event/docker/hub)
-	PostEventDockerHub(w http.ResponseWriter, r *http.Request)
+	PostEventDockerHub(c *gin.Context)
 	// Kubernetes readiness and liveness probe endpoint
 	// (GET /status)
-	GetStatus(w http.ResponseWriter, r *http.Request)
+	GetStatus(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler            ServerInterface
 	HandlerMiddlewares []MiddlewareFunc
-	ErrorHandlerFunc   func(w http.ResponseWriter, r *http.Request, err error)
+	ErrorHandler       func(*gin.Context, error, int)
 }
 
-type MiddlewareFunc func(http.Handler) http.Handler
+type MiddlewareFunc func(c *gin.Context)
 
 // GetApiDocs operation middleware
-func (siw *ServerInterfaceWrapper) GetApiDocs(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetApiDocs(w, r)
-	})
+func (siw *ServerInterfaceWrapper) GetApiDocs(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
+		middleware(c)
 	}
 
-	handler.ServeHTTP(w, r.WithContext(ctx))
+	siw.Handler.GetApiDocs(c)
+}
+
+// PostEventAzureContainer operation middleware
+func (siw *ServerInterfaceWrapper) PostEventAzureContainer(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.PostEventAzureContainer(c)
 }
 
 // PostEventDockerHub operation middleware
-func (siw *ServerInterfaceWrapper) PostEventDockerHub(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostEventDockerHub(w, r)
-	})
+func (siw *ServerInterfaceWrapper) PostEventDockerHub(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
+		middleware(c)
 	}
 
-	handler.ServeHTTP(w, r.WithContext(ctx))
+	siw.Handler.PostEventDockerHub(c)
 }
 
 // GetStatus operation middleware
-func (siw *ServerInterfaceWrapper) GetStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetStatus(w, r)
-	})
+func (siw *ServerInterfaceWrapper) GetStatus(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
+		middleware(c)
 	}
 
-	handler.ServeHTTP(w, r.WithContext(ctx))
+	siw.Handler.GetStatus(c)
 }
 
-type UnescapedCookieParamError struct {
-	ParamName string
-	Err       error
+// GinServerOptions provides options for the Gin server.
+type GinServerOptions struct {
+	BaseURL      string
+	Middlewares  []MiddlewareFunc
+	ErrorHandler func(*gin.Context, error, int)
 }
 
-func (e *UnescapedCookieParamError) Error() string {
-	return fmt.Sprintf("error unescaping cookie parameter '%s'", e.ParamName)
+// RegisterHandlers creates http.Handler with routing matching OpenAPI spec.
+func RegisterHandlers(router *gin.Engine, si ServerInterface) *gin.Engine {
+	return RegisterHandlersWithOptions(router, si, GinServerOptions{})
 }
 
-func (e *UnescapedCookieParamError) Unwrap() error {
-	return e.Err
-}
+// RegisterHandlersWithOptions creates http.Handler with additional options
+func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options GinServerOptions) *gin.Engine {
 
-type UnmarshallingParamError struct {
-	ParamName string
-	Err       error
-}
+	errorHandler := options.ErrorHandler
 
-func (e *UnmarshallingParamError) Error() string {
-	return fmt.Sprintf("Error unmarshalling parameter %s as JSON: %s", e.ParamName, e.Err.Error())
-}
-
-func (e *UnmarshallingParamError) Unwrap() error {
-	return e.Err
-}
-
-type RequiredParamError struct {
-	ParamName string
-}
-
-func (e *RequiredParamError) Error() string {
-	return fmt.Sprintf("Query argument %s is required, but not found", e.ParamName)
-}
-
-type RequiredHeaderError struct {
-	ParamName string
-	Err       error
-}
-
-func (e *RequiredHeaderError) Error() string {
-	return fmt.Sprintf("Header parameter %s is required, but not found", e.ParamName)
-}
-
-func (e *RequiredHeaderError) Unwrap() error {
-	return e.Err
-}
-
-type InvalidParamFormatError struct {
-	ParamName string
-	Err       error
-}
-
-func (e *InvalidParamFormatError) Error() string {
-	return fmt.Sprintf("Invalid format for parameter %s: %s", e.ParamName, e.Err.Error())
-}
-
-func (e *InvalidParamFormatError) Unwrap() error {
-	return e.Err
-}
-
-type TooManyValuesForParamError struct {
-	ParamName string
-	Count     int
-}
-
-func (e *TooManyValuesForParamError) Error() string {
-	return fmt.Sprintf("Expected one value for %s, got %d", e.ParamName, e.Count)
-}
-
-// Handler creates http.Handler with routing matching OpenAPI spec.
-func Handler(si ServerInterface) http.Handler {
-	return HandlerWithOptions(si, ChiServerOptions{})
-}
-
-type ChiServerOptions struct {
-	BaseURL          string
-	BaseRouter       chi.Router
-	Middlewares      []MiddlewareFunc
-	ErrorHandlerFunc func(w http.ResponseWriter, r *http.Request, err error)
-}
-
-// HandlerFromMux creates http.Handler with routing matching OpenAPI spec based on the provided mux.
-func HandlerFromMux(si ServerInterface, r chi.Router) http.Handler {
-	return HandlerWithOptions(si, ChiServerOptions{
-		BaseRouter: r,
-	})
-}
-
-func HandlerFromMuxWithBaseURL(si ServerInterface, r chi.Router, baseURL string) http.Handler {
-	return HandlerWithOptions(si, ChiServerOptions{
-		BaseURL:    baseURL,
-		BaseRouter: r,
-	})
-}
-
-// HandlerWithOptions creates http.Handler with additional options
-func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handler {
-	r := options.BaseRouter
-
-	if r == nil {
-		r = chi.NewRouter()
-	}
-	if options.ErrorHandlerFunc == nil {
-		options.ErrorHandlerFunc = func(w http.ResponseWriter, r *http.Request, err error) {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+	if errorHandler == nil {
+		errorHandler = func(c *gin.Context, err error, statusCode int) {
+			c.JSON(statusCode, gin.H{"msg": err.Error()})
 		}
 	}
+
 	wrapper := ServerInterfaceWrapper{
 		Handler:            si,
 		HandlerMiddlewares: options.Middlewares,
-		ErrorHandlerFunc:   options.ErrorHandlerFunc,
+		ErrorHandler:       errorHandler,
 	}
 
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api-docs", wrapper.GetApiDocs)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/event/docker/hub", wrapper.PostEventDockerHub)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/status", wrapper.GetStatus)
-	})
+	router.GET(options.BaseURL+"/api-docs", wrapper.GetApiDocs)
 
-	return r
+	router.POST(options.BaseURL+"/event/azure/container", wrapper.PostEventAzureContainer)
+
+	router.POST(options.BaseURL+"/event/docker/hub", wrapper.PostEventDockerHub)
+
+	router.GET(options.BaseURL+"/status", wrapper.GetStatus)
+
+	return router
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/5ySz2ocMQyHX0XoPN2ZtDffQhPakEJC01vIwWNrdkVnbSPJA8sy7148C6Wkf+nJCH76",
-	"9MnojCEfS06UTNGd1w45TRndGSNpEC7GOaHD9zmZ50QCo3DcEzwUSvD59ukLXD/egRYKPHHwW7xDY5vp",
-	"721Pr9oWEr3Mu9oNuwHXDnOh5Aujw3e7YXeFHRZvh+aKvS/8JuawFXuy9uRCstHuIjr8QHZd+KZFOhTS",
-	"kpPSFn87DD8v+XCP69qh1uPRywkdfmI1yFNzVSiSF44UYTyBHQiUZOFAbVu/V3TPWOo4c8CXBulpoWR9",
-	"zOErSX+oYxtXsv7C8jGr3bb0zRb+WMf/s20cuDAOdQQvxpMPluUEm4z+TlXNW/3jLz5dEv+ipTUEUp3q",
-	"DN8xr0Tv60iSyEhByEdOpAo+RZh5oa0okkcCSrFkTvajt/DijZp4Q5K0k0H3fMYqMzrscX1ZvwUAAP//",
-	"Lv/PMNUCAAA=",
+	"H4sIAAAAAAAC/6SSQWscMQyF/4rQebqzaW9zC01oQwoJ2d5CDh5buyMyaxtJnrJd5r8Xz9K0pCUJ7ckI",
+	"3nv6JOuIPu1zihRNsTvODXLcJuyOGEi9cDZOETv8mKI5jiTQC4cdwU2mCHeXm69wfnsFmsnzlr1b5A0a",
+	"20iv2zbPbBOJnvqdrdarNc4NpkzRZcYOP6zWqzNsMDsbKiu2LvO7kPxS7MjqkzLJknYVsMNPZOeZL6qk",
+	"QSHNKSot8vfr9Z9D3lzjPDeoZb93csAOv7AapG1lVciSJg4UoD+ADQRKMrGnOq3bKXb3mEs/sseHGtLS",
+	"RNFa970Itf7nGmrPnPQvqLdJ7bJazqvjaW//xl3DYAmCXz9wRztWkwN8o35I6REWQn2ZPyT/SNIOpX8D",
+	"+sUi/lz6/6A+ZQylByfGW+ctyeEVVDVn5cUr2JwUb8HS4j2pbssITzHPQK9LTxLJSEHIBY6kCi4GGHmi",
+	"pciSegKKISeO9ju38OSMKniNJKknj939EYuM2GGL88P8IwAA//90yrlhlQMAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -13,7 +13,6 @@ require (
 	github.com/getkin/kin-openapi v0.118.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-co-op/gocron v1.30.1
 	github.com/go-playground/webhooks/v6 v6.2.0
 	github.com/google/uuid v1.3.0
