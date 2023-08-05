@@ -153,7 +153,7 @@ const azureContainerPushEventTable DBStatement = `
 		ImageName String,
 		Event String,
 		Timestamp String,
-		Size Int64,
+		Size Int32,
 		SHAID String
 	) engine=File(TabSeparated)
 	`
