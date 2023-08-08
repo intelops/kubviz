@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"github.com/intelops/kubviz/model"
-	v1 "github.com/vijeyash1/go-github-container/v1"
 )
 
 // GithubContainerWatch monitors and publishes container image details from a specified GitHub organization's repositories.
@@ -24,7 +23,7 @@ func (app *Application) GithubContainerWatch() {
 	}
 
 	// Create a new GitHub client with the provided organization and token.
-	client := v1.NewGithubClient(app.GithubConfig.Org, app.GithubConfig.Token)
+	client := NewGithubClient(app.GithubConfig.Org, app.GithubConfig.Token)
 
 	// Fetch the list of packages (repositories) from the GitHub organization.
 	packages, err := client.FetchPackages()
@@ -61,7 +60,7 @@ func (app *Application) GithubContainerWatch() {
 }
 
 // BuildImageDetails constructs a model.GithubImage from the given v1.Package and v1.Version.
-func BuildImageDetails(pkg v1.Package, version v1.Version) model.GithubImage {
+func BuildImageDetails(pkg Package, version Version) model.GithubImage {
 	// Create and return a new GithubImage object using the provided package and version information.
 	return model.GithubImage{
 		PackageId:    fmt.Sprint(pkg.ID),     // Convert the package ID to a string and set it as PackageId.

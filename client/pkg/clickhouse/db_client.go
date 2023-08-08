@@ -39,6 +39,7 @@ type DBInterface interface {
 	RetriveKubepugEvent() ([]model.Result, error)
 	RetrieveKubvizEvent() ([]model.DbEvent, error)
 	InsertContainerEventDockerHub(model.DockerHubBuild)
+	InsertContainerEventAzure(model.AzureContainerPushEventPayload)
 	InsertContainerEventGithub(string)
 	InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) error
 	Close()
@@ -70,7 +71,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -88,6 +89,46 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 	return &DBClient{splconn: splconn, conn: stdconn, conf: conf}, nil
+}
+func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushEventPayload) {
+	var (
+		tx, _   = c.conn.Begin()
+		stmt, _ = tx.Prepare(string(InsertAzureContainerPushEvent))
+	)
+	defer stmt.Close()
+	registryURL := pushEvent.Request.Host
+	repositoryName := pushEvent.Target.Repository
+	tag := pushEvent.Target.Tag
+
+	if tag == "" {
+		tag = "latest"
+	}
+	imageName := registryURL + "/" + repositoryName + ":" + tag
+	size := pushEvent.Target.Size
+	shaID := pushEvent.Target.Digest
+
+	// Marshaling the pushEvent into a JSON string
+	pushEventJSON, err := json.Marshal(pushEvent)
+	if err != nil {
+		log.Printf("Error while marshaling Azure Container Registry payload: %v", err)
+		return
+	}
+
+	if _, err := stmt.Exec(
+		registryURL,
+		repositoryName,
+		tag,
+		imageName,
+		string(pushEventJSON),
+		pushEvent.Timestamp,
+		size,
+		shaID,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {

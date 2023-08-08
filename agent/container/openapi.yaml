@@ -36,6 +36,13 @@ paths:
       responses:
         '200':
           description: OK
-
+  /event/azure/container:
+    post:
+      tags:
+        - public
+      summary: Post Azure Container Registry webhook events
+      responses:
+        '200':
+          description: OK
 
 # oapi-codegen -config ./cfg.yaml ./openapi.yaml
