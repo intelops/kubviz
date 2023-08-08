@@ -33,10 +33,6 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg 
 		//continue // Move on to the next image in case of an error
 	}
 	publishKubescoreMetrics(report, js, errCh)
-	//log.Println("Publishing kube-score recommendations for namespace")
-
-	// If you want to publish the report or perform any other action with it, you can do it here
-
 }
 
 func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamContext, errCh chan error) {
