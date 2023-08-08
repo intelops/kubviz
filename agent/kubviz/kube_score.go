@@ -23,14 +23,12 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext, wg 
 
 	if err != nil {
 		log.Printf("Error scanning image %s:", err)
-		//continue // Move on to the next image in case of an error
 	}
 
 	err = json.Unmarshal([]byte(out), &report)
 
 	if err != nil {
 		log.Printf("Error occurred while Unmarshalling json: %v", err)
-		//continue // Move on to the next image in case of an error
 	}
 	publishKubescoreMetrics(report, js, errCh)
 }

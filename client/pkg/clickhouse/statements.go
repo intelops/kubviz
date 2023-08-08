@@ -134,6 +134,12 @@ const trivyTableImage DBStatement = `
 		id UUID,
 		cluster_name String,
 		artifact_name String,
+		metadata_size BIGINT,
+		metadata_osname String,
+		metadata_imageid String,
+		metadata_diffid String,
+		metadata_repotags String,
+		metadata_repodigest String,
 		vul_id String,
 		vul_pkg_id String,
 		vul_pkg_name String,
@@ -180,6 +186,6 @@ const containerDockerhubTable DBStatement = `CREATE table IF NOT EXISTS containe
 const containerGithubTable DBStatement = `CREATE table IF NOT EXISTS container_github(event JSON) ENGINE = MergeTree ORDER BY tuple();`
 const InsertKubeScore string = "INSERT INTO kubescore(id,clustername,object_name,kind,apiVersion,name,namespace,target_type,description,path,summary,file_name,file_row) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"
 const InsertTrivyVul string = "INSERT INTO trivy_vul (id, cluster_name, namespace, kind, name, vul_id, vul_vendor_ids, vul_pkg_id, vul_pkg_name, vul_pkg_path, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?. ?)"
-const InsertTrivyImage string = "INSERT INTO trivyimage (id, cluster_name, artifact_name, vul_id,  vul_pkg_id, vul_pkg_name,  vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date) VALUES ( ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const InsertTrivyImage string = "INSERT INTO trivyimage (id, cluster_name, artifact_name,metadata_size ,metadata_osname ,metadata_imageid ,metadata_diffid ,metadata_repotags ,metadata_repodigest, vul_id,  vul_pkg_id, vul_pkg_name,  vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date) VALUES ( ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)"
 const InsertTrivyMisconfig string = "INSERT INTO trivy_misconfig (id, cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?. ?, ?)"
 const InsertAzureContainerPushEvent DBStatement = "INSERT INTO azurecontainerpush (RegistryURL, RepositoryName, Tag, ImageName, Event, Timestamp, Size, SHAID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
