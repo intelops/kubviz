@@ -129,6 +129,11 @@ resources:
     cpu: 200m
     memory: 256Mi
 
+vault:
+  address: http://vault:8200
+  role: "vault-role-kubviz"
+  policyNames: "vault-policy-cluster-admin,vault-policy-cluster-read"
+
 autoscaling:
   enabled: false
   minReplicas: 1
@@ -146,6 +151,8 @@ schedulingInterval: "24h"
 
 clusterName: "kubviz"
 nats:
-  host: kubviz-client-nats 
-  auth:
-    token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
+  host: kubviz-client-nats
+  credidentifier: auth-token
+  entityname: nats
+ # auth:
+ #   token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"

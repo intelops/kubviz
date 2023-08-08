@@ -1,12 +1,13 @@
 package clients
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/intelops/kubviz/agent/container/pkg/config"
-
+	"github.com/intelops/kubviz/credential"
 	"github.com/nats-io/nats.go"
 )
 
@@ -40,8 +41,13 @@ type NATSContext struct {
 func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	fmt.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
-
-	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
+	
+	cred, err := credential.GetGenericCredential(context.Background(), conf.EntityName, conf.CredIdentifier)
+	if err != nil {
+		return nil, err
+	}
+	token:=cred["nats"]
+	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(token))
 	if err != nil {
 		return nil, err
 	}

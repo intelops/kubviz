@@ -48,6 +48,16 @@ spec:
           env:
           - name: CLUSTER_NAME
             value: {{ .Values.clusterName }}
+          - name: VAULT_ADDR
+            value: {{ .Values.vault.address }}
+          - name: VAULT_ROLE
+            value: {{ .Values.vault.role }}
+          
+          - name: NATS_CRED_IDENTIFIER
+            value: {{ .Values.nats.credidentifier | quote }}
+          - name: NATS_ENTITY_NAME
+            value: {{ .Values.nats.entityname | quote }}  
+          
           - name: NATS_TOKEN
             value: {{ .Values.nats.auth.token }}
           - name: NATS_ADDRESS
@@ -85,8 +95,8 @@ spec:
           env:
           - name: CLUSTER_NAME
             value: {{ .Values.clusterName }}
-          - name: NATS_TOKEN
-            value: {{ .Values.nats.auth.token }}
+    #      - name: NATS_TOKEN
+    #        value: {{ .Values.nats.auth.token }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
           resources:
