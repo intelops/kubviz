@@ -47,12 +47,11 @@ spec:
 #              port: http
           env:
           - name: CLUSTER_NAME
-            value: {{ .Values.clusterName }}
-        
-     #     - name: NATS_TOKEN
-     #       value: {{ .Values.nats.auth.token }}
-     #     - name: NATS_ADDRESS
-     #       value: {{ .Values.nats.host }}
+            value: {{ .Values.clusterName }}     
+          - name: NATS_TOKEN
+            value: {{ .Values.nats.auth.token }}
+          - name: NATS_ADDRESS
+            value: {{ .Values.nats.host }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 {{- if .Values.git_bridge.enabled }}
