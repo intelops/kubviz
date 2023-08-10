@@ -107,8 +107,8 @@ spec:
           env:
           - name: CLUSTER_NAME
             value: {{ .Values.clusterName }}
-    #      - name: NATS_TOKEN
-    #        value: {{ .Values.nats.auth.token }}
+          - name: NATS_TOKEN
+            value: {{ .Values.nats.auth.token }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
           resources:
