@@ -103,4 +103,4 @@ jobs:
           format: 'github'
           output: 'dependency-results.sbom.json'
           image-ref: '.'
-          github-pat: ${{ secrets.GIT_TOKENS }}
+          github-pat: ${{ secrets.TOKENS }}
