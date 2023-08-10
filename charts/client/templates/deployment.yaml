@@ -45,19 +45,42 @@ spec:
 #            httpGet:
 #              path: /
 #              port: http
+{{- if .Values.vault.enabled }}
+
           env:
+          - name: ENABLED
+            value: {{ .Values.vault.enabled }}
+
           - name: VAULT_ADDR
             value: {{ .Values.vault.address }}
           - name: VAULT_ROLE
             value: {{ .Values.vault.role }}
+         
           - name: NATS_CRED_IDENTIFIER
-            value: {{ .Values.nats.credidentifier | quote }}
+            value: {{ .Values.vault.credidentifier | quote }}
           - name: NATS_ENTITY_NAME
-            value: {{ .Values.nats.entityname | quote }}  
+            value: {{ .Values.vault.entityname | quote }}
+{{- else }}
+          env:
+          - name: NATS_TOKEN
+            value: {{ .Values.nats.auth.token }}
+          - name: NATS_ADDRESS
+            value: {{ .Values.nats.host }}
+
+{{- end }}
+          env:
+  #        - name: VAULT_ADDR
+  #          value: {{ .Values.vault.address }}
+  #        - name: VAULT_ROLE
+  #          value: {{ .Values.vault.role }}
+  #        - name: NATS_CRED_IDENTIFIER
+  #          value: {{ .Values.nats.credidentifier | quote }}
+  #        - name: NATS_ENTITY_NAME
+  #          value: {{ .Values.nats.entityname | quote }}  
    #       - name: NATS_TOKEN
    #         value: {{ .Values.nats.auth.token }}
-          - name: NATS_ADDRESS
-            value: {{ include "client.fullname" . }}-nats
+   #       - name: NATS_ADDRESS
+   #         value: {{ include "client.fullname" . }}-nats
           - name: DB_ADDRESS
             value: {{ include "client.fullname" . }}-clickhouse
           - name: DB_PORT

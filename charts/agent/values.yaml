@@ -130,9 +130,13 @@ resources:
     memory: 256Mi
 
 vault:
+  enabled: true
   address: http://vault:8200
   role: "vault-role-kubviz"
   policyNames: "vault-policy-cluster-admin,vault-policy-cluster-read"
+  host: kubviz-client-nats
+  credidentifier: auth-token
+  entityname: nats
 
 autoscaling:
   enabled: false
@@ -149,8 +153,7 @@ affinity: {}
 
 clusterName: "kubviz"
 nats:
-  host: kubviz-client-nats
-  credidentifier: auth-token
-  entityname: nats
- # auth:
- #   token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
+ enabled: false
+ host: kubviz-client-nats
+ auth:
+   token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
