@@ -65,6 +65,17 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+
+
+vault:
+  enabled: true
+  address: http://vault:8200
+  role: "vault-role-kubviz"
+  policyNames: "vault-policy-cluster-admin,vault-policy-cluster-read"
+  credidentifier: auth-token
+  entityname: nats
+
+
 autoscaling:
   enabled: false
   minReplicas: 1
@@ -79,10 +90,10 @@ tolerations: []
 affinity: {}
 
 nats:
-  enabled: true
+
   #Authentication setup
   auth:
-    enabled: true
+    enabled: false
     token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
   nats:
     jetstream:
