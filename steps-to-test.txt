@@ -14,7 +14,7 @@ paste your kubeconfig content in this file
 
 docker-compose up -d (to run agents and client)
 
-open postman ,
+open postman,
 
 send a sample json to localhost:8090/github
 
