@@ -8,7 +8,7 @@ on:
     branches:
       - 'main'
     tags:
-      - 'v*..'
+      - 'v*.*.*'
   pull_request:
     branches:
       - 'main'  
@@ -39,7 +39,7 @@ jobs:
         id: metadata
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -59,7 +59,7 @@ jobs:
         with:
           context: .
           file: ./dockerfiles/agent/kubviz/Dockerfile
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_id }}
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:${{ github.run_id }}
           labels: ${{ steps.metadata.outputs.labels }}
         
           push: true
@@ -69,12 +69,12 @@ jobs:
 
       - name: Sign the images
         run: |
-          cosign sign -y ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_id }}
+          cosign sign -y ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:${{ github.run_id }}
         env:
           COSIGN_EXPERIMENTAL: 1
       
       - name: Verify the pushed tags
-        run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_id }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/agent-docker-image.yml@refs/heads/main  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+        run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:${{ github.run_id }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/agent-docker-image.yml@refs/heads/main  --certificate-oidc-issuer https://token.actions.githubusercontent.com
         env:
           COSIGN_EXPERIMENTAL: 1
       
