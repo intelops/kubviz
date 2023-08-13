@@ -1,4 +1,4 @@
-name: app-release
+name: client-release
 on:
   push:
     tags:
