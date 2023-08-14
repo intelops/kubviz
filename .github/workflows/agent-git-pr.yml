@@ -1,0 +1,69 @@
+name: Git Agent Docker Image CI
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - 'charts/**'
+    branches:
+      - 'main'
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      GH_URL: https://github.com
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+          
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        
+      - uses: docker/setup-buildx-action@v1
+        name: Set up Docker Buildx
+
+      -
+        name: Login to ghcr registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+    
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/git-agent
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            latest # Add the "latest" tag
+   
+            
+      -
+        name: Build and push on PR
+        uses: docker/build-push-action@v4
+        if: github.event_name == 'pull_request'
+        with:
+          context: .
+          file: ./dockerfiles/agent/git/Dockerfile
+          push: false
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/git-agent:pr-${{ github.event.pull_request.number }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
+ 
