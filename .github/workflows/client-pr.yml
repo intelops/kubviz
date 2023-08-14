@@ -1,14 +1,6 @@
 name: Client Docker Image CI
 
 on:
-  push:
-    paths-ignore:
-      - '**.md'
-      - 'charts/**'
-    branches:
-      - 'main'
-    tags:
-      - 'v*.*.*'
   pull_request:
     branches:
       - 'main'
