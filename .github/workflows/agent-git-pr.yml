@@ -34,19 +34,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
     
       -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ github.repository }}/git-agent
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            latest # Add the "latest" tag
-   
-            
-      -
         name: Build and push on PR
         uses: docker/build-push-action@v4
         if: github.event_name == 'pull_request'
@@ -55,7 +42,6 @@ jobs:
           file: ./dockerfiles/agent/git/Dockerfile
           push: false
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/git-agent:pr-${{ github.event.pull_request.number }}
-          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
  
