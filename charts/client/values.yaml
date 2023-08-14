@@ -1,4 +1,4 @@
-# Default values for client.
+# Default values for client. 
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/intelops/kubviz/client
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "v1.0.0"
 
 imagePullSecrets: []
 nameOverride: ""
