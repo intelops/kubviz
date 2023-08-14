@@ -39,7 +39,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
     
       -
         name: Docker meta
@@ -65,5 +65,5 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/client:pr-${{ github.event.pull_request.number }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            "GITHUB_TOKEN=${{ secrets.TOKEN }}"
+            "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
  
