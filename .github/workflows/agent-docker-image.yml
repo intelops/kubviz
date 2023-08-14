@@ -8,7 +8,7 @@ on:
     branches:
       - 'main'
     tags:
-      - 'v*.*.*'
+      - 'v*..'
   pull_request:
     branches:
       - 'main'  
@@ -54,27 +54,30 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.TOKEN }}
 
-      - name: Build image and push to GitHub Container Registry
+      
+      - name: Build and push on PR
         uses: docker/build-push-action@v4
+        if: github.event_name == 'pull_request'
         with:
           context: .
           file: ./dockerfiles/agent/kubviz/Dockerfile
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:${{ github.run_id }}
-          labels: ${{ steps.metadata.outputs.labels }}
-        
-          push: true
+          push: false
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:pr-${{ github.event.pull_request.number }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            "GITHUB_TOKEN=${{ secrets.TOKEN }}"
 
       - name: Install cosign
         uses: sigstore/cosign-installer@main
 
       - name: Sign the images
         run: |
-          cosign sign -y ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:${{ github.run_id }}
+          cosign sign -y ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:pr-${{ github.event.pull_request.number }}
         env:
           COSIGN_EXPERIMENTAL: 1
       
       - name: Verify the pushed tags
-        run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:${{ github.run_id }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/agent-docker-image.yml@refs/heads/main  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+        run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:pr-${{ github.event.pull_request.number }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/agent-docker-image.yml@refs/heads/main  --certificate-oidc-issuer https://token.actions.githubusercontent.com
         env:
           COSIGN_EXPERIMENTAL: 1
       
