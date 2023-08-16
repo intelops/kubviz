@@ -40,7 +40,7 @@ jobs:
         with:
           context: .
           file: ./dockerfiles/agent/kubviz/Dockerfile
-          push: false
+          push: true
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:pr-${{ github.event.pull_request.number }}
           build-args: |
             "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
