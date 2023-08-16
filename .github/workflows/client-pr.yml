@@ -41,7 +41,7 @@ jobs:
         with:
           context: .
           file: ./dockerfiles/client/Dockerfile
-          push: false
+          push: true
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/client:pr-${{ github.event.pull_request.number }}
           build-args: |
             "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
