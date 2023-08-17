@@ -1,8 +1,9 @@
 package model
 
+import "github.com/zegl/kube-score/renderer/json_v2"
+
 type KubeScoreRecommendations struct {
-	ID              string
-	Namespace       string
-	Recommendations string
-	ClusterName     string
+	ID          string
+	ClusterName string
+	Report      []json_v2.ScoredObject
 }
