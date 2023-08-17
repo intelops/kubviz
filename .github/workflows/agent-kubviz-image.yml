@@ -1,4 +1,4 @@
-name: GIT Agent Docker Image CI
+name: Kubviz Agent Docker Image CI
 
 on:
   push:
@@ -34,7 +34,7 @@ jobs:
         id: metadata
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository }}/git-agent
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -53,8 +53,8 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file:  ./dockerfiles/agent/git/Dockerfile
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/git-agent:${{ github.run_id }}
+          file: ./dockerfiles/agent/kubviz/Dockerfile
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:${{ github.run_id }}
           labels: ${{ steps.metadata.outputs.labels }}
         
           push: true
@@ -64,12 +64,12 @@ jobs:
 
       - name: Sign the images
         run: |
-          cosign sign -y ${{ env.REGISTRY }}/${{ github.repository }}/git-agent:${{ github.run_id }}
+          cosign sign -y ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:${{ github.run_id }}
         env:
           COSIGN_EXPERIMENTAL: 1
       
       - name: Verify the pushed tags
-        run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}/git-agent:${{ github.run_id }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/agent-git.yml@refs/heads/main  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+        run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}/kubviz-agent:${{ github.run_id }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/agent-kubviz-image.yml@refs/heads/main  --certificate-oidc-issuer https://token.actions.githubusercontent.com
         env:
           COSIGN_EXPERIMENTAL: 1
       
