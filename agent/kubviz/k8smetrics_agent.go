@@ -58,6 +58,7 @@ var (
 )
 
 func main() {
+	log.Println("***********starting application***********")
 	env := Production
 	clusterMetricsChan := make(chan error, 1)
 	var (
