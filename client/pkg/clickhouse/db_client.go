@@ -280,6 +280,7 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	}
 }
 func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
+	log.Println("####started inserting value")
 	result := metrics.Report
 	for _, com := range result.Components {
 		if len(result.Metadata.Tools) == 0 || len(com.Properties) == 0 || len(com.Hashes) == 0 || len(com.Licenses) == 0 {
@@ -321,6 +322,7 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
 			stmt.Close()
 		}
 	}
+	log.Println("#### value inserted")
 }
 func (c *DBClient) InsertGitEvent(event string) {
 	ctx := context.Background()

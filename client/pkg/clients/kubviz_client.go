@@ -143,36 +143,36 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		// 		log.Println()
 		// 	},
 		// },
-		// {
-		// 	Subject:  constants.TRIVY_SBOM_SUBJECT,
-		// 	Consumer: constants.Trivy_Sbom_Consumer,
-		// 	Handler: func(msg *nats.Msg) {
-		// 		msg.Ack()
-		// 		var metrics model.Reports
-		// 		err := json.Unmarshal(msg.Data, &metrics)
-		// 		if err != nil {
-		// 			log.Fatal(err)
-		// 		}
-		// 		log.Printf("Trivy sbom Metrics Received: %#v,", metrics)
-		// 		conn.InsertTrivySbomMetrics(metrics)
-		// 		log.Println()
-		// 	},
-		// },
 		{
-			Subject:  constants.TRIVY_K8S_SUBJECT,
-			Consumer: constants.TrivyConsumer,
+			Subject:  constants.TRIVY_SBOM_SUBJECT,
+			Consumer: constants.Trivy_Sbom_Consumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
-				var metrics model.Trivy
+				var metrics model.Reports
 				err := json.Unmarshal(msg.Data, &metrics)
 				if err != nil {
 					log.Fatal(err)
 				}
-				log.Printf("Trivy Metrics Received: %#v,", metrics)
-				conn.InsertTrivyMetrics(metrics)
+				log.Printf("Trivy sbom Metrics Received: %#v,", metrics)
+				conn.InsertTrivySbomMetrics(metrics)
 				log.Println()
 			},
 		},
+		// {
+		// 	Subject:  constants.TRIVY_K8S_SUBJECT,
+		// 	Consumer: constants.TrivyConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.Trivy
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		log.Printf("Trivy Metrics Received: %#v,", metrics)
+		// 		conn.InsertTrivyMetrics(metrics)
+		// 		log.Println()
+		// 	},
+		// },
 	}
 
 	for _, sub := range subscriptions {
