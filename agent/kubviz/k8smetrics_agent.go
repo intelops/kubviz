@@ -98,9 +98,9 @@ func main() {
 		//outdatedErrChan := make(chan error, 1)
 		//kubePreUpgradeChan := make(chan error, 1)
 		//getAllResourceChan := make(chan error, 1)
-		trivySbomcanChan := make(chan error, 1)
+		//trivySbomcanChan := make(chan error, 1)
 		trivyImagescanChan := make(chan error, 1)
-		trivyK8sMetricsChan := make(chan error, 1)
+		//trivyK8sMetricsChan := make(chan error, 1)
 		//kubescoreMetricsChan := make(chan error, 1)
 		//RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
@@ -130,18 +130,18 @@ func main() {
 				// 	if err != nil {
 				// 		log.Println(err)
 				// 	}
-				case err := <-trivySbomcanChan:
-					if err != nil {
-					log.Println(err)
-				}
+				// case err := <-trivySbomcanChan:
+				// 	if err != nil {
+				// 	log.Println(err)
+				// }
 				case err := <-trivyImagescanChan:
 					if err != nil {
 						log.Println(err)
 					}
-				case err := <-trivyK8sMetricsChan:
-					if err != nil {
-						log.Println(err)
-					}
+				// case err := <-trivyK8sMetricsChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
 				// case err := <-RakeesErrChan:
 				// 	if err != nil {
 				// 		log.Println(err)
@@ -158,10 +158,10 @@ func main() {
 		//go GetAllResources(config, js, &wg, getAllResourceChan)
 		//go RakeesOutput(config, js, &wg, RakeesErrChan)
 		//go getK8sEvents(clientset)
-		//go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
+		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
 		//go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 		//go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
-		go RunTrivyScans(config, js, &wg, trivySbomcanChan,trivyImagescanChan,trivyK8sMetricsChan)
+		//go RunTrivyScans(config, js, &wg, trivySbomcanChan,trivyImagescanChan,trivyK8sMetricsChan)
 
 		wg.Wait()
 		// once the go routines completes we will close the error channels
@@ -170,9 +170,9 @@ func main() {
 		//close(getAllResourceChan)
 		// close(clusterMetricsChan)
 		//close(kubescoreMetricsChan)
-		defer close(trivySbomcanChan)
+		//defer close(trivySbomcanChan)
 		defer close(trivyImagescanChan)
-		defer close(trivyK8sMetricsChan)
+		//defer close(trivyK8sMetricsChan)
 		//close(RakeesErrChan)
 		// Signal that all other goroutines have finished
 		doneChan <- true
@@ -191,13 +191,13 @@ func main() {
 	s.StartBlocking()                                        // Blocks the main function
 }
 
-func RunTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup,trivySbomcanChan chan error, trivyImagescanChan chan error, trivyK8sMetricsChan chan error) {
-	defer wg.Done()
-	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
-	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
-	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
+// func RunTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup,trivySbomcanChan chan error, trivyImagescanChan chan error, trivyK8sMetricsChan chan error) {
+// 	defer wg.Done()
+// 	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
+// 	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
+// 	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
 	
-}
+// }
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
