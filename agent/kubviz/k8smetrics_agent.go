@@ -99,8 +99,8 @@ func main() {
 		//kubePreUpgradeChan := make(chan error, 1)
 		//getAllResourceChan := make(chan error, 1)
 		//trivySbomcanChan := make(chan error, 1)
-		trivyImagescanChan := make(chan error, 1)
-		//trivyK8sMetricsChan := make(chan error, 1)
+		//trivyImagescanChan := make(chan error, 1)
+		trivyK8sMetricsChan := make(chan error, 1)
 		//kubescoreMetricsChan := make(chan error, 1)
 		//RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
@@ -134,14 +134,14 @@ func main() {
 				// 	if err != nil {
 				// 	log.Println(err)
 				// }
-				case err := <-trivyImagescanChan:
-					if err != nil {
-						log.Println(err)
-					}
-				// case err := <-trivyK8sMetricsChan:
+				// case err := <-trivyImagescanChan:
 				// 	if err != nil {
 				// 		log.Println(err)
 				// 	}
+				case err := <-trivyK8sMetricsChan:
+					if err != nil {
+						log.Println(err)
+					}
 				// case err := <-RakeesErrChan:
 				// 	if err != nil {
 				// 		log.Println(err)
@@ -158,9 +158,9 @@ func main() {
 		//go GetAllResources(config, js, &wg, getAllResourceChan)
 		//go RakeesOutput(config, js, &wg, RakeesErrChan)
 		//go getK8sEvents(clientset)
-		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
+		//go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
 		//go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
-		//go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
+		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
 		//go RunTrivyScans(config, js, &wg, trivySbomcanChan,trivyImagescanChan,trivyK8sMetricsChan)
 
 		wg.Wait()
@@ -171,8 +171,8 @@ func main() {
 		// close(clusterMetricsChan)
 		//close(kubescoreMetricsChan)
 		//defer close(trivySbomcanChan)
-		close(trivyImagescanChan)
-		//defer close(trivyK8sMetricsChan)
+		//close(trivyImagescanChan)
+		close(trivyK8sMetricsChan)
 		//close(RakeesErrChan)
 		// Signal that all other goroutines have finished
 		doneChan <- true
