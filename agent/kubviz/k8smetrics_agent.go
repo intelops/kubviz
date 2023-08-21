@@ -95,14 +95,14 @@ func main() {
 	// starting all the go routines
 	collectAndPublishMetrics := func() {
 		// error channels declared for the go routines
-		outdatedErrChan := make(chan error, 1)
-		kubePreUpgradeChan := make(chan error, 1)
-		getAllResourceChan := make(chan error, 1)
+		//outdatedErrChan := make(chan error, 1)
+		//kubePreUpgradeChan := make(chan error, 1)
+		//getAllResourceChan := make(chan error, 1)
 		trivyK8sMetricsChan := make(chan error, 1)
-		kubescoreMetricsChan := make(chan error, 1)
+		//kubescoreMetricsChan := make(chan error, 1)
 		trivyImagescanChan := make(chan error, 1)
 		trivySbomcanChan := make(chan error, 1)
-		RakeesErrChan := make(chan error, 1)
+		//RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
 		doneChan := make(chan bool)
 		go func() {
@@ -110,26 +110,26 @@ func main() {
 			// logs if any error occurs
 			for {
 				select {
-				case err := <-outdatedErrChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-kubePreUpgradeChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-getAllResourceChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-clusterMetricsChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-kubescoreMetricsChan:
-					if err != nil {
-						log.Println(err)
-					}
+				// case err := <-outdatedErrChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
+				// case err := <-kubePreUpgradeChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
+				// case err := <-getAllResourceChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
+				// case err := <-clusterMetricsChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
+				// case err := <-kubescoreMetricsChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
 				case err := <-trivyImagescanChan:
 					if err != nil {
 						log.Println(err)
@@ -142,10 +142,10 @@ func main() {
 					if err != nil {
 						log.Println(err)
 					}
-				case err := <-RakeesErrChan:
-					if err != nil {
-						log.Println(err)
-					}
+				// case err := <-RakeesErrChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
 				case <-doneChan:
 					return // All other goroutines have finished, so exit the goroutine
 				}
