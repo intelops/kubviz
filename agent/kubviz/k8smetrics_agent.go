@@ -161,7 +161,7 @@ func main() {
 		//go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
 		//go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 		//go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
-		go RunTrivyScans(config, js, &wg, trivyImagescanChan, trivyK8sMetricsChan, trivySbomcanChan)
+		go RunTrivyScans(config, js, &wg, trivySbomcanChan,trivyImagescanChan,trivyK8sMetricsChan)
 		wg.Wait()
 		// once the go routines completes we will close the error channels
 		close(outdatedErrChan)
@@ -189,11 +189,12 @@ func main() {
 	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
 	s.StartBlocking()                                        // Blocks the main function
 }
-func RunTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyImagescanChan chan error, trivyK8sMetricsChan chan error, trivySbomcanChan chan error) {
+func RunTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup,trivySbomcanChan chan error, trivyImagescanChan chan error, trivyK8sMetricsChan chan error) {
 	defer wg.Done()
+	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
 	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
 	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
-	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
+	
 }
 
 // publishMetrics publishes stream of events
