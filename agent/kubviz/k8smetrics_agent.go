@@ -170,13 +170,13 @@ func main() {
 		//close(getAllResourceChan)
 		// close(clusterMetricsChan)
 		//close(kubescoreMetricsChan)
-		close(trivySbomcanChan)
-		close(trivyImagescanChan)
-		close(trivyK8sMetricsChan)
+		defer close(trivySbomcanChan)
+		defer close(trivyImagescanChan)
+		defer close(trivyK8sMetricsChan)
 		//close(RakeesErrChan)
 		// Signal that all other goroutines have finished
 		doneChan <- true
-		close(doneChan)
+		defer close(doneChan)
 	}
 	collectAndPublishMetrics()
 	if schedulingIntervalStr == "" {
