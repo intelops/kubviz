@@ -98,10 +98,10 @@ func main() {
 		//outdatedErrChan := make(chan error, 1)
 		//kubePreUpgradeChan := make(chan error, 1)
 		//getAllResourceChan := make(chan error, 1)
+		trivySbomcanChan := make(chan error, 1)
+		trivyImagescanChan := make(chan error, 1)
 		trivyK8sMetricsChan := make(chan error, 1)
 		//kubescoreMetricsChan := make(chan error, 1)
-		trivyImagescanChan := make(chan error, 1)
-		trivySbomcanChan := make(chan error, 1)
 		//RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
 		doneChan := make(chan bool)
@@ -130,11 +130,11 @@ func main() {
 				// 	if err != nil {
 				// 		log.Println(err)
 				// 	}
-				case err := <-trivyImagescanChan:
-					if err != nil {
-						log.Println(err)
-					}
 				case err := <-trivySbomcanChan:
+					if err != nil {
+					log.Println(err)
+				}
+				case err := <-trivyImagescanChan:
 					if err != nil {
 						log.Println(err)
 					}
@@ -170,8 +170,8 @@ func main() {
 		//close(getAllResourceChan)
 		// close(clusterMetricsChan)
 		//close(kubescoreMetricsChan)
-		close(trivyImagescanChan)
 		close(trivySbomcanChan)
+		close(trivyImagescanChan)
 		close(trivyK8sMetricsChan)
 		//close(RakeesErrChan)
 		// Signal that all other goroutines have finished
