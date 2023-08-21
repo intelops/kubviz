@@ -26,7 +26,7 @@
 
 ## KubViz
 
-Visualize Kubernetes & DevSecOps Workflows. Tracks changes/events real-time across your entire K8s clusters, git repos, container registries, etc. , analyzing their effects and providing you with the context you need to troubleshoot efficiently. Get the Observability you need, easily.
+Visualize Kubernetes & DevSecOps Workflows. Tracks changes/events real-time across your entire K8s clusters, git repos, container registries, Container image Vulnerability scanning, misconfiguration etc. , analyzing their effects and providing you with the context you need to troubleshoot efficiently. Get the Observability you need, easily.
 
 ## Table of Contents
 - [How KubViz works](#how-kubviz-works)
@@ -51,6 +51,7 @@ KubViz offers a seamless integration with Git repositories, empowering you to ef
 KubViz also monitors changes in your container registry, providing visibility into image updates. By tracking these changes, KubViz helps you proactively manage container security and compliance.
 
 It comprehensively scans the kubernetes containers for the security flaws such as vulnerabilities and misconfigurations.
+
 ## Architecture diagram
 
 ![Arch. Diagram](.readme_assets/kubviz.png)
@@ -207,7 +208,7 @@ kubectl --namespace kubviz port-forward $POD_NAME 3000
 
 ### Cluster Event Tracking
 
-<img src=".readme_assets/kubedata.jpeg" alt="Cluster Events" width="525" align="right">
+<img src=".readme_assets/newKubeData.jpeg" alt="Cluster Events" width="525" align="right">
 
 <br>
 
@@ -221,7 +222,7 @@ Use KubViz to monitor your cluster events, including:
 
 <br clear="all">
 
-<img src=".readme_assets/deleted_apis.png" alt="Deprecated Kubernetes APIs" width="525" align="right">
+<img src=".readme_assets/new-deletedapi.jpeg" alt="Deprecated Kubernetes APIs" width="525" align="right">
 
 <br>
 
@@ -235,7 +236,7 @@ Use KubViz to monitor your cluster events, including:
 
 ### Git Repository Events Tracking
 
-<img src=".readme_assets/newGitBridge.jpeg" alt="gitBridge" width="525" align="right">
+<img src=".readme_assets/newgitBridge.jpeg" alt="gitBridge" width="525" align="right">
 
 <br>
 
@@ -261,7 +262,7 @@ Use KubViz to monitor your cluster events, including:
 
 ### Kubernetes Container Security Tracking
 
-<img src=".readme_assets/TrivyK8s.jpeg" alt="Kubernetes Container Security Tracking" width="525" align="right">
+<img src=".readme_assets/trivySev.jpeg" alt="Kubernetes Container Security Tracking" width="525" align="right">
 
 <br>
 
@@ -269,6 +270,8 @@ Use KubViz to monitor your cluster events, including:
 - Detects comprehensive vulnerabilities in OS packages (Alpine, Red Hat Universal Base Image, Red Hat Enterprise Linux, CentOS, Oracle Linux, Debian, Ubuntu, Amazon Linux, openSUSE Leap, SUSE Enterprise Linux, Photon OS and Distroless).
 - Detects configuration issues in Kubernetes cluster
 <br>
+
+<img src=".readme_assets/trivy-vul-mis.jpeg" alt="Kubernetes Container Security Tracking" width="525" align="right">
 
 <br clear="all">
 
