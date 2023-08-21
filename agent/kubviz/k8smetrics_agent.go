@@ -99,6 +99,7 @@ func main() {
 		kubePreUpgradeChan := make(chan error, 1)
 		getAllResourceChan := make(chan error, 1)
 		trivyK8sMetricsChan := make(chan error, 1)
+		trivySbomcanChan := make(chan error, 1)
 		kubescoreMetricsChan := make(chan error, 1)
 		trivyImagescanChan := make(chan error, 1)
 		RakeesErrChan := make(chan error, 1)
@@ -133,6 +134,10 @@ func main() {
 					if err != nil {
 						log.Println(err)
 					}
+				case err := <-trivySbomcanChan:
+					if err != nil {
+					log.Println(err)
+				}
 				case err := <-trivyK8sMetricsChan:
 					if err != nil {
 						log.Println(err)
@@ -153,9 +158,11 @@ func main() {
 		go GetAllResources(config, js, &wg, getAllResourceChan)
 		go RakeesOutput(config, js, &wg, RakeesErrChan)
 		go getK8sEvents(clientset)
-		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
+		//go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
 		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
-		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
+		//go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
+		go RunTrivyScans(config, js, &wg, trivySbomcanChan,trivyImagescanChan,trivyK8sMetricsChan)
+
 		wg.Wait()
 		// once the go routines completes we will close the error channels
 		close(outdatedErrChan)
@@ -163,6 +170,7 @@ func main() {
 		close(getAllResourceChan)
 		// close(clusterMetricsChan)
 		close(kubescoreMetricsChan)
+		close(trivySbomcanChan)
 		close(trivyImagescanChan)
 		close(trivyK8sMetricsChan)
 		close(RakeesErrChan)
@@ -181,6 +189,14 @@ func main() {
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
 	s.StartBlocking()                                        // Blocks the main function
+}
+
+func RunTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup,trivySbomcanChan chan error, trivyImagescanChan chan error, trivyK8sMetricsChan chan error) {
+	defer wg.Done()
+	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
+	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
+	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
+	
 }
 
 // publishMetrics publishes stream of events
