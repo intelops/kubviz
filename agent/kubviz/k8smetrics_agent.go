@@ -151,15 +151,15 @@ func main() {
 				}
 			}
 		}()
-		wg.Add(1) // Initialize the WaitGroup for the seven goroutines
+		wg.Add(7) // Initialize the WaitGroup for the seven goroutines
 		// ... start other goroutines ...
-		//go outDatedImages(config, js, &wg, outdatedErrChan)
-		//go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-		//go GetAllResources(config, js, &wg, getAllResourceChan)
-		//go RakeesOutput(config, js, &wg, RakeesErrChan)
-		//go getK8sEvents(clientset)
+		go outDatedImages(config, js, &wg, outdatedErrChan)
+		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+		go GetAllResources(config, js, &wg, getAllResourceChan)
+		go RakeesOutput(config, js, &wg, RakeesErrChan)
+		go getK8sEvents(clientset)
 		//go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
-		//go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
+		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 		//go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
 		go RunTrivyScans(config, js, &wg, trivySbomcanChan,trivyImagescanChan,trivyK8sMetricsChan)
 		wg.Wait()
