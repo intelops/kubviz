@@ -180,6 +180,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 			log.Printf("Error unmarshaling JSON data for image %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
+		log.Println("report", report)
 
 		// Publish the report using the given function
 		publishTrivySbomReport(report, js, errCh)
