@@ -149,10 +149,10 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 	command := "trivy image --format cyclonedx docker.io/library/ubuntu:20.04"
 	out, err := executeCommandSbom(ctx, command)
 
-	log.Println("trivy help command executed******")
+	log.Println("trivy docker-ubuntu command executed******")
 
 	if err != nil {
-		log.Printf("Error executing Trivy sbom command %v", err)
+		log.Printf("Error executing Trivy sbom-docker-ubuntu command %v", err)
 	}
 
 	log.Println("datas is getting", string(out))
