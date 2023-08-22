@@ -100,7 +100,8 @@ func executeCommandSbom(ctx context.Context, command string) ([]byte, error) {
 // 	wgc.Wait()
 // }
 func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
-	defer wg.Done()
+	log.Println("trivy run started****************")
+    defer wg.Done()
 	images, err := ListImages(config)
 	log.Println("length of images", len(images))
 
