@@ -159,7 +159,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 		log.Printf("Error executing Trivy -h command %v", err)
 	}
 
-	command := "trivy image --format cyclonedx docker.io/crossplane/crossplane@sha256:50641735fad95c8a9eb27008b44f6cad14861efcb615d70ba10b8100b2b45bf7"
+	command := "trivy image --format cyclonedx docker.io/crossplane/crossplane@sha256:50641735fad95c8a9eb27008b44f6cad14861efcb615d70ba10b8100b2b45bf7 --cache-dir /tmp/.cache"
 	out, err := executeCommandSbom(command)
 
 	log.Println("trivy docker-crossplane command executed******")
