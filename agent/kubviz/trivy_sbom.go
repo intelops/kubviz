@@ -115,7 +115,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 		fmt.Printf("pullable Image %#v\n", image.PullableImage)
 
 		// Execute the Trivy command with the context
-		command := fmt.Sprintf("trivy image --format cyclonedx %s", image.PullableImage)
+		command := fmt.Sprintf("trivy -d image --format cyclonedx %s", image.PullableImage)
 		out, err := executeCommandSbom(ctx, command)
 
 		if err != nil {
