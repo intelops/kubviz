@@ -30,7 +30,7 @@ func publishTrivySbomReport(report model.Sbom, js nats.JetStreamContext, errCh c
 }
 
 func executeCommandSbom(ctx context.Context, command string) ([]byte, error) {
-	cmd := exec.CommandContext(ctx, "/bin/sh", "-c", command)
+	cmd := exec.CommandContext(ctx, "/bin/sh", command)
 	stdout, err := cmd.Output()
 
 	if err != nil {
