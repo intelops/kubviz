@@ -99,45 +99,62 @@ func executeCommandSbom(ctx context.Context, command string) ([]byte, error) {
 //		// Wait for all the goroutines to complete
 //		wgc.Wait()
 //	}
+// func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+// 	log.Println("trivy run started****************")
+// 	defer wg.Done()
+// 	images, err := ListImages(config)
+// 	log.Println("length of images", len(images))
+
+// 	if err != nil {
+// 		log.Printf("failed to list images: %v", err)
+// 	}
+
+// 	ctx := context.Background()
+
+// 	for _, image := range images {
+// 		fmt.Printf("pullable Image %#v\n", image.PullableImage)
+
+// 		// Execute the Trivy command with the context
+// 		command := fmt.Sprintf("trivy -d image --format cyclonedx %s", image.PullableImage)
+// 		out, err := executeCommandSbom(ctx, command)
+
+// 		if err != nil {
+// 			log.Printf("Error executing Trivy for image %s: %v", image.PullableImage, err)
+// 			continue // Move on to the next image in case of an error
+// 		}
+
+// 		// Check if the output is empty or invalid JSON
+// 		if len(out) == 0 {
+// 			log.Printf("Trivy output is empty for image %s", image.PullableImage)
+// 			continue // Move on to the next image
+// 		}
+
+// 		// Extract the JSON data from the output
+// 		var report model.Sbom
+// 		err = json.Unmarshal(out, &report)
+// 		if err != nil {
+// 			log.Printf("Error unmarshaling JSON data for image %s: %v", image.PullableImage, err)
+// 			continue // Move on to the next image in case of an error
+// 		}
+
+//			// Publish the report using the given function
+//			publishTrivySbomReport(report, js, errCh)
+//		}
+//	}
 func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	log.Println("trivy run started****************")
 	defer wg.Done()
-	images, err := ListImages(config)
-	log.Println("length of images", len(images))
-
-	if err != nil {
-		log.Printf("failed to list images: %v", err)
-	}
 
 	ctx := context.Background()
 
-	for _, image := range images {
-		fmt.Printf("pullable Image %#v\n", image.PullableImage)
+	command := fmt.Sprint("trivy -h")
+	out, err := executeCommandSbom(ctx, command)
 
-		// Execute the Trivy command with the context
-		command := fmt.Sprintf("trivy -d image --format cyclonedx %s", image.PullableImage)
-		out, err := executeCommandSbom(ctx, command)
+	log.Println("trivy help command executed******")
 
-		if err != nil {
-			log.Printf("Error executing Trivy for image %s: %v", image.PullableImage, err)
-			continue // Move on to the next image in case of an error
-		}
-
-		// Check if the output is empty or invalid JSON
-		if len(out) == 0 {
-			log.Printf("Trivy output is empty for image %s", image.PullableImage)
-			continue // Move on to the next image
-		}
-
-		// Extract the JSON data from the output
-		var report model.Sbom
-		err = json.Unmarshal(out, &report)
-		if err != nil {
-			log.Printf("Error unmarshaling JSON data for image %s: %v", image.PullableImage, err)
-			continue // Move on to the next image in case of an error
-		}
-
-		// Publish the report using the given function
-		publishTrivySbomReport(report, js, errCh)
+	if err != nil {
+		log.Printf("Error executing Trivy help command %v", err)
 	}
+
+	log.Println("datas is getting", string(out))
 }
