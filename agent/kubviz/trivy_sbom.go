@@ -111,45 +111,33 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 
 	ctx := context.Background()
 
-	var wgc sync.WaitGroup
-	wgc.Add(len(images)) // Set the wait group count to the number of images
-
-	for i, image := range images {
+	for _, image := range images {
 		fmt.Printf("pullable Image %#v\n", image.PullableImage)
 
-		// Start a goroutine for each image
-		go func(i int, image model.RunningImage) {
-			defer wgc.Done()
+		// Execute the Trivy command with the context
+		command := fmt.Sprintf("trivy image --format cyclonedx %s", image.PullableImage)
+		out, err := executeCommandSbom(ctx, command)
 
-			// Execute the Trivy command with the context
-			command := fmt.Sprintf("trivy image --format cyclonedx %s", image.PullableImage)
-			// command := fmt.Sprintf("trivy -q image --format cyclonedx %s", image.PullableImage)
-			out, err := executeCommandSbom(ctx, command)
+		if err != nil {
+			log.Printf("Error executing Trivy for image %s: %v", image.PullableImage, err)
+			continue // Move on to the next image in case of an error
+		}
 
-			if err != nil {
-				log.Printf("Error executing Trivy for image %s: %v", image.PullableImage, err)
-				return // Move on to the next image in case of an error
-			}
+		// Check if the output is empty or invalid JSON
+		if len(out) == 0 {
+			log.Printf("Trivy output is empty for image %s", image.PullableImage)
+			continue // Move on to the next image
+		}
 
-			// Check if the output is empty or invalid JSON
-			if len(out) == 0 {
-				log.Printf("Trivy output is empty for image %s", image.PullableImage)
-				return // Move on to the next image
-			}
+		// Extract the JSON data from the output
+		var report model.Sbom
+		err = json.Unmarshal(out, &report)
+		if err != nil {
+			log.Printf("Error unmarshaling JSON data for image %s: %v", image.PullableImage, err)
+			continue // Move on to the next image in case of an error
+		}
 
-			// Extract the JSON data from the output
-			var report model.Sbom
-			err = json.Unmarshal(out, &report)
-			if err != nil {
-				log.Printf("Error unmarshaling JSON data for image %s: %v", image.PullableImage, err)
-				return // Move on to the next image in case of an error
-			}
-
-			// Publish the report using the given function
-			publishTrivySbomReport(report, js, errCh)
-		}(i, image)
+		// Publish the report using the given function
+		publishTrivySbomReport(report, js, errCh)
 	}
-
-	// Wait for all the goroutines to complete
-	wgc.Wait()
 }
