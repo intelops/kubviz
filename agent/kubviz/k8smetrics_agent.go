@@ -15,7 +15,7 @@ import (
 	"context"
 
 	"github.com/intelops/kubviz/constants"
-	"github.com/intelops/kubviz/model"
+	//"github.com/intelops/kubviz/model"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -58,7 +58,7 @@ var (
 )
 
 func main() {
-	log.Println("****************startring sbom")
+	log.Println("main started****************")
 	env := Production
 	clusterMetricsChan := make(chan error, 1)
 	var (
@@ -99,10 +99,10 @@ func main() {
 		//outdatedErrChan := make(chan error, 1)
 		//kubePreUpgradeChan := make(chan error, 1)
 		//getAllResourceChan := make(chan error, 1)
-		trivySbomcanChan := make(chan error, 1)
-		//trivyImagescanChan := make(chan error, 1)
 		//trivyK8sMetricsChan := make(chan error, 1)
+		trivySbomcanChan := make(chan error, 1)
 		//kubescoreMetricsChan := make(chan error, 1)
+		//trivyImagescanChan := make(chan error, 1)
 		//RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
 		doneChan := make(chan bool)
@@ -123,22 +123,22 @@ func main() {
 				// 	if err != nil {
 				// 		log.Println(err)
 				// 	}
-				// case err := <-clusterMetricsChan:
+				case err := <-clusterMetricsChan:
+					if err != nil {
+						log.Println(err)
+					}
+				// case err := <-kubescoreMetricsChan:
 				// 	if err != nil {
 				// 		log.Println(err)
 				// 	}
-				// case err := <-kubescoreMetricsChan:
+				// case err := <-trivyImagescanChan:
 				// 	if err != nil {
 				// 		log.Println(err)
 				// 	}
 				case err := <-trivySbomcanChan:
 					if err != nil {
-					log.Println(err)
-				}
-				// case err := <-trivyImagescanChan:
-				// 	if err != nil {
-				// 		log.Println(err)
-				// 	}
+						log.Println(err)
+					}
 				// case err := <-trivyK8sMetricsChan:
 				// 	if err != nil {
 				// 		log.Println(err)
@@ -160,11 +160,9 @@ func main() {
 		//go RakeesOutput(config, js, &wg, RakeesErrChan)
 		//go getK8sEvents(clientset)
 		//go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
-		go RunTrivySbomScan(config, js, &wg,trivySbomcanChan)
 		//go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
+		go RunTrivySbomScan(config, js, &wg, trivySbomcanChan)
 		//go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
-		//go RunTrivyScans(config, js, &wg, trivySbomcanChan,trivyImagescanChan,trivyK8sMetricsChan)
-
 		wg.Wait()
 		// once the go routines completes we will close the error channels
 		//close(outdatedErrChan)
@@ -172,13 +170,12 @@ func main() {
 		//close(getAllResourceChan)
 		// close(clusterMetricsChan)
 		//close(kubescoreMetricsChan)
-		close(trivySbomcanChan)
 		//close(trivyImagescanChan)
 		//close(trivyK8sMetricsChan)
 		//close(RakeesErrChan)
 		// Signal that all other goroutines have finished
 		doneChan <- true
-		defer close(doneChan)
+		close(doneChan)
 	}
 	collectAndPublishMetrics()
 	if schedulingIntervalStr == "" {
@@ -193,35 +190,27 @@ func main() {
 	s.StartBlocking()                                        // Blocks the main function
 }
 
-// func RunTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup,trivySbomcanChan chan error, trivyImagescanChan chan error, trivyK8sMetricsChan chan error) {
-// 	defer wg.Done()
-// 	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
-// 	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
-// 	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
-	
-// }
-
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
 func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
-	watchK8sEvents(clientset, js)
+	//watchK8sEvents(clientset, js)
 
 	errCh <- nil
 }
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext) (bool, error) {
-	metrics := model.Metrics{
-		ID:          id,
-		Type:        mtype,
-		Event:       mdata,
-		ClusterName: ClusterName,
-	}
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.EventSubject, metricsJson)
-	if err != nil {
-		return true, err
-	}
-	log.Printf("Metrics with ID:%s has been published\n", id)
+	// metrics := model.Metrics{
+	// 	ID:          id,
+	// 	Type:        mtype,
+	// 	Event:       mdata,
+	// 	ClusterName: ClusterName,
+	// }
+	// metricsJson, _ := json.Marshal(metrics)
+	// _, err := js.Publish(constants.EventSubject, metricsJson)
+	// if err != nil {
+	// 	return true, err
+	// }
+	// log.Printf("Metrics with ID:%s has been published\n", id)
 	return false, nil
 }
 
