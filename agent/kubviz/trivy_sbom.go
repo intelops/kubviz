@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os/exec"
 	"sync"
@@ -147,13 +146,13 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 
 	ctx := context.Background()
 
-	command := fmt.Sprint("trivy -h")
+	command := "trivy image --format cyclonedx docker.io/crossplane/crossplane@sha256:50641735fad95c8a9eb27008b44f6cad14861efcb615d70ba10b8100b2b45bf7"
 	out, err := executeCommandSbom(ctx, command)
 
 	log.Println("trivy help command executed******")
 
 	if err != nil {
-		log.Printf("Error executing Trivy help command %v", err)
+		log.Printf("Error executing Trivy sbom command %v", err)
 	}
 
 	log.Println("datas is getting", string(out))
