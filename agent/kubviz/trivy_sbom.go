@@ -96,12 +96,12 @@ func executeCommandSbom(ctx context.Context, command string) ([]byte, error) {
 // 		}(i, image)
 // 	}
 
-// 	// Wait for all the goroutines to complete
-// 	wgc.Wait()
-// }
+//		// Wait for all the goroutines to complete
+//		wgc.Wait()
+//	}
 func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	log.Println("trivy run started****************")
-    defer wg.Done()
+	defer wg.Done()
 	images, err := ListImages(config)
 	log.Println("length of images", len(images))
 
@@ -122,8 +122,8 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 			defer wgc.Done()
 
 			// Execute the Trivy command with the context
-			//command := fmt.Sprintf("trivy image --format cyclonedx %s", image.PullableImage)
-            command := fmt.Sprintf("trivy -q image --format cyclonedx %s", image.PullableImage)
+			command := fmt.Sprintf("trivy image --format cyclonedx %s", image.PullableImage)
+			// command := fmt.Sprintf("trivy -q image --format cyclonedx %s", image.PullableImage)
 			out, err := executeCommandSbom(ctx, command)
 
 			if err != nil {
