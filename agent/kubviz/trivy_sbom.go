@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os/exec"
 	"sync"
@@ -43,7 +44,7 @@ func executeCommandSbom(command string) ([]byte, error) {
 	if err != nil {
 		log.Println("Execute Command Error", err.Error())
 	}
-	log.Println("*******output", outc.String(), errc.String())
+	// log.Println("*******output", outc.String(), errc.String())
 
 	return outc.Bytes(), err
 }
@@ -151,22 +152,36 @@ func executeCommandSbom(command string) ([]byte, error) {
 func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
 	log.Println("trivy run started****************")
 	defer wg.Done()
-
-	command1 := "trivy -h"
-	out1, err := executeCommandSbom(command1)
+	images, err := ListImages(config)
 
 	if err != nil {
-		log.Printf("Error executing Trivy -h command %v", err)
+		log.Printf("failed to list images: %v", err)
 	}
+	for _, image := range images {
+		fmt.Printf("pullable Image %#v\n", image.PullableImage)
 
-	command := "trivy image --format cyclonedx docker.io/crossplane/crossplane@sha256:50641735fad95c8a9eb27008b44f6cad14861efcb615d70ba10b8100b2b45bf7 --cache-dir /tmp/.cache"
-	out, err := executeCommandSbom(command)
+		command := fmt.Sprintf("trivy image --format cyclonedx %s %s", image.PullableImage, "--cache-dir /tmp/.cache")
+		out, err := executeCommandSbom(command)
 
-	log.Println("trivy docker-crossplane command executed******")
+		if err != nil {
+			log.Printf("Error executing Trivy for image %s: %v", image.PullableImage, err)
+			continue // Move on to the next image in case of an error
+		}
 
-	if err != nil {
-		log.Printf("Error executing Trivy sbom-docker-crossplane command %v", err)
+		// Check if the output is empty or invalid JSON
+		if len(out) == 0 {
+			log.Printf("Trivy output is empty for image %s", image.PullableImage)
+			continue // Move on to the next image
+		}
+
+		var report model.Sbom
+		err = json.Unmarshal(out, &report)
+		if err != nil {
+			log.Printf("Error unmarshaling JSON data for image %s: %v", image.PullableImage, err)
+			continue // Move on to the next image in case of an error
+		}
+
+		// Publish the report using the given function
+		publishTrivySbomReport(report, js, errCh)
 	}
-	log.Println("datas is getting1", string(out1))
-	log.Println("datas is getting", string(out))
 }
