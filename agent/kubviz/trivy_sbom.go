@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"os/exec"
@@ -31,13 +32,20 @@ func publishTrivySbomReport(report model.Sbom, js nats.JetStreamContext, errCh c
 func executeCommandSbom(command string) ([]byte, error) {
 	cmd := exec.Command("/bin/sh", "-c", command)
 	//cmd := exec.Command(command)
-	stdout, err := cmd.Output()
+	var outc, errc bytes.Buffer
+	cmd.Stdout = &outc
+	cmd.Stderr = &errc
+	log.Println("*******before ece command")
+	//stdout, err := cmd.Output()
+	err := cmd.Run()
+	log.Println("*******command ececuted")
 
 	if err != nil {
 		log.Println("Execute Command Error", err.Error())
 	}
+	log.Println("*******output", outc.String(), errc.String())
 
-	return stdout, err
+	return outc.Bytes(), err
 }
 
 // func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
