@@ -144,14 +144,21 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 	log.Println("trivy run started****************")
 	defer wg.Done()
 
-	command := "trivy image --format cyclonedx docker.io/library/ubuntu:20.04"
-	out, err := executeCommandSbom(command)
-
-	log.Println("trivy docker-ubuntu command executed******")
+	command1 := "trivy -h"
+	out1, err := executeCommandSbom(command1)
 
 	if err != nil {
-		log.Printf("Error executing Trivy sbom-docker-ubuntu command %v", err)
+		log.Printf("Error executing Trivy -h command %v", err)
 	}
 
+	command := "trivy image --format cyclonedx docker.io/crossplane/crossplane@sha256:50641735fad95c8a9eb27008b44f6cad14861efcb615d70ba10b8100b2b45bf7"
+	out, err := executeCommandSbom(command)
+
+	log.Println("trivy docker-crossplane command executed******")
+
+	if err != nil {
+		log.Printf("Error executing Trivy sbom-docker-crossplane command %v", err)
+	}
+	log.Println("datas is getting1", string(out1))
 	log.Println("datas is getting", string(out))
 }
