@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"os/exec"
@@ -29,15 +28,15 @@ func publishTrivySbomReport(report model.Sbom, js nats.JetStreamContext, errCh c
 	errCh <- nil
 }
 
-func executeCommandSbom(ctx context.Context, command string) ([]byte, error) {
-	cmd := exec.CommandContext(ctx, "/bin/sh", command)
+func executeCommandSbom(command string) ([]byte, error) {
+	cmd := exec.Command("/bin/sh", "-c", command)
 	stdout, err := cmd.Output()
 
 	if err != nil {
 		log.Println("Execute Command Error", err.Error())
 	}
 
-	return stdout, nil
+	return stdout, err
 }
 
 // func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
@@ -144,10 +143,8 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 	log.Println("trivy run started****************")
 	defer wg.Done()
 
-	ctx := context.Background()
-
 	command := "trivy image --format cyclonedx docker.io/library/ubuntu:20.04"
-	out, err := executeCommandSbom(ctx, command)
+	out, err := executeCommandSbom(command)
 
 	log.Println("trivy docker-ubuntu command executed******")
 
