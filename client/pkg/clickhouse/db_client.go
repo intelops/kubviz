@@ -512,7 +512,7 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
 				result.BomFormat,
 				result.SpecVersion,
 				result.SerialNumber,
-				result.Version,
+				int32(result.Version),
 				result.Metadata.Timestamp,
 				result.Metadata.Tools[0].Vendor,
 				result.Metadata.Tools[0].Name,
