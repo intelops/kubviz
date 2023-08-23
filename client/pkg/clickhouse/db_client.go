@@ -279,51 +279,6 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 		log.Fatal(err)
 	}
 }
-func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
-	log.Println("####started inserting value")
-	result := metrics.Report
-	for _, com := range result.Components {
-		if len(result.Metadata.Tools) == 0 || len(com.Properties) == 0 || len(com.Hashes) == 0 || len(com.Licenses) == 0 {
-			continue
-		}
-		for _, depend := range result.Dependencies {
-			var (
-				tx, _   = c.conn.Begin()
-				stmt, _ = tx.Prepare(InsertTrivySbom)
-			)
-			if _, err := stmt.Exec(
-				metrics.ID,
-				result.Schema,
-				result.BomFormat,
-				result.SpecVersion,
-				result.SerialNumber,
-				result.Version,
-				result.Metadata.Timestamp,
-				result.Metadata.Tools[0].Vendor,
-				result.Metadata.Tools[0].Name,
-				result.Metadata.Tools[0].Version,
-				com.BomRef,
-				com.Type,
-				com.Name,
-				com.Version,
-				com.Properties[0].Name,
-				com.Properties[0].Value,
-				com.Hashes[0].Alg,
-				com.Hashes[0].Content,
-				com.Licenses[0].Expression,
-				com.Purl,
-				depend.Ref,
-			); err != nil {
-				log.Fatal(err)
-			}
-			if err := tx.Commit(); err != nil {
-				log.Fatal(err)
-			}
-			stmt.Close()
-		}
-	}
-	log.Println("#### value inserted")
-}
 func (c *DBClient) InsertGitEvent(event string) {
 	ctx := context.Background()
 	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO git_json")
@@ -476,6 +431,112 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 		}
 
 	}
+}
+
+//	func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
+//		log.Println("####started inserting value")
+//		result := metrics.Report
+//		for _, com := range result.Components {
+//			if len(result.Metadata.Tools) == 0 || len(com.Properties) == 0 || len(com.Hashes) == 0 || len(com.Licenses) == 0 {
+//				continue
+//			}
+//			for _, depend := range result.Dependencies {
+//				var (
+//					// tx, _   = c.conn.Begin()
+//					// stmt, _ = tx.Prepare(InsertTrivySbom)
+//					tx, errBegin     = c.conn.Begin()
+//					stmt, errPrepare = tx.Prepare(InsertTrivySbom)
+//				)
+//				if errBegin != nil {
+//					log.Println("error in connection beginning")
+//				}
+//				if errPrepare != nil {
+//					log.Println("error in Prepare")
+//				}
+//				if _, err := stmt.Exec(
+//					metrics.ID,
+//					result.Schema,
+//					result.BomFormat,
+//					result.SpecVersion,
+//					result.SerialNumber,
+//					result.Version,
+//					result.Metadata.Timestamp,
+//					result.Metadata.Tools[0].Vendor,
+//					result.Metadata.Tools[0].Name,
+//					result.Metadata.Tools[0].Version,
+//					com.BomRef,
+//					com.Type,
+//					com.Name,
+//					com.Version,
+//					com.Properties[0].Name,
+//					com.Properties[0].Value,
+//					com.Hashes[0].Alg,
+//					com.Hashes[0].Content,
+//					com.Licenses[0].Expression,
+//					com.Purl,
+//					depend.Ref,
+//				); err != nil {
+//					log.Fatal(err)
+//				}
+//				if err := tx.Commit(); err != nil {
+//					log.Fatal(err)
+//				}
+//				stmt.Close()
+//			}
+//		}
+//		log.Println("#### value inserted")
+//	}
+func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
+	log.Println("####started inserting value")
+	result := metrics.Report
+	tx, err := c.conn.Begin()
+	if err != nil {
+		//log.Fatal(err)
+		log.Println("error in conn Begin", err)
+	}
+	defer tx.Rollback()
+	stmt, err := tx.Prepare(InsertTrivySbom)
+	if err != nil {
+		//log.Fatal(err)
+		log.Println("error in prepare", err)
+	}
+	defer stmt.Close()
+	for _, com := range result.Components {
+		if len(result.Metadata.Tools) == 0 || len(com.Properties) == 0 || len(com.Hashes) == 0 || len(com.Licenses) == 0 {
+			continue
+		}
+		for _, depend := range result.Dependencies {
+			if _, err := stmt.Exec(
+				metrics.ID,
+				result.Schema,
+				result.BomFormat,
+				result.SpecVersion,
+				result.SerialNumber,
+				result.Version,
+				result.Metadata.Timestamp,
+				result.Metadata.Tools[0].Vendor,
+				result.Metadata.Tools[0].Name,
+				result.Metadata.Tools[0].Version,
+				com.BomRef,
+				com.Type,
+				com.Name,
+				com.Version,
+				com.Properties[0].Name,
+				com.Properties[0].Value,
+				com.Hashes[0].Alg,
+				com.Hashes[0].Content,
+				com.Licenses[0].Expression,
+				com.Purl,
+				depend.Ref,
+			); err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("#### value inserted")
 }
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
