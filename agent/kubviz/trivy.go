@@ -88,7 +88,7 @@ func executeCommandK8(command string) ([]byte, error) {
 	if err != nil {
 		log.Println("Execute Command Error", err.Error())
 	}
-	// log.Println("*******output", outc.String(), errc.String())
+	log.Println("*******output", outc.String(), errc.String())
 
 	return outc.Bytes(), err
 }
