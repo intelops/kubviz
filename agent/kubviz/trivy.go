@@ -2,17 +2,19 @@ package main
 
 import (
 	"encoding/json"
+	"log"
+	"strings"
+	"sync"
+
 	"github.com/aquasecurity/trivy/pkg/k8s/report"
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
-	"log"
-	"strings"
-	"sync"
 )
 
 func RunTrivyK8sClusterScan(wg *sync.WaitGroup, js nats.JetStreamContext, errCh chan error) {
+	log.Println("*****started cluster scan")
 	defer wg.Done()
 	var report report.ConsolidatedReport
 	out, err := executeCommand("trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache")
