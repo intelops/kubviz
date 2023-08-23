@@ -170,7 +170,7 @@ func main() {
 		// close(clusterMetricsChan)
 		close(kubescoreMetricsChan)
 		close(trivyImagescanChan)
-		close(trivySbomcanChan)
+		//close(trivySbomcanChan)
 		close(trivyK8sMetricsChan)
 		close(RakeesErrChan)
 		// Signal that all other goroutines have finished
