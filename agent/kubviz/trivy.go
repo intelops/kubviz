@@ -41,7 +41,7 @@ func RunTrivyK8sClusterScan(wg *sync.WaitGroup, js nats.JetStreamContext, errCh 
 	log.Println("*****started cluster scan")
 	defer wg.Done()
 
-	command := "trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache"
+	command := "trivy k8s --report=summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache"
 	out, err := executeCommandK8(command)
 
 	if err != nil {
