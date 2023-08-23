@@ -157,7 +157,7 @@ const azureContainerPushEventTable DBStatement = `
 		SHAID String
 	) engine=File(TabSeparated)
 	`
-const CreatetrivySbomTable DBStatement = `
+const trivySbomTable DBStatement = `
 	CREATE TABLE IF NOT EXISTS trivysbom (
 		id UUID,
 		schema String,
