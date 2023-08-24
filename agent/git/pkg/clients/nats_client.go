@@ -39,22 +39,11 @@ type NATSContext struct {
 func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	fmt.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
-	certPEM, keyPEM, caCertPEM, err := ReadMtlsCerts(certFilePath, keyFilePath, caFilePath)
+	tlsConfig, err := GetTlsConfig()
 	if err != nil {
-		log.Printf("Error reading MTLS certs: %v", err)
+		log.Println("error while getting tls config ", err)
 		time.Sleep(time.Minute * 30)
 		log.Fatal("error while getting tls config ", err)
-	}
-	cert, err := tls.X509KeyPair(certPEM, keyPEM)
-	if err != nil {
-		log.Printf("Error loading X509 key pair from PEM: %v", err)
-	}
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCertPEM)
-	tlsConfig := &tls.Config{
-		Certificates:       []tls.Certificate{cert},
-		RootCAs:            caCertPool,
-		InsecureSkipVerify: false,
 	}
 	conn, err := nats.Connect(conf.NatsAddress,
 		nats.Name("Github metrics"),
@@ -173,4 +162,23 @@ func OpenMtlsCertFile(path string) (f *os.File, err error) {
 		return nil, fmt.Errorf("failed to open MTLS cert file: %w", err)
 	}
 	return f, nil
+}
+
+func GetTlsConfig() (*tls.Config, error) {
+	certPEM, keyPEM, caCertPEM, err := ReadMtlsCerts(certFilePath, keyFilePath, caFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to read mtls certs %w", err)
+	}
+	cert, err := tls.X509KeyPair(certPEM, keyPEM)
+	if err != nil {
+		return nil, fmt.Errorf("Error loading X509 key pair from PEM: %w", err)
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCertPEM)
+	tlsConfig := &tls.Config{
+		Certificates:       []tls.Certificate{cert},
+		RootCAs:            caCertPool,
+		InsecureSkipVerify: false,
+	}
+	return tlsConfig, nil
 }
