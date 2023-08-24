@@ -27,4 +27,6 @@ const (
 	TrivyConsumer                = "TRIVY_CONSUMER"
 	TRIVY_IMAGE_SUBJECT          = "METRICS.trivyimage"
 	Trivy_Image_Consumer         = "TRIVY_IMAGE_CONSUMER"
+	TRIVY_SBOM_SUBJECT           = "METRICS.trivysbom"
+	Trivy_Sbom_Consumer          = "TRIVY_SBOM_CONSUMER"
 )
