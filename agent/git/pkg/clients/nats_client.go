@@ -42,6 +42,8 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	certPEM, keyPEM, caCertPEM, err := ReadMtlsCerts(certFilePath, keyFilePath, caFilePath)
 	if err != nil {
 		log.Printf("Error reading MTLS certs: %v", err)
+		time.Sleep(time.Minute * 30)
+		log.Fatal("error while getting tls config ", err)
 	}
 	cert, err := tls.X509KeyPair(certPEM, keyPEM)
 	if err != nil {

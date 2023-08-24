@@ -53,6 +53,8 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	tlsConfig, err := GetTlsConfig()
 	if err != nil {
 		log.Println("error while getting tls config ", err)
+		time.Sleep(time.Minute * 30)
+		log.Fatal("error while getting tls config ", err)
 	}
 	conn, err := nats.Connect(conf.NatsAddress,
 		nats.Name("Github metrics"),

@@ -74,6 +74,8 @@ func main() {
 	tlsConfig, err := GetTlsConfig()
 	if err != nil {
 		log.Println("error while getting tls config ", err)
+		time.Sleep(time.Minute * 30)
+		log.Fatal("error while getting tls config ", err)
 	}
 	// connecting with nats ...
 	nc, err := nats.Connect(
