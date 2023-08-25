@@ -158,10 +158,10 @@ func main() {
 		go GetAllResources(config, js, &wg, getAllResourceChan)
 		go RakeesOutput(config, js, &wg, RakeesErrChan)
 		go getK8sEvents(clientset)
-		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
-		go RunTrivySbomScan(config, js, &wg, trivySbomcanChan)
+		RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
+		RunTrivySbomScan(config, js, &wg, trivySbomcanChan)
 		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
-		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
+		RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
 		wg.Wait()
 		// once the go routines completes we will close the error channels
 		close(outdatedErrChan)
