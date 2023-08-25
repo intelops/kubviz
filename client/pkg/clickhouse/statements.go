@@ -157,6 +157,15 @@ const azureContainerPushEventTable DBStatement = `
 		SHAID String
 	) engine=File(TabSeparated)
 	`
+const quayContainerPushEventTable DBStatement = `
+	CREATE TABLE IF NOT EXISTS quaycontainerpush (
+		Name String,
+		Repository String,
+		NameSpace String,
+		DockerURL String,
+		HomePage String		
+	) engine=File(TabSeparated)
+	`
 
 const InsertDockerHubBuild DBStatement = "INSERT INTO dockerhubbuild (PushedBy, ImageTag, RepositoryName, DateCreated, Owner, Event) VALUES (?, ?, ?, ?, ?, ?)"
 const InsertRakees DBStatement = "INSERT INTO rakkess (ClusterName, Name, Create, Delete, List, Update) VALUES (?, ?, ?, ?, ?, ?)"
@@ -173,3 +182,4 @@ const InsertTrivyVul string = "INSERT INTO trivy_vul (id, cluster_name, namespac
 const InsertTrivyImage string = "INSERT INTO trivyimage (id, cluster_name, artifact_name, vul_id,  vul_pkg_id, vul_pkg_name,  vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date) VALUES ( ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertTrivyMisconfig string = "INSERT INTO trivy_misconfig (id, cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?. ?, ?)"
 const InsertAzureContainerPushEvent DBStatement = "INSERT INTO azurecontainerpush (RegistryURL, RepositoryName, Tag, ImageName, Event, Timestamp, Size, SHAID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+const InsertQuayContainerPushEvent DBStatement = "INSERT INTO quaycontainerpush (Name, Repository, NameSpace, DockerURL, HomePage) VALUES (?, ?, ?, ?, ?)"
