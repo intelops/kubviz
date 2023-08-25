@@ -182,6 +182,15 @@ const trivySbomTable DBStatement = `
 		dependency_ref String
 	) engine=File(TabSeparated)
 	`
+const quayContainerPushEventTable DBStatement = `
+	CREATE TABLE IF NOT EXISTS quaycontainerpush (
+		Name String,
+		Repository String,
+		NameSpace String,
+		DockerURL String,
+		HomePage String		
+	) engine=File(TabSeparated)
+	`
 
 const InsertDockerHubBuild DBStatement = "INSERT INTO dockerhubbuild (PushedBy, ImageTag, RepositoryName, DateCreated, Owner, Event) VALUES (?, ?, ?, ?, ?, ?)"
 const InsertRakees DBStatement = "INSERT INTO rakkess (ClusterName, Name, Create, Delete, List, Update) VALUES (?, ?, ?, ?, ?, ?)"
@@ -199,3 +208,4 @@ const InsertTrivyImage string = "INSERT INTO trivyimage (id, cluster_name, artif
 const InsertTrivyMisconfig string = "INSERT INTO trivy_misconfig (id, cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?. ?, ?)"
 const InsertAzureContainerPushEvent DBStatement = "INSERT INTO azurecontainerpush (RegistryURL, RepositoryName, Tag, ImageName, Event, Timestamp, Size, SHAID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertTrivySbom string = "INSERT INTO trivysbom (id, schema, bom_format,spec_version,serial_number,  version, metadata_timestamp,metatool_vendor,metatool_name,metatool_version,component_bom_ref,component_type,component_name,component_version,component_property_name,component_property_value,component_hash_alg,component_hash_content,component_license_exp,component_purl,dependency_ref) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+const InsertQuayContainerPushEvent DBStatement = "INSERT INTO quaycontainerpush (Name, Repository, NameSpace, DockerURL, HomePage) VALUES (?, ?, ?, ?, ?)"
