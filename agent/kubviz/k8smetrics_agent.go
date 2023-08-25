@@ -349,37 +349,22 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 }
 
 func ReadMtlsCerts(certFile, keyFile, caFile string) (certPEM, keyPEM, caCertPEM []byte, err error) {
-	cf, err := OpenMtlsCertFile(certFile)
+	certPEM, err = ReadMTLSFileContents(certFile)
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Error opening cert file: %w", err)
-	}
-	defer cf.Close()
-
-	certPEM, err = io.ReadAll(cf)
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Error reading cert file: %w", err)
+		err = fmt.Errorf("error reading cert file: %w", err)
+		return
 	}
 
-	kf, err := OpenMtlsCertFile(keyFile)
+	keyPEM, err = ReadMTLSFileContents(keyFile)
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Error opening key file: %w", err)
-	}
-	defer kf.Close()
-
-	keyPEM, err = io.ReadAll(kf)
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Error reading key file: %w", err)
+		err = fmt.Errorf("error reading key file: %w", err)
+		return
 	}
 
-	caf, err := OpenMtlsCertFile(caFile)
+	caCertPEM, err = ReadMTLSFileContents(caFile)
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Error opening CA file: %w", err)
-	}
-	defer caf.Close()
-
-	caCertPEM, err = io.ReadAll(caf)
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Error reading CA file: %w", err)
+		err = fmt.Errorf("error reading ca file: %w", err)
+		return
 	}
 
 	return certPEM, keyPEM, caCertPEM, nil
@@ -391,6 +376,21 @@ func OpenMtlsCertFile(path string) (f *os.File, err error) {
 		return nil, fmt.Errorf("failed to open MTLS cert file: %w", err)
 	}
 	return f, nil
+}
+
+func ReadMTLSFileContents(filePath string) ([]byte, error) {
+	file, err := OpenMtlsCertFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	contents, err := io.ReadAll(file)
+	if err != nil {
+		return nil, fmt.Errorf("Error reading file %s: %w", filePath, err)
+	}
+
+	return contents, nil
 }
 
 func GetTlsConfig() (*tls.Config, error) {
