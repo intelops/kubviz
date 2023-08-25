@@ -367,7 +367,7 @@ func ReadMtlsCerts(certFile, keyFile, caFile string) (certPEM, keyPEM, caCertPEM
 		return
 	}
 
-	return certPEM, keyPEM, caCertPEM, nil
+	return
 }
 
 func OpenMtlsCertFile(path string) (f *os.File, err error) {
