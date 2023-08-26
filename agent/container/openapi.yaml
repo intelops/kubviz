@@ -45,4 +45,13 @@ paths:
         '200':
           description: OK
 
+  /event/quay/container:
+    post:
+      tags:
+        - public
+      summary: Post quay Container Registry webhook events
+      responses:
+        '200':
+          description: OK
+
 # oapi-codegen -config ./cfg.yaml ./openapi.yaml
