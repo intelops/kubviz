@@ -158,7 +158,7 @@ func main() {
 				}
 			}
 		}()
-		wg.Add(9) // Initialize the WaitGroup for the seven goroutines
+		wg.Add(6) // Initialize the WaitGroup for the seven goroutines
 		// ... start other goroutines ...
 		go outDatedImages(config, js, &wg, outdatedErrChan)
 		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
