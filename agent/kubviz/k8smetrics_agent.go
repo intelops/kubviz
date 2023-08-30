@@ -53,8 +53,13 @@ var (
 	//for local testing provide the location of kubeconfig
 	// inside the civo file paste your kubeconfig
 	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)
-	cluster_conf_loc      string = os.Getenv("CONFIG_LOCATION")
-	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
+	cluster_conf_loc           string = os.Getenv("CONFIG_LOCATION")
+	schedulingIntervalStr      string = os.Getenv("SCHEDULING_INTERVAL")
+	enableScheduling           string = os.Getenv("ENABLE_SCHEDULING")
+	outdatedIntervalStr        string = os.Getenv("OUTDATED_INTERVAL")
+	preUpgradeIntervalStr      string = os.Getenv("PRE_UPGRADE_INTERVAL")
+	getAllResourcesIntervalStr string = os.Getenv("GET_ALL_RESOURCES_INTERVAL")
+	rakkessIntervalStr         string = os.Getenv("RAKKESS_INTERVAL")
 )
 
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan chan error) {
@@ -160,41 +165,80 @@ func main() {
 		}()
 		wg.Add(6) // Initialize the WaitGroup for the seven goroutines
 		// ... start other goroutines ...
-		go outDatedImages(config, js, &wg, outdatedErrChan)
-		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-		go GetAllResources(config, js, &wg, getAllResourceChan)
-		go RakeesOutput(config, js, &wg, RakeesErrChan)
-		go getK8sEvents(clientset)
-		// Run these functions sequentially within a single goroutine using the wrapper function
-		go runTrivyScans(config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
-		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
-		wg.Wait()
-		// once the go routines completes we will close the error channels
-		close(outdatedErrChan)
-		close(kubePreUpgradeChan)
-		close(getAllResourceChan)
-		// close(clusterMetricsChan)
-		close(kubescoreMetricsChan)
-		close(trivyImagescanChan)
-		close(trivySbomcanChan)
-		close(trivyK8sMetricsChan)
-		close(RakeesErrChan)
-		// Signal that all other goroutines have finished
-		doneChan <- true
-		close(doneChan)
+		if enableScheduling == "true" {
+
+			// ... read other intervals ...
+
+			// Convert interval strings to time.Duration
+			outdatedInterval, _ := time.ParseDuration(outdatedIntervalStr)
+			if err != nil {
+				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for outdated: %v", err)
+			}
+			preUpgradeInterval, _ := time.ParseDuration(preUpgradeIntervalStr)
+			if err != nil {
+				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for preupgrade: %v", err)
+			}
+			getAllResourcesInterval, _ := time.ParseDuration(getAllResourcesIntervalStr)
+			if err != nil {
+				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for allresource: %v", err)
+			}
+			rakkessInterval, _ := time.ParseDuration(rakkessIntervalStr)
+			if err != nil {
+				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for Rakkess: %v", err)
+			}
+			// ... convert other intervals ...
+			s := gocron.NewScheduler(time.UTC)
+
+			s.Every(outdatedInterval).Do(outDatedImages, config, js, &wg, outdatedErrChan)
+			s.Every(preUpgradeInterval).Do(KubePreUpgradeDetector, config, js, &wg, kubePreUpgradeChan)
+			s.Every(getAllResourcesInterval).Do(GetAllResources, config, js, &wg, getAllResourceChan)
+			s.Every(rakkessInterval).Do(RakeesOutput, config, js, &wg, RakeesErrChan)
+			// once the go routines completes we will close the error channels
+			s.StartBlocking()
+			// ... call other functions ...
+		} else {
+
+			outDatedImages(config, js, &wg, outdatedErrChan)
+			KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+			GetAllResources(config, js, &wg, getAllResourceChan)
+			RakeesOutput(config, js, &wg, RakeesErrChan)
+			getK8sEvents(clientset)
+			// Run these functions sequentially within a single goroutine using the wrapper function
+			runTrivyScans(config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
+			RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
+
+			wg.Wait()
+			// once the go routines completes we will close the error channels
+			close(outdatedErrChan)
+			close(kubePreUpgradeChan)
+			close(getAllResourceChan)
+			// close(clusterMetricsChan)
+			close(kubescoreMetricsChan)
+			close(trivyImagescanChan)
+			close(trivySbomcanChan)
+			close(trivyK8sMetricsChan)
+			close(RakeesErrChan)
+			// Signal that all other goroutines have finished
+			doneChan <- true
+			close(doneChan)
+
+		}
 	}
 	collectAndPublishMetrics()
-	if schedulingIntervalStr == "" {
-		schedulingIntervalStr = "20m" // Default value, e.g., 20 minutes
+	if enableScheduling == "false" {
+		if schedulingIntervalStr == "" {
+			schedulingIntervalStr = "20m" // Default value, e.g., 20 minutes
+		}
+		schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
+		if err != nil {
+			log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+		}
+		s := gocron.NewScheduler(time.UTC)
+		s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
+		s.StartBlocking()
 	}
-	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
-	if err != nil {
-		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
-	}
-	s := gocron.NewScheduler(time.UTC)
-	s.Every(schedulingInterval).Do(collectAndPublishMetrics) // Run immediately and then at the scheduled interval
-	s.StartBlocking()                                        // Blocks the main function
-}
+
+} // Blocks the main function
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
