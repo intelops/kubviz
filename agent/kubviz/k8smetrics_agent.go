@@ -57,6 +57,13 @@ var (
 	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
+func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan chan error) {
+	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
+	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
+	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
+	wg.Done()
+}
+
 func main() {
 	env := Production
 	clusterMetricsChan := make(chan error, 1)
@@ -151,17 +158,16 @@ func main() {
 				}
 			}
 		}()
-		wg.Add(8) // Initialize the WaitGroup for the seven goroutines
+		wg.Add(6) // Initialize the WaitGroup for the seven goroutines
 		// ... start other goroutines ...
 		go outDatedImages(config, js, &wg, outdatedErrChan)
 		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
 		go GetAllResources(config, js, &wg, getAllResourceChan)
 		go RakeesOutput(config, js, &wg, RakeesErrChan)
 		go getK8sEvents(clientset)
-		go RunTrivyImageScans(config, js, &wg, trivyImagescanChan)
-		go RunTrivySbomScan(config, js, &wg, trivySbomcanChan)
+		// Run these functions sequentially within a single goroutine using the wrapper function
+		go runTrivyScans(config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
 		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
-		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
 		wg.Wait()
 		// once the go routines completes we will close the error channels
 		close(outdatedErrChan)
