@@ -42,6 +42,7 @@ type DBInterface interface {
 	InsertContainerEventDockerHub(model.DockerHubBuild)
 	InsertContainerEventAzure(model.AzureContainerPushEventPayload)
 	InsertContainerEventGithub(string)
+	InsertContainerEventJfrog(model.JfrogContainerPushEventPayload)
 	InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) error
 	Close()
 }
@@ -72,7 +73,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage,trivySbomTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, jfrogContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -145,6 +146,47 @@ func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 		metrics.Delete,
 		metrics.List,
 		metrics.Update,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+}
+func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushEventPayload) {
+	var (
+		tx, _   = c.conn.Begin()
+		stmt, _ = tx.Prepare(string(InsertJfrogContainerPushEvent))
+	)
+	defer stmt.Close()
+	registryURL := pushEvent.Data.Path
+	repositoryName := pushEvent.Data.Name
+	tag := pushEvent.Data.Tag
+
+	if tag == "" {
+		tag = "latest"
+	}
+	imageName := registryURL + "/" + repositoryName + ":" + tag
+	size := pushEvent.Data.Size
+	shaID := pushEvent.Data.SHA256
+
+	// Marshaling the pushEvent into a JSON string
+	pushEventJSON, err := json.Marshal(pushEvent)
+	if err != nil {
+		log.Printf("Error while marshaling Azure Container Registry payload: %v", err)
+		return
+	}
+
+	if _, err := stmt.Exec(
+		registryURL,
+		repositoryName,
+		tag,
+		imageName,
+		string(pushEventJSON),
+		pushEvent.Domain,
+		pushEvent.EventType,
+		size,
+		shaID,
 	); err != nil {
 		log.Fatal(err)
 	}
