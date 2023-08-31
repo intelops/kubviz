@@ -72,7 +72,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage,trivySbomTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -261,7 +261,7 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	if _, err := stmt.Exec(
 		metrics.ClusterName,
 		string(metrics.Event.UID),
-		time.Now().Format("2006-01-02 15:04:05"),
+		time.Now().UTC().Format("2006-01-02 15:04:05"),
 		metrics.Type,
 		metrics.Event.Name,
 		metrics.Event.Namespace,
@@ -270,8 +270,8 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 		metrics.Event.Reason,
 		metrics.Event.Source.Host,
 		string(eventJson),
-		metrics.Event.FirstTimestamp.Time.Format("2006-01-02 15:04:05"),
-		metrics.Event.LastTimestamp.Time.Format("2006-01-02 15:04:05"),
+		metrics.Event.FirstTimestamp.Time.UTC().Format("2006-01-02 15:04:05"),
+		metrics.Event.LastTimestamp.Time.UTC().Format("2006-01-02 15:04:05"),
 	); err != nil {
 		log.Fatal(err)
 	}
