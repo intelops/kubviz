@@ -105,7 +105,7 @@ func main() {
 	}
 
 	// starting the endless go routine to monitor the cluster
-	publishMetrics(clientset, js, clusterMetricsChan)
+	go publishMetrics(clientset, js, clusterMetricsChan)
 
 	// starting all the go routines
 	collectAndPublishMetrics := func() {
