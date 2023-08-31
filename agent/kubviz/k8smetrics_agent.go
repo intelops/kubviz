@@ -67,8 +67,8 @@ var (
 
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan chan error) {
 	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
-	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
 	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
+	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
 	wg.Done()
 }
 
@@ -233,8 +233,8 @@ func main() {
 			s.Every(getAllResourcesInterval).Do(GetAllResources, config, js, &wg, getAllResourceChan)
 			s.Every(rakkessInterval).Do(RakeesOutput, config, js, &wg, RakeesErrChan)
 			//s.Every(getclientInterval).Do(getK8sClient, clientset)
-			s.Every(trivyInterval).Do(runTrivyScans, config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
 			s.Every(kubescoreInterval).Do(RunKubeScore, clientset, js, &wg, kubescoreMetricsChan)
+			s.Every(trivyInterval).Do(runTrivyScans, config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
 
 			// once the go routines completes we will close the error channels
 			s.StartBlocking()
