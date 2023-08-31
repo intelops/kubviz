@@ -61,8 +61,8 @@ var (
 	getAllResourcesIntervalStr string = os.Getenv("GET_ALL_RESOURCES_INTERVAL")
 	rakkessIntervalStr         string = os.Getenv("RAKKESS_INTERVAL")
 	//getclientIntervalStr       string = os.Getenv("GETCLIENT_INTERVAL")
-	trivyIntervalStr string = os.Getenv("TRIVY_INTERVAL")
-	//kubescoreIntervalStr string = os.Getenv("KUBESCORE_INTERVAL")
+	trivyIntervalStr     string = os.Getenv("TRIVY_INTERVAL")
+	kubescoreIntervalStr string = os.Getenv("KUBESCORE_INTERVAL")
 )
 
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan chan error) {
@@ -218,13 +218,13 @@ func main() {
 			if err != nil {
 				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for trivy: %v", err)
 			}
-			// if kubescoreIntervalStr == "" {
-			// 	kubescoreIntervalStr = "45m" // Default value, e.g., 20 minutes
-			// }
-			// kubescoreInterval, _ := time.ParseDuration(kubescoreIntervalStr)
-			// if err != nil {
-			// 	log.Fatalf("Failed to parse SCHEDULING_INTERVAL for kubescore: %v", err)
-			// }
+			if kubescoreIntervalStr == "" {
+				kubescoreIntervalStr = "45m" // Default value, e.g., 20 minutes
+			}
+			kubescoreInterval, _ := time.ParseDuration(kubescoreIntervalStr)
+			if err != nil {
+				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for kubescore: %v", err)
+			}
 			// ... convert other intervals ...
 			s := gocron.NewScheduler(time.UTC)
 
@@ -234,7 +234,7 @@ func main() {
 			s.Every(rakkessInterval).Do(RakeesOutput, config, js, &wg, RakeesErrChan)
 			//s.Every(getclientInterval).Do(getK8sClient, clientset)
 			s.Every(trivyInterval).Do(runTrivyScans, config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
-			//s.Every(kubescoreInterval).Do(RunKubeScore, clientset, js, &wg, kubescoreMetricsChan)
+			s.Every(kubescoreInterval).Do(RunKubeScore, clientset, js, &wg, kubescoreMetricsChan)
 
 			// once the go routines completes we will close the error channels
 			s.StartBlocking()
