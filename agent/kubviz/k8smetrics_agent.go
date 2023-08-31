@@ -168,34 +168,58 @@ func main() {
 		}()
 		wg.Add(6) // Initialize the WaitGroup for the seven goroutines
 		// ... start other goroutines ...
+		if enableScheduling == "" {
+			enableScheduling = "true"
+		}
 		if enableScheduling == "true" {
 
 			// ... read other intervals ...
 
 			// Convert interval strings to time.Duration
+			if outdatedIntervalStr == "" {
+				outdatedIntervalStr = "20m" // Default value, e.g., 20 minutes
+			}
 			outdatedInterval, _ := time.ParseDuration(outdatedIntervalStr)
 			if err != nil {
 				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for outdated: %v", err)
+			}
+			if preUpgradeIntervalStr == "" {
+				preUpgradeIntervalStr = "20m" // Default value, e.g., 20 minutes
 			}
 			preUpgradeInterval, _ := time.ParseDuration(preUpgradeIntervalStr)
 			if err != nil {
 				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for preupgrade: %v", err)
 			}
+			if getAllResourcesIntervalStr == "" {
+				getAllResourcesIntervalStr = "20m" // Default value, e.g., 20 minutes
+			}
 			getAllResourcesInterval, _ := time.ParseDuration(getAllResourcesIntervalStr)
 			if err != nil {
 				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for allresource: %v", err)
+			}
+			if rakkessIntervalStr == "" {
+				rakkessIntervalStr = "20m" // Default value, e.g., 20 minutes
 			}
 			rakkessInterval, _ := time.ParseDuration(rakkessIntervalStr)
 			if err != nil {
 				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for Rakkess: %v", err)
 			}
+			if getclientIntervalStr == "" {
+				getclientIntervalStr = "20m" // Default value, e.g., 20 minutes
+			}
 			getclientInterval, _ := time.ParseDuration(getclientIntervalStr)
 			if err != nil {
 				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for getclient: %v", err)
 			}
+			if trivyIntervalStr == "" {
+				trivyIntervalStr = "20m" // Default value, e.g., 20 minutes
+			}
 			trivyInterval, _ := time.ParseDuration(trivyIntervalStr)
 			if err != nil {
 				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for trivy: %v", err)
+			}
+			if kubescoreIntervalStr == "" {
+				kubescoreIntervalStr = "20m" // Default value, e.g., 20 minutes
 			}
 			kubescoreInterval, _ := time.ParseDuration(kubescoreIntervalStr)
 			if err != nil {
@@ -209,7 +233,7 @@ func main() {
 			s.Every(getAllResourcesInterval).Do(GetAllResources, config, js, &wg, getAllResourceChan)
 			s.Every(rakkessInterval).Do(RakeesOutput, config, js, &wg, RakeesErrChan)
 			s.Every(getclientInterval).Do(getK8sClient, clientset)
-			s.Every(trivyInterval).Do(runTrivyScans, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
+			s.Every(trivyInterval).Do(runTrivyScans, config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
 			s.Every(kubescoreInterval).Do(RunKubeScore, clientset, js, &wg, kubescoreMetricsChan)
 
 			// once the go routines completes we will close the error channels
@@ -217,14 +241,14 @@ func main() {
 			// ... call other functions ...
 		} else {
 
-			go outDatedImages(config, js, &wg, outdatedErrChan)
-			go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-			go GetAllResources(config, js, &wg, getAllResourceChan)
-			go RakeesOutput(config, js, &wg, RakeesErrChan)
-			go getK8sEvents(clientset)
+			outDatedImages(config, js, &wg, outdatedErrChan)
+			KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+			GetAllResources(config, js, &wg, getAllResourceChan)
+			RakeesOutput(config, js, &wg, RakeesErrChan)
+			getK8sEvents(clientset)
 			// Run these functions sequentially within a single goroutine using the wrapper function
-			go runTrivyScans(config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
-			go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
+			runTrivyScans(config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
+			RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 			wg.Wait()
 			// once the go routines completes we will close the error channels
 			close(outdatedErrChan)
