@@ -15,7 +15,7 @@ import (
 	"context"
 
 	"github.com/intelops/kubviz/constants"
-	"github.com/intelops/kubviz/model"
+	//"github.com/intelops/kubviz/model"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -102,14 +102,14 @@ func main() {
 	// starting all the go routines
 	collectAndPublishMetrics := func() {
 		// error channels declared for the go routines
-		outdatedErrChan := make(chan error, 1)
-		kubePreUpgradeChan := make(chan error, 1)
-		getAllResourceChan := make(chan error, 1)
+		//outdatedErrChan := make(chan error, 1)
+		//kubePreUpgradeChan := make(chan error, 1)
+		//getAllResourceChan := make(chan error, 1)
 		trivyK8sMetricsChan := make(chan error, 1)
-		kubescoreMetricsChan := make(chan error, 1)
+		//kubescoreMetricsChan := make(chan error, 1)
 		trivyImagescanChan := make(chan error, 1)
 		trivySbomcanChan := make(chan error, 1)
-		RakeesErrChan := make(chan error, 1)
+		//RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
 		doneChan := make(chan bool)
 		go func() {
@@ -117,26 +117,26 @@ func main() {
 			// logs if any error occurs
 			for {
 				select {
-				case err := <-outdatedErrChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-kubePreUpgradeChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-getAllResourceChan:
-					if err != nil {
-						log.Println(err)
-					}
+				// case err := <-outdatedErrChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
+				// case err := <-kubePreUpgradeChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
+				// case err := <-getAllResourceChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
 				case err := <-clusterMetricsChan:
 					if err != nil {
 						log.Println(err)
 					}
-				case err := <-kubescoreMetricsChan:
-					if err != nil {
-						log.Println(err)
-					}
+				// case err := <-kubescoreMetricsChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
 				case err := <-trivyImagescanChan:
 					if err != nil {
 						log.Println(err)
@@ -149,36 +149,36 @@ func main() {
 					if err != nil {
 						log.Println(err)
 					}
-				case err := <-RakeesErrChan:
-					if err != nil {
-						log.Println(err)
-					}
+				// case err := <-RakeesErrChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
 				case <-doneChan:
 					return // All other goroutines have finished, so exit the goroutine
 				}
 			}
 		}()
-		wg.Add(7) // Initialize the WaitGroup for the seven goroutines
+		wg.Add(2) // Initialize the WaitGroup for the seven goroutines
 		// ... start other goroutines ...
-		go outDatedImages(config, js, &wg, outdatedErrChan)
-		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-		go GetAllResources(config, js, &wg, getAllResourceChan)
-		go RakeesOutput(config, js, &wg, RakeesErrChan)
+		//go outDatedImages(config, js, &wg, outdatedErrChan)
+		//go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
+		//go GetAllResources(config, js, &wg, getAllResourceChan)
+		//go RakeesOutput(config, js, &wg, RakeesErrChan)
 		go getK8sEvents(clientset)
 		// Run these functions sequentially within a single goroutine using the wrapper function
 		go runTrivyScans(config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
-		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
+		//go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 		wg.Wait()
 		// once the go routines completes we will close the error channels
-		close(outdatedErrChan)
-		close(kubePreUpgradeChan)
-		close(getAllResourceChan)
+		//close(outdatedErrChan)
+		//close(kubePreUpgradeChan)
+		//close(getAllResourceChan)
 		// close(clusterMetricsChan)
-		close(kubescoreMetricsChan)
+		//close(kubescoreMetricsChan)
 		close(trivyImagescanChan)
 		close(trivySbomcanChan)
 		close(trivyK8sMetricsChan)
-		close(RakeesErrChan)
+		//close(RakeesErrChan)
 		// Signal that all other goroutines have finished
 		doneChan <- true
 		close(doneChan)
@@ -199,24 +199,24 @@ func main() {
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
 func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
-	watchK8sEvents(clientset, js)
+	//watchK8sEvents(clientset, js)
 
 	errCh <- nil
 }
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext) (bool, error) {
-	metrics := model.Metrics{
-		ID:          id,
-		Type:        mtype,
-		Event:       mdata,
-		ClusterName: ClusterName,
-	}
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.EventSubject, metricsJson)
-	if err != nil {
-		return true, err
-	}
-	log.Printf("Metrics with ID:%s has been published\n", id)
+	// metrics := model.Metrics{
+	// 	ID:          id,
+	// 	Type:        mtype,
+	// 	Event:       mdata,
+	// 	ClusterName: ClusterName,
+	// }
+	// metricsJson, _ := json.Marshal(metrics)
+	// _, err := js.Publish(constants.EventSubject, metricsJson)
+	// if err != nil {
+	// 	return true, err
+	// }
+	// log.Printf("Metrics with ID:%s has been published\n", id)
 	return false, nil
 }
 
