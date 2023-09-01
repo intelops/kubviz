@@ -60,9 +60,9 @@ var (
 	preUpgradeIntervalStr      string = os.Getenv("PRE_UPGRADE_INTERVAL")
 	getAllResourcesIntervalStr string = os.Getenv("GET_ALL_RESOURCES_INTERVAL")
 	rakkessIntervalStr         string = os.Getenv("RAKKESS_INTERVAL")
-	getclientIntervalStr       string = os.Getenv("GETCLIENT_INTERVAL")
-	trivyIntervalStr           string = os.Getenv("TRIVY_INTERVAL")
-	kubescoreIntervalStr       string = os.Getenv("KUBESCORE_INTERVAL")
+	//getclientIntervalStr       string = os.Getenv("GETCLIENT_INTERVAL")
+	trivyIntervalStr     string = os.Getenv("TRIVY_INTERVAL")
+	kubescoreIntervalStr string = os.Getenv("KUBESCORE_INTERVAL")
 )
 
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan chan error) {
@@ -204,13 +204,13 @@ func main() {
 			if err != nil {
 				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for Rakkess: %v", err)
 			}
-			if getclientIntervalStr == "" {
-				getclientIntervalStr = "10m" // Default value, e.g., 20 minutes
-			}
-			getclientInterval, _ := time.ParseDuration(getclientIntervalStr)
-			if err != nil {
-				log.Fatalf("Failed to parse SCHEDULING_INTERVAL for getclient: %v", err)
-			}
+			// if getclientIntervalStr == "" {
+			// 	getclientIntervalStr = "10m" // Default value, e.g., 20 minutes
+			// }
+			// getclientInterval, _ := time.ParseDuration(getclientIntervalStr)
+			// if err != nil {
+			// 	log.Fatalf("Failed to parse SCHEDULING_INTERVAL for getclient: %v", err)
+			// }
 			if trivyIntervalStr == "" {
 				trivyIntervalStr = "25m" // Default value, e.g., 20 minutes
 			}
@@ -232,7 +232,7 @@ func main() {
 			s.Every(preUpgradeInterval).Do(KubePreUpgradeDetector, config, js, &wg, kubePreUpgradeChan)
 			s.Every(getAllResourcesInterval).Do(GetAllResources, config, js, &wg, getAllResourceChan)
 			s.Every(rakkessInterval).Do(RakeesOutput, config, js, &wg, RakeesErrChan)
-			s.Every(getclientInterval).Do(getK8sClient, clientset)
+			//s.Every(getclientInterval).Do(getK8sClient, clientset)
 			s.Every(kubescoreInterval).Do(RunKubeScore, clientset, js, &wg, kubescoreMetricsChan)
 			s.Every(trivyInterval).Do(runTrivyScans, config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
 
