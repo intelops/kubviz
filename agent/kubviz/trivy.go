@@ -59,7 +59,8 @@ func executeCommandCluster(command string) ([]byte, error) {
 	cmd.Stderr = &errc
 
 	err := cmd.Run()
-	log.Printf("data %q", outc.String())
+	log.Printf("data %v", outc.String())
+	log.Printf("err %v", errc.String())
 
 	if err != nil {
 		log.Println("Execute Command Error", err.Error())
