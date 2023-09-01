@@ -58,9 +58,9 @@ var (
 )
 
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan chan error) {
-	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
-	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
-	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
+	RunTrivyK8sClusterScan(js, trivyK8sMetricsChan)
+	RunTrivyImageScans(config, js, trivyImagescanChan)
+	RunTrivySbomScan(config, js, trivySbomcanChan)
 	wg.Done()
 }
 
@@ -159,7 +159,7 @@ func main() {
 				}
 			}
 		}()
-		wg.Add(6) // Initialize the WaitGroup for the seven goroutines
+		wg.Add(7) // Initialize the WaitGroup for the seven goroutines
 		// ... start other goroutines ...
 		go outDatedImages(config, js, &wg, outdatedErrChan)
 		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
-	"sync"
 
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
@@ -39,15 +38,14 @@ func executeCommandSbom(command string) ([]byte, error) {
 	err := cmd.Run()
 
 	if err != nil {
-		log.Println("Execute Command Error", err.Error())
+		log.Println("Execute SBOM Command Error", err.Error())
 	}
 
 	return outc.Bytes(), err
 }
 
-func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, errCh chan error) {
 	log.Println("trivy sbom run started")
-	defer wg.Done()
 	images, err := ListImages(config)
 
 	if err != nil {
@@ -60,20 +58,20 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, wg *sync.Wa
 		out, err := executeCommandSbom(command)
 
 		if err != nil {
-			log.Printf("Error executing Trivy for image %s: %v", image.PullableImage, err)
+			log.Printf("Error executing Trivy for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
 
 		// Check if the output is empty or invalid JSON
 		if len(out) == 0 {
-			log.Printf("Trivy output is empty for image %s", image.PullableImage)
+			log.Printf("Trivy output is empty for image sbom %s", image.PullableImage)
 			continue // Move on to the next image
 		}
 
 		var report model.Sbom
 		err = json.Unmarshal(out, &report)
 		if err != nil {
-			log.Printf("Error unmarshaling JSON data for image %s: %v", image.PullableImage, err)
+			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
 		log.Println("report", report)
