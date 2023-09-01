@@ -166,7 +166,7 @@ func main() {
 				}
 			}
 		}()
-		wg.Add(6) // Initialize the WaitGroup for the seven goroutines
+		wg.Add(7) // Initialize the WaitGroup for the seven goroutines
 		// ... start other goroutines ...
 		if enableScheduling == "" {
 			enableScheduling = "true"
