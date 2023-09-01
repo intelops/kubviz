@@ -57,10 +57,11 @@ var (
 	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
-func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan chan error) {
+func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyK8sMetricsChan, trivyImagescanChan, trivySbomcanChan chan error) {
+	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
 	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
 	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
-	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
+
 	wg.Done()
 }
 
@@ -166,7 +167,7 @@ func main() {
 		//go RakeesOutput(config, js, &wg, RakeesErrChan)
 		go getK8sEvents(clientset)
 		// Run these functions sequentially within a single goroutine using the wrapper function
-		go runTrivyScans(config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
+		go runTrivyScans(config, js, &wg, trivyK8sMetricsChan, trivyImagescanChan, trivySbomcanChan)
 		//go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 		wg.Wait()
 		// once the go routines completes we will close the error channels
