@@ -57,13 +57,13 @@ var (
 	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
-func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyK8sMetricsChan, trivyImagescanChan, trivySbomcanChan chan error) {
-	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
-	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
-	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
+// func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyK8sMetricsChan, trivyImagescanChan, trivySbomcanChan chan error) {
+// 	RunTrivyK8sClusterScan(wg, js, trivyK8sMetricsChan)
+// 	RunTrivyImageScans(config, js, wg, trivyImagescanChan)
+// 	RunTrivySbomScan(config, js, wg, trivySbomcanChan)
 
-	wg.Done()
-}
+// 	wg.Done()
+// }
 
 func main() {
 	env := Production
@@ -108,8 +108,8 @@ func main() {
 		//getAllResourceChan := make(chan error, 1)
 		trivyK8sMetricsChan := make(chan error, 1)
 		//kubescoreMetricsChan := make(chan error, 1)
-		trivyImagescanChan := make(chan error, 1)
-		trivySbomcanChan := make(chan error, 1)
+		//trivyImagescanChan := make(chan error, 1)
+		//trivySbomcanChan := make(chan error, 1)
 		//RakeesErrChan := make(chan error, 1)
 		// Start a goroutine to handle errors
 		doneChan := make(chan bool)
@@ -138,14 +138,14 @@ func main() {
 				// 	if err != nil {
 				// 		log.Println(err)
 				// 	}
-				case err := <-trivyImagescanChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-trivySbomcanChan:
-					if err != nil {
-						log.Println(err)
-					}
+				// case err := <-trivyImagescanChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
+				// case err := <-trivySbomcanChan:
+				// 	if err != nil {
+				// 		log.Println(err)
+				// 	}
 				case err := <-trivyK8sMetricsChan:
 					if err != nil {
 						log.Println(err)
@@ -166,8 +166,9 @@ func main() {
 		//go GetAllResources(config, js, &wg, getAllResourceChan)
 		//go RakeesOutput(config, js, &wg, RakeesErrChan)
 		go getK8sEvents(clientset)
+		go RunTrivyK8sClusterScan(&wg, js, trivyK8sMetricsChan)
 		// Run these functions sequentially within a single goroutine using the wrapper function
-		go runTrivyScans(config, js, &wg, trivyK8sMetricsChan, trivyImagescanChan, trivySbomcanChan)
+		//go runTrivyScans(config, js, &wg, trivyK8sMetricsChan, trivyImagescanChan, trivySbomcanChan)
 		//go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
 		wg.Wait()
 		// once the go routines completes we will close the error channels
@@ -176,8 +177,8 @@ func main() {
 		//close(getAllResourceChan)
 		// close(clusterMetricsChan)
 		//close(kubescoreMetricsChan)
-		close(trivyImagescanChan)
-		close(trivySbomcanChan)
+		//close(trivyImagescanChan)
+		//close(trivySbomcanChan)
 		close(trivyK8sMetricsChan)
 		//close(RakeesErrChan)
 		// Signal that all other goroutines have finished
