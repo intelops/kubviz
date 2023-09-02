@@ -30,7 +30,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 6,
+      "id": 4,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -71,15 +71,18 @@ data:
           "id": 20,
           "options": {
             "displayMode": "gradient",
+            "minVizHeight": 10,
+            "minVizWidth": 0,
             "orientation": "horizontal",
             "reduceOptions": {
               "calcs": [],
               "fields": "",
               "values": true
             },
-            "showUnfilled": true
+            "showUnfilled": true,
+            "valueMode": "color"
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -99,7 +102,6 @@ data:
             }
           ],
           "title": "Vulnerability Severity counts grouped by Cluster",
-          "transparent": true,
           "type": "bargauge"
         },
         {
@@ -139,15 +141,18 @@ data:
           "id": 22,
           "options": {
             "displayMode": "gradient",
+            "minVizHeight": 10,
+            "minVizWidth": 0,
             "orientation": "horizontal",
             "reduceOptions": {
               "calcs": [],
               "fields": "",
               "values": true
             },
-            "showUnfilled": true
+            "showUnfilled": true,
+            "valueMode": "color"
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -167,7 +172,6 @@ data:
             }
           ],
           "title": "Misconfiguration Severity counts grouped by Cluster",
-          "transparent": true,
           "type": "bargauge"
         },
         {
@@ -216,7 +220,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -236,7 +240,6 @@ data:
             }
           ],
           "title": "Misconfiguration Count by Cluster",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -285,7 +288,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -305,7 +308,6 @@ data:
             }
           ],
           "title": "Vulnerability Count by Cluster",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -345,15 +347,18 @@ data:
           "id": 12,
           "options": {
             "displayMode": "basic",
+            "minVizHeight": 10,
+            "minVizWidth": 0,
             "orientation": "horizontal",
             "reduceOptions": {
               "calcs": [],
               "fields": "",
               "values": true
             },
-            "showUnfilled": true
+            "showUnfilled": true,
+            "valueMode": "color"
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -373,7 +378,6 @@ data:
             }
           ],
           "title": "Critical Vulnerability Count by Namespace and ClusterName",
-          "transparent": true,
           "type": "bargauge"
         },
         {
@@ -413,15 +417,18 @@ data:
           "id": 14,
           "options": {
             "displayMode": "basic",
+            "minVizHeight": 10,
+            "minVizWidth": 0,
             "orientation": "horizontal",
             "reduceOptions": {
               "calcs": [],
               "fields": "",
               "values": true
             },
-            "showUnfilled": true
+            "showUnfilled": true,
+            "valueMode": "color"
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -442,7 +449,6 @@ data:
             }
           ],
           "title": "Critical  Misconfiguration Count by Namespace and ClusterName",
-          "transparent": true,
           "type": "bargauge"
         },
         {
@@ -493,7 +499,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -564,7 +570,6 @@ data:
             }
           ],
           "title": "Count of Misconfiguration Severity Level",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -615,7 +620,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -686,7 +691,6 @@ data:
             }
           ],
           "title": "Count of Vulnereability  Severity level",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -726,15 +730,18 @@ data:
           "id": 4,
           "options": {
             "displayMode": "lcd",
+            "minVizHeight": 10,
+            "minVizWidth": 0,
             "orientation": "horizontal",
             "reduceOptions": {
               "calcs": [],
               "fields": "",
               "values": true
             },
-            "showUnfilled": true
+            "showUnfilled": true,
+            "valueMode": "color"
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -754,7 +761,6 @@ data:
             }
           ],
           "title": "Misconfiguration Count by Cluster and Namespace",
-          "transparent": true,
           "type": "bargauge"
         },
         {
@@ -794,15 +800,18 @@ data:
           "id": 6,
           "options": {
             "displayMode": "lcd",
+            "minVizHeight": 10,
+            "minVizWidth": 0,
             "orientation": "horizontal",
             "reduceOptions": {
               "calcs": [],
               "fields": "",
               "values": true
             },
-            "showUnfilled": true
+            "showUnfilled": true,
+            "valueMode": "color"
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -822,7 +831,6 @@ data:
             }
           ],
           "title": "Vulnerability Count by Cluster and Namespace",
-          "transparent": true,
           "type": "bargauge"
         },
         {
@@ -837,8 +845,11 @@ data:
               },
               "custom": {
                 "align": "center",
-                "displayMode": "color-text",
-                "filterable": true
+                "cellOptions": {
+                  "type": "color-text"
+                },
+                "filterable": true,
+                "inspect": false
               },
               "mappings": [],
               "thresholds": {
@@ -876,7 +887,7 @@ data:
             },
             "showHeader": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "builderOptions": {
@@ -899,7 +910,7 @@ data:
                   "vul_last_modified_date"
                 ],
                 "filters": [],
-                "limit": 100,
+                "limit": null,
                 "mode": "list",
                 "orderBy": [],
                 "table": "trivy_vul"
@@ -910,13 +921,12 @@ data:
               },
               "format": 1,
               "queryType": "builder",
-              "rawSql": "SELECT cluster_name, namespace, kind, name, vul_id, vul_vendor_ids, vul_pkg_id, vul_pkg_name, vul_pkg_path, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date FROM default.\"trivy_vul\" LIMIT 100",
+              "rawSql": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"vul_id\", \"vul_vendor_ids\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_pkg_path\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" FROM \"default\".\"trivy_vul\"",
               "refId": "A",
               "selectedFormat": 1
             }
           ],
           "title": "Trivy Vulnerabilities",
-          "transparent": true,
           "type": "table"
         },
         {
@@ -932,8 +942,11 @@ data:
               },
               "custom": {
                 "align": "center",
-                "displayMode": "color-text",
-                "filterable": true
+                "cellOptions": {
+                  "type": "color-text"
+                },
+                "filterable": true,
+                "inspect": false
               },
               "mappings": [],
               "thresholds": {
@@ -971,7 +984,7 @@ data:
             },
             "showHeader": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "builderOptions": {
@@ -993,7 +1006,7 @@ data:
                   "misconfig_status"
                 ],
                 "filters": [],
-                "limit": 100,
+                "limit": null,
                 "mode": "list",
                 "orderBy": [],
                 "table": "trivy_misconfig"
@@ -1004,13 +1017,12 @@ data:
               },
               "format": 1,
               "queryType": "builder",
-              "rawSql": "SELECT cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status FROM default.\"trivy_misconfig\" LIMIT 100",
+              "rawSql": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"misconfig_id\", \"misconfig_avdid\", \"misconfig_type\", \"misconfig_title\", \"misconfig_desc\", \"misconfig_msg\", \"misconfig_query\", \"misconfig_resolution\", \"misconfig_severity\", \"misconfig_status\" FROM \"default\".\"trivy_misconfig\"",
               "refId": "A",
               "selectedFormat": 1
             }
           ],
           "title": "Trivy Misconfiguration",
-          "transparent": true,
           "type": "table"
         },
         {
@@ -1025,8 +1037,11 @@ data:
               },
               "custom": {
                 "align": "center",
-                "displayMode": "color-text",
-                "filterable": true
+                "cellOptions": {
+                  "type": "color-text"
+                },
+                "filterable": true,
+                "inspect": false
               },
               "mappings": [],
               "thresholds": {
@@ -1053,7 +1068,9 @@ data:
           },
           "id": 24,
           "options": {
+            "cellHeight": "sm",
             "footer": {
+              "countRows": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -1062,7 +1079,7 @@ data:
             },
             "showHeader": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "builderOptions": {
@@ -1117,7 +1134,7 @@ data:
                   "vul_last_modified_date"
                 ],
                 "filters": [],
-                "limit": 100,
+                "limit": null,
                 "mode": "list",
                 "orderBy": [],
                 "table": "trivyimage"
@@ -1135,18 +1152,95 @@ data:
                 }
               },
               "queryType": "builder",
-              "rawSql": "SELECT cluster_name, artifact_name, vul_id, vul_pkg_id, vul_pkg_name, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date FROM default.\"trivyimage\" LIMIT 100",
+              "rawSql": "SELECT \"cluster_name\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" FROM \"default\".\"trivyimage\"",
               "refId": "A",
               "selectedFormat": 1
             }
           ],
           "title": "Trivy Image",
-          "transparent": true,
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "cellOptions": {
+                  "type": "color-text"
+                },
+                "filterable": true,
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 62
+          },
+          "id": 25,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "10.0.3",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "default",
+                "fields": [
+                  "*"
+                ],
+                "filters": [],
+                "limit": null,
+                "mode": "list",
+                "orderBy": [],
+                "table": "trivysbom"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 1,
+              "queryType": "builder",
+              "rawSql": "SELECT * FROM \"default\".\"trivysbom\"",
+              "refId": "A",
+              "selectedFormat": 1
+            }
+          ],
+          "title": "Trivy_SBOM",
           "type": "table"
         }
       ],
       "refresh": "",
-      "schemaVersion": 35,
+      "schemaVersion": 38,
       "style": "dark",
       "tags": [],
       "templating": {
@@ -1160,7 +1254,7 @@ data:
       "timezone": "",
       "title": "Trivy",
       "uid": "f9b0a865-f419-410a-b7d9-9a3f79a70d47",
-      "version": 15,
+      "version": 1,
       "weekStart": ""
     }
 {{- end }}
