@@ -35,6 +35,7 @@ func (ah *APIHandler) BindRequest(r *gin.Engine) {
 		apiGroup.GET("/status", ah.GetStatus)
 		apiGroup.POST("/event/docker/hub", ah.PostEventDockerHub)
 		apiGroup.POST("/event/azure/container", ah.PostEventAzureContainer)
+		apiGroup.POST("/event/quay/container", ah.PostEventQuayContainer)
 	}
 }
 

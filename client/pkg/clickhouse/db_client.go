@@ -41,6 +41,7 @@ type DBInterface interface {
 	RetrieveKubvizEvent() ([]model.DbEvent, error)
 	InsertContainerEventDockerHub(model.DockerHubBuild)
 	InsertContainerEventAzure(model.AzureContainerPushEventPayload)
+	InsertContainerEventQuay(model.QuayImagePushPayload)
 	InsertContainerEventGithub(string)
 	InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) error
 	Close()
@@ -72,7 +73,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable,quayContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -124,6 +125,42 @@ func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushE
 		pushEvent.Timestamp,
 		size,
 		shaID,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload) {
+	var (
+		tx, _   = c.conn.Begin()
+		stmt, _ = tx.Prepare(string(InsertQuayContainerPushEvent))
+	)
+	defer stmt.Close()
+	dockerURL := pushEvent.DockerURL
+	repository := pushEvent.Repository
+	tag := pushEvent.UpdatedTags
+	name:=pushEvent.Name
+	nameSpace:=pushEvent.Namespace
+	homePage:=pushEvent.Homepage
+	
+	// Marshaling the pushEvent into a JSON string
+	pushEventJSON, err := json.Marshal(pushEvent)
+	if err != nil {
+		log.Printf("Error while marshaling Quay Container Registry payload: %v", err)
+		return
+	}
+
+	if _, err := stmt.Exec(
+		dockerURL,
+		repository,
+		tag,
+		name,
+		string(pushEventJSON),
+		nameSpace,
+		homePage,
 	); err != nil {
 		log.Fatal(err)
 	}
