@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/intelops/kubviz/kubviz-agent
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.0.0"
+  tag: "v1.1.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -47,7 +47,7 @@ git_bridge:
   image:
     repository: ghcr.io/intelops/kubviz/git-agent
     pullPolicy: Always
-    tag: "v1.0.0"
+    tag: "v1.1.0"
   resources: 
      limits:
        cpu: 200m
@@ -81,7 +81,7 @@ container_bridge:
   image:
     repository: ghcr.io/intelops/kubviz/container-agent
     pullPolicy: Always
-    tag: "v1.0.0"
+    tag: "v1.1.0"
   resources: 
      limits:
        cpu: 200m

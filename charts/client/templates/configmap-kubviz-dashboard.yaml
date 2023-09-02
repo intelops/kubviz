@@ -30,7 +30,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 5,
+      "id": 1,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -47,8 +47,12 @@ data:
               },
               "custom": {
                 "align": "center",
-                "displayMode": "lcd-gauge",
-                "filterable": true
+                "cellOptions": {
+                  "mode": "lcd",
+                  "type": "gauge"
+                },
+                "filterable": true,
+                "inspect": false
               },
               "mappings": [],
               "thresholds": {
@@ -86,7 +90,7 @@ data:
             },
             "showHeader": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -98,15 +102,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT DISTINCT ClusterName from(SELECT distinct ClusterName FROM default.DeletedAPIs\nUNION ALL\nSELECT DISTINCT ClusterName FROM default.DeprecatedAPIs\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.events\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.getall_resources\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.outdated_images)",
-              "rawQuery": "SELECT DISTINCT ClusterName from(SELECT distinct ClusterName FROM default.DeletedAPIs\nUNION ALL\nSELECT DISTINCT ClusterName FROM default.DeprecatedAPIs\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.events\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.getall_resources\n UNION ALL\n SELECT DISTINCT ClusterName FROM default.outdated_images)",
+              "query": "SELECT DISTINCT ClusterName FROM default.events",
+              "rawQuery": "SELECT DISTINCT ClusterName FROM default.events",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Monitoring Clusters",
-          "transparent": true,
           "type": "table"
         },
         {
@@ -163,7 +166,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -175,15 +178,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT ClusterName,count(*) AS Events From default.events\nGROUP BY ClusterName\nORDER BY Events DESC\nLIMIT 1",
-              "rawQuery": "SELECT ClusterName,count(*) AS Events From default.events\nGROUP BY ClusterName\nORDER BY Events DESC\nLIMIT 1",
+              "query": "SELECT ClusterName,count(*) AS Events From default.events\nWHERE $timeFilterByColumn(EventTime) \nGROUP BY ClusterName\nORDER BY Events DESC\nLIMIT 1",
+              "rawQuery": "SELECT ClusterName,count(*) AS Events From default.events\nWHERE EventTime >= toDateTime(1693460315) AND EventTime <= toDateTime(1693460615) \nGROUP BY ClusterName\nORDER BY Events DESC\nLIMIT 1",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Clusters with Most Activity",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -240,7 +242,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -260,7 +262,6 @@ data:
             }
           ],
           "title": "Number of Outdated Images Across All Clusters",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -317,7 +318,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -329,15 +330,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(*) FROM default.events",
-              "rawQuery": "SELECT count(*) FROM default.events",
+              "query": "SELECT count(*) FROM default.events\nWHERE $timeFilterByColumn(EventTime) ",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE EventTime >= toDateTime(1693460292) AND EventTime <= toDateTime(1693460592)",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Number of Events across all Clusters",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -394,7 +394,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -414,7 +414,6 @@ data:
             }
           ],
           "title": "Number of DeletedAPIs across all Clusters",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -471,7 +470,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -491,7 +490,6 @@ data:
             }
           ],
           "title": "Number of DeprecatedAPIs across all Clusters",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -548,7 +546,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -568,8 +566,130 @@ data:
             }
           ],
           "title": "Number of k8s_Resources across all Clusters",
-          "transparent": true,
           "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "ClickHouse"
+          },
+          "description": "This panel provides a time-based analysis of the occurrences of 'Pod' and 'Node'",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisGridShow": true,
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "always",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 10
+          },
+          "id": 53,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT EventTime, COUNT(*) AS Pods\nFROM default.events\nWHERE Kind = 'Pod'\nGROUP BY EventTime;\n",
+              "refId": "A",
+              "selectedFormat": 0
+            },
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "ClickHouse"
+              },
+              "format": 0,
+              "hide": false,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT EventTime, COUNT(*) AS Nodes\nFROM default.events\nWHERE Kind = 'Node'\nGROUP BY EventTime;\n",
+              "refId": "B",
+              "selectedFormat": 0
+            }
+          ],
+          "title": "Number of Pods and Nodes over time",
+          "type": "timeseries"
         },
         {
           "datasource": {
@@ -611,7 +731,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 0,
-            "y": 10
+            "y": 16
           },
           "id": 57,
           "options": {
@@ -628,7 +748,7 @@ data:
             },
             "textMode": "value"
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -640,8 +760,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod'",
-              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod'",
+              "query": "SELECT count(*) FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Pod'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE EventTime >= toDateTime(1693438853) AND EventTime <= toDateTime(1693460453) AND Kind IN 'Pod'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -690,7 +810,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 6,
-            "y": 10
+            "y": 16
           },
           "id": 63,
           "options": {
@@ -705,7 +825,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -717,15 +837,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'Created'",
-              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'Created'",
+              "query": "SELECT count(*) FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Pod' AND Reason IN 'Created'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE EventTime >= toDateTime(1693460172) AND EventTime <= toDateTime(1693460472) AND Kind IN 'Pod' AND Reason IN 'Created'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Number of pods with Created state",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -768,7 +887,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 12,
-            "y": 10
+            "y": 16
           },
           "id": 61,
           "options": {
@@ -783,7 +902,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -795,15 +914,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'BackOff'",
-              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'BackOff'",
+              "query": "SELECT count(*) FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Pod' AND Reason IN 'BackOff'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE EventTime >= toDateTime(1693460182) AND EventTime <= toDateTime(1693460482) AND Kind IN 'Pod' AND Reason IN 'BackOff'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Number of pods with BackOff state",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -846,7 +964,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 18,
-            "y": 10
+            "y": 16
           },
           "id": 62,
           "options": {
@@ -861,7 +979,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -873,15 +991,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'Unhealthy'",
-              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Pod' AND Reason IN 'Unhealthy'",
+              "query": "SELECT count(*) FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Pod' AND Reason IN 'Unhealthy'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE EventTime >= toDateTime(1693460193) AND EventTime <= toDateTime(1693460493) AND Kind IN 'Pod' AND Reason IN 'Unhealthy'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Number of pods with Unhealthy state",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -924,7 +1041,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 0,
-            "y": 14
+            "y": 20
           },
           "id": 56,
           "options": {
@@ -941,7 +1058,7 @@ data:
             },
             "textMode": "value"
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -953,15 +1070,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node'",
-              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node'",
+              "query": "SELECT count(*) FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Node'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE EventTime >= toDateTime(1693438754) AND EventTime <= toDateTime(1693460354) AND Kind IN 'Node'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Number of Node creation events",
-          "transparent": true,
           "type": "stat"
         },
         {
@@ -1004,7 +1120,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 6,
-            "y": 14
+            "y": 20
           },
           "id": 58,
           "options": {
@@ -1019,7 +1135,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -1031,15 +1147,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeNotReady'",
-              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeNotReady'",
+              "query": "SELECT count(*) FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Node' AND Reason IN 'NodeNotReady'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE EventTime >= toDateTime(1693438784) AND EventTime <= toDateTime(1693460384) AND Kind IN 'Node' AND Reason IN 'NodeNotReady'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Number of Nodes with NotReady State",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -1082,7 +1197,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 12,
-            "y": 14
+            "y": 20
           },
           "id": 59,
           "options": {
@@ -1097,7 +1212,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -1109,15 +1224,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeReady'",
-              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeReady'",
+              "query": "SELECT count(*) FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Node' AND Reason IN 'NodeReady'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE EventTime >= toDateTime(1693438825) AND EventTime <= toDateTime(1693460425) AND Kind IN 'Node' AND Reason IN 'NodeReady'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Number of Nodes with Ready State",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -1160,7 +1274,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 18,
-            "y": 14
+            "y": 20
           },
           "id": 60,
           "options": {
@@ -1175,7 +1289,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -1187,15 +1301,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeHasNoDiskPressure'",
-              "rawQuery": "SELECT count(*) FROM default.events\nWHERE Kind IN 'Node' AND Reason IN 'NodeHasNoDiskPressure'",
+              "query": "SELECT count(*) FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Node' AND Reason IN 'NodeHasNoDiskPressure'",
+              "rawQuery": "SELECT count(*) FROM default.events\nWHERE EventTime >= toDateTime(1693438835) AND EventTime <= toDateTime(1693460435) AND Kind IN 'Node' AND Reason IN 'NodeHasNoDiskPressure'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Number of Nodes with  NodeHasNoDiskPressure State",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -1211,8 +1324,11 @@ data:
               },
               "custom": {
                 "align": "center",
-                "displayMode": "gradient-gauge",
-                "filterable": true
+                "cellOptions": {
+                  "type": "color-text"
+                },
+                "filterable": true,
+                "inspect": false
               },
               "links": [
                 {
@@ -1248,12 +1364,20 @@ data:
               {
                 "matcher": {
                   "id": "byName",
-                  "options": "Namespace"
+                  "options": "Events"
                 },
                 "properties": [
                   {
                     "id": "custom.width",
                     "value": 425
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "gradient",
+                      "type": "gauge",
+                      "valueDisplayMode": "text"
+                    }
                   }
                 ]
               }
@@ -1263,7 +1387,7 @@ data:
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 18
+            "y": 24
           },
           "id": 44,
           "options": {
@@ -1279,7 +1403,7 @@ data:
             "showHeader": true,
             "sortBy": []
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -1291,15 +1415,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT ClusterName, Namespace, count(Event) AS Events FROM default.events\nGROUP BY ClusterName,Namespace\nORDER BY Events DESC",
-              "rawQuery": "SELECT ClusterName, Namespace, count(Event) AS Events FROM default.events\nGROUP BY ClusterName,Namespace\nORDER BY Events DESC",
+              "query": "SELECT ClusterName, Namespace, count(Event) AS Events FROM default.events\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName,Namespace\nORDER BY Events DESC",
+              "rawQuery": "SELECT ClusterName, Namespace, count(Event) AS Events FROM default.events\nWHERE EventTime >= toDateTime(1693460424) AND EventTime <= toDateTime(1693460724)\nGROUP BY ClusterName,Namespace\nORDER BY Events DESC",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Events per cluster by Namespace",
-          "transparent": true,
           "type": "table"
         },
         {
@@ -1335,7 +1458,7 @@ data:
             "h": 5,
             "w": 24,
             "x": 0,
-            "y": 26
+            "y": 32
           },
           "id": 40,
           "options": {
@@ -1350,7 +1473,7 @@ data:
             "showThresholdLabels": false,
             "showThresholdMarkers": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -1421,7 +1544,6 @@ data:
             }
           ],
           "title": "Number of Clusters Containing Activity",
-          "transparent": true,
           "type": "gauge"
         },
         {
@@ -1435,6 +1557,14 @@ data:
               "color": {
                 "mode": "continuous-GrYlRd"
               },
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "color-text"
+                },
+                "filterable": true,
+                "inspect": false
+              },
               "links": [
                 {
                   "targetBlank": true,
@@ -1447,8 +1577,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1457,29 +1586,45 @@ data:
                 ]
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Pods"
+                },
+                "properties": [
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "lcd",
+                      "type": "gauge",
+                      "valueDisplayMode": "text"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "gridPos": {
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 31
+            "y": 37
           },
           "id": 64,
           "options": {
-            "displayMode": "lcd",
-            "minVizHeight": 10,
-            "minVizWidth": 0,
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [],
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
               "fields": "",
-              "values": true
+              "reducer": [
+                "sum"
+              ],
+              "show": false
             },
-            "showUnfilled": true,
-            "valueMode": "color"
+            "showHeader": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -1491,16 +1636,15 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT count(Kind) AS Pods,ClusterName, Reason FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
-              "rawQuery": "SELECT count(Kind) AS Pods,ClusterName, Reason FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
+              "query": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
+              "rawQuery": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Count of Pods grouped by Reason",
-          "transparent": true,
-          "type": "bargauge"
+          "type": "table"
         },
         {
           "datasource": {
@@ -1515,6 +1659,8 @@ data:
                 "mode": "fixed"
               },
               "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
                 "axisLabel": "",
                 "axisPlacement": "auto",
                 "axisSoftMin": 0,
@@ -1528,6 +1674,9 @@ data:
                 "lineWidth": 1,
                 "scaleDistribution": {
                   "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
                 }
               },
               "links": [
@@ -1542,8 +1691,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1558,7 +1706,7 @@ data:
             "h": 9,
             "w": 12,
             "x": 0,
-            "y": 39
+            "y": 45
           },
           "id": 34,
           "options": {
@@ -1601,7 +1749,6 @@ data:
             }
           ],
           "title": "Count of DeprecatedAPIs per cluster",
-          "transparent": true,
           "type": "barchart"
         },
         {
@@ -1617,6 +1764,8 @@ data:
                 "mode": "fixed"
               },
               "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
                 "axisLabel": "",
                 "axisPlacement": "auto",
                 "axisSoftMin": 0,
@@ -1630,6 +1779,9 @@ data:
                 "lineWidth": 1,
                 "scaleDistribution": {
                   "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
                 }
               },
               "links": [
@@ -1644,8 +1796,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1660,7 +1811,7 @@ data:
             "h": 9,
             "w": 12,
             "x": 12,
-            "y": 39
+            "y": 45
           },
           "id": 36,
           "options": {
@@ -1703,7 +1854,6 @@ data:
             }
           ],
           "title": "Count of DeletedAPIs per cluster",
-          "transparent": true,
           "type": "barchart"
         },
         {
@@ -1719,6 +1869,8 @@ data:
                 "mode": "fixed"
               },
               "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
                 "axisLabel": "",
                 "axisPlacement": "auto",
                 "axisSoftMin": 0,
@@ -1732,6 +1884,9 @@ data:
                 "lineWidth": 1,
                 "scaleDistribution": {
                   "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
                 }
               },
               "links": [
@@ -1746,8 +1901,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1762,7 +1916,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 48
+            "y": 54
           },
           "id": 28,
           "options": {
@@ -1805,7 +1959,6 @@ data:
             }
           ],
           "title": "Count of Outdated Images per cluster",
-          "transparent": true,
           "type": "barchart"
         },
         {
@@ -1820,6 +1973,8 @@ data:
                 "mode": "palette-classic"
               },
               "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
                 "axisLabel": "",
                 "axisPlacement": "auto",
                 "axisSoftMin": 0,
@@ -1833,6 +1988,9 @@ data:
                 "lineWidth": 1,
                 "scaleDistribution": {
                   "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
                 }
               },
               "links": [
@@ -1847,8 +2005,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1863,7 +2020,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 48
+            "y": 54
           },
           "id": 32,
           "options": {
@@ -1898,15 +2055,14 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "select ClusterName,count(Id) AS Events from default.events\ngroup by ClusterName",
-              "rawQuery": "select ClusterName,count(Id) AS Events from default.events\ngroup by ClusterName",
+              "query": "select ClusterName,count(Id) AS Events from default.events\nWHERE $timeFilterByColumn(EventTime) \ngroup by ClusterName",
+              "rawQuery": "select ClusterName,count(Id) AS Events from default.events\nWHERE EventTime >= toDateTime(1693460253) AND EventTime <= toDateTime(1693460553) \ngroup by ClusterName",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Count of Events per cluster",
-          "transparent": true,
           "type": "barchart"
         },
         {
@@ -1922,6 +2078,8 @@ data:
                 "mode": "fixed"
               },
               "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
                 "axisLabel": "",
                 "axisPlacement": "auto",
                 "axisSoftMin": 0,
@@ -1935,6 +2093,9 @@ data:
                 "lineWidth": 1,
                 "scaleDistribution": {
                   "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
                 }
               },
               "links": [
@@ -1949,8 +2110,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1965,7 +2125,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 48
+            "y": 54
           },
           "id": 30,
           "options": {
@@ -2008,7 +2168,6 @@ data:
             }
           ],
           "title": "Count of Resources per cluster",
-          "transparent": true,
           "type": "barchart"
         },
         {
@@ -2024,8 +2183,11 @@ data:
               },
               "custom": {
                 "align": "center",
-                "displayMode": "gradient-gauge",
-                "filterable": true
+                "cellOptions": {
+                  "type": "color-text"
+                },
+                "filterable": true,
+                "inspect": false
               },
               "links": [
                 {
@@ -2039,8 +2201,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "light-yellow",
@@ -2053,13 +2214,30 @@ data:
                 ]
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Resources"
+                },
+                "properties": [
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "gradient",
+                      "type": "gauge",
+                      "valueDisplayMode": "text"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "gridPos": {
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 56
+            "y": 62
           },
           "id": 42,
           "options": {
@@ -2074,7 +2252,7 @@ data:
             },
             "showHeader": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -2094,20 +2272,19 @@ data:
             }
           ],
           "title": " Resources per Cluster by Kind",
-          "transparent": true,
           "type": "table"
         },
         {
           "collapsed": true,
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "e06865c2-5bcc-4533-8de7-880298c555af"
           },
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 63
+            "y": 69
           },
           "id": 16,
           "panels": [
@@ -2150,11 +2327,13 @@ data:
                 "h": 16,
                 "w": 24,
                 "x": 0,
-                "y": 217
+                "y": 70
               },
               "id": 14,
               "options": {
+                "cellHeight": "sm",
                 "footer": {
+                  "countRows": false,
                   "fields": "",
                   "reducer": [
                     "sum"
@@ -2163,7 +2342,7 @@ data:
                 },
                 "showHeader": true
               },
-              "pluginVersion": "9.3.2",
+              "pluginVersion": "10.0.3",
               "targets": [
                 {
                   "datasource": {
@@ -2191,7 +2370,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "e06865c2-5bcc-4533-8de7-880298c555af"
               },
               "refId": "A"
             }
@@ -2203,13 +2382,13 @@ data:
           "collapsed": true,
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "e06865c2-5bcc-4533-8de7-880298c555af"
           },
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 64
+            "y": 70
           },
           "id": 12,
           "panels": [
@@ -2292,7 +2471,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "e06865c2-5bcc-4533-8de7-880298c555af"
               },
               "refId": "A"
             }
@@ -2304,13 +2483,13 @@ data:
           "collapsed": true,
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "e06865c2-5bcc-4533-8de7-880298c555af"
           },
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 65
+            "y": 71
           },
           "id": 8,
           "panels": [
@@ -2394,7 +2573,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "e06865c2-5bcc-4533-8de7-880298c555af"
               },
               "refId": "A"
             }
@@ -2406,13 +2585,13 @@ data:
           "collapsed": true,
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "e06865c2-5bcc-4533-8de7-880298c555af"
           },
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 66
+            "y": 72
           },
           "id": 4,
           "panels": [
@@ -2496,7 +2675,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "e06865c2-5bcc-4533-8de7-880298c555af"
               },
               "refId": "A"
             }
@@ -2506,21 +2685,21 @@ data:
         }
       ],
       "refresh": "",
-      "schemaVersion": 35,
+      "schemaVersion": 38,
       "style": "dark",
       "tags": [],
       "templating": {
         "list": []
       },
       "time": {
-        "from": "now-6h",
+        "from": "now-30m",
         "to": "now"
       },
       "timepicker": {},
       "timezone": "",
       "title": "Kubviz Dashboard",
       "uid": "eT4fox94z",
-      "version": 8,
+      "version": 4,
       "weekStart": ""
     }
 {{- end }}
