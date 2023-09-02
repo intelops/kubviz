@@ -264,7 +264,7 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	if _, err := stmt.Exec(
 		metrics.ClusterName,
 		string(metrics.Event.UID),
-		time.Now().UTC().Unix(),
+		time.Now().UTC(),
 		metrics.Type,
 		metrics.Event.Name,
 		metrics.Event.Namespace,

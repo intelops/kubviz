@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"strings"
-	"sync"
 
 	"github.com/aquasecurity/trivy/pkg/types"
 	"github.com/google/uuid"
@@ -14,8 +13,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
-	defer wg.Done()
+func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext, errCh chan error) {
 	images, err := ListImages(config)
 	if err != nil {
 		log.Fatal(err)
@@ -31,18 +29,18 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext, wg *sync.
 
 		parts := strings.SplitN(out, "{", 2)
 		if len(parts) <= 1 {
-			log.Println("No output from command", err)
+			log.Println("No output from image scan command", err)
 			continue // Move on to the next image if there's no output
 		}
 
-		log.Println("Command logs", parts[0])
+		log.Println("Command logs for image", parts[0])
 		jsonPart := "{" + parts[1]
-		log.Println("First 200 lines output", jsonPart[:200])
-		log.Println("Last 200 lines output", jsonPart[len(jsonPart)-200:])
+		log.Println("First 200 image scan lines output", jsonPart[:200])
+		log.Println("Last 200 image scan lines output", jsonPart[len(jsonPart)-200:])
 
 		err = json.Unmarshal([]byte(jsonPart), &report)
 		if err != nil {
-			log.Printf("Error occurred while Unmarshalling json: %v", err)
+			log.Printf("Error occurred while Unmarshalling json for image: %v", err)
 			continue // Move on to the next image in case of an error
 		}
 		publishImageScanReports(report, js, errCh)
@@ -62,6 +60,6 @@ func publishImageScanReports(report types.Report, js nats.JetStreamContext, errC
 	if err != nil {
 		errCh <- err
 	}
-	log.Printf("Trivy report with ID:%s has been published\n", metrics.ID)
+	log.Printf("Trivy image report with ID:%s has been published\n", metrics.ID)
 	errCh <- nil
 }
