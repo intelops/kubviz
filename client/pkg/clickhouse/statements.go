@@ -15,8 +15,8 @@ const kubvizTable DBStatement = `
 		Reason       String,
 		Host         String,
 		Event        String,
-		FirstTime   DateTime('UTC'),
-		LastTime    DateTime('UTC')
+		FirstTime   String,
+		LastTime    String
 	) engine=File(TabSeparated)
 `
 const rakeesTable DBStatement = `
