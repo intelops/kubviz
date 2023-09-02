@@ -258,10 +258,13 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	)
 	defer stmt.Close()
 	eventJson, _ := json.Marshal(metrics.Event)
+	formattedFirstTimestamp := metrics.Event.FirstTimestamp.Time.UTC().Format("2006-01-02 15:04:05")
+	formattedLastTimestamp := metrics.Event.LastTimestamp.Time.UTC().Format("2006-01-02 15:04:05")
+
 	if _, err := stmt.Exec(
 		metrics.ClusterName,
 		string(metrics.Event.UID),
-		time.Now().UTC().Unix(),
+		time.Now().UTC(),
 		metrics.Type,
 		metrics.Event.Name,
 		metrics.Event.Namespace,
@@ -270,8 +273,8 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 		metrics.Event.Reason,
 		metrics.Event.Source.Host,
 		string(eventJson),
-		metrics.Event.FirstTimestamp.Time.UTC().Unix(),
-		metrics.Event.LastTimestamp.Time.UTC().Unix(),
+		formattedFirstTimestamp,
+		formattedLastTimestamp,
 	); err != nil {
 		log.Fatal(err)
 	}

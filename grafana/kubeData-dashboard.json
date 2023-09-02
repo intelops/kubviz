@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 15,
+  "id": 1,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -75,7 +75,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
@@ -87,8 +87,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT\n    count()\nFROM default.events\n\nWHERE Kind IN ('Pod') AND Reason IN ('Created') AND Namespace IN ($namespace)\n",
-          "rawQuery": "SELECT\n    count()\nFROM default.events\n\nWHERE Kind IN ('Pod') AND Reason IN ('Created') AND Namespace IN ('argocd','quality','default','sonarqube','observability')",
+          "query": "SELECT\n    count()\nFROM default.events\n\nWHERE $timeFilterByColumn(EventTime) AND Kind IN ('Pod') AND Reason IN ('Created') AND Namespace IN ($namespace)\n",
+          "rawQuery": "SELECT\n    count()\nFROM default.events\n\nWHERE EventTime >= toDateTime(1693485465) AND EventTime <= toDateTime(1693486365) AND Kind IN ('Pod') AND Reason IN ('Created') AND Namespace IN ('argocd','kubviz','default','observability','otel-collector','tek','sonarqube','tekton-pipelines','cert-manager','kube-system','quality','traefik','tracetestdemo')",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -110,7 +110,9 @@
           },
           "custom": {
             "align": "center",
-            "displayMode": "color-text",
+            "cellOptions": {
+              "type": "color-text"
+            },
             "filterable": true,
             "inspect": false
           },
@@ -139,7 +141,9 @@
       },
       "id": 2,
       "options": {
+        "cellHeight": "sm",
         "footer": {
+          "countRows": false,
           "fields": "",
           "reducer": [
             "sum"
@@ -148,7 +152,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
@@ -160,8 +164,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT * FROM default.events\nWHERE Namespace IN ($namespace) AND Reason IN ($reason) AND Kind IN ($kind) AND ClusterName IN ($clusterName)",
-          "rawQuery": "SELECT * FROM default.events\nWHERE Namespace IN ('argocd','quality','default','sonarqube','observability') AND Reason IN ('OperationStarted','ResourceUpdated','OperationCompleted','FailedMount','ApplyClusterRoles','ApplyRoles','UpdateFailed','Unhealthy','InstallPackageRevision','Valid','Updated','RenderCRD','BackOff','BindClusterRole','SyncPackage') AND Kind IN ('Application','Pod','ProviderRevision','CompositeResourceDefinition','Namespace','ExternalSecret','Provider','SecretStore') AND ClusterName IN ('kubviz')",
+          "query": "SELECT * FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Namespace IN ($namespace) AND Reason IN ($reason) AND Kind IN ($kind) AND ClusterName IN ($clusterName)\nORDER BY EventTime DESC",
+          "rawQuery": "SELECT * FROM default.events\nWHERE EventTime >= toDateTime(1693486140) AND EventTime <= toDateTime(1693486440) AND Namespace IN ('argocd','kubviz','default','observability','otel-collector','tek','sonarqube','tekton-pipelines','cert-manager','kube-system','quality','traefik','tracetestdemo') AND Reason IN ('OperationCompleted','Pulled','Created','Started','OperationStarted','SuccessfulCreate','Scheduled','BackOff','Pulling','Unhealthy','Killing','FinalizerUpdate','WaitForFirstConsumer','Running','ExternalProvisioning','Provisioning','Pending','ProvisioningFailed','ProvisioningSucceeded','SuccessfulAttachVolume','Succeeded','Failed','FailedGetResourceMetric','FailedComputeMetricsReplicas','NodeNotReady','NodeHasSufficientMemory','NodeHasNoDiskPressure','NodeHasSufficientPID','NodeReady') AND Kind IN ('Application','Pod','ReplicaSet','StatefulSet','PipelineRun','PersistentVolumeClaim','TaskRun','HorizontalPodAutoscaler','Node') AND ClusterName IN ('dev')\nORDER BY EventTime DESC",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -172,7 +176,8 @@
       "type": "table"
     }
   ],
-  "schemaVersion": 37,
+  "refresh": "",
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -272,7 +277,7 @@
     ]
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
