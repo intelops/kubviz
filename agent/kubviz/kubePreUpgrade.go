@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/intelops/kubviz/constants"
 	"io"
 	"net/http"
 	"os"
 	"strings"
-	"sync"
+
+	"github.com/intelops/kubviz/constants"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -79,29 +79,26 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 	return nil
 }
 
-func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
-	defer wg.Done()
+func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error {
 	swaggerdir, err := os.MkdirTemp("", "kubepug")
 	if err != nil {
-		errCh <- err
+		return err
 	}
 	filename := fmt.Sprintf("%s/swagger-%s.json", swaggerdir, k8sVersion)
 	url := fmt.Sprintf("%s/%s/%s", baseURL, k8sVersion, fileURL)
 	err = downloadFile(filename, url)
 	if err != nil {
-		errCh <- err
+		return err
 	}
 	defer os.RemoveAll(filename)
 	swaggerfile := filename
 	kubernetesAPIs, err := PopulateKubeAPIMap(swaggerfile)
 	if err != nil {
-		errCh <- err
+		return err
 	}
 	result = getResults(config, kubernetesAPIs)
 	err = publishK8sDepricated_Deleted_Api(result, js)
-	errCh <- err
-	// b, _ := json.MarshalIndent(result, "", " ")
-	// fmt.Printf("%s", string(b))
+	return err
 }
 
 func PopulateKubeAPIMap(swagfile string) (model.KubernetesAPIs, error) {

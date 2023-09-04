@@ -13,7 +13,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext, errCh chan error) {
+func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 	images, err := ListImages(config)
 	if err != nil {
 		log.Fatal(err)
@@ -43,13 +43,15 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext, errCh cha
 			log.Printf("Error occurred while Unmarshalling json for image: %v", err)
 			continue // Move on to the next image in case of an error
 		}
-		publishImageScanReports(report, js, errCh)
-		// If you want to publish the report or perform any other action with it, you can do it here
-
+		err = publishImageScanReports(report, js)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func publishImageScanReports(report types.Report, js nats.JetStreamContext, errCh chan error) {
+func publishImageScanReports(report types.Report, js nats.JetStreamContext) error {
 	metrics := model.TrivyImage{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,
@@ -58,8 +60,8 @@ func publishImageScanReports(report types.Report, js nats.JetStreamContext, errC
 	metricsJson, _ := json.Marshal(metrics)
 	_, err := js.Publish(constants.TRIVY_IMAGE_SUBJECT, metricsJson)
 	if err != nil {
-		errCh <- err
+		return err
 	}
 	log.Printf("Trivy image report with ID:%s has been published\n", metrics.ID)
-	errCh <- nil
+	return nil
 }
