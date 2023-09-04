@@ -1,3 +1,5 @@
 civo
 migration/
 info.txt
+Dockerfile
+Dockerfile-client
