@@ -73,7 +73,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable,quayContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, quayContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -141,11 +141,18 @@ func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload
 	defer stmt.Close()
 	dockerURL := pushEvent.DockerURL
 	repository := pushEvent.Repository
-	tag := pushEvent.UpdatedTags
-	name:=pushEvent.Name
-	nameSpace:=pushEvent.Namespace
-	homePage:=pushEvent.Homepage
-	
+	//tag := pushEvent.UpdatedTags
+	name := pushEvent.Name
+	nameSpace := pushEvent.Namespace
+	homePage := pushEvent.Homepage
+
+	var tag string
+	if pushEvent.UpdatedTags != nil {
+		tag = strings.Join(pushEvent.UpdatedTags, ",")
+	} else {
+		tag = ""
+	}
+
 	// Marshaling the pushEvent into a JSON string
 	pushEventJSON, err := json.Marshal(pushEvent)
 	if err != nil {
@@ -154,13 +161,13 @@ func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload
 	}
 
 	if _, err := stmt.Exec(
-		dockerURL,
-		repository,
-		tag,
 		name,
-		string(pushEventJSON),
+		repository,
 		nameSpace,
+		dockerURL,
 		homePage,
+		tag,
+		string(pushEventJSON),
 	); err != nil {
 		log.Fatal(err)
 	}
