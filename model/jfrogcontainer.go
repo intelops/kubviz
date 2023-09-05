@@ -8,7 +8,7 @@ type JfrogContainerPushEventPayload struct {
 		Path      string `json:"path"`
 		Name      string `json:"name"`
 		SHA256    string `json:"sha256"`
-		Size      int    `json:"size"`
+		Size      int32  `json:"size"`
 		ImageName string `json:"image_name"`
 		Tag       string `json:"tag"`
 	} `json:"data"`
