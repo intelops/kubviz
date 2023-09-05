@@ -73,7 +73,6 @@ func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
 }
 
 func main() {
-	fmt.Println("new code runs...")
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	env := Production
 	clusterMetricsChan := make(chan error, 1)
