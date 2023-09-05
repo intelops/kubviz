@@ -73,12 +73,12 @@ func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
 			var pushEvent model.JfrogContainerPushEventPayload
 			err := json.Unmarshal(msg.Data, &pushEvent)
 			if err != nil {
-				log.Printf("Error while unmarshaling Azure Container Registry payload: %v", err)
+				log.Printf("Error while unmarshaling Jgrog Container Registry payload: %v", err)
 				return
 			}
 			// Extract the necessary information from pushEvent and insert into ClickHouse
 			conn.InsertContainerEventJfrog(pushEvent)
-			log.Println("Inserted Azure Container Registry metrics:", string(msg.Data))
+			log.Println("Inserted Jfrog Container Registry metrics:", string(msg.Data))
 		}
 
 	}, nats.Durable(string(containerConsumer)), nats.ManualAck())

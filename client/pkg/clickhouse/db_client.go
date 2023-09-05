@@ -195,7 +195,7 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 	// Marshaling the pushEvent into a JSON string
 	pushEventJSON, err := json.Marshal(pushEvent)
 	if err != nil {
-		log.Printf("Error while marshaling Azure Container Registry payload: %v", err)
+		log.Printf("Error while marshaling Jfrog Container Registry payload: %v", err)
 		return
 	}
 
