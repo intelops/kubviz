@@ -145,7 +145,7 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 	if tag == "" {
 		tag = "latest"
 	}
-	imageName := registryURL + "/" + repositoryName + ":" + tag
+	imageName := pushEvent.Data.ImageName
 	size := pushEvent.Data.Size
 	shaID := pushEvent.Data.SHA256
 
@@ -157,15 +157,15 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 	}
 
 	if _, err := stmt.Exec(
+		pushEvent.Domain,
+		pushEvent.EventType,
 		registryURL,
 		repositoryName,
 		tag,
 		imageName,
-		string(pushEventJSON),
-		pushEvent.Domain,
-		pushEvent.EventType,
 		size,
 		shaID,
+		string(pushEventJSON),
 	); err != nil {
 		log.Fatal(err)
 	}
