@@ -30,6 +30,7 @@ import (
 
 	//  _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 // constants for jetstream
@@ -73,71 +74,71 @@ func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
 
 func main() {
 	fmt.Println("new code runs...")
-	// log.SetFlags(log.LstdFlags | log.Lshortfile)
-	// env := Production
-	// clusterMetricsChan := make(chan error, 1)
-	// var (
-	// 	config    *rest.Config
-	// 	clientset *kubernetes.Clientset
-	// )
-	// // connecting with nats ...
-	// nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
-	// checkErr(err)
-	// // creating a jetstream connection using the nats connection
-	// js, err := nc.JetStream()
-	// checkErr(err)
-	// // creating a stream with stream name METRICS
-	// err = createStream(js)
-	// checkErr(err)
-	// //setupAgent()
-	// if env != Production {
-	// 	config, err = clientcmd.BuildConfigFromFlags("", cluster_conf_loc)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	clientset = getK8sClient(config)
-	// } else {
-	// 	config, err = rest.InClusterConfig()
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	clientset = getK8sClient(config)
-	// }
-	// controlChan := make(chan bool)
-	// go publishMetrics(clientset, js, clusterMetricsChan, controlChan)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	env := Production
+	clusterMetricsChan := make(chan error, 1)
+	var (
+		config    *rest.Config
+		clientset *kubernetes.Clientset
+	)
+	// connecting with nats ...
+	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+	checkErr(err)
+	// creating a jetstream connection using the nats connection
+	js, err := nc.JetStream()
+	checkErr(err)
+	// creating a stream with stream name METRICS
+	err = createStream(js)
+	checkErr(err)
+	//setupAgent()
+	if env != Production {
+		config, err = clientcmd.BuildConfigFromFlags("", cluster_conf_loc)
+		if err != nil {
+			log.Fatal(err)
+		}
+		clientset = getK8sClient(config)
+	} else {
+		config, err = rest.InClusterConfig()
+		if err != nil {
+			log.Fatal(err)
+		}
+		clientset = getK8sClient(config)
+	}
+	controlChan := make(chan bool)
+	go publishMetrics(clientset, js, clusterMetricsChan, controlChan)
 
-	// collectAndPublishMetrics := func() {
-	// 	err := outDatedImages(config, js)
-	// 	LogErr(err)
-	// 	err = KubePreUpgradeDetector(config, js)
-	// 	LogErr(err)
-	// 	err = GetAllResources(config, js)
-	// 	LogErr(err)
-	// 	err = RakeesOutput(config, js)
-	// 	LogErr(err)
-	// 	// getK8sEvents(clientset)
-	// 	err = runTrivyScans(config, js)
-	// 	LogErr(err)
-	// 	err = RunKubeScore(clientset, js)
-	// 	LogErr(err)
-	// }
+	collectAndPublishMetrics := func() {
+		err := outDatedImages(config, js)
+		LogErr(err)
+		err = KubePreUpgradeDetector(config, js)
+		LogErr(err)
+		err = GetAllResources(config, js)
+		LogErr(err)
+		err = RakeesOutput(config, js)
+		LogErr(err)
+		// getK8sEvents(clientset)
+		err = runTrivyScans(config, js)
+		LogErr(err)
+		err = RunKubeScore(clientset, js)
+		LogErr(err)
+	}
 
-	// controlChan <- true
-	// collectAndPublishMetrics()
-	// controlChan <- true
-	// if schedulingIntervalStr == "" {
-	// 	schedulingIntervalStr = "20m"
-	// }
-	// schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
-	// if err != nil {
-	// 	log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
-	// }
+	controlChan <- true
+	collectAndPublishMetrics()
+	controlChan <- true
+	if schedulingIntervalStr == "" {
+		schedulingIntervalStr = "20m"
+	}
+	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
+	if err != nil {
+		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+	}
 	s := gocron.NewScheduler(time.UTC)
-	// s.Every(schedulingInterval).Do(func() {
-	// 	controlChan <- true
-	// 	collectAndPublishMetrics()
-	// 	controlChan <- true
-	// })
+	s.Every(schedulingInterval).Do(func() {
+		controlChan <- true
+		collectAndPublishMetrics()
+		controlChan <- true
+	})
 	s.StartBlocking()
 }
 
