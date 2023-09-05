@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS DeletedAPIs (
 ) engine=File(TabSeparated)
 `
 const jfrogContainerPushEventTable DBStatement = `
-	CREATE TABLE IF NOT EXISTS azurecontainerpush (
+	CREATE TABLE IF NOT EXISTS jfrogcontainerpush (
 		Domain String,
 		EventType String,
 		RegistryURL String,
