@@ -22,7 +22,6 @@ import (
 
 	"fmt"
 
-	"github.com/ghodss/yaml"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -117,7 +116,7 @@ func main() {
 		LogErr(err)
 		err = RakeesOutput(config, js)
 		LogErr(err)
-		getK8sEvents(clientset)
+		// getK8sEvents(clientset)
 		err = runTrivyScans(config, js)
 		LogErr(err)
 		err = RunKubeScore(clientset, js)
@@ -156,7 +155,7 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 	if err != nil {
 		return true, err
 	}
-	log.Printf("Metrics with ID:%s has been published\n", id)
+	// log.Printf("Metrics with ID:%s has been published\n", id)
 	return false, nil
 }
 
@@ -252,22 +251,22 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
-				fmt.Printf("Event namespace: %s \n", event.GetNamespace())
-				y, err := yaml.Marshal(event)
-				if err != nil {
-					fmt.Printf("err: %v\n", err)
-				}
-				fmt.Printf("Add event: %s \n", y)
+				// fmt.Printf("Event namespace: %s \n", event.GetNamespace())
+				// y, err := yaml.Marshal(event)
+				// if err != nil {
+				// 	fmt.Printf("err: %v\n", err)
+				// }
+				// fmt.Printf("Add event: %s \n", y)
 				publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js)
 			},
 			DeleteFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
-				fmt.Printf("Delete event: %s \n", obj)
+				// fmt.Printf("Delete event: %s \n", obj)
 				publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				event := newObj.(*v1.Event)
-				fmt.Printf("Change event \n")
+				// fmt.Printf("Change event \n")
 				publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js)
 			},
 		},
