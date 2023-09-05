@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/intelops/kubviz/constants"
 	"log"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
+
+	"github.com/intelops/kubviz/constants"
 
 	"github.com/intelops/kubviz/agent/kubviz/rakkess"
 	"github.com/intelops/kubviz/model"
@@ -33,17 +33,17 @@ func accessToOutcome(access rakkess.Access) (rakkess.Outcome, error) {
 	}
 }
 
-func RakeesOutput(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
+func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
 	// Create a new Kubernetes client
 	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		errCh <- err
+		return err
 	}
 
 	// Retrieve all available resource types
 	resourceList, err := client.Discovery().ServerPreferredResources()
 	if err != nil {
-		errCh <- err
+		return err
 	}
 	var opts = rakkess.NewRakkessOptions()
 	opts.Verbs = []string{"list", "create", "update", "delete"}
@@ -56,25 +56,25 @@ func RakeesOutput(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGr
 	res, err := rakkess.Resource(ctx, opts)
 	if err != nil {
 		fmt.Println("Error")
-		errCh <- err
+		return err
 	}
 	fmt.Println("Result..")
 	for resourceType, access := range res {
 		createOutcome, err := accessToOutcome(access["create"])
 		if err != nil {
-			errCh <- err
+			return err
 		}
 		deleteOutcome, err := accessToOutcome(access["delete"])
 		if err != nil {
-			errCh <- err
+			return err
 		}
 		listOutcome, err := accessToOutcome(access["list"])
 		if err != nil {
-			errCh <- err
+			return err
 		}
 		updateOutcome, err := accessToOutcome(access["update"])
 		if err != nil {
-			errCh <- err
+			return err
 		}
 		metrics := model.RakeesMetrics{
 			ClusterName: ClusterName,
@@ -87,12 +87,11 @@ func RakeesOutput(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGr
 		metricsJson, _ := json.Marshal(metrics)
 		_, err = js.Publish(constants.EventSubject_rakees, metricsJson)
 		if err != nil {
-			errCh <- err
+			return err
 		}
 		log.Printf("Metrics with resource %s has been published", resourceType)
 	}
-	// t := res.Table(opts.Verbs)
-	// t.Render(opts.Streams.Out, opts.OutputFormat)
+	return nil
 
 }
 

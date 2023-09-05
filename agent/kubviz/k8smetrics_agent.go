@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -57,11 +56,21 @@ var (
 	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
-func runTrivyScans(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan chan error) {
-	RunTrivyK8sClusterScan(js, trivyK8sMetricsChan)
-	RunTrivyImageScans(config, js, trivyImagescanChan)
-	RunTrivySbomScan(config, js, trivySbomcanChan)
-	wg.Done()
+func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
+	err := RunTrivyK8sClusterScan(js)
+	if err != nil {
+		return err
+	}
+	err = RunTrivyImageScans(config, js)
+	if err != nil {
+		return err
+	}
+	err = RunTrivySbomScan(config, js)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
 func main() {
@@ -69,7 +78,6 @@ func main() {
 	env := Production
 	clusterMetricsChan := make(chan error, 1)
 	var (
-		wg        sync.WaitGroup
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
@@ -100,90 +108,22 @@ func main() {
 	// starting the endless go routine to monitor the cluster
 	go publishMetrics(clientset, js, clusterMetricsChan)
 
-	// starting all the go routines
 	collectAndPublishMetrics := func() {
-		// error channels declared for the go routines
-		outdatedErrChan := make(chan error, 1)
-		kubePreUpgradeChan := make(chan error, 1)
-		getAllResourceChan := make(chan error, 1)
-		trivyK8sMetricsChan := make(chan error, 1)
-		kubescoreMetricsChan := make(chan error, 1)
-		trivyImagescanChan := make(chan error, 1)
-		trivySbomcanChan := make(chan error, 1)
-		RakeesErrChan := make(chan error, 1)
-		// Start a goroutine to handle errors
-		doneChan := make(chan bool)
-		go func() {
-			// for loop will wait for the error channels
-			// logs if any error occurs
-			for {
-				select {
-				case err := <-outdatedErrChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-kubePreUpgradeChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-getAllResourceChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-clusterMetricsChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-kubescoreMetricsChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-trivyImagescanChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-trivySbomcanChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-trivyK8sMetricsChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case err := <-RakeesErrChan:
-					if err != nil {
-						log.Println(err)
-					}
-				case <-doneChan:
-					return // All other goroutines have finished, so exit the goroutine
-				}
-			}
-		}()
-		wg.Add(7) // Initialize the WaitGroup for the seven goroutines
-		// ... start other goroutines ...
-		go outDatedImages(config, js, &wg, outdatedErrChan)
-		go KubePreUpgradeDetector(config, js, &wg, kubePreUpgradeChan)
-		go GetAllResources(config, js, &wg, getAllResourceChan)
-		go RakeesOutput(config, js, &wg, RakeesErrChan)
-		go getK8sEvents(clientset)
-		// Run these functions sequentially within a single goroutine using the wrapper function
-		go runTrivyScans(config, js, &wg, trivyImagescanChan, trivySbomcanChan, trivyK8sMetricsChan)
-		go RunKubeScore(clientset, js, &wg, kubescoreMetricsChan)
-		wg.Wait()
-		// once the go routines completes we will close the error channels
-		close(outdatedErrChan)
-		close(kubePreUpgradeChan)
-		close(getAllResourceChan)
-		// close(clusterMetricsChan)
-		close(kubescoreMetricsChan)
-		close(trivyImagescanChan)
-		close(trivySbomcanChan)
-		close(trivyK8sMetricsChan)
-		close(RakeesErrChan)
-		// Signal that all other goroutines have finished
-		doneChan <- true
-		close(doneChan)
+		err := outDatedImages(config, js)
+		LogErr(err)
+		err = KubePreUpgradeDetector(config, js)
+		LogErr(err)
+		err = GetAllResources(config, js)
+		LogErr(err)
+		err = RakeesOutput(config, js)
+		LogErr(err)
+		getK8sEvents(clientset)
+		err = runTrivyScans(config, js)
+		LogErr(err)
+		err = RunKubeScore(clientset, js)
+		LogErr(err)
 	}
+
 	collectAndPublishMetrics()
 	if schedulingIntervalStr == "" {
 		schedulingIntervalStr = "20m" // Default value, e.g., 20 minutes
@@ -201,7 +141,6 @@ func main() {
 // with subject "METRICS.created"
 func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
 	watchK8sEvents(clientset, js)
-
 	errCh <- nil
 }
 
@@ -294,7 +233,11 @@ func checkErr(err error) {
 		log.Fatal(err)
 	}
 }
-
+func LogErr(err error) {
+	if err != nil {
+		log.Println(err)
+	}
+}
 func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 	watchlist := cache.NewListWatchFromClient(
 		clientset.CoreV1().RESTClient(),

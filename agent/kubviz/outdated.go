@@ -66,12 +66,11 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 	return nil
 }
 
-func outDatedImages(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
-	defer wg.Done()
+func outDatedImages(config *rest.Config, js nats.JetStreamContext) error {
 	images, err := ListImages(config)
 	if err != nil {
 		log.Println("unable to list images")
-		errCh <- err
+		return err
 	}
 	for _, image := range images {
 		namespace := image.Namespace
@@ -92,7 +91,7 @@ func outDatedImages(config *rest.Config, js nats.JetStreamContext, wg *sync.Wait
 			final.Pod = pod
 			err := PublishOutdatedImages(final, js)
 			if err != nil {
-				errCh <- err
+				return err
 			}
 		} else {
 			if checkResult != nil {
@@ -108,7 +107,7 @@ func outDatedImages(config *rest.Config, js nats.JetStreamContext, wg *sync.Wait
 					final.Pod = pod
 					err := PublishOutdatedImages(final, js)
 					if err != nil {
-						errCh <- err
+						return err
 					}
 				} else {
 					tagtrunk := truncateTagName(tag)
@@ -125,12 +124,13 @@ func outDatedImages(config *rest.Config, js nats.JetStreamContext, wg *sync.Wait
 					final.Pod = pod
 					err := PublishOutdatedImages(final, js)
 					if err != nil {
-						errCh <- err
+						return err
 					}
 				}
 			}
 		}
 	}
+	return nil
 }
 
 func ParseImageName(imageName string) (string, string, string, error) {

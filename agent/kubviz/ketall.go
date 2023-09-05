@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/intelops/kubviz/constants"
-	"sync"
 	"time"
+
+	"github.com/intelops/kubviz/constants"
 
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
@@ -28,8 +28,7 @@ func PublishAllResources(result model.Resource, js nats.JetStreamContext) error 
 	return nil
 }
 
-func GetAllResources(config *rest.Config, js nats.JetStreamContext, wg *sync.WaitGroup, errCh chan error) {
-	defer wg.Done()
+func GetAllResources(config *rest.Config, js nats.JetStreamContext) error {
 	// TODO: upto this uncomment for production
 	// Create a new discovery client to discover all resources in the cluster
 	dc := discovery.NewDiscoveryClientForConfigOrDie(config)
@@ -37,19 +36,16 @@ func GetAllResources(config *rest.Config, js nats.JetStreamContext, wg *sync.Wai
 	// Create a new dynamic client to list resources in the cluster
 	dynamicClient, err := dynamic.NewForConfig(config)
 	if err != nil {
-		log.Error(err)
-		errCh <- err
+		return err
 	}
 	// Get a list of all available API groups and versions in the cluster
 	resourceLists, err := dc.ServerPreferredResources()
 	if err != nil {
-		log.Error(err)
-		errCh <- err
+		return err
 	}
 	gvrs, err := discovery.GroupVersionResources(resourceLists)
 	if err != nil {
-		panic(err)
-		errCh <- err
+		return err
 	}
 	// Iterate over all available API groups and versions and list all resources in each group
 	for gvr := range gvrs {
@@ -81,9 +77,9 @@ func GetAllResources(config *rest.Config, js nats.JetStreamContext, wg *sync.Wai
 			}
 			err := PublishAllResources(resource, js)
 			if err != nil {
-				errCh <- err
+				return err
 			}
 		}
 	}
-	errCh <- nil
+	return nil
 }

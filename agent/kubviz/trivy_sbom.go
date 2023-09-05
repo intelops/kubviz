@@ -14,7 +14,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func publishTrivySbomReport(report model.Sbom, js nats.JetStreamContext, errCh chan error) {
+func publishTrivySbomReport(report model.Sbom, js nats.JetStreamContext) error {
 	metrics := model.Reports{
 		ID:     uuid.New().String(),
 		Report: report,
@@ -22,11 +22,11 @@ func publishTrivySbomReport(report model.Sbom, js nats.JetStreamContext, errCh c
 	metricsJson, _ := json.Marshal(metrics)
 	_, err := js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
 	if err != nil {
-		errCh <- err
+		return err
 	}
 
 	log.Printf("Trivy report with BomFormat:%v has been published\n", metrics.Report.BomFormat)
-	errCh <- nil
+	return nil
 }
 
 func executeCommandSbom(command string) ([]byte, error) {
@@ -44,7 +44,7 @@ func executeCommandSbom(command string) ([]byte, error) {
 	return outc.Bytes(), err
 }
 
-func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, errCh chan error) {
+func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 	log.Println("trivy sbom run started")
 	images, err := ListImages(config)
 
@@ -77,6 +77,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext, errCh chan 
 		log.Println("report", report)
 
 		// Publish the report using the given function
-		publishTrivySbomReport(report, js, errCh)
+		publishTrivySbomReport(report, js)
 	}
+	return nil
 }
