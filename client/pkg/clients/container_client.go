@@ -76,7 +76,7 @@ func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
 				log.Printf("Error while unmarshaling Jfrog Container Registry payload: %v", err)
 				return
 			}
-			// Extract the necessary information from pushEvent and insert into ClickHouse
+			// Extract the necessary information from pushEvent and insert into ClickHouse.
 			conn.InsertContainerEventJfrog(pushEvent)
 			log.Println("Inserted Jfrog Container Registry metrics:", string(msg.Data))
 		}
