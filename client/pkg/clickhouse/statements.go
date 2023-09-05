@@ -51,6 +51,19 @@ CREATE TABLE IF NOT EXISTS DeletedAPIs (
 	Scope String
 ) engine=File(TabSeparated)
 `
+const jfrogContainerPushEventTable DBStatement = `
+	CREATE TABLE IF NOT EXISTS azurecontainerpush (
+		Domain String,
+		EventType String,
+		RegistryURL String,
+		RepositoryName String,
+		SHAID String,
+		Size Int32,
+		ImageName String,
+		Tag String,
+		Event String
+	) engine=File(TabSeparated)
+	`
 const ketallTable DBStatement = `
 CREATE TABLE IF NOT EXISTS getall_resources (
 	ClusterName String,
@@ -211,3 +224,4 @@ const InsertTrivyMisconfig string = "INSERT INTO trivy_misconfig (id, cluster_na
 const InsertAzureContainerPushEvent DBStatement = "INSERT INTO azurecontainerpush (RegistryURL, RepositoryName, Tag, ImageName, Event, Timestamp, Size, SHAID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertTrivySbom string = "INSERT INTO trivysbom (id, schema, bom_format,spec_version,serial_number,  version, metadata_timestamp,metatool_vendor,metatool_name,metatool_version,component_bom_ref,component_type,component_name,component_version,component_property_name,component_property_value,component_hash_alg,component_hash_content,component_license_exp,component_purl,dependency_ref) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 const InsertQuayContainerPushEvent DBStatement = "INSERT INTO quaycontainerpush (name, repository, nameSpace, dockerURL, homePage,tag, Event) VALUES (?, ?, ?, ?, ?, ?, ?)"
+const InsertJfrogContainerPushEvent DBStatement = "INSERT INTO jfrogcontainerpush (Domain, EventType,RegistryURL, RepositoryName,SHAID, Size, ImageName ,Tag, Event) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)"
