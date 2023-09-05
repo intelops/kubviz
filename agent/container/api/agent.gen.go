@@ -27,6 +27,9 @@ type ServerInterface interface {
 	// Post Dockerhub artifactory events
 	// (POST /event/docker/hub)
 	PostEventDockerHub(c *gin.Context)
+	// Post quay Container Registry webhook events
+	// (POST /event/quay/container)
+	PostEventQuayContainer(c *gin.Context)
 	// Kubernetes readiness and liveness probe endpoint
 	// (GET /status)
 	GetStatus(c *gin.Context)
@@ -69,6 +72,16 @@ func (siw *ServerInterfaceWrapper) PostEventDockerHub(c *gin.Context) {
 	}
 
 	siw.Handler.PostEventDockerHub(c)
+}
+
+// PostEventQuayContainer operation middleware
+func (siw *ServerInterfaceWrapper) PostEventQuayContainer(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.PostEventQuayContainer(c)
 }
 
 // GetStatus operation middleware
@@ -116,6 +129,8 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 
 	router.POST(options.BaseURL+"/event/docker/hub", wrapper.PostEventDockerHub)
 
+	router.POST(options.BaseURL+"/event/quay/container", wrapper.PostEventQuayContainer)
+
 	router.GET(options.BaseURL+"/status", wrapper.GetStatus)
 
 	return router
@@ -124,13 +139,14 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/6SSQWscMQyF/4rQebqzaW9zC01oQwoJ2d5CDh5buyMyaxtJnrJd5r8Xz9K0pCUJ7ckI",
-	"3nv6JOuIPu1zihRNsTvODXLcJuyOGEi9cDZOETv8mKI5jiTQC4cdwU2mCHeXm69wfnsFmsnzlr1b5A0a",
-	"20iv2zbPbBOJnvqdrdarNc4NpkzRZcYOP6zWqzNsMDsbKiu2LvO7kPxS7MjqkzLJknYVsMNPZOeZL6qk",
-	"QSHNKSot8vfr9Z9D3lzjPDeoZb93csAOv7AapG1lVciSJg4UoD+ADQRKMrGnOq3bKXb3mEs/sseHGtLS",
-	"RNFa970Itf7nGmrPnPQvqLdJ7bJazqvjaW//xl3DYAmCXz9wRztWkwN8o35I6REWQn2ZPyT/SNIOpX8D",
-	"+sUi/lz6/6A+ZQylByfGW+ctyeEVVDVn5cUr2JwUb8HS4j2pbssITzHPQK9LTxLJSEHIBY6kCi4GGHmi",
-	"pciSegKKISeO9ju38OSMKniNJKknj939EYuM2GGL88P8IwAA//90yrlhlQMAAA==",
+	"H4sIAAAAAAAC/6yTQW/TQBCF/8poziZO4eZbRCuoitTScKt6WK8nyajO7jIza2Qi/3e0jiiooBIKJ2uk",
+	"995882wf0Md9ioGCKTaHqUIOm4jNATtSL5yMY8AG38ZgjgMJtMLdluA6UYDbi/UnWN1cgibyvGHvZnmF",
+	"xtbTn23rJ7aBRI/7zhbLxRKnCmOi4BJjg28Wy8UZVpic7Qor1i7xqy76ediSlUdMJHPaZYcNviNbJT4v",
+	"kgqFNMWgNMtfL5e/Hnl9hdNUoeb93smIDX5gNYibwqqQJA7cUQftCLYjUJKBPZVr3VaxucOU25493peQ",
+	"mgYKVruvWaj232soO1PU36DeRLWLYlkVx2NvL+MuYTAHwY83cEtbVpMRvlC7i/EBZkJ9nr+L/oGk3uX2",
+	"BPTzWfw+t/9AfczY5RacGG+ctyjjSaifsxv/qumP2Y3/o+iy+OU9qznLz37C66PiFEDN3pPqJvfwGPME",
+	"+Sq3JIGMFIRcx4FUwYUOeh5oHpLEloBClyIH+5lbeHBGBbxEkpT/FZu7A2bpscEap/vpWwAAAP//KFB7",
+	"SlIEAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
