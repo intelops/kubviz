@@ -23,8 +23,8 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	}
 	log.Println("Command logs for k8s cluster scan", parts[0])
 	jsonPart := "{" + parts[1]
-	log.Println("First 200 k8s cluster scan lines output", jsonPart[:200])
-	log.Println("Last 200 k8s cluster scan lines output", jsonPart[len(jsonPart)-200:])
+	// log.Println("First 200 k8s cluster scan lines output", jsonPart[:200])
+	// log.Println("Last 200 k8s cluster scan lines output", jsonPart[len(jsonPart)-200:])
 	err = json.Unmarshal([]byte(jsonPart), &report)
 	if err != nil {
 		log.Printf("Error occurred while Unmarshalling json for k8s cluster scan: %v", err)
