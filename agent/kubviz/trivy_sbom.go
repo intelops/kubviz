@@ -52,7 +52,6 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		log.Printf("failed to list images: %v", err)
 	}
 	for _, image := range images {
-		fmt.Printf("pullable Image %#v\n", image.PullableImage)
 
 		command := fmt.Sprintf("trivy image --format cyclonedx %s %s", image.PullableImage, "--cache-dir /tmp/.cache")
 		out, err := executeCommandSbom(command)
@@ -74,7 +73,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
-		log.Println("report", report)
+		// log.Println("report", report)
 
 		// Publish the report using the given function
 		publishTrivySbomReport(report, js)
