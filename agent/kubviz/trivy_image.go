@@ -33,10 +33,10 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 			continue // Move on to the next image if there's no output
 		}
 
-		log.Println("Command logs for image", parts[0])
+		// log.Println("Command logs for image", parts[0])
 		jsonPart := "{" + parts[1]
-		log.Println("First 200 image scan lines output", jsonPart[:200])
-		log.Println("Last 200 image scan lines output", jsonPart[len(jsonPart)-200:])
+		// log.Println("First 200 image scan lines output", jsonPart[:200])
+		// log.Println("Last 200 image scan lines output", jsonPart[len(jsonPart)-200:])
 
 		err = json.Unmarshal([]byte(jsonPart), &report)
 		if err != nil {

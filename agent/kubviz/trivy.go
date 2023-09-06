@@ -15,13 +15,13 @@ import (
 func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	var report report.ConsolidatedReport
 	out, err := executeCommand("trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache")
-	log.Println("Commnd for k8s cluster scan: trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache")
+	// log.Println("Commnd for k8s cluster scan: trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache")
 	parts := strings.SplitN(out, "{", 2)
 	if len(parts) <= 1 {
 		log.Println("No output from k8s cluster scan command", err)
 		return err
 	}
-	log.Println("Command logs for k8s cluster scan", parts[0])
+	// log.Println("Command logs for k8s cluster scan", parts[0])
 	jsonPart := "{" + parts[1]
 	// log.Println("First 200 k8s cluster scan lines output", jsonPart[:200])
 	// log.Println("Last 200 k8s cluster scan lines output", jsonPart[len(jsonPart)-200:])
