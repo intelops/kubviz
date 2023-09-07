@@ -161,7 +161,7 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 	if err != nil {
 		return true, err
 	}
-	// log.Printf("Metrics with ID:%s has been published\n", id)
+	log.Printf("Metrics with ID:%s has been published\n", id)
 	return false, nil
 }
 
