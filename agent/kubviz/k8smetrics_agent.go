@@ -117,7 +117,7 @@ func main() {
 		// LogErr(err)
 		err = RunTrivyK8sClusterScan(clientset, js)
 		LogErr(err)
-		err = RunKubeScore(clientset, js)
+		//err = RunKubeScore(clientset, js)
 		// LogErr(err)// err = RunKubeScore(clientset, js)
 		// LogErr(err)
 	}
