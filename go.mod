@@ -11,7 +11,6 @@ require (
 	github.com/docker/docker v24.0.4+incompatible
 	github.com/genuinetools/reg v0.16.1
 	github.com/getkin/kin-openapi v0.118.0
-	github.com/ghodss/yaml v1.0.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-co-op/gocron v1.30.1
 	github.com/go-playground/webhooks/v6 v6.2.0
