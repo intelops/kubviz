@@ -104,22 +104,22 @@ func main() {
 	go publishMetrics(clientset, js, clusterMetricsChan, controlChan)
 
 	collectAndPublishMetrics := func() {
-		// err := outDatedImages(config, js)
-		// LogErr(err)
-		// err = KubePreUpgradeDetector(config, js)
-		// LogErr(err)
-		// err = GetAllResources(config, js)
-		// LogErr(err)
-		// err = RakeesOutput(config, js)
-		// LogErr(err)
-		// // getK8sEvents(clientset)
-		// err = runTrivyScans(config, js)
-		// LogErr(err)
+		err := outDatedImages(config, js)
+		LogErr(err)
+		err = KubePreUpgradeDetector(config, js)
+		LogErr(err)
+		err = GetAllResources(config, js)
+		LogErr(err)
+		err = RakeesOutput(config, js)
+		LogErr(err)
+		// getK8sEvents(clientset)
+		err = runTrivyScans(config, js)
+		LogErr(err)
 		err = RunTrivyK8sClusterScan(clientset, js)
 		LogErr(err)
-		//err = RunKubeScore(clientset, js)
-		// LogErr(err)// err = RunKubeScore(clientset, js)
-		// LogErr(err)
+		err = RunKubeScore(clientset, js)
+		LogErr(err) // err = RunKubeScore(clientset, js)
+
 	}
 
 	controlChan <- true
