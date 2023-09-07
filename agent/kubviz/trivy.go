@@ -53,7 +53,7 @@ func RunTrivyK8sClusterScan(clientset *kubernetes.Clientset, js nats.JetStreamCo
 		if err != nil {
 			log.Printf("Error occurred while publishing Trivy scan report for namespace %s: %v", namespace, err)
 		}
-		return nil
+
 	}
 	return nil
 }
