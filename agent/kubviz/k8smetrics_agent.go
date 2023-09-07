@@ -104,8 +104,7 @@ func main() {
 		}
 		clientset = getK8sClient(config)
 	}
-	controlChan := make(chan bool)
-	go publishMetrics(clientset, js, clusterMetricsChan, controlChan)
+	go publishMetrics(clientset, js, clusterMetricsChan)
 
 	collectAndPublishMetrics := func() {
 		err := outDatedImages(config, js)
@@ -123,9 +122,7 @@ func main() {
 		LogErr(err)
 	}
 
-	controlChan <- true
 	collectAndPublishMetrics()
-	controlChan <- true
 	if schedulingIntervalStr == "" {
 		schedulingIntervalStr = "20m"
 	}
@@ -135,17 +132,15 @@ func main() {
 	}
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(schedulingInterval).Do(func() {
-		controlChan <- true
 		collectAndPublishMetrics()
-		controlChan <- true
 	})
 	s.StartBlocking()
 }
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
-func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error, controlChan <-chan bool) {
-	watchK8sEvents(clientset, js, controlChan)
+func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
+	watchK8sEvents(clientset, js)
 	errCh <- nil
 }
 
@@ -243,7 +238,7 @@ func LogErr(err error) {
 		log.Println(err)
 	}
 }
-func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext, controlChan <-chan bool) {
+func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 	watchlist := cache.NewListWatchFromClient(
 		clientset.CoreV1().RESTClient(),
 		"events",
@@ -270,17 +265,10 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext, c
 		},
 	)
 	stop := make(chan struct{})
+	defer close(stop)
 	go controller.Run(stop)
 
 	for {
-		select {
-		case <-controlChan:
-			close(stop)
-			<-controlChan
-			stop = make(chan struct{})
-			go controller.Run(stop)
-		default:
-			time.Sleep(time.Second)
-		}
+		time.Sleep(time.Second)
 	}
 }
