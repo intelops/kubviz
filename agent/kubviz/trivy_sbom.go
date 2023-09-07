@@ -25,7 +25,7 @@ func publishTrivySbomReport(report model.Sbom, js nats.JetStreamContext) error {
 		return err
 	}
 
-	log.Printf("Trivy report with BomFormat:%v has been published\n", metrics.Report.BomFormat)
+	log.Printf("Trivy report with Id %v has been published\n", metrics.ID)
 	return nil
 }
 
