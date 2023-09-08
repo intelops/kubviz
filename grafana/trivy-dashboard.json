@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 14,
+  "id": 15,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -1306,8 +1306,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"vul_id\", \"vul_vendor_ids\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_pkg_path\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivy_vul\"\nORDER BY vul_last_modified_date DESC",
-          "rawQuery": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"vul_id\", \"vul_vendor_ids\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_pkg_path\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivy_vul\"\nORDER BY vul_last_modified_date DESC",
+          "query": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"vul_id\", \"vul_vendor_ids\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_pkg_path\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivy_vul\"\nWHERE $timeFilterByColumn(vul_last_modified_date)\nORDER BY vul_last_modified_date DESC",
+          "rawQuery": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"vul_id\", \"vul_vendor_ids\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_pkg_path\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivy_vul\"\nWHERE vul_last_modified_date >= toDateTime(1694099993) AND vul_last_modified_date <= toDateTime(1694186393)\nORDER BY vul_last_modified_date DESC",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1450,8 +1450,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT \"cluster_name\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nORDER BY vul_last_modified_date DESC",
-          "rawQuery": "SELECT \"cluster_name\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nORDER BY vul_last_modified_date DESC",
+          "query": "SELECT \"cluster_name\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE $timeFilterByColumn(vul_last_modified_date)\nORDER BY vul_last_modified_date DESC",
+          "rawQuery": "SELECT \"cluster_name\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE vul_last_modified_date >= toDateTime(1693581675) AND vul_last_modified_date <= toDateTime(1694186475)\nORDER BY vul_last_modified_date DESC",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1522,8 +1522,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT \"schema\", \"bom_format\", \"spec_version\", \"serial_number\", \"version\", \"metadata_timestamp\", \"metatool_vendor\", \"metatool_name\", \"metatool_version\", \"component_bom_ref\", \"component_type\", \"component_name\", \"component_version\", \"component_property_name\", \"component_property_value\", \"component_hash_alg\", \"component_hash_content\", \"component_license_exp\", \"component_purl\", \"dependency_ref\" \nFROM \"default\".\"trivysbom\"",
-          "rawQuery": "SELECT \"schema\", \"bom_format\", \"spec_version\", \"serial_number\", \"version\", \"metadata_timestamp\", \"metatool_vendor\", \"metatool_name\", \"metatool_version\", \"component_bom_ref\", \"component_type\", \"component_name\", \"component_version\", \"component_property_name\", \"component_property_value\", \"component_hash_alg\", \"component_hash_content\", \"component_license_exp\", \"component_purl\", \"dependency_ref\" \nFROM \"default\".\"trivysbom\"",
+          "query": "SELECT \"schema\", \"bom_format\", \"spec_version\", \"serial_number\", \"version\", \"metadata_timestamp\", \"metatool_vendor\", \"metatool_name\", \"metatool_version\", \"component_bom_ref\", \"component_type\", \"component_name\", \"component_version\", \"component_property_name\", \"component_property_value\", \"component_hash_alg\", \"component_hash_content\", \"component_license_exp\", \"component_purl\", \"dependency_ref\" \nFROM \"default\".\"trivysbom\"\nWHERE $timeFilterByColumn(metadata_timestamp)\nORDER BY metadata_timestamp DESC",
+          "rawQuery": "SELECT \"schema\", \"bom_format\", \"spec_version\", \"serial_number\", \"version\", \"metadata_timestamp\", \"metatool_vendor\", \"metatool_name\", \"metatool_version\", \"component_bom_ref\", \"component_type\", \"component_name\", \"component_version\", \"component_property_name\", \"component_property_value\", \"component_hash_alg\", \"component_hash_content\", \"component_license_exp\", \"component_purl\", \"dependency_ref\" \nFROM \"default\".\"trivysbom\"\nWHERE metadata_timestamp >= toDateTime(1693581733) AND metadata_timestamp <= toDateTime(1694186533)\nORDER BY metadata_timestamp DESC",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1541,13 +1541,13 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Trivy",
   "uid": "f9b0a865-f419-410a-b7d9-9a3f79a70d48",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
