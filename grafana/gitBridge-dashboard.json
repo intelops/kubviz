@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 9,
+  "id": 13,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -795,7 +795,6 @@
         }
       ],
       "title": "Azure Push Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -898,7 +897,6 @@
         }
       ],
       "title": "Azure Merge Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -1001,7 +999,6 @@
         }
       ],
       "title": "BitBucket Push Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -1104,7 +1101,6 @@
         }
       ],
       "title": "BitBucket Merge Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -1207,7 +1203,6 @@
         }
       ],
       "title": "GiTea Push Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -1323,7 +1318,6 @@
         }
       ],
       "title": "GiTea Merge Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -1426,7 +1420,6 @@
         }
       ],
       "title": "GitLab Push Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -1529,7 +1522,6 @@
         }
       ],
       "title": "GitLab Merge Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -1631,7 +1623,6 @@
         }
       ],
       "title": "Github Push Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -1733,7 +1724,6 @@
         }
       ],
       "title": "Github Merge Events by Author",
-      "transparent": true,
       "type": "barchart"
     },
     {
@@ -1821,13 +1811,12 @@
           },
           "format": 1,
           "queryType": "builder",
-          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"azure_devops\" ORDER BY TimeStamp DESC LIMIT 100",
+          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"azure_devops\" ORDER BY TimeStamp DESC",
           "refId": "A",
           "selectedFormat": 1
         }
       ],
       "title": "Azure",
-      "transparent": true,
       "type": "table"
     },
     {
@@ -1915,13 +1904,12 @@
           },
           "format": 1,
           "queryType": "builder",
-          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"bitbucket\" ORDER BY TimeStamp DESC LIMIT 100",
+          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"bitbucket\" ORDER BY TimeStamp DESC",
           "refId": "A",
           "selectedFormat": 1
         }
       ],
       "title": "BitBucket",
-      "transparent": true,
       "type": "table"
     },
     {
@@ -2009,13 +1997,12 @@
           },
           "format": 1,
           "queryType": "builder",
-          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"gitea\" ORDER BY TimeStamp DESC LIMIT 100",
+          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"gitea\" ORDER BY TimeStamp DESC",
           "refId": "A",
           "selectedFormat": 1
         }
       ],
       "title": "GiTea",
-      "transparent": true,
       "type": "table"
     },
     {
@@ -2103,13 +2090,12 @@
           },
           "format": 1,
           "queryType": "builder",
-          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"gitlab\" ORDER BY TimeStamp DESC LIMIT 100",
+          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"gitlab\" ORDER BY TimeStamp DESC",
           "refId": "A",
           "selectedFormat": 1
         }
       ],
       "title": "GitLab",
-      "transparent": true,
       "type": "table"
     },
     {
@@ -2197,13 +2183,12 @@
           },
           "format": 1,
           "queryType": "builder",
-          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"github\" ORDER BY TimeStamp DESC LIMIT 100",
+          "rawSql": "SELECT Author, CommitID, CommitUrl, EventType, RepoName, TimeStamp FROM default.\"github\" ORDER BY TimeStamp DESC",
           "refId": "A",
           "selectedFormat": 1
         }
       ],
       "title": "GitHub",
-      "transparent": true,
       "type": "table"
     }
   ],
