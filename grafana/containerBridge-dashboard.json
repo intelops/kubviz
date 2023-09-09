@@ -8,12 +8,6 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
-        "target": {
-          "limit": 100,
-          "matchAny": false,
-          "tags": [],
-          "type": "dashboard"
-        },
         "type": "dashboard"
       }
     ]
@@ -21,7 +15,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 10,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -30,7 +24,7 @@
         "type": "vertamedia-clickhouse-datasource",
         "uid": "vertamedia-clickhouse-datasource"
       },
-      "description": "This panel displays all the resources running in the kubernetes cluster.",
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -51,10 +45,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           }
@@ -66,160 +56,6 @@
         "w": 24,
         "x": 0,
         "y": 0
-      },
-      "id": 8,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "intervalFactor": 1,
-          "query": "SELECT * FROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
-          "rawQuery": "SELECT * FROM default.getall_resources\nWHERE EventTime >= toDateTime(1694219529) AND EventTime <= toDateTime(1694241129)\nORDER BY EventTime DESC",
-          "refId": "A",
-          "round": "0s",
-          "skip_comments": true
-        }
-      ],
-      "title": "Kubernetes Resources",
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "vertamedia-clickhouse-datasource"
-      },
-      "description": "This panel displays all the out-of-date images from the cluster.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "center",
-            "cellOptions": {
-              "type": "color-text"
-            },
-            "filterable": true,
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 10
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 8
-      },
-      "id": 6,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "intervalFactor": 1,
-          "query": "SELECT * FROM default.outdated_images\nWHERE $timeFilterByColumn(EventTime) AND VersionsBehind > 0\nORDER BY EventTime DESC",
-          "rawQuery": "SELECT * FROM default.outdated_images\nWHERE EventTime >= toDateTime(1694219614) AND EventTime <= toDateTime(1694241214) AND VersionsBehind > 0\nORDER BY EventTime DESC",
-          "refId": "A",
-          "round": "0s",
-          "skip_comments": true
-        }
-      ],
-      "title": "Outdated Images",
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "vertamedia-clickhouse-datasource"
-      },
-      "description": "This panel displays all the DeletedAPIs from the cluster.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "center",
-            "cellOptions": {
-              "type": "color-text"
-            },
-            "filterable": true,
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 17
       },
       "id": 4,
       "options": {
@@ -246,14 +82,14 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT * FROM default.DeletedAPIs\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
-          "rawQuery": "SELECT * FROM default.DeletedAPIs\nWHERE EventTime >= toDateTime(1694219743) AND EventTime <= toDateTime(1694241343)\nORDER BY EventTime DESC",
+          "query": "SELECT * FROM default.quaycontainerpush\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime",
+          "rawQuery": "SELECT * FROM default.quaycontainerpush\nWHERE EventTime >= toDateTime(1694165676) AND EventTime <= toDateTime(1694252076)\nORDER BY EventTime",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
         }
       ],
-      "title": "DeletedAPIs",
+      "title": "Quay Container Registry",
       "type": "table"
     },
     {
@@ -261,7 +97,6 @@
         "type": "vertamedia-clickhouse-datasource",
         "uid": "vertamedia-clickhouse-datasource"
       },
-      "description": "This panel displays all the DeprecatedAPIs from the cluster.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -282,10 +117,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           }
@@ -293,10 +124,82 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT * FROM default.jfrogcontainerpush\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
+          "rawQuery": "SELECT * FROM default.jfrogcontainerpush\nWHERE EventTime >= toDateTime(1694226084) AND EventTime <= toDateTime(1694247684)\nORDER BY EventTime DESC",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "JFrog Container Registry",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
       },
       "id": 2,
       "options": {
@@ -323,14 +226,86 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT * FROM default.DeprecatedAPIs\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
-          "rawQuery": "SELECT * FROM default.DeprecatedAPIs\nWHERE EventTime >= toDateTime(1694219780) AND EventTime <= toDateTime(1694241380)\nORDER BY EventTime DESC",
+          "query": "SELECT * FROM default.azurecontainerpush\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
+          "rawQuery": "SELECT * FROM default.azurecontainerpush\nWHERE EventTime >= toDateTime(1694165623) AND EventTime <= toDateTime(1694252023)\nORDER BY EventTime DESC",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
         }
       ],
-      "title": "DeprecatedAPIs",
+      "title": "Azure Container Registry",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT * FROM default.dockerhubbuild\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC\n",
+          "rawQuery": "SELECT * FROM default.dockerhubbuild\nWHERE EventTime >= toDateTime(1694165564) AND EventTime <= toDateTime(1694251964)\nORDER BY EventTime DESC",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "DockerHub",
       "type": "table"
     }
   ],
@@ -347,8 +322,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Kubviz Features",
-  "uid": "o2M7hbrVk",
-  "version": 1,
+  "title": "Container-Bridge",
+  "uid": "cf8cf066-b241-48c8-9e3d-863eed33bcf3",
+  "version": 2,
   "weekStart": ""
 }

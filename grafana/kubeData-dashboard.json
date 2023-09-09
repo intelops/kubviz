@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 5,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -172,7 +172,6 @@
         }
       ],
       "title": "Kubernetes",
-      "transparent": true,
       "type": "table"
     }
   ],
