@@ -40,7 +40,7 @@ var migrateCmd = &cobra.Command{
 			} else {
 				fmt.Println(err)
 			}
-			log.Fatalf("Could not parse env Config: %v", err)
+			log.Fatalf("Could not ping the DB connection: %v", err)
 		}
 
 		driver, err := cm.WithInstance(conn, &cm.Config{})
