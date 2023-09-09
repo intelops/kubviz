@@ -484,11 +484,16 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 				}
 				stmt.Close()
 			}
+
 			for _, misconfiguration := range result.Misconfigurations {
 				var (
 					tx, _   = c.conn.Begin()
 					stmt, _ = tx.Prepare(InsertTrivyMisconfig)
 				)
+				defer stmt.Close()
+
+				currentTime := time.Now().UTC()
+
 				if _, err := stmt.Exec(
 					metrics.ID,
 					metrics.ClusterName,
@@ -505,6 +510,7 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 					misconfiguration.Resolution,
 					misconfiguration.Severity,
 					string(misconfiguration.Status),
+					currentTime,
 				); err != nil {
 					log.Fatal(err)
 				}
