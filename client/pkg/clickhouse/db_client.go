@@ -517,7 +517,6 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 				if err := tx.Commit(); err != nil {
 					log.Fatal(err)
 				}
-				stmt.Close()
 			}
 		}
 	}
