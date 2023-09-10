@@ -1,0 +1,28 @@
+kubviz-tables :
+
+events - have datetime
+trivy_vul - have datetime
+trivysbom - have datetime
+trivyimage - have datetime
+trivy_misconfig - need to include time field in schema
+rakkess - need to include time field in schema
+DeprecatedAPIs - need to include time field in schema
+DeletedAPIs - have datetime
+getall_resources - need to include time field in schema
+outdated_images - need to include time field in schema
+kubescore - need to include time field in schema
+
+container-bridge tables:
+
+dockerhubbuild - need to include time field in schema
+quaycontainerpush - need to include time field in schema
+jfrogcontainerpush - need to include time field in schema
+azurecontainerpush - time is in string
+
+git-bridge tables :
+
+azure_devops - time is in string
+github - time is in string
+gitlab - time is in string
+bitbucket - time is in string
+gitea - time is in string
