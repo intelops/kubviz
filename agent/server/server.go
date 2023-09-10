@@ -26,5 +26,5 @@ func EnableProfile(r *gin.Engine) {
 func StartServer() {
 	r := gin.Default()
 	EnableProfile(r)
-	log.Fatal(r.Run(":6060"))
+	log.Fatal(r.Run(":8080"))
 }
