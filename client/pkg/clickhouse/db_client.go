@@ -74,7 +74,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerDockerhubTable, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, quayContainerPushEventTable, jfrogContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
+	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, quayContainerPushEventTable, jfrogContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
 	for _, table := range tables {
 		if err = splconn.Exec(context.Background(), string(table)); err != nil {
 			return nil, err
@@ -93,12 +93,16 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 	}
 	return &DBClient{splconn: splconn, conn: stdconn, conf: conf}, nil
 }
+
 func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushEventPayload) {
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertAzureContainerPushEvent))
 	)
 	defer stmt.Close()
+
+	currentTime := time.Now().UTC()
+
 	registryURL := pushEvent.Request.Host
 	repositoryName := pushEvent.Target.Repository
 	tag := pushEvent.Target.Tag
@@ -110,7 +114,6 @@ func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushE
 	size := pushEvent.Target.Size
 	shaID := pushEvent.Target.Digest
 
-	// Marshaling the pushEvent into a JSON string
 	pushEventJSON, err := json.Marshal(pushEvent)
 	if err != nil {
 		log.Printf("Error while marshaling Azure Container Registry payload: %v", err)
@@ -126,6 +129,7 @@ func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushE
 		pushEvent.Timestamp,
 		size,
 		shaID,
+		currentTime,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -133,15 +137,18 @@ func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushE
 		log.Fatal(err)
 	}
 }
+
 func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload) {
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertQuayContainerPushEvent))
 	)
 	defer stmt.Close()
+
+	currentTime := time.Now().UTC()
+
 	dockerURL := pushEvent.DockerURL
 	repository := pushEvent.Repository
-	//tag := pushEvent.UpdatedTags
 	name := pushEvent.Name
 	nameSpace := pushEvent.Namespace
 	homePage := pushEvent.Homepage
@@ -153,7 +160,6 @@ func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload
 		tag = ""
 	}
 
-	// Marshaling the pushEvent into a JSON string
 	pushEventJSON, err := json.Marshal(pushEvent)
 	if err != nil {
 		log.Printf("Error while marshaling Quay Container Registry payload: %v", err)
@@ -168,6 +174,7 @@ func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload
 		homePage,
 		tag,
 		string(pushEventJSON),
+		currentTime,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -175,12 +182,16 @@ func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload
 		log.Fatal(err)
 	}
 }
+
 func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushEventPayload) {
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertJfrogContainerPushEvent))
 	)
 	defer stmt.Close()
+
+	currentTime := time.Now().UTC()
+
 	registryURL := pushEvent.Data.Path
 	repositoryName := pushEvent.Data.Name
 	tag := pushEvent.Data.Tag
@@ -192,7 +203,6 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 	size := pushEvent.Data.Size
 	shaID := pushEvent.Data.SHA256
 
-	// Marshaling the pushEvent into a JSON string
 	pushEventJSON, err := json.Marshal(pushEvent)
 	if err != nil {
 		log.Printf("Error while marshaling Jfrog Container Registry payload: %v", err)
@@ -209,6 +219,7 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 		imageName,
 		tag,
 		string(pushEventJSON),
+		currentTime,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -216,12 +227,16 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 		log.Fatal(err)
 	}
 }
+
 func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertRakees))
 	)
 	defer stmt.Close()
+
+	currentTime := time.Now().UTC()
+
 	if _, err := stmt.Exec(
 		metrics.ClusterName,
 		metrics.Name,
@@ -229,6 +244,7 @@ func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 		metrics.Delete,
 		metrics.List,
 		metrics.Update,
+		currentTime,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -236,18 +252,23 @@ func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 		log.Fatal(err)
 	}
 }
+
 func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertKetall))
 	)
 	defer stmt.Close()
+
+	currentTime := time.Now().UTC()
+
 	if _, err := stmt.Exec(
 		metrics.ClusterName,
 		metrics.Namespace,
 		metrics.Kind,
 		metrics.Resource,
 		metrics.Age,
+		currentTime,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -255,12 +276,16 @@ func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
 		log.Fatal(err)
 	}
 }
+
 func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertOutdated))
 	)
 	defer stmt.Close()
+
+	currentTime := time.Now().UTC()
+
 	if _, err := stmt.Exec(
 		metrics.ClusterName,
 		metrics.Namespace,
@@ -269,6 +294,7 @@ func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
 		metrics.Current,
 		metrics.LatestVersion,
 		metrics.VersionsBehind,
+		currentTime,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -276,6 +302,7 @@ func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
 		log.Fatal(err)
 	}
 }
+
 func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 	var (
 		tx, _   = c.conn.Begin()
@@ -288,6 +315,8 @@ func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 		deprecated = 1
 	}
 
+	currentTime := time.Now().UTC()
+
 	for _, item := range deprecatedAPI.Items {
 		if _, err := stmt.Exec(
 			deprecatedAPI.ClusterName,
@@ -296,6 +325,7 @@ func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 			deprecatedAPI.Kind,
 			deprecated,
 			item.Scope,
+			currentTime,
 		); err != nil {
 			log.Fatal(err)
 		}
@@ -305,6 +335,7 @@ func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 		log.Fatal(err)
 	}
 }
+
 func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 	var (
 		tx, _   = c.conn.Begin()
@@ -316,6 +347,8 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 		deleted = 1
 	}
 
+	currentTime := time.Now().UTC()
+
 	for _, item := range deletedAPI.Items {
 		if _, err := stmt.Exec(
 			deletedAPI.ClusterName,
@@ -326,6 +359,7 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 			deletedAPI.Name,
 			deleted,
 			item.Scope,
+			currentTime,
 		); err != nil {
 			log.Fatal(err)
 		}
@@ -335,6 +369,7 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 		log.Fatal(err)
 	}
 }
+
 func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	var (
 		tx, _   = c.conn.Begin()
@@ -403,11 +438,15 @@ func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations
 		stmt, _ = tx.Prepare(InsertKubeScore)
 	)
 	defer stmt.Close()
+
+	currentTime := time.Now().UTC()
+
 	if _, err := stmt.Exec(
 		metrics.ID,
 		metrics.Namespace,
 		metrics.ClusterName,
 		metrics.Recommendations,
+		currentTime,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -449,11 +488,16 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 				}
 				stmt.Close()
 			}
+
 			for _, misconfiguration := range result.Misconfigurations {
 				var (
 					tx, _   = c.conn.Begin()
 					stmt, _ = tx.Prepare(InsertTrivyMisconfig)
 				)
+				defer stmt.Close()
+
+				currentTime := time.Now().UTC()
+
 				if _, err := stmt.Exec(
 					metrics.ID,
 					metrics.ClusterName,
@@ -470,13 +514,13 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 					misconfiguration.Resolution,
 					misconfiguration.Severity,
 					string(misconfiguration.Status),
+					currentTime,
 				); err != nil {
 					log.Fatal(err)
 				}
 				if err := tx.Commit(); err != nil {
 					log.Fatal(err)
 				}
-				stmt.Close()
 			}
 		}
 	}
@@ -674,6 +718,9 @@ func (c *DBClient) InsertContainerEventDockerHub(build model.DockerHubBuild) {
 		stmt, _ = tx.Prepare(string(InsertDockerHubBuild))
 	)
 	defer stmt.Close()
+
+	currentTime := time.Now().UTC()
+
 	if _, err := stmt.Exec(
 		build.PushedBy,
 		build.ImageTag,
@@ -681,6 +728,7 @@ func (c *DBClient) InsertContainerEventDockerHub(build model.DockerHubBuild) {
 		build.DateCreated,
 		build.Owner,
 		build.Event,
+		currentTime,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -737,6 +785,9 @@ func (c *DBClient) InsertGitCommon(metrics model.GitCommonAttribute, statement d
 		return err
 	}
 	defer stmt.Close()
+
+	currentTime := time.Now().UTC()
+
 	if _, err := stmt.Exec(
 		metrics.Author,
 		metrics.GitProvider,
@@ -744,7 +795,7 @@ func (c *DBClient) InsertGitCommon(metrics model.GitCommonAttribute, statement d
 		metrics.CommitUrl,
 		metrics.EventType,
 		metrics.RepoName,
-		metrics.TimeStamp,
+		currentTime,
 		metrics.Event,
 	); err != nil {
 		return err

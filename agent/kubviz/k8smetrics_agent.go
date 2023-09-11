@@ -29,6 +29,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	//  _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
+	"github.com/intelops/kubviz/agent/server"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -104,7 +105,7 @@ func main() {
 		clientset = getK8sClient(config)
 	}
 	go publishMetrics(clientset, js, clusterMetricsChan)
-
+	go server.StartServer()
 	collectAndPublishMetrics := func() {
 		err := outDatedImages(config, js)
 		LogErr(err)
