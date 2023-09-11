@@ -16,7 +16,7 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	var report report.ConsolidatedReport
 	//out, err := executeCommand("trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache")
 	// log.Println("Commnd for k8s cluster scan: trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache")
-	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 20m -f json --cache-dir /tmp/.cache"
+	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 20m -f json --cache-dir /tmp/.cache --debug"
 
 	// Log the command before execution
 	log.Printf("Executing command: %s\n", cmdString)
