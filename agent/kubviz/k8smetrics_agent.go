@@ -115,7 +115,7 @@ func main() {
 		LogErr(err)
 		err = RakeesOutput(config, js)
 		LogErr(err)
-		getK8sEvents(clientset)
+		//getK8sEvents(clientset)
 		err = RunTrivyK8sClusterScan(js)
 		LogErr(err)
 		err = runTrivyScans(config, js)
