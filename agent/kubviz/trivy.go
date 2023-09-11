@@ -28,6 +28,8 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	if err != nil {
 		log.Printf("Error executing command: %v\n", err)
 	}
+	// Log the command output for debugging purposes
+	log.Printf("Command output: %s\n", out)
 	parts := strings.SplitN(out, "{", 2)
 	if len(parts) <= 1 {
 		log.Println("No output from k8s cluster scan command", err)
