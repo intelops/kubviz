@@ -13,6 +13,7 @@ import (
 
 	"context"
 
+	"github.com/intelops/go-common/logging"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 
@@ -29,6 +30,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
 	//  _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
+	"github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/agent/server"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
@@ -77,10 +79,15 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	env := Production
 	clusterMetricsChan := make(chan error, 1)
+	cfg, err := config.GetAgentConfigurations()
+	if err != nil {
+		log.Fatal("Failed to retrieve agent configurations", err)
+	}
 	var (
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
+
 	// connecting with nats ...
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
@@ -106,8 +113,13 @@ func main() {
 	}
 	go publishMetrics(clientset, js, clusterMetricsChan)
 	go server.StartServer()
+	scheduler := initScheduler(config, js, *cfg)
+
+	// Start the scheduler
+	scheduler.Start()
+
 	collectAndPublishMetrics := func() {
-		err := outDatedImages(config, js)
+		err := OutDatedImages(config, js)
 		LogErr(err)
 		err = KubePreUpgradeDetector(config, js)
 		LogErr(err)
@@ -273,4 +285,20 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 	for {
 		time.Sleep(time.Second)
 	}
+}
+func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.AgentConfigurations) (s *Scheduler) {
+	log := logging.NewLogger()
+	s = NewScheduler(log)
+	if cfg.OutdatedInterval != "" {
+		sj, err := NewOutDatedImagesJob(config, js, cfg.OutdatedInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("Outdated", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+
+	return
 }

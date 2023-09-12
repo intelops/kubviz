@@ -6,8 +6,9 @@ import (
 )
 
 type AgentConfigurations struct {
-	SANamespace string `envconfig:"SA_NAMESPACE" default:"default"`
-	SAName      string `envconfig:"SA_NAME" default:"default"`
+	SANamespace      string `envconfig:"SA_NAMESPACE" default:"default"`
+	SAName           string `envconfig:"SA_NAME" default:"default"`
+	OutdatedInterval string `envconfig:"OUTDATED_INTERVAL" default:"20m"`
 }
 
 func GetAgentConfigurations() (serviceConf *AgentConfigurations, err error) {

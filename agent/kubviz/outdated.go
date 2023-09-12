@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/intelops/kubviz/constants"
 	"log"
 	"os"
 	"regexp"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/intelops/kubviz/constants"
 
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
@@ -66,7 +67,7 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 	return nil
 }
 
-func outDatedImages(config *rest.Config, js nats.JetStreamContext) error {
+func OutDatedImages(config *rest.Config, js nats.JetStreamContext) error {
 	images, err := ListImages(config)
 	if err != nil {
 		log.Println("unable to list images")
