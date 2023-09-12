@@ -26,7 +26,7 @@ dependencies:
   - name: nats
     condition: nats.enabled
     version: 0.13.4
-    repository: https://intelops.github.io/kubviz/ 
+    repository: https://intelops.github.io/kubviz/
   - name: clickhouse
     condition: clickhouse.enabled
     version: 1.0.2
