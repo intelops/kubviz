@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -46,9 +49,12 @@ const (
 // env variables for getting
 // nats token, natsurl, clustername
 var (
-	ClusterName string = os.Getenv("CLUSTER_NAME")
-	token       string = os.Getenv("NATS_TOKEN")
-	natsurl     string = os.Getenv("NATS_ADDRESS")
+	ClusterName  string = os.Getenv("CLUSTER_NAME")
+	token        string = os.Getenv("NATS_TOKEN")
+	natsurl      string = os.Getenv("NATS_ADDRESS")
+	certFilePath string = os.Getenv("CERT_FILE")
+	keyFilePath  string = os.Getenv("KEY_FILE")
+	caFilePath   string = os.Getenv("CA_FILE")
 	//for local testing provide the location of kubeconfig
 	// inside the civo file paste your kubeconfig
 	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)
@@ -81,8 +87,20 @@ func main() {
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
+	tlsConfig, err := GetTlsConfig()
+	if err != nil {
+		log.Println("error while getting tls config ", err)
+		time.Sleep(time.Minute * 30)
+		log.Fatal("error while getting tls config ", err)
+	}
 	// connecting with nats ...
-	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+	nc, err := nats.Connect(
+		natsurl,
+		nats.Name("K8s Metrics"),
+		nats.Token(token),
+		nats.Secure(tlsConfig),
+	)
+
 	checkErr(err)
 	// creating a jetstream connection using the nats connection
 	js, err := nc.JetStream()
@@ -271,4 +289,68 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 	for {
 		time.Sleep(time.Second)
 	}
+}
+
+func ReadMtlsCerts(certFile, keyFile, caFile string) (certPEM, keyPEM, caCertPEM []byte, err error) {
+	certPEM, err = ReadMTLSFileContents(certFile)
+	if err != nil {
+		err = fmt.Errorf("error reading cert file: %w", err)
+		return
+	}
+
+	keyPEM, err = ReadMTLSFileContents(keyFile)
+	if err != nil {
+		err = fmt.Errorf("error reading key file: %w", err)
+		return
+	}
+
+	caCertPEM, err = ReadMTLSFileContents(caFile)
+	if err != nil {
+		err = fmt.Errorf("error reading ca file: %w", err)
+		return
+	}
+
+	return
+}
+
+func OpenMtlsCertFile(path string) (f *os.File, err error) {
+	f, err = os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open MTLS cert file: %w", err)
+	}
+	return f, nil
+}
+
+func ReadMTLSFileContents(filePath string) ([]byte, error) {
+	file, err := OpenMtlsCertFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	contents, err := io.ReadAll(file)
+	if err != nil {
+		return nil, fmt.Errorf("Error reading file %s: %w", filePath, err)
+	}
+
+	return contents, nil
+}
+
+func GetTlsConfig() (*tls.Config, error) {
+	certPEM, keyPEM, caCertPEM, err := ReadMtlsCerts(certFilePath, keyFilePath, caFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to read mtls certs %w", err)
+	}
+	cert, err := tls.X509KeyPair(certPEM, keyPEM)
+	if err != nil {
+		return nil, fmt.Errorf("Error loading X509 key pair from PEM: %w", err)
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCertPEM)
+	tlsConfig := &tls.Config{
+		Certificates:       []tls.Certificate{cert},
+		RootCAs:            caCertPool,
+		InsecureSkipVerify: false,
+	}
+	return tlsConfig, nil
 }
