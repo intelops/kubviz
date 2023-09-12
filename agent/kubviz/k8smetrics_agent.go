@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -117,7 +119,11 @@ func main() {
 
 	// Start the scheduler
 	scheduler.Start()
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+	<-signals
 
+	scheduler.Stop()
 	collectAndPublishMetrics := func() {
 		err := OutDatedImages(config, js)
 		LogErr(err)
