@@ -10,7 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
 
 	"context"
@@ -115,6 +114,26 @@ func main() {
 	}
 	go publishMetrics(clientset, js, clusterMetricsChan)
 	go server.StartServer()
+
+	collectAndPublishMetrics := func() {
+		err := OutDatedImages(config, js)
+		LogErr(err)
+		// err = KubePreUpgradeDetector(config, js)
+		// LogErr(err)
+		// err = GetAllResources(config, js)
+		// LogErr(err)
+		// err = RakeesOutput(config, js)
+		// LogErr(err)
+		// //getK8sEvents(clientset)
+		// // err = RunTrivyK8sClusterScan(js)
+		// // LogErr(err)
+		// err = runTrivyScans(config, js)
+		// LogErr(err)
+		// err = RunKubeScore(clientset, js)
+		// LogErr(err)
+	}
+
+	collectAndPublishMetrics()
 	scheduler := initScheduler(config, js, *cfg)
 
 	// Start the scheduler
@@ -124,37 +143,18 @@ func main() {
 	<-signals
 
 	scheduler.Stop()
-	collectAndPublishMetrics := func() {
-		err := OutDatedImages(config, js)
-		LogErr(err)
-		err = KubePreUpgradeDetector(config, js)
-		LogErr(err)
-		err = GetAllResources(config, js)
-		LogErr(err)
-		err = RakeesOutput(config, js)
-		LogErr(err)
-		//getK8sEvents(clientset)
-		// err = RunTrivyK8sClusterScan(js)
-		// LogErr(err)
-		err = runTrivyScans(config, js)
-		LogErr(err)
-		err = RunKubeScore(clientset, js)
-		LogErr(err)
-	}
-
-	collectAndPublishMetrics()
-	if schedulingIntervalStr == "" {
-		schedulingIntervalStr = "20m"
-	}
-	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
-	if err != nil {
-		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
-	}
-	s := gocron.NewScheduler(time.UTC)
-	s.Every(schedulingInterval).Do(func() {
-		collectAndPublishMetrics()
-	})
-	s.StartBlocking()
+	// if schedulingIntervalStr == "" {
+	// 	schedulingIntervalStr = "20m"
+	// }
+	// schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
+	// if err != nil {
+	// 	log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+	// }
+	// s := gocron.NewScheduler(time.UTC)
+	// s.Every(schedulingInterval).Do(func() {
+	// 	collectAndPublishMetrics()
+	// })
+	// s.StartBlocking()
 }
 
 // publishMetrics publishes stream of events
