@@ -21,8 +21,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	"fmt"
-	"github.com/intelops/kubviz/credential"
-
+	
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -82,18 +81,9 @@ func main() {
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
-	// connecting with nats ...
-	var Token string
-	if (token==""){
-		cred, err := credential.GetGenericCredential(context.Background(), conf.EntityName, conf.CredIdentifier)
-		if err != nil {
-			return 
-		}
-		Token=cred["nats"]
-	}else{
-		Token=token
-	}
-	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(Token))
+
+
+	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
 	// creating a jetstream connection using the nats connection
 	js, err := nc.JetStream()
