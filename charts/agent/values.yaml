@@ -74,7 +74,14 @@ git_bridge:
     #    hosts:
     #      - chart-example.local
 
-
+vault:
+  enabled: true
+  address: http://vault:8200
+  role: "vault-role-kubviz"
+  policyNames: "vault-policy-cluster-admin,vault-policy-cluster-read"
+  host: kubviz-client-nats
+  credidentifier: auth-token
+  entityname: nats
 
 container_bridge:
   enabled: false
@@ -146,6 +153,7 @@ schedulingInterval: "24h"
 
 clusterName: "kubviz"
 nats:
+  enabled: false
   host: kubviz-client-nats 
   auth:
     token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"

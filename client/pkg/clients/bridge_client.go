@@ -62,7 +62,6 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 			log.Println(ErrHeaderEmpty.Error())
 			return
 		}
-		log.Println("Sample Print statement")
 		log.Printf("event from Header %v", event)
 		log.Printf("RAW DATA BEFORE UNMARSHAL: %#v", string(msg.Data))
 		switch repo {

@@ -5,6 +5,9 @@ package config
 
 //Config will have the configuration details
 type Config struct {
+	Enabled bool `envconfig:"ENABLED"`
+	CredIdentifier string `envconfig:"NATS_CRED_IDENTIFIER" default:"authToken"`
+	EntityName     string `envconfig:"NATS_ENTITY_NAME" default:"nats"`
 	NatsAddress string `envconfig:"NATS_ADDRESS"`
 	NatsToken   string `envconfig:"NATS_TOKEN"`
 	Port        int    `envconfig:"PORT"`

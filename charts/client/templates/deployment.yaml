@@ -37,6 +37,26 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+  {{- if .Values.vault.enabled }}
+
+          env:
+          - name: VAULT_ADDR
+            value: {{ .Values.vault.address }}
+          - name: VAULT_ROLE
+            value: {{ .Values.vault.role }}
+
+          - name: NATS_CRED_IDENTIFIER
+            value: {{ .Values.vault.credidentifier | quote }}
+          - name: NATS_ENTITY_NAME
+            value: {{ .Values.vault.entityname | quote }}
+  {{- else }}
+          env:
+          - name: NATS_TOKEN
+            value: {{ .Values.nats.auth.token }}
+          - name: NATS_ADDRESS
+            value: {{ .Values.nats.host }}
+
+  {{- end }}
 #          livenessProbe:
 #            httpGet:
 #              path: /
@@ -46,10 +66,10 @@ spec:
 #              path: /
 #              port: http
           env:
-          - name: NATS_TOKEN
-            value: {{ .Values.nats.auth.token }}
-          - name: NATS_ADDRESS
-            value: {{ include "client.fullname" . }}-nats
+#          - name: NATS_TOKEN
+#            value: {{ .Values.nats.auth.token }}
+#          - name: NATS_ADDRESS
+#            value: {{ include "client.fullname" . }}-nats
           - name: DB_ADDRESS
             value: {{ include "client.fullname" . }}-clickhouse
           - name: DB_PORT
@@ -68,3 +88,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      
