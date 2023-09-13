@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
 
 	"context"
@@ -118,43 +119,46 @@ func main() {
 	collectAndPublishMetrics := func() {
 		err := OutDatedImages(config, js)
 		LogErr(err)
-		// err = KubePreUpgradeDetector(config, js)
-		// LogErr(err)
-		// err = GetAllResources(config, js)
-		// LogErr(err)
-		// err = RakeesOutput(config, js)
-		// LogErr(err)
+		err = KubePreUpgradeDetector(config, js)
+		LogErr(err)
+		err = GetAllResources(config, js)
+		LogErr(err)
+		err = RakeesOutput(config, js)
+		LogErr(err)
 		// //getK8sEvents(clientset)
 		// // err = RunTrivyK8sClusterScan(js)
 		// // LogErr(err)
-		// err = runTrivyScans(config, js)
-		// LogErr(err)
-		// err = RunKubeScore(clientset, js)
-		// LogErr(err)
+		err = runTrivyScans(config, js)
+		LogErr(err)
+		err = RunKubeScore(clientset, js)
+		LogErr(err)
 	}
 
 	collectAndPublishMetrics()
-	scheduler := initScheduler(config, js, *cfg)
+	if cfg.Scheduler { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
+		scheduler := initScheduler(config, js, *cfg, clientset)
 
-	// Start the scheduler
-	scheduler.Start()
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
-	<-signals
+		// Start the scheduler
+		scheduler.Start()
+		signals := make(chan os.Signal, 1)
+		signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+		<-signals
 
-	scheduler.Stop()
-	// if schedulingIntervalStr == "" {
-	// 	schedulingIntervalStr = "20m"
-	// }
-	// schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
-	// if err != nil {
-	// 	log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
-	// }
-	// s := gocron.NewScheduler(time.UTC)
-	// s.Every(schedulingInterval).Do(func() {
-	// 	collectAndPublishMetrics()
-	// })
-	// s.StartBlocking()
+		scheduler.Stop()
+	} else {
+		if schedulingIntervalStr == "" {
+			schedulingIntervalStr = "20m"
+		}
+		schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
+		if err != nil {
+			log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+		}
+		s := gocron.NewScheduler(time.UTC)
+		s.Every(schedulingInterval).Do(func() {
+			collectAndPublishMetrics()
+		})
+		s.StartBlocking()
+	}
 }
 
 // publishMetrics publishes stream of events
@@ -292,7 +296,7 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 		time.Sleep(time.Second)
 	}
 }
-func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.AgentConfigurations) (s *Scheduler) {
+func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.AgentConfigurations, clientset *kubernetes.Clientset) (s *Scheduler) {
 	log := logging.NewLogger()
 	s = NewScheduler(log)
 	if cfg.OutdatedInterval != "" {
@@ -305,6 +309,55 @@ func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.Age
 			log.Fatal("failed to do job", err)
 		}
 	}
-
+	if cfg.GetAllInterval != "" {
+		sj, err := NewKetallJob(config, js, cfg.GetAllInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("GetALL", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.KubeScoreInterval != "" {
+		sj, err := NewKubescoreJob(clientset, js, cfg.KubeScoreInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("KubeScore", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.RakkessInterval != "" {
+		sj, err := NewRakkessJob(config, js, cfg.RakkessInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("Rakkess", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.KubePreUpgradeInterval != "" {
+		sj, err := NewKubePreUpgradeJob(config, js, cfg.KubePreUpgradeInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("KubePreUpgrade", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.TrivyInterval != "" {
+		sj, err := NewTrivyJob(config, js, cfg.TrivyInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("Trivy", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
 	return
 }
