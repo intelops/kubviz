@@ -1,9 +1,9 @@
 module github.com/intelops/kubviz
 
-go 1.19
+go 1.21.1
 
 require (
-	github.com/ClickHouse/clickhouse-go/v2 v2.13.4
+	github.com/ClickHouse/clickhouse-go/v2 v2.14.0
 	github.com/aquasecurity/trivy v0.45.0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/corneliusweig/tabwriter v0.0.0-20190512204542-5f8a091e83b5
