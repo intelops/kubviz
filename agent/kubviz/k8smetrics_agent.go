@@ -130,8 +130,8 @@ func main() {
 		// // LogErr(err)
 		err = runTrivyScans(config, js)
 		LogErr(err)
-		err = RunKubeScore(clientset, js)
-		LogErr(err)
+		// err = RunKubeScore(clientset, js)
+		// LogErr(err)
 	}
 
 	collectAndPublishMetrics()
