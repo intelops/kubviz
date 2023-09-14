@@ -37,6 +37,7 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          
   {{- if .Values.vault.enabled }}
 
           env:
@@ -53,8 +54,6 @@ spec:
           env:
           - name: NATS_TOKEN
             value: {{ .Values.nats.auth.token }}
-          - name: NATS_ADDRESS
-            value: {{ .Values.nats.host }}
 
   {{- end }}
 #          livenessProbe:
@@ -66,6 +65,8 @@ spec:
 #              path: /
 #              port: http
           env:
+          - name: NATS_ADDRESS
+            value: {{ .Values.nats.host }}
 #          - name: NATS_TOKEN
 #            value: {{ .Values.nats.auth.token }}
 #          - name: NATS_ADDRESS
