@@ -44,6 +44,7 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	time.Sleep(1 * time.Second)
 
 	var token string
+	log.Println("Vault enabled",conf.Enabled)
 	if conf.Enabled {
 		cred, err := credential.GetGenericCredential(context.Background(), conf.EntityName, conf.CredIdentifier)
 		if err != nil {
@@ -53,6 +54,7 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	} else {
 		token = conf.NatsToken
 	}
+	log.Println("Nats Token inside container: ",token)
 
 	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(token))
 	if err != nil {

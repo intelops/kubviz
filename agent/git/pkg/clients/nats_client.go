@@ -31,7 +31,7 @@ type NATSContext struct {
 func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	fmt.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
-
+	log.Println("Vault Enabled", conf.Enabled)
 	var token string
 	if conf.Enabled {
 		cred, err := credential.GetGenericCredential(context.Background(), conf.EntityName, conf.CredIdentifier)
@@ -43,7 +43,7 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 		token = conf.NatsToken
 	}
 
-
+	log.Println("Nats token inside git", token)
 	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(token))
 	if err != nil {
 		return nil, err
