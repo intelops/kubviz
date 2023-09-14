@@ -61,15 +61,16 @@ var (
 )
 
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
-	err := RunTrivyK8sClusterScan(js)
-	if err != nil {
-		return err
-	}
-	err = RunTrivyImageScans(config, js)
+
+	err := RunTrivyImageScans(config, js)
 	if err != nil {
 		return err
 	}
 	err = RunTrivySbomScan(config, js)
+	if err != nil {
+		return err
+	}
+	err = RunTrivyK8sClusterScan(js)
 	if err != nil {
 		return err
 	}
@@ -126,12 +127,10 @@ func main() {
 		err = RakeesOutput(config, js)
 		LogErr(err)
 		// //getK8sEvents(clientset)
-		// // err = RunTrivyK8sClusterScan(js)
-		// // LogErr(err)
 		err = runTrivyScans(config, js)
 		LogErr(err)
-		// err = RunKubeScore(clientset, js)
-		// LogErr(err)
+		err = RunKubeScore(clientset, js)
+		LogErr(err)
 	}
 
 	collectAndPublishMetrics()

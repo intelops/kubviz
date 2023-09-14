@@ -11,7 +11,7 @@ type AgentConfigurations struct {
 	OutdatedInterval       string `envconfig:"OUTDATED_INTERVAL" default:"*/20 * * * *"`
 	GetAllInterval         string `envconfig:"GETALL_INTERVAL" default:"*/30 * * * *"`
 	KubeScoreInterval      string `envconfig:"KUBESCORE_INTERVAL" default:"*/40 * * * *"`
-	RakkessInterval        string `envconfig:"KUBESCORE_INTERVAL" default:"*/50 * * * *"`
+	RakkessInterval        string `envconfig:"RAKKESS_INTERVAL" default:"*/50 * * * *"`
 	KubePreUpgradeInterval string `envconfig:"KUBEPREUPGRADE_INTERVAL" default:"*/60 * * * *"`
 	TrivyInterval          string `envconfig:"TRIVY_INTERVAL" default:"*/10 * * * *"`
 	Scheduler              bool   `envconfig:"SCHEDULER" default:"true"`
