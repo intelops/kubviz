@@ -21,7 +21,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	"fmt"
-
+	
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -81,7 +81,8 @@ func main() {
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
-	// connecting with nats ...
+
+
 	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 	checkErr(err)
 	// creating a jetstream connection using the nats connection

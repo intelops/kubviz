@@ -1,12 +1,15 @@
 package clients
 
 import (
+	"context"
 	"fmt"
+	
 	"log"
 	"time"
 
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
 	"github.com/intelops/kubviz/client/pkg/config"
+	"github.com/intelops/kubviz/credential"
 	"github.com/nats-io/nats.go"
 )
 
@@ -20,8 +23,19 @@ type NATSContext struct {
 func NewNATSContext(conf *config.Config, dbClient clickhouse.DBInterface) (*NATSContext, error) {
 	log.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
-
-	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
+	var token string
+	log.Println("Vault enabled",conf.VaultEnabled)
+	if conf.VaultEnabled {
+		cred, err := credential.GetGenericCredential(context.Background(), conf.EntityName, conf.CredIdentifier)
+		if err != nil {
+			return nil, err
+		}
+		token = cred["nats"]
+	} else {
+		token = conf.NatsToken
+	}
+ 
+	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(token))
 	if err != nil {
 		return nil, err
 	}
