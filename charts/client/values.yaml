@@ -87,7 +87,6 @@ affinity: {}
 
 nats:
 
-  enabled: false
   #Authentication setup
   auth:
     enabled: true

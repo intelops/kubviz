@@ -34,7 +34,7 @@ func NewNATSContext(conf *config.Config, dbClient clickhouse.DBInterface) (*NATS
 	} else {
 		token = conf.NatsToken
 	}
-    log.Println("Token in client",token)
+ 
 	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(token))
 	if err != nil {
 		return nil, err

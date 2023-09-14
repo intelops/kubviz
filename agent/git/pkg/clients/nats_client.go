@@ -42,8 +42,6 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	} else {
 		token = conf.NatsToken
 	}
-
-	log.Println("Nats token inside git", token)
 	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(token))
 	if err != nil {
 		return nil, err
