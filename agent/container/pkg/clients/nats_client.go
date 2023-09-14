@@ -44,8 +44,8 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	time.Sleep(1 * time.Second)
 
 	var token string
-	log.Println("Vault enabled",conf.Enabled)
-	if conf.Enabled {
+	log.Println("Vault enabled",conf.VaultEnabled)
+	if conf.VaultEnabled {
 		cred, err := credential.GetGenericCredential(context.Background(), conf.EntityName, conf.CredIdentifier)
 		if err != nil {
 			return nil, err

@@ -24,8 +24,8 @@ func NewNATSContext(conf *config.Config, dbClient clickhouse.DBInterface) (*NATS
 	log.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
 	var token string
-	log.Println("Vault enabled",conf.Enabled)
-	if conf.Enabled {
+	log.Println("Vault enabled",conf.VaultEnabled)
+	if conf.VaultEnabled {
 		cred, err := credential.GetGenericCredential(context.Background(), conf.EntityName, conf.CredIdentifier)
 		if err != nil {
 			return nil, err

@@ -31,9 +31,9 @@ type NATSContext struct {
 func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	fmt.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
-	log.Println("Vault Enabled", conf.Enabled)
+	log.Println("Vault Enabled", conf.VaultEnabled)
 	var token string
-	if conf.Enabled {
+	if conf.VaultEnabled {
 		cred, err := credential.GetGenericCredential(context.Background(), conf.EntityName, conf.CredIdentifier)
 		if err != nil {
 			return nil, err
