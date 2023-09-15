@@ -134,7 +134,7 @@ func main() {
 	}
 
 	collectAndPublishMetrics()
-	if cfg.Scheduler { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
+	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
 		scheduler := initScheduler(config, js, *cfg, clientset)
 
 		// Start the scheduler
