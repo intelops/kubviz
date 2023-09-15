@@ -1,4 +1,4 @@
-# Default values for client. 
+# Default values for client.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -106,3 +106,12 @@ datasources:
   label: grafana_datasource
   labelValue: "1"
   uid: vertamedia-clickhouse-datasource
+
+migration:
+  enabled: true
+  image:
+    repository: ghcr.io/intelops/kubviz/migration
+    pullPolicy: Always
+    tag: "v1.1.0"
+  schema:
+    path: "/sql"

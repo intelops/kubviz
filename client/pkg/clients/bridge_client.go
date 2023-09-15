@@ -89,7 +89,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitUrl = pl.Resource.Repository.RemoteURL + "/commit/" + pl.Resource.RefUpdates[0].NewObjectID
 				gca.EventType = string(azuremodel.GitPushEventType)
 				gca.RepoName = pl.Resource.Repository.Name
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertAzureDevops)
 				log.Println("Inserted AzureDevops metrics:", string(msg.Data))
@@ -108,7 +108,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitUrl = pl.Resource.Repository.RemoteURL + "/commit/" + pl.Resource.LastMergeCommit.CommitID
 				gca.EventType = string(azuremodel.GitPullRequestMergedEventType)
 				gca.RepoName = pl.Resource.Repository.Name
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertAzureDevops)
 				log.Println("Inserted AzureDevops metrics:", string(msg.Data))
@@ -121,7 +121,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitID = ""
 				gca.CommitUrl = ""
 				gca.EventType = event
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertAzureDevops)
 				log.Println("Inserted GitHub metrics:", string(msg.Data))
@@ -155,7 +155,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				}
 				gca.EventType = string(github.PushEvent)
 				gca.RepoName = pl.Repository.Name
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertGithub)
 				log.Println("Inserted GitHub metrics:", string(msg.Data))
@@ -179,7 +179,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					gca.CommitUrl = pl.PullRequest.HTMLURL
 					gca.EventType = string(github.PullRequestEvent)
 					gca.RepoName = pl.Repository.Name
-					gca.TimeStamp = time.Now().Format(time.DateTime)
+					gca.TimeStamp = time.Now().UTC()
 					gca.Event = string(msg.Data)
 					conn.InsertGitCommon(gca, dbstatement.InsertGithub)
 					log.Println("Inserted GitHub metrics:", string(msg.Data))
@@ -193,7 +193,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitID = ""
 				gca.CommitUrl = ""
 				gca.EventType = event
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertGithub)
 				log.Println("Inserted GitHub metrics:", string(msg.Data))
@@ -219,7 +219,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitUrl = pl.CompareURL
 				gca.EventType = string(gitea.PushEvent)
 				gca.RepoName = pl.Repo.Name
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertGitea)
 				log.Println("Inserted Gitea metrics:", string(msg.Data))
@@ -253,7 +253,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					} else {
 						gca.RepoName = ""
 					}
-					gca.TimeStamp = time.Now().Format(time.DateTime)
+					gca.TimeStamp = time.Now().UTC()
 					gca.Event = string(msg.Data)
 					conn.InsertGitCommon(gca, dbstatement.InsertGitea)
 					log.Println("Inserted Gitea metrics:", string(msg.Data))
@@ -265,7 +265,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitID = ""
 				gca.CommitUrl = ""
 				gca.EventType = event
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.RepoName = ""
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertGitea)
@@ -292,7 +292,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitUrl = pl.Project.WebURL + "/commit/" + pl.After
 				gca.EventType = string(gitlab.PushEvents)
 				gca.RepoName = pl.Project.Name
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
 				log.Println("Inserted Gitlab metrics:", string(msg.Data))
@@ -312,7 +312,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					gca.CommitUrl = pl.ObjectAttributes.URL
 					gca.EventType = string(gitlab.MergeRequestEvents)
 					gca.RepoName = pl.Project.Name
-					gca.TimeStamp = time.Now().Format(time.DateTime)
+					gca.TimeStamp = time.Now().UTC()
 					gca.Event = string(msg.Data)
 					conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
 					log.Println("Inserted Gitlab metrics:", string(msg.Data))
@@ -325,7 +325,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitID = ""
 				gca.CommitUrl = ""
 				gca.EventType = event
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.RepoName = ""
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
@@ -353,7 +353,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				}
 				gca.EventType = string(bitbucket.RepoPushEvent)
 				gca.RepoName = pl.Repository.Name
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
 				log.Println("Inserted BitBucket metrics:", string(msg.Data))
@@ -372,7 +372,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitUrl = pl.PullRequest.Links.HTML.Href
 				gca.EventType = string(bitbucket.PullRequestMergedEvent)
 				gca.RepoName = pl.Repository.Name
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
 				log.Println("Inserted BitBucket metrics:", string(msg.Data))
@@ -384,7 +384,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.CommitID = ""
 				gca.CommitUrl = ""
 				gca.EventType = event
-				gca.TimeStamp = time.Now().Format(time.DateTime)
+				gca.TimeStamp = time.Now().UTC()
 				gca.RepoName = ""
 				gca.Event = string(msg.Data)
 				conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
