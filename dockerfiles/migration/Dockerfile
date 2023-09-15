@@ -10,7 +10,7 @@ RUN chmod +x /workspace/script/wait-for-clickhouse.sh
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
+FROM golang:alpine
 WORKDIR /
 COPY --from=builder /workspace/migration .
 COPY --from=builder /workspace/sql /sql
