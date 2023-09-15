@@ -65,7 +65,7 @@ jobs:
           COSIGN_EXPERIMENTAL: 1
 
       - name: Verify the pushed tags
-        run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}/migration:${{ github.run_id }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/migration.yml@refs/heads/main  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+        run: cosign verify ${{ env.REGISTRY }}/${{ github.repository }}/migration:${{ github.run_id }} --certificate-identity ${{ env.GH_URL }}/${{ github.repository }}/.github/workflows/migration-image.yml@refs/heads/main  --certificate-oidc-issuer https://token.actions.githubusercontent.com
         env:
           COSIGN_EXPERIMENTAL: 1
 
