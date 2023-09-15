@@ -7,7 +7,7 @@ MAX_RETRIES=60
 
 retry_count=0
 while [ $retry_count -lt $MAX_RETRIES ]; do
-  if clickhouse-client --host $CLICKHOUSE_HOST --port $CLICKHOUSE_PORT --query "SELECT 1"; then
+  if nc -z -v -w5 $CLICKHOUSE_HOST $CLICKHOUSE_PORT; then
     echo "ClickHouse is ready!"
     exit 0
   else
