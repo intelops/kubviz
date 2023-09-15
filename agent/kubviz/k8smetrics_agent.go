@@ -4,9 +4,13 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
+
+	"github.com/intelops/go-common/logging"
 
 	"github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
@@ -22,6 +26,7 @@ import (
 
 	"fmt"
 
+	"github.com/intelops/kubviz/agent/config"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -77,6 +82,10 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	env := Production
 	clusterMetricsChan := make(chan error, 1)
+	cfg, err := config.GetAgentConfigurations()
+	if err != nil {
+		log.Fatal("Failed to retrieve agent configurations", err)
+	}
 	var (
 		config    *rest.Config
 		clientset *kubernetes.Clientset
@@ -126,15 +135,30 @@ func main() {
 	if schedulingIntervalStr == "" {
 		schedulingIntervalStr = "20m"
 	}
-	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
-	if err != nil {
-		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
+		scheduler := initScheduler(config, js, *cfg, clientset)
+
+		// Start the scheduler
+		scheduler.Start()
+		signals := make(chan os.Signal, 1)
+		signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+		<-signals
+
+		scheduler.Stop()
+	} else {
+		if schedulingIntervalStr == "" {
+			schedulingIntervalStr = "20m"
+		}
+		schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
+		if err != nil {
+			log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+		}
+		s := gocron.NewScheduler(time.UTC)
+		s.Every(schedulingInterval).Do(func() {
+			collectAndPublishMetrics()
+		})
+		s.StartBlocking()
 	}
-	s := gocron.NewScheduler(time.UTC)
-	s.Every(schedulingInterval).Do(func() {
-		collectAndPublishMetrics()
-	})
-	s.StartBlocking()
 }
 
 // publishMetrics publishes stream of events
@@ -271,4 +295,69 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 	for {
 		time.Sleep(time.Second)
 	}
+}
+func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.AgentConfigurations, clientset *kubernetes.Clientset) (s *Scheduler) {
+	log := logging.NewLogger()
+	s = NewScheduler(log)
+	if cfg.OutdatedInterval != "" {
+		sj, err := NewOutDatedImagesJob(config, js, cfg.OutdatedInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("Outdated", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.GetAllInterval != "" {
+		sj, err := NewKetallJob(config, js, cfg.GetAllInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("GetALL", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.KubeScoreInterval != "" {
+		sj, err := NewKubescoreJob(clientset, js, cfg.KubeScoreInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("KubeScore", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.RakkessInterval != "" {
+		sj, err := NewRakkessJob(config, js, cfg.RakkessInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("Rakkess", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.KubePreUpgradeInterval != "" {
+		sj, err := NewKubePreUpgradeJob(config, js, cfg.KubePreUpgradeInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("KubePreUpgrade", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.TrivyInterval != "" {
+		sj, err := NewTrivyJob(config, js, cfg.TrivyInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("Trivy", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	return
 }
