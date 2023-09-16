@@ -27,6 +27,22 @@ spec:
       serviceAccountName: {{ include "client.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: migration-init
+          image: "{{ .Values.migration.image.repository }}:{{ .Values.migration.image.tag }}"
+          imagePullPolicy: {{ .Values.migration.image.pullPolicy }}
+          command:
+          - /bin/sh
+          - -c
+          args:
+          - "/script/wait-for-clickhouse.sh && /migration sql -e --yes"
+          env:
+          - name: SCHEMA_PATH
+            value : {{ .Values.migration.schema.path }}
+          - name: DB_ADDRESS
+            value: {{ include "client.fullname" . }}-clickhouse
+          - name: DB_PORT
+            value: "9000"
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

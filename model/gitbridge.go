@@ -40,6 +40,6 @@ type GitCommonAttribute struct {
 	CommitUrl   string
 	EventType   string
 	RepoName    string
-	TimeStamp   string
+	TimeStamp   time.Time
 	Event       string
 }
