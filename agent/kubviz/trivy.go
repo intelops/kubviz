@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
+	exec "os/exec"
 	"strings"
 
 	"github.com/aquasecurity/trivy/pkg/k8s/report"
@@ -12,11 +14,38 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
+func executeCommandTrivy(command string) ([]byte, error) {
+	cmd := exec.Command("/bin/sh", "-c", command)
+	var outc, errc bytes.Buffer
+	cmd.Stdout = &outc
+	cmd.Stderr = &errc
+
+	err := cmd.Run()
+
+	if err != nil {
+		log.Println("Execute Trivy Command Error", err.Error())
+	}
+
+	return outc.Bytes(), err
+}
 func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	var report report.ConsolidatedReport
-	out, err := executeCommand("trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache")
-	// log.Println("Commnd for k8s cluster scan: trivy k8s --report summary cluster --timeout 60m -f json -q --cache-dir /tmp/.cache")
-	parts := strings.SplitN(out, "{", 2)
+	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 20m -f json --cache-dir /tmp/.cache --debug"
+
+	// Log the command before execution
+	log.Printf("Executing command: %s\n", cmdString)
+
+	// Execute the command
+	out, err := executeCommandTrivy(cmdString)
+
+	// Handle errors and process the command output as needed
+	if err != nil {
+		log.Printf("Error executing command: %v\n", err)
+	}
+	// Log the command output for debugging purposes
+	log.Printf("Command output: %s\n", out)
+	outStr := string(out)
+	parts := strings.SplitN(outStr, "{", 2)
 	if len(parts) <= 1 {
 		log.Println("No output from k8s cluster scan command", err)
 		return err

@@ -74,12 +74,12 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 
-	tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, quayContainerPushEventTable, jfrogContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
-	for _, table := range tables {
-		if err = splconn.Exec(context.Background(), string(table)); err != nil {
-			return nil, err
-		}
-	}
+	// tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, quayContainerPushEventTable, jfrogContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
+	// for _, table := range tables {
+	// 	if err = splconn.Exec(context.Background(), string(table)); err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 	stdconn := clickhouse.OpenDB(&clickhouse.Options{
 		Addr: []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
 	})
@@ -126,7 +126,6 @@ func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushE
 		tag,
 		imageName,
 		string(pushEventJSON),
-		pushEvent.Timestamp,
 		size,
 		shaID,
 		currentTime,

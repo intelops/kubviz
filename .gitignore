@@ -1,2 +1,5 @@
 civo
-migration/
+alloc.svg
+allocs.pprof
+cpu.pprof
+steps-to-test.txt
