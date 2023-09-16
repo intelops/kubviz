@@ -21,10 +21,69 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
+  "id": 19,
   "links": [],
   "liveNow": false,
   "panels": [
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "baidu": {
+          "callback": "bmapReady",
+          "key": ""
+        },
+        "editor": {
+          "format": "auto",
+          "height": 600
+        },
+        "gaode": {
+          "key": "",
+          "plugin": "AMap.Scale,AMap.ToolBar"
+        },
+        "getOption": "// Extract data from your JSON\nconst clusterNames = data.series[0].fields[0].values; // New column for ClusterName\nconst namespaces = data.series[0].fields[1].values;\nconst kinds = data.series[0].fields[2].values; // Adjusted index for Kind\nconst counts = data.series[0].fields[3].values; // New column for Count\n\n// Create a hierarchical structure from the data without a root node\nconst hierarchy = {\n  name: 'root', // Use 'root' as a placeholder\n  children: [],\n};\n\nconst seenClusterNames = new Set();\nconst seenNamespaces = new Set();\n\nfor (let i = 0; i < clusterNames.length; i++) {\n  const clusterName = clusterNames[i];\n  const namespace = namespaces[i];\n  const kind = kinds[i];\n  const count = counts[i]; // Get the count value\n\n  if (!seenClusterNames.has(clusterName)) {\n    seenClusterNames.add(clusterName);\n    const clusterNode = { name: clusterName, children: [] };\n    hierarchy.children.push(clusterNode);\n    seenNamespaces.clear(); // Reset seenNamespaces for each cluster\n  }\n\n  const clusterNode = hierarchy.children.find((node) => node.name === clusterName);\n\n  if (!seenNamespaces.has(namespace)) {\n    seenNamespaces.add(namespace);\n    const namespaceNode = { name: namespace, children: [] };\n    clusterNode.children.push(namespaceNode);\n  }\n\n  const namespaceNode = clusterNode.children.find((node) => node.name === namespace);\n  const kindNode = { name: kind, children: [{ name: `Count: ${count}` }] }; // Include the count as a child node\n  namespaceNode.children.push(kindNode);\n}\n\n// Create the tree chart using ECharts\nconst option = {\n  tooltip: {\n    trigger: 'item',\n    triggerOn: 'mousemove',\n    formatter: function (params) {\n      const node = params.data;\n      let tooltip = '';\n      if (node.column) {\n        tooltip += `${node.column}: ${node.name}`;\n      } else {\n        tooltip += node.name;\n      }\n      return tooltip;\n    },\n  },\n  series: [\n    {\n      type: 'tree',\n      data: hierarchy.children, // Use the children directly\n      top: '1%',\n      left: '7%',\n      bottom: '1%',\n      right: '20%',\n      symbolSize: 7,\n      label: {\n        position: 'left',\n        verticalAlign: 'middle',\n        align: 'right',\n        fontSize: 14, // Increase the text size for regular nodes\n      },\n      leaves: {\n        label: {\n          position: 'right',\n          verticalAlign: 'middle',\n          align: 'left',\n          fontSize: 14, // Increase the text size for leaves\n        },\n      },\n      emphasis: {\n        focus: 'descendant',\n      },\n      expandAndCollapse: true,\n      animationDuration: 550,\n      animationDurationUpdate: 750,\n    },\n  ],\n};\nreturn option;",
+        "google": {
+          "callback": "gmapReady",
+          "key": ""
+        },
+        "map": "none",
+        "renderer": "canvas",
+        "themeEditor": {
+          "config": "{}",
+          "height": 400,
+          "name": "default"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT ClusterName, Namespace, Kind, count(*) AS count\nFROM default.events\nWHERE $timeFilterByColumn(EventTime) AND ClusterName IN ($clusterName) AND Namespace IN ($namespace)\nGROUP BY ClusterName, Namespace, Kind",
+          "rawQuery": "SELECT ClusterName, Namespace, Kind, count(*) AS count\nFROM default.events\nWHERE EventTime >= toDateTime(1694603943) AND EventTime <= toDateTime(1694604243) AND ClusterName IN ('dev') AND Namespace IN ('kubviz','argocd','observability','default','tracetestdemo','sonarqube','kube-system','tek','quality','tekton-pipelines','sample','tekton-pipelines-resolvers','tekton-chains','cert-manager','qtapp','otel-collector','mysql','traefik')\nGROUP BY ClusterName, Namespace, Kind",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "Kubernetes Workload",
+      "type": "volkovlabs-echarts-panel"
+    },
     {
       "datasource": {
         "type": "vertamedia-clickhouse-datasource",
@@ -58,7 +117,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 11
       },
       "id": 4,
       "options": {
@@ -137,7 +196,7 @@
         "h": 16,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 18
       },
       "id": 2,
       "options": {
@@ -238,6 +297,11 @@
           "uid": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT Kind FROM default.events",
+        "error": {
+          "data": {
+            "message": "Unexpected error"
+          }
+        },
         "hide": 0,
         "includeAll": true,
         "multi": true,
@@ -283,6 +347,6 @@
   "timezone": "",
   "title": "Kubedata",
   "uid": "Qq-FK1rVz",
-  "version": 1,
+  "version": 3,
   "weekStart": ""
 }

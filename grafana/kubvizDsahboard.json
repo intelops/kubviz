@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 8,
+  "id": 5,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -114,7 +114,13 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -184,7 +190,13 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Outdated Images",
+              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -233,8 +245,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT count(*) FROM default.outdated_images\nWHERE $timeFilterByColumn(EventTime) AND VersionsBehind > 0",
-          "rawQuery": "SELECT count(*) FROM default.outdated_images\nWHERE EventTime >= toDateTime(1694243264) AND EventTime <= toDateTime(1694243564) AND VersionsBehind > 0",
+          "query": "SELECT count(*) FROM default.outdated_images\nWHERE VersionsBehind > 0",
+          "rawQuery": "SELECT count(*) FROM default.outdated_images\nWHERE VersionsBehind > 0",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -254,7 +266,13 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Kubedata",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1689917173495&to=1689918073495"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -324,7 +342,13 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "DeletedAPIs",
+              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -373,8 +397,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT count(*) FROM default.DeletedAPIs\nWHERE $timeFilterByColumn(EventTime)",
-          "rawQuery": "SELECT count(*) FROM default.DeletedAPIs\nWHERE EventTime >= toDateTime(1694243293) AND EventTime <= toDateTime(1694243593)",
+          "query": "SELECT count(*) FROM default.DeletedAPIs",
+          "rawQuery": "SELECT count(*) FROM default.DeletedAPIs",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -394,7 +418,13 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "DeprecatedAPIs",
+              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -443,8 +473,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT count(*) FROM default.DeprecatedAPIs\nWHERE $timeFilterByColumn(EventTime)",
-          "rawQuery": "SELECT count(*) FROM default.DeprecatedAPIs\nWHERE EventTime >= toDateTime(1694243320) AND EventTime <= toDateTime(1694243620)",
+          "query": "SELECT count(*) FROM default.DeprecatedAPIs",
+          "rawQuery": "SELECT count(*) FROM default.DeprecatedAPIs",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -464,7 +494,13 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Kubernetes Resources",
+              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -513,8 +549,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT count(*) FROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)",
-          "rawQuery": "SELECT count(*) FROM default.getall_resources\nWHERE EventTime >= toDateTime(1694243344) AND EventTime <= toDateTime(1694243644)",
+          "query": "SELECT count(*) FROM default.getall_resources",
+          "rawQuery": "SELECT count(*) FROM default.getall_resources",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -528,7 +564,7 @@
         "type": "grafana-clickhouse-datasource",
         "uid": "ClickHouse"
       },
-      "description": "This panel provides a time-based analysis of the occurrences of 'Pod' and 'Node'",
+      "description": "This panel provides a time-based analysis of the occurrences of 'Pod'",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -587,7 +623,7 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 24,
+        "w": 13,
         "x": 0,
         "y": 10
       },
@@ -622,14 +658,96 @@
           "rawSql": "SELECT EventTime, COUNT(*) AS Pods\nFROM default.events\nWHERE Kind = 'Pod'\nGROUP BY EventTime;\n",
           "refId": "A",
           "selectedFormat": 0
+        }
+      ],
+      "title": "Number of Pods over time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "ClickHouse"
+      },
+      "description": "This panel provides a time-based analysis of the occurrences of 'Node'",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "yellow",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 11,
+        "x": 13,
+        "y": 10
+      },
+      "id": 65,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
         {
           "datasource": {
             "type": "grafana-clickhouse-datasource",
             "uid": "ClickHouse"
           },
           "format": 0,
-          "hide": false,
           "meta": {
             "builderOptions": {
               "fields": [],
@@ -639,11 +757,11 @@
           },
           "queryType": "sql",
           "rawSql": "SELECT EventTime, COUNT(*) AS Nodes\nFROM default.events\nWHERE Kind = 'Node'\nGROUP BY EventTime;\n",
-          "refId": "B",
+          "refId": "A",
           "selectedFormat": 0
         }
       ],
-      "title": "Number of Pods and Nodes over time",
+      "title": "Number of Nodes over Time",
       "type": "timeseries"
     },
     {
@@ -658,7 +776,13 @@
             "fixedColor": "#249b6a",
             "mode": "fixed"
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -727,7 +851,13 @@
       "description": "This panel displays the total number of pods with Created state.",
       "fieldConfig": {
         "defaults": {
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -798,7 +928,13 @@
       "description": "This panel displays the total number of pods with backOff state.",
       "fieldConfig": {
         "defaults": {
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -869,7 +1005,13 @@
       "description": "This panel displays the total number of pods with Unhealthy state.",
       "fieldConfig": {
         "defaults": {
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -944,7 +1086,13 @@
             "fixedColor": "#249b6a",
             "mode": "fixed"
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1013,7 +1161,13 @@
       "description": "This panel displays the total number of nodes which is in not ready state",
       "fieldConfig": {
         "defaults": {
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1084,7 +1238,13 @@
       "description": "This panel displays the total number of nodes which is in ready state",
       "fieldConfig": {
         "defaults": {
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1155,7 +1315,13 @@
       "description": "This panel displays the total number of nodes which is in NodeHasNoDiskPressure state",
       "fieldConfig": {
         "defaults": {
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1237,7 +1403,13 @@
             "filterable": true,
             "inspect": false
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Kubedata",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1689917173495&to=1689918073495"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1331,9 +1503,13 @@
         "type": "vertamedia-clickhouse-datasource",
         "uid": "vertamedia-clickhouse-datasource"
       },
-      "description": "This panel displays the total number of clusters containing DeletedAPIs  activity.",
+      "description": "This panel displays the total number of clusters containing activity uniquely.",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1343,12 +1519,8 @@
                 "value": null
               },
               {
-                "color": "orange",
-                "value": 70
-              },
-              {
                 "color": "red",
-                "value": 85
+                "value": 80
               }
             ]
           }
@@ -1356,12 +1528,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 6,
+        "h": 5,
+        "w": 24,
         "x": 0,
         "y": 32
       },
-      "id": 65,
+      "id": 40,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
@@ -1391,61 +1563,7 @@
           "refId": "A",
           "round": "0s",
           "skip_comments": true
-        }
-      ],
-      "title": "Clusters Containing DeletedAPIs Activity",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "vertamedia-clickhouse-datasource"
-      },
-      "description": "This panel displays the total number of clusters containing Events activity.",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          }
         },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 6,
-        "y": 32
-      },
-      "id": 67,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
@@ -1455,155 +1573,50 @@
           "extrapolate": true,
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "intervalFactor": 1,
-          "query": "SELECT count(DISTINCT(ClusterName)) AS Events\nFROM default.events",
-          "rawQuery": "SELECT count(DISTINCT(ClusterName)) AS Events\nFROM default.events",
-          "refId": "A",
-          "round": "0s",
-          "skip_comments": true
-        }
-      ],
-      "title": "Clusters Containing Events Activity",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "vertamedia-clickhouse-datasource"
-      },
-      "description": "This panel displays the total number of clusters containing Outdated Images activity.",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 12,
-        "y": 32
-      },
-      "id": 68,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "intervalFactor": 1,
-          "query": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images",
-          "rawQuery": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images",
-          "refId": "A",
-          "round": "0s",
-          "skip_comments": true
-        }
-      ],
-      "title": "Clusters Containing Outdated_Images Activity",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "vertamedia-clickhouse-datasource"
-      },
-      "description": "This panel displays the total number of clusters containing DeprecatedAPIs activity.",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 18,
-        "y": 32
-      },
-      "id": 66,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "hide": false,
           "intervalFactor": 1,
           "query": "SELECT COUNT(DISTINCT ClusterName) AS DeprecatedAPIs\nFROM default.DeprecatedAPIs",
           "rawQuery": "SELECT COUNT(DISTINCT ClusterName) AS DeprecatedAPIs\nFROM default.DeprecatedAPIs",
-          "refId": "A",
+          "refId": "B",
+          "round": "0s",
+          "skip_comments": true
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "hide": false,
+          "intervalFactor": 1,
+          "query": "SELECT count(DISTINCT(ClusterName)) AS Events\nFROM default.events",
+          "rawQuery": "SELECT count(DISTINCT(ClusterName)) AS Events\nFROM default.events",
+          "refId": "C",
+          "round": "0s",
+          "skip_comments": true
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "hide": false,
+          "intervalFactor": 1,
+          "query": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images",
+          "rawQuery": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images",
+          "refId": "D",
           "round": "0s",
           "skip_comments": true
         }
       ],
-      "title": "Clusters Containing DeprecatedAPIs Activity",
+      "title": "Number of Clusters Containing Activity",
       "type": "gauge"
     },
     {
@@ -1625,7 +1638,13 @@
             "filterable": true,
             "inspect": false
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "KubeData",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1664,7 +1683,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 37
       },
       "id": 64,
       "options": {
@@ -1691,8 +1710,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
-          "rawQuery": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE EventTime >= toDateTime(1694243396) AND EventTime <= toDateTime(1694243696) AND Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
+          "query": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
+          "rawQuery": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1734,7 +1753,13 @@
               "mode": "off"
             }
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "DeprecatedAPIs",
+              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1756,7 +1781,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 44
+        "y": 45
       },
       "id": 34,
       "options": {
@@ -1791,8 +1816,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName",
-          "rawQuery": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nWHERE EventTime >= toDateTime(1694243425) AND EventTime <= toDateTime(1694243725)\nGROUP BY ClusterName",
+          "query": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nGROUP BY ClusterName",
+          "rawQuery": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nGROUP BY ClusterName",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1834,7 +1859,13 @@
               "mode": "off"
             }
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "DeletedAPIs",
+              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1856,7 +1887,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 44
+        "y": 45
       },
       "id": 36,
       "options": {
@@ -1891,8 +1922,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName",
-          "rawQuery": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nWHERE EventTime >= toDateTime(1694243449) AND EventTime <= toDateTime(1694243749)\nGROUP BY ClusterName",
+          "query": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nGROUP BY ClusterName",
+          "rawQuery": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nGROUP BY ClusterName",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1934,7 +1965,13 @@
               "mode": "off"
             }
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Outdated Images",
+              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1956,7 +1993,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 53
+        "y": 54
       },
       "id": 28,
       "options": {
@@ -1991,8 +2028,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName",
-          "rawQuery": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nWHERE EventTime >= toDateTime(1694243473) AND EventTime <= toDateTime(1694243773)\nGROUP BY ClusterName",
+          "query": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nGROUP BY ClusterName",
+          "rawQuery": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nGROUP BY ClusterName",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -2033,7 +2070,13 @@
               "mode": "off"
             }
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Kubedata",
+              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1689917173495&to=1689918073495"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2055,7 +2098,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 53
+        "y": 54
       },
       "id": 32,
       "options": {
@@ -2133,7 +2176,13 @@
               "mode": "off"
             }
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Kubernetes Resources",
+              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2155,7 +2204,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 53
+        "y": 54
       },
       "id": 30,
       "options": {
@@ -2190,8 +2239,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName",
-          "rawQuery": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nWHERE EventTime >= toDateTime(1694200604) AND EventTime <= toDateTime(1694243804)\nGROUP BY ClusterName",
+          "query": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName",
+          "rawQuery": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -2219,7 +2268,13 @@
             "filterable": true,
             "inspect": false
           },
-          "links": [],
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Kubernetes Resources",
+              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2262,7 +2317,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 61
+        "y": 62
       },
       "id": 42,
       "options": {
@@ -2289,8 +2344,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
-          "rawQuery": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nWHERE EventTime >= toDateTime(1694200646) AND EventTime <= toDateTime(1694243846)\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
+          "query": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
+          "rawQuery": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -2309,7 +2364,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 68
+        "y": 69
       },
       "id": 16,
       "panels": [
@@ -2337,8 +2392,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2353,7 +2407,7 @@
             "h": 16,
             "w": 24,
             "x": 0,
-            "y": 69
+            "y": 78
           },
           "id": 14,
           "options": {
@@ -2380,14 +2434,15 @@
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)",
-              "rawQuery": "SELECT * FROM default.getall_resources\nWHERE EventTime >= toDateTime(1694200677) AND EventTime <= toDateTime(1694243877)",
+              "query": "SELECT * FROM default.getall_resources",
+              "rawQuery": "SELECT * FROM default.getall_resources",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Kubernetes Resources",
+          "transparent": true,
           "type": "table"
         }
       ],
@@ -2413,7 +2468,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 69
+        "y": 70
       },
       "id": 12,
       "panels": [
@@ -2440,8 +2495,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2456,13 +2510,11 @@
             "h": 16,
             "w": 24,
             "x": 0,
-            "y": 70
+            "y": 226
           },
           "id": 10,
           "options": {
-            "cellHeight": "sm",
             "footer": {
-              "countRows": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -2471,7 +2523,7 @@
             },
             "showHeader": true
           },
-          "pluginVersion": "10.0.3",
+          "pluginVersion": "9.3.2",
           "targets": [
             {
               "datasource": {
@@ -2483,14 +2535,15 @@
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.outdated_images\nWHERE $timeFilterByColumn(EventTime) AND VersionsBehind > 0",
-              "rawQuery": "SELECT * FROM default.outdated_images\nWHERE EventTime >= toDateTime(1694200706) AND EventTime <= toDateTime(1694243906) AND VersionsBehind > 0",
+              "query": "SELECT * FROM default.outdated_images\nWHERE VersionsBehind > 0",
+              "rawQuery": "SELECT * FROM default.outdated_images\nWHERE VersionsBehind > 0",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "Outdated Images",
+          "transparent": true,
           "type": "table"
         }
       ],
@@ -2516,7 +2569,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 70
+        "y": 71
       },
       "id": 8,
       "panels": [
@@ -2544,8 +2597,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2560,13 +2612,11 @@
             "h": 11,
             "w": 24,
             "x": 0,
-            "y": 71
+            "y": 227
           },
           "id": 6,
           "options": {
-            "cellHeight": "sm",
             "footer": {
-              "countRows": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -2575,7 +2625,7 @@
             },
             "showHeader": true
           },
-          "pluginVersion": "10.0.3",
+          "pluginVersion": "9.3.2",
           "targets": [
             {
               "datasource": {
@@ -2587,14 +2637,15 @@
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.DeletedAPIs\nWHERE $timeFilterByColumn(EventTime)",
-              "rawQuery": "SELECT * FROM default.DeletedAPIs\nWHERE EventTime >= toDateTime(1694200743) AND EventTime <= toDateTime(1694243943)",
+              "query": "SELECT * FROM default.DeletedAPIs",
+              "rawQuery": "SELECT * FROM default.DeletedAPIs",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "DeletedAPIs",
+          "transparent": true,
           "type": "table"
         }
       ],
@@ -2620,7 +2671,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 71
+        "y": 72
       },
       "id": 4,
       "panels": [
@@ -2648,8 +2699,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2664,13 +2714,11 @@
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 72
+            "y": 228
           },
           "id": 2,
           "options": {
-            "cellHeight": "sm",
             "footer": {
-              "countRows": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -2679,7 +2727,7 @@
             },
             "showHeader": true
           },
-          "pluginVersion": "10.0.3",
+          "pluginVersion": "9.3.2",
           "targets": [
             {
               "datasource": {
@@ -2691,14 +2739,15 @@
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.DeprecatedAPIs\nWHERE $timeFilterByColumn(EventTime)",
-              "rawQuery": "SELECT * FROM default.DeprecatedAPIs\nWHERE EventTime >= toDateTime(1694200768) AND EventTime <= toDateTime(1694243968)",
+              "query": "SELECT * FROM default.DeprecatedAPIs",
+              "rawQuery": "SELECT * FROM default.DeprecatedAPIs",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "DeprecatedAPIs",
+          "transparent": true,
           "type": "table"
         }
       ],
@@ -2730,6 +2779,6 @@
   "timezone": "",
   "title": "Kubviz Dashboard",
   "uid": "eT4fox94z",
-  "version": 3,
+  "version": 1,
   "weekStart": ""
 }
