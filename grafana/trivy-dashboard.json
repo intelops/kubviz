@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 7,
+  "id": 86,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -1254,8 +1254,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"misconfig_id\", \"misconfig_avdid\", \"misconfig_type\", \"misconfig_title\", \"misconfig_desc\", \"misconfig_msg\", \"misconfig_query\", \"misconfig_resolution\", \"misconfig_severity\", \"misconfig_status\" \nFROM \"default\".\"trivy_misconfig\"\nWHERE $timeFilterByColumn(EventTime)",
-          "rawQuery": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"misconfig_id\", \"misconfig_avdid\", \"misconfig_type\", \"misconfig_title\", \"misconfig_desc\", \"misconfig_msg\", \"misconfig_query\", \"misconfig_resolution\", \"misconfig_severity\", \"misconfig_status\" \nFROM \"default\".\"trivy_misconfig\"\nWHERE EventTime >= toDateTime(1694156566) AND EventTime <= toDateTime(1694242966)",
+          "query": "SELECT \"cluster_name\", \"EventTime\", \"namespace\", \"kind\", \"name\", \"misconfig_id\", \"misconfig_avdid\", \"misconfig_type\", \"misconfig_title\", \"misconfig_desc\", \"misconfig_msg\", \"misconfig_query\", \"misconfig_resolution\", \"misconfig_severity\", \"misconfig_status\" \nFROM \"default\".\"trivy_misconfig\"\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
+          "rawQuery": "SELECT \"cluster_name\", \"EventTime\", \"namespace\", \"kind\", \"name\", \"misconfig_id\", \"misconfig_avdid\", \"misconfig_type\", \"misconfig_title\", \"misconfig_desc\", \"misconfig_msg\", \"misconfig_query\", \"misconfig_resolution\", \"misconfig_severity\", \"misconfig_status\" \nFROM \"default\".\"trivy_misconfig\"\nWHERE EventTime >= toDateTime(1694966455) AND EventTime <= toDateTime(1695052855)\nORDER BY EventTime DESC",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1359,8 +1359,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
