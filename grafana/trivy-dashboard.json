@@ -30,6 +30,124 @@
         "type": "vertamedia-clickhouse-datasource",
         "uid": "vertamedia-clickhouse-datasource"
       },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 36,
+      "options": {
+        "baidu": {
+          "callback": "bmapReady",
+          "key": ""
+        },
+        "editor": {
+          "format": "auto",
+          "height": 600
+        },
+        "gaode": {
+          "key": "",
+          "plugin": "AMap.Scale,AMap.ToolBar"
+        },
+        "getOption": "let severity = [];\nlet counts = [];\n\ndata.series.map((s) => {\n  severity = s.fields.find((f) => f.name === 'vul_severity').values;\n  counts = s.fields.find((f) => f.name === 'total_count').values;\n});\n\n// Create an empty array to store pie chart data\nconst pieChartData = [];\n\n// Define colors for pie slices\nconst pieSliceColors = ['#235894', '#FF0000', '#00FF00', '#FFFF00', '#FFA500'];\n\n// Map severity and counts to pie chart data\nseverity.forEach((sev, index) => {\n  pieChartData.push({\n    value: counts[index],\n    name: sev,\n    itemStyle: {\n      opacity: 0.7,\n      color: pieSliceColors[index % pieSliceColors.length],\n      borderWidth: 3,\n      borderColor: '#FFFFFF', // Set the border color to white\n    },\n  });\n});\n\nreturn {\n  backgroundColor: '#FFFFFF', // Set the background color to white\n  tooltip: {},\n  series: [\n    {\n      name: 'pie',\n      type: 'pie',\n      selectedMode: 'single',\n      selectedOffset: 30,\n      clockwise: true,\n      label: {\n        fontSize: 18,\n        color: '#235894',\n      },\n      labelLine: {\n        lineStyle: {\n          color: '#235894',\n        },\n      },\n      data: pieChartData, // Use the modified pie chart data\n      itemStyle: {\n        opacity: 0.7,\n        borderWidth: 3,\n        borderColor: '#FFFFFF', // Set the border color to white\n      },\n    },\n  ],\n};",
+        "google": {
+          "callback": "gmapReady",
+          "key": ""
+        },
+        "map": "none",
+        "renderer": "canvas",
+        "themeEditor": {
+          "config": "{}",
+          "height": 400,
+          "name": "default"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT vul_severity, count(*) AS total_count\nFROM default.trivy_vul\nWHERE $timeFilterByColumn(vul_last_modified_date)\nGROUP BY vul_severity",
+          "rawQuery": "SELECT vul_severity, count(*) AS total_count\nFROM default.trivy_vul\nWHERE vul_last_modified_date >= toDateTime(1694438766) AND vul_last_modified_date <= toDateTime(1694611566)\nGROUP BY vul_severity",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "Vulnerability Severity Distribution",
+      "type": "volkovlabs-echarts-panel"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 37,
+      "options": {
+        "baidu": {
+          "callback": "bmapReady",
+          "key": ""
+        },
+        "editor": {
+          "format": "auto",
+          "height": 600
+        },
+        "gaode": {
+          "key": "",
+          "plugin": "AMap.Scale,AMap.ToolBar"
+        },
+        "getOption": "let severity = [];\nlet counts = [];\n\ndata.series.map((s) => {\n  severity = s.fields.find((f) => f.name === 'misconfig_severity').values;\n  counts = s.fields.find((f) => f.name === 'total_count').values;\n});\n\n// Create an empty array to store pie chart data\nconst pieChartData = [];\n\n// Define colors for pie slices\nconst pieSliceColors = ['#235894', '#FF0000', '#00FF00', '#FFFF00', '#FFA500'];\n\n// Map severity and counts to pie chart data\nseverity.forEach((sev, index) => {\n  pieChartData.push({\n    value: counts[index],\n    name: sev,\n    itemStyle: {\n      opacity: 0.7,\n      color: pieSliceColors[index % pieSliceColors.length],\n      borderWidth: 3,\n      borderColor: '#FFFFFF', // Set the border color to white\n    },\n  });\n});\n\nreturn {\n  backgroundColor: '#FFFFFF', // Set the background color to white\n  tooltip: {},\n  series: [\n    {\n      name: 'pie',\n      type: 'pie',\n      selectedMode: 'single',\n      selectedOffset: 30,\n      clockwise: true,\n      label: {\n        fontSize: 18,\n        color: '#235894',\n      },\n      labelLine: {\n        lineStyle: {\n          color: '#235894',\n        },\n      },\n      data: pieChartData, // Use the modified pie chart data\n      itemStyle: {\n        opacity: 0.7,\n        borderWidth: 3,\n        borderColor: '#FFFFFF', // Set the border color to white\n      },\n    },\n  ],\n};",
+        "google": {
+          "callback": "gmapReady",
+          "key": ""
+        },
+        "map": "none",
+        "renderer": "canvas",
+        "themeEditor": {
+          "config": "{}",
+          "height": 400,
+          "name": "default"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT misconfig_severity, count(*) AS total_count\nFROM default.trivy_misconfig\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY misconfig_severity",
+          "rawQuery": "SELECT misconfig_severity, count(*) AS total_count\nFROM default.trivy_misconfig\nWHERE EventTime >= toDateTime(1694438912) AND EventTime <= toDateTime(1694611712)\nGROUP BY misconfig_severity",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "Misconfiguration Severity Distribution",
+      "type": "volkovlabs-echarts-panel"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
       "description": "This panel illustrates the distribution of vulnerability severities across different clusters. It provides an overview of the count of vulnerabilities categorized by severity levels within each cluster.",
       "fieldConfig": {
         "defaults": {
@@ -57,7 +175,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 8
       },
       "id": 20,
       "options": {
@@ -127,7 +245,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 8
       },
       "id": 22,
       "options": {
@@ -198,7 +316,7 @@
         "h": 5,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "id": 18,
       "options": {
@@ -266,7 +384,7 @@
         "h": 5,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 16
       },
       "id": 16,
       "options": {
@@ -333,7 +451,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 13
+        "y": 21
       },
       "id": 29,
       "options": {
@@ -403,7 +521,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 13
+        "y": 21
       },
       "id": 30,
       "options": {
@@ -473,7 +591,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 20
+        "y": 28
       },
       "id": 27,
       "options": {
@@ -543,7 +661,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 20
+        "y": 28
       },
       "id": 28,
       "options": {
@@ -613,7 +731,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 27
+        "y": 35
       },
       "id": 25,
       "options": {
@@ -683,7 +801,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 27
+        "y": 35
       },
       "id": 26,
       "options": {
@@ -753,7 +871,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 42
       },
       "id": 12,
       "options": {
@@ -823,7 +941,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 42
       },
       "id": 14,
       "options": {
@@ -867,248 +985,6 @@
         "type": "vertamedia-clickhouse-datasource",
         "uid": "vertamedia-clickhouse-datasource"
       },
-      "description": "This panel displays the total count of Vulnerability severity for each level",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 12,
-        "x": 0,
-        "y": 41
-      },
-      "id": 10,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "intervalFactor": 1,
-          "query": "SELECT count(*) AS High_Severity\nFROM default.trivy_vul\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'HIGH'",
-          "rawQuery": "SELECT count(*) AS High_Severity\nFROM default.trivy_vul\nWHERE vul_last_modified_date >= toDateTime(1694156133) AND vul_last_modified_date <= toDateTime(1694242533) AND vul_severity = 'HIGH'",
-          "refId": "A",
-          "round": "0s",
-          "skip_comments": true
-        },
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "hide": false,
-          "intervalFactor": 1,
-          "query": "SELECT count(*) AS Medium_Severity\nFROM default.trivy_vul\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'MEDIUM'",
-          "rawQuery": "SELECT count(*) AS Medium_Severity\nFROM default.trivy_vul\nWHERE vul_last_modified_date >= toDateTime(1694156133) AND vul_last_modified_date <= toDateTime(1694242533) AND vul_severity = 'MEDIUM'",
-          "refId": "B",
-          "round": "0s",
-          "skip_comments": true
-        },
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "hide": false,
-          "intervalFactor": 1,
-          "query": "SELECT count(*) AS Low_Severity\nFROM default.trivy_vul\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'LOW'",
-          "rawQuery": "SELECT count(*) AS Low_Severity\nFROM default.trivy_vul\nWHERE vul_last_modified_date >= toDateTime(1694156133) AND vul_last_modified_date <= toDateTime(1694242533) AND vul_severity = 'LOW'",
-          "refId": "C",
-          "round": "0s",
-          "skip_comments": true
-        },
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "hide": false,
-          "intervalFactor": 1,
-          "query": "SELECT count(*) AS Critical_Severity\nFROM default.trivy_vul\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'CRITICAL'",
-          "rawQuery": "SELECT count(*) AS Critical_Severity\nFROM default.trivy_vul\nWHERE vul_last_modified_date >= toDateTime(1694156133) AND vul_last_modified_date <= toDateTime(1694242533) AND vul_severity = 'CRITICAL'",
-          "refId": "D",
-          "round": "0s",
-          "skip_comments": true
-        }
-      ],
-      "title": "Count of Vulnereability  Severity level",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "vertamedia-clickhouse-datasource"
-      },
-      "description": "This panel displays the total count of Misconfiguration severity for each level",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 12,
-        "x": 12,
-        "y": 41
-      },
-      "id": 8,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "intervalFactor": 1,
-          "query": "SELECT count(*) AS High_Severity\nFROM default.trivy_misconfig\nWHERE $timeFilterByColumn(EventTime) AND misconfig_severity = 'HIGH'",
-          "rawQuery": "SELECT count(*) AS High_Severity\nFROM default.trivy_misconfig\nWHERE EventTime >= toDateTime(1694156516) AND EventTime <= toDateTime(1694242916) AND misconfig_severity = 'HIGH'",
-          "refId": "A",
-          "round": "0s",
-          "skip_comments": true
-        },
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "hide": false,
-          "intervalFactor": 1,
-          "query": "SELECT count(*) AS Medium_Severity\nFROM default.trivy_misconfig\nWHERE $timeFilterByColumn(EventTime) AND misconfig_severity = 'MEDIUM'",
-          "rawQuery": "SELECT count(*) AS Medium_Severity\nFROM default.trivy_misconfig\nWHERE EventTime >= toDateTime(1694156516) AND EventTime <= toDateTime(1694242916) AND misconfig_severity = 'MEDIUM'",
-          "refId": "B",
-          "round": "0s",
-          "skip_comments": true
-        },
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "hide": false,
-          "intervalFactor": 1,
-          "query": "SELECT count(*) AS Low_Severity\nFROM default.trivy_misconfig\nWHERE $timeFilterByColumn(EventTime) AND misconfig_severity = 'LOW'",
-          "rawQuery": "SELECT count(*) AS Low_Severity\nFROM default.trivy_misconfig\nWHERE EventTime >= toDateTime(1694156516) AND EventTime <= toDateTime(1694242916) AND misconfig_severity = 'LOW'",
-          "refId": "C",
-          "round": "0s",
-          "skip_comments": true
-        },
-        {
-          "datasource": {
-            "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
-          },
-          "dateTimeType": "DATETIME",
-          "extrapolate": true,
-          "format": "table",
-          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-          "hide": false,
-          "intervalFactor": 1,
-          "query": "SELECT count(*) AS Critical_Severity\nFROM default.trivy_misconfig\nWHERE $timeFilterByColumn(EventTime) AND misconfig_severity = 'CRITICAL'",
-          "rawQuery": "SELECT count(*) AS Critical_Severity\nFROM default.trivy_misconfig\nWHERE EventTime >= toDateTime(1694156516) AND EventTime <= toDateTime(1694242916) AND misconfig_severity = 'CRITICAL'",
-          "refId": "D",
-          "round": "0s",
-          "skip_comments": true
-        }
-      ],
-      "title": "Count of Misconfiguration Severity Level",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "vertamedia-clickhouse-datasource",
-        "uid": "vertamedia-clickhouse-datasource"
-      },
       "description": "This panel displays the count of vulnerabilities in different clusters and namespaces.",
       "fieldConfig": {
         "defaults": {
@@ -1136,7 +1012,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 47
+        "y": 49
       },
       "id": 6,
       "options": {
@@ -1206,7 +1082,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 47
+        "y": 49
       },
       "id": 4,
       "options": {
@@ -1279,7 +1155,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 55
+        "y": 57
       },
       "id": 32,
       "options": {
@@ -1351,7 +1227,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 63
+        "y": 65
       },
       "id": 33,
       "options": {
@@ -1423,7 +1299,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 71
+        "y": 73
       },
       "id": 34,
       "options": {
@@ -1495,7 +1371,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 79
+        "y": 81
       },
       "id": 35,
       "options": {
@@ -1548,6 +1424,6 @@
   "timezone": "",
   "title": "Trivy",
   "uid": "f9b0a865-f419-410a-b7d9-9a3f79a70d48",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
