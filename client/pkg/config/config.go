@@ -5,4 +5,5 @@ type Config struct {
 	NatsToken   string `envconfig:"NATS_TOKEN"`
 	DbPort      int    `envconfig:"DB_PORT"`
 	DBAddress   string `envconfig:"DB_ADDRESS"`
+	AuthToken   string `envconfig:"AUTH_TOKEN"`
 }

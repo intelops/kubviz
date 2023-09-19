@@ -14,7 +14,7 @@ type AgentConfigurations struct {
 	RakkessInterval        string `envconfig:"RAKKESS_INTERVAL" default:"*/50 * * * *"`
 	KubePreUpgradeInterval string `envconfig:"KUBEPREUPGRADE_INTERVAL" default:"*/60 * * * *"`
 	TrivyInterval          string `envconfig:"TRIVY_INTERVAL" default:"*/10 * * * *"`
-	SchedulerEnable        bool   `envconfig:"SCHEDULER_ENABLE" default:"true"`
+	SchedulerEnable        bool   `envconfig:"SCHEDULER_ENABLE" default:"false"`
 }
 
 func GetAgentConfigurations() (serviceConf *AgentConfigurations, err error) {
