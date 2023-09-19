@@ -83,7 +83,12 @@ nats:
   #Authentication setup
   auth:
     enabled: true
-    token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
+    # Use token if you want to provide the token via Helm Values
+    token: ""
+    # Use a secret reference if you want to get a token from a secret
+    secret:
+      name: ""
+      key: ""
   nats:
     jetstream:
       enabled: true
