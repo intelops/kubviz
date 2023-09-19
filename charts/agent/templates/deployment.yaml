@@ -53,19 +53,19 @@ spec:
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
           - name: SCHEDULING_INTERVAL
-            value: {{ .Values.schedulingInterval }}
+            value: {{ .Values.schedule.schedulingInterval }}
           - name: SCHEDULER_ENABLE
-            value: {{ .Values.schedulingEnable }}
+            value: {{ .Values.schedule.enabled }}
           - name: OUTDATED_INTERVAL
-            value: {{ .Values.OutdatedInterval }}
+            value: {{ .Values.schedule.outdatedInterval }}
           - name: GETALL_INTERVAL
-            value: {{ .Values.GetallInterval }}
+            value: {{ .Values.schedule.getallInterval }}
           - name: KUBESCORE_INTERVAL
-            value: {{ .Values.KubescoreInterval }}
+            value: {{ .Values.schedule.kubescoreInterval }}
           - name: RAKKESS_INTERVAL
-            value: {{ .Values.RakkessInterval }}
+            value: {{ .Values.schedule.rakkessInterval }}
           - name: KUBEPREUPGRADE_INTERVAL
-            value: {{ .Values.KubepreupgradeInterval }}
+            value: {{ .Values.schedule.kubepreupgradeInterval }}
           - name: TRIVY_INTERVAL
             value: {{ .Values.TrivyInterval }}
           resources:
