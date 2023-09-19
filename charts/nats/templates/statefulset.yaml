@@ -318,7 +318,6 @@ spec:
               fieldPath: metadata.namespace
         - name: CLUSTER_ADVERTISE
           value: {{ include "nats.clusterAdvertise" . }}
-
         {{- if .Values.nats.jetstream.enabled }}
         {{- with .Values.nats.jetstream.encryption }}
         {{- with .secret }}
@@ -329,6 +328,13 @@ spec:
               key: {{ .key }}
         {{- end }}
         {{- end }}
+        {{- end }}
+        {{- if and .Values.auth.enabled .Values.auth.secret }}
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.auth.secret.name }}
+              key: {{ .Values.auth.secret.key }}
         {{- end }}
         volumeMounts:
           - name: config-volume
