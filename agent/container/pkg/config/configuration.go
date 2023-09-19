@@ -7,6 +7,7 @@ package config
 type Config struct {
 	NatsAddress string `envconfig:"NATS_ADDRESS"`
 	NatsToken   string `envconfig:"NATS_TOKEN"`
+	AuthToken   string `envconfig:"AUTH_TOKEN"`
 	Port        int    `envconfig:"PORT"`
 	StreamName  string `envconfig:"STREAM_NAME"`
 }
