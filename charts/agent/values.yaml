@@ -142,7 +142,15 @@ tolerations: []
 
 affinity: {}
 
-schedulingInterval: "24h"
+schedule:
+  enabled: false
+  schedulingInterval: "24h"
+  outdatedInterval: "@every 18h"
+  getallInterval: "@every 19h"
+  kubescoreInterval: "@every 20h"
+  rakkessInterval: "@every 21h"
+  kubepreupgradeInterval: "@every 22h"
+  trivyInterval: "@every 24h"
 
 clusterName: "kubviz"
 nats:
