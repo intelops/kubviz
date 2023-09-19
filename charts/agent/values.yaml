@@ -143,7 +143,7 @@ tolerations: []
 affinity: {}
 
 schedulingInterval: "24h"
-schedulingEnable: "fals"
+schedulingEnable: "false"
 OutdatedInterval: "@every 18h"
 GetallInterval: "@every 19h"
 KubescoreInterval: "@every 20h"

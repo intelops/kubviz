@@ -8,7 +8,7 @@ import (
 type AgentConfigurations struct {
 	SANamespace            string `envconfig:"SA_NAMESPACE" default:"default"`
 	SAName                 string `envconfig:"SA_NAME" default:"default"`
-	OutdatedInterval       string `envconfig:"OUTDATED_INTERVAL" default:"@every 5m"`
+	OutdatedInterval       string `envconfig:"OUTDATED_INTERVAL" default:"@every 20m"`
 	GetAllInterval         string `envconfig:"GETALL_INTERVAL" default:"*/30 * * * *"`
 	KubeScoreInterval      string `envconfig:"KUBESCORE_INTERVAL" default:"*/40 * * * *"`
 	RakkessInterval        string `envconfig:"RAKKESS_INTERVAL" default:"*/50 * * * *"`
