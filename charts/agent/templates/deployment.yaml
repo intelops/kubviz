@@ -54,6 +54,20 @@ spec:
             value: {{ .Values.nats.host }}
           - name: SCHEDULING_INTERVAL
             value: {{ .Values.schedulingInterval }}
+          - name: SCHEDULER_ENABLE
+            value: {{ .Values.schedulingEnable }}
+          - name: OUTDATED_INTERVAL
+            value: {{ .Values.OutdatedInterval }}
+          - name: GETALL_INTERVAL
+            value: {{ .Values.GetallInterval }}
+          - name: KUBESCORE_INTERVAL
+            value: {{ .Values.KubescoreInterval }}
+          - name: RAKKESS_INTERVAL
+            value: {{ .Values.RakkessInterval }}
+          - name: KUBEPREUPGRADE_INTERVAL
+            value: {{ .Values.KubepreupgradeInterval }}
+          - name: TRIVY_INTERVAL
+            value: {{ .Values.TrivyInterval }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 {{- if .Values.git_bridge.enabled }}

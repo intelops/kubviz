@@ -143,7 +143,13 @@ tolerations: []
 affinity: {}
 
 schedulingInterval: "24h"
-
+schedulingEnable: "false"
+OutdatedInterval: "@every 18h"
+GetallInterval: "@every 19h"
+KubescoreInterval: "@every 20h"
+RakkessInterval: "@every 21h"
+KubepreupgradeInterval: "@every 22h"
+TrivyInterval: "@every 24h"
 clusterName: "kubviz"
 nats:
   host: kubviz-client-nats 
