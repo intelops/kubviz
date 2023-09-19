@@ -53,7 +53,9 @@ const (
 var (
 	ClusterName string = os.Getenv("CLUSTER_NAME")
 	token       string = os.Getenv("NATS_TOKEN")
+	authtoken   string = os.Getenv("AUTH_TOKEN")
 	natsurl     string = os.Getenv("NATS_ADDRESS")
+
 	//for local testing provide the location of kubeconfig
 	// inside the civo file paste your kubeconfig
 	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)
@@ -91,7 +93,7 @@ func main() {
 		clientset *kubernetes.Clientset
 	)
 	// connecting with nats ...
-	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(authtoken))
 	checkErr(err)
 	// creating a jetstream connection using the nats connection
 	js, err := nc.JetStream()
