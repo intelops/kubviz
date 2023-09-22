@@ -15,7 +15,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 22,
+  "id": 12,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -103,7 +103,7 @@
           "key": "",
           "plugin": "AMap.Scale,AMap.ToolBar"
         },
-        "getOption": "// Extract Author and Push_Events data from the series\nconst categories = data.series[0].fields.find((f) => f.name === 'Author').values;\nconst pushEvents = data.series[0].fields.find((f) => f.name === 'Push_Events').values;\n\n// Create the ECharts options\nconst options = {\n  grid: {\n    bottom: '3%',\n    containLabel: true,\n    left: '3%',\n    right: '4%',\n    top: '4%',\n  },\n  toolbox: {\n    left: 'center',\n    feature: {\n      dataZoom: {\n        yAxisIndex: 'none',\n      },\n      restore: {},\n    },\n  },\n  tooltip: {\n    trigger: 'axis',\n    axisPointer: {\n      type: 'shadow',\n    },\n  },\n  xAxis: {\n    type: 'category',\n    data: categories,\n  },\n  yAxis: {\n    type: 'value',\n  },\n  legend: {\n    data: ['Push_Events'],\n    orient: 'vertical', // Change the orientation to vertical\n    left: '5%', // Adjust the left margin to position it on the top left\n    top: '5%', // Adjust the top margin to position it on the top left\n  },\n  series: [\n    {\n      data: pushEvents,\n      type: 'line',\n      areaStyle: {\n        color: 'rgba(0, 128, 255, 0.3)', // Set the area (shadow) color\n      },\n      name: 'Push_Events',\n    },\n  ],\n};\n\nreturn options;\n",
+        "getOption": "// Extract Author and Push_Events data from the series\nconst categories = data.series[0].fields.find((f) => f.name === 'Author').values;\nconst pushEvents = data.series[0].fields.find((f) => f.name === 'Push_Events').values;\n\n// Create the ECharts options\nconst options = {\n  grid: {\n    bottom: '3%',\n    containLabel: true,\n    left: '3%',\n    right: '4%',\n    top: '4%',\n  },\n  toolbox: {\n    right: '5%', // Adjust the right margin to position it on the top right\n    top: '0%', // Adjust the top margin to position it on the top right\n    feature: {\n      dataZoom: {\n        yAxisIndex: 'none',\n      },\n      restore: {},\n    },\n  },\n  tooltip: {\n    trigger: 'axis',\n    axisPointer: {\n      type: 'shadow',\n    },\n  },\n  xAxis: {\n    type: 'category',\n    data: categories,\n  },\n  yAxis: {\n    type: 'value',\n  },\n  legend: {\n    data: ['Push_Events'],\n    orient: 'vertical', // Change the orientation to vertical\n    left: '5%', // Adjust the left margin to position it on the top left\n    top: '5%', // Adjust the top margin to position it on the top left\n  },\n  series: [\n    {\n      data: pushEvents,\n      type: 'line',\n      areaStyle: {\n        color: 'rgba(0, 128, 255, 0.3)', // Set the area (shadow) color\n      },\n      name: 'Push_Events',\n    },\n  ],\n};\n\nreturn options;\n",
         "google": {
           "callback": "gmapReady",
           "key": ""
@@ -162,7 +162,7 @@
           "key": "",
           "plugin": "AMap.Scale,AMap.ToolBar"
         },
-        "getOption": "// Extract Author and Merge_Events data from the series\nconst categories = data.series[0].fields.find((f) => f.name === 'Author').values;\nconst mergeEvents = data.series[0].fields.find((f) => f.name === 'Merge_Events').values;\n\n// Create the ECharts options\nconst options = {\n  grid: {\n    bottom: '3%',\n    containLabel: true,\n    left: '3%',\n    right: '4%',\n    top: '4%',\n  },\n  toolbox: {\n    left: 'center',\n    feature: {\n      dataZoom: {\n        yAxisIndex: 'none',\n      },\n      restore: {},\n    },\n  },\n  tooltip: {\n    trigger: 'axis',\n    axisPointer: {\n      type: 'shadow',\n    },\n  },\n  xAxis: {\n    type: 'category',\n    data: categories,\n  },\n  yAxis: {\n    type: 'value',\n  },\n  legend: {\n    data: ['Merge_Events'],\n    orient: 'vertical',\n    left: '5%',\n    top: '5%',\n  },\n  series: [\n    {\n      data: mergeEvents,\n      type: 'line',\n      name: 'Merge_Events',\n      areaStyle: {\n        color: 'rgba(255, 0, 0, 0.3)', // Set the area (shadow) color\n      },\n      lineStyle: {\n        color: 'red', // Set the line color\n      },\n    },\n  ],\n};\n\nreturn options;",
+        "getOption": "// Extract Author and Merge_Events data from the series\nconst categories = data.series[0].fields.find((f) => f.name === 'Author').values;\nconst mergeEvents = data.series[0].fields.find((f) => f.name === 'Merge_Events').values;\n\n// Create the ECharts options\nconst options = {\n  grid: {\n    bottom: '3%',\n    containLabel: true,\n    left: '3%',\n    right: '4%',\n    top: '4%',\n  },\n  toolbox: {\n    right: '5%', // Adjust the right margin to position it on the top right\n    top: '0%', // Adjust the top margin to position it on the top right\n    feature: {\n      dataZoom: {\n        yAxisIndex: 'none',\n      },\n      restore: {},\n    },\n  },\n  tooltip: {\n    trigger: 'axis',\n    axisPointer: {\n      type: 'shadow',\n    },\n  },\n  xAxis: {\n    type: 'category',\n    data: categories,\n  },\n  yAxis: {\n    type: 'value',\n  },\n  legend: {\n    data: ['Merge_Events'],\n    orient: 'vertical',\n    left: '5%',\n    top: '5%',\n  },\n  series: [\n    {\n      data: mergeEvents,\n      type: 'line',\n      name: 'Merge_Events',\n      areaStyle: {\n        color: 'rgba(255, 0, 0, 0.3)', // Set the area (shadow) color\n      },\n      lineStyle: {\n        color: 'red', // Set the line color\n      },\n    },\n  ],\n};\n\nreturn options;",
         "google": {
           "callback": "gmapReady",
           "key": ""
@@ -473,7 +473,6 @@
   "timezone": "",
   "title": "Azure",
   "uid": "dd66838a-ffda-4de2-944f-1828d1671fc9",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
-

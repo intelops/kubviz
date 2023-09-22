@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 19,
+  "id": 9,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -50,7 +50,7 @@
           "key": "",
           "plugin": "AMap.Scale,AMap.ToolBar"
         },
-        "getOption": "// Extract data from your JSON\nconst clusterNames = data.series[0].fields[0].values; // New column for ClusterName\nconst namespaces = data.series[0].fields[1].values;\nconst kinds = data.series[0].fields[2].values; // Adjusted index for Kind\nconst counts = data.series[0].fields[3].values; // New column for Count\n\n// Create a hierarchical structure from the data without a root node\nconst hierarchy = {\n  name: 'root', // Use 'root' as a placeholder\n  children: [],\n};\n\nconst seenClusterNames = new Set();\nconst seenNamespaces = new Set();\n\nfor (let i = 0; i < clusterNames.length; i++) {\n  const clusterName = clusterNames[i];\n  const namespace = namespaces[i];\n  const kind = kinds[i];\n  const count = counts[i]; // Get the count value\n\n  if (!seenClusterNames.has(clusterName)) {\n    seenClusterNames.add(clusterName);\n    const clusterNode = { name: clusterName, children: [] };\n    hierarchy.children.push(clusterNode);\n    seenNamespaces.clear(); // Reset seenNamespaces for each cluster\n  }\n\n  const clusterNode = hierarchy.children.find((node) => node.name === clusterName);\n\n  if (!seenNamespaces.has(namespace)) {\n    seenNamespaces.add(namespace);\n    const namespaceNode = { name: namespace, children: [] };\n    clusterNode.children.push(namespaceNode);\n  }\n\n  const namespaceNode = clusterNode.children.find((node) => node.name === namespace);\n  const kindNode = { name: kind, children: [{ name: `Count: ${count}` }] }; // Include the count as a child node\n  namespaceNode.children.push(kindNode);\n}\n\n// Create the tree chart using ECharts\nconst option = {\n  tooltip: {\n    trigger: 'item',\n    triggerOn: 'mousemove',\n    formatter: function (params) {\n      const node = params.data;\n      let tooltip = '';\n      if (node.column) {\n        tooltip += `${node.column}: ${node.name}`;\n      } else {\n        tooltip += node.name;\n      }\n      return tooltip;\n    },\n  },\n  series: [\n    {\n      type: 'tree',\n      data: hierarchy.children, // Use the children directly\n      top: '1%',\n      left: '7%',\n      bottom: '1%',\n      right: '20%',\n      symbolSize: 7,\n      label: {\n        position: 'left',\n        verticalAlign: 'middle',\n        align: 'right',\n        fontSize: 14, // Increase the text size for regular nodes\n      },\n      leaves: {\n        label: {\n          position: 'right',\n          verticalAlign: 'middle',\n          align: 'left',\n          fontSize: 14, // Increase the text size for leaves\n        },\n      },\n      emphasis: {\n        focus: 'descendant',\n      },\n      expandAndCollapse: true,\n      animationDuration: 550,\n      animationDurationUpdate: 750,\n    },\n  ],\n};\nreturn option;",
+        "getOption": "// Extract data from your JSON\nconst clusterNames = data.series[0].fields[0].values; // New column for ClusterName\nconst namespaces = data.series[0].fields[1].values;\nconst kinds = data.series[0].fields[2].values; // Adjusted index for Kind\nconst counts = data.series[0].fields[3].values; // New column for Count\n\n// Create a hierarchical structure from the data without a root node\nconst hierarchy = {\n  name: 'root', // Use 'root' as a placeholder\n  children: [],\n};\n\nconst seenClusterNames = new Set();\nconst seenNamespaces = new Set();\n\nfor (let i = 0; i < clusterNames.length; i++) {\n  const clusterName = clusterNames[i];\n  const namespace = namespaces[i];\n  const kind = kinds[i];\n  const count = counts[i]; // Get the count value\n\n  if (!seenClusterNames.has(clusterName)) {\n    seenClusterNames.add(clusterName);\n    const clusterNode = { name: clusterName, children: [] };\n    hierarchy.children.push(clusterNode);\n    seenNamespaces.clear(); // Reset seenNamespaces for each cluster\n  }\n\n  const clusterNode = hierarchy.children.find((node) => node.name === clusterName);\n\n  if (!seenNamespaces.has(namespace)) {\n    seenNamespaces.add(namespace);\n    const namespaceNode = { name: namespace, children: [] };\n    clusterNode.children.push(namespaceNode);\n  }\n\n  const namespaceNode = clusterNode.children.find((node) => node.name === namespace);\n  const kindNode = { name: kind, children: [{ name: `Count: ${count}` }] }; // Include the count as a child node\n  namespaceNode.children.push(kindNode);\n}\n\n// Create the tree chart using ECharts\nconst option = {\n  tooltip: {\n    trigger: 'item',\n    triggerOn: 'mousemove',\n    formatter: function (params) {\n      const node = params.data;\n      let tooltip = '';\n      if (node.column) {\n        tooltip += `${node.column}: ${node.name}`;\n      } else {\n        tooltip += node.name;\n      }\n      return tooltip;\n    },\n  },\n  series: [\n    {\n      type: 'tree',\n      data: hierarchy.children, // Use the children directly\n      top: '1%',\n      left: '7%',\n      bottom: '1%',\n      right: '20%',\n      symbolSize: 7,\n      label: {\n        position: 'left',\n        verticalAlign: 'middle',\n        align: 'right',\n        fontSize: 15, // Increase the text size for regular nodes\n        fontWeight: 'bold', // Set the font weight to bold\n      },\n      leaves: {\n        label: {\n          position: 'right',\n          verticalAlign: 'middle',\n          align: 'left',\n          fontSize: 15, // Increase the text size for leaves\n          fontWeight: 'bold', // Set the font weight to bold\n        },\n      },\n      emphasis: {\n        focus: 'descendant',\n      },\n      expandAndCollapse: true,\n      animationDuration: 550,\n      animationDurationUpdate: 750,\n    },\n  ],\n};\nreturn option;",
         "google": {
           "callback": "gmapReady",
           "key": ""
@@ -297,11 +297,6 @@
           "uid": "vertamedia-clickhouse-datasource"
         },
         "definition": "SELECT Kind FROM default.events",
-        "error": {
-          "data": {
-            "message": "Unexpected error"
-          }
-        },
         "hide": 0,
         "includeAll": true,
         "multi": true,
@@ -347,6 +342,6 @@
   "timezone": "",
   "title": "Kubedata",
   "uid": "Qq-FK1rVz",
-  "version": 3,
+  "version": 2,
   "weekStart": ""
 }

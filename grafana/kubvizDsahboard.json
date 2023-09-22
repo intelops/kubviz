@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 76,
+  "id": 8,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -245,8 +245,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT count(*) FROM default.outdated_images\nWHERE VersionsBehind > 0",
-          "rawQuery": "SELECT count(*) FROM default.outdated_images\nWHERE VersionsBehind > 0",
+          "query": "SELECT count(*)\n\nFROM default.outdated_images\n\nWHERE $timeFilterByColumn(EventTime) AND VersionsBehind > 0",
+          "rawQuery": "SELECT count(*)\n\nFROM default.outdated_images\n\nWHERE EventTime >= toDateTime(1695283225) AND EventTime <= toDateTime(1695369625) AND VersionsBehind > 0",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -397,8 +397,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT count(*) FROM default.DeletedAPIs",
-          "rawQuery": "SELECT count(*) FROM default.DeletedAPIs",
+          "query": "SELECT count(*) FROM default.DeletedAPIs\nWHERE $timeFilterByColumn(EventTime)",
+          "rawQuery": "SELECT count(*) FROM default.DeletedAPIs\nWHERE EventTime >= toDateTime(1695367863) AND EventTime <= toDateTime(1695369663)",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -473,8 +473,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT count(*) FROM default.DeprecatedAPIs",
-          "rawQuery": "SELECT count(*) FROM default.DeprecatedAPIs",
+          "query": "SELECT count(*) FROM default.DeprecatedAPIs\nWHERE $timeFilterByColumn(EventTime)",
+          "rawQuery": "SELECT count(*) FROM default.DeprecatedAPIs\nWHERE EventTime >= toDateTime(1695367882) AND EventTime <= toDateTime(1695369682)",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -549,8 +549,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT count(*) FROM default.getall_resources",
-          "rawQuery": "SELECT count(*) FROM default.getall_resources",
+          "query": "SELECT count(*) FROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)",
+          "rawQuery": "SELECT count(*) FROM default.getall_resources\nWHERE EventTime >= toDateTime(1695367909) AND EventTime <= toDateTime(1695369709)",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1561,8 +1561,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT COUNT(DISTINCT ClusterName) AS DeletedAPIs\nFROM default.DeletedAPIs",
-          "rawQuery": "SELECT COUNT(DISTINCT ClusterName) AS DeletedAPIs\nFROM default.DeletedAPIs",
+          "query": "SELECT COUNT(DISTINCT ClusterName) AS DeletedAPIs\nFROM default.DeletedAPIs\nWHERE $timeFilterByColumn(EventTime)",
+          "rawQuery": "SELECT COUNT(DISTINCT ClusterName) AS DeletedAPIs\nFROM default.DeletedAPIs\nWHERE EventTime >= toDateTime(1695369491) AND EventTime <= toDateTime(1695369791)",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1631,8 +1631,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images",
-          "rawQuery": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images",
+          "query": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images\nWHERE $timeFilterByColumn(EventTime)",
+          "rawQuery": "SELECT count(DISTINCT(ClusterName)) AS OutdatedImages\nFROM default.outdated_images\nWHERE EventTime >= toDateTime(1695369518) AND EventTime <= toDateTime(1695369818)",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1701,8 +1701,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT COUNT(DISTINCT ClusterName) AS DeprecatedAPIs\nFROM default.DeprecatedAPIs",
-          "rawQuery": "SELECT COUNT(DISTINCT ClusterName) AS DeprecatedAPIs\nFROM default.DeprecatedAPIs",
+          "query": "SELECT COUNT(DISTINCT ClusterName) AS DeprecatedAPIs\nFROM default.DeprecatedAPIs\nWHERE $timeFilterByColumn(EventTime)",
+          "rawQuery": "SELECT COUNT(DISTINCT ClusterName) AS DeprecatedAPIs\nFROM default.DeprecatedAPIs\nWHERE EventTime >= toDateTime(1695369535) AND EventTime <= toDateTime(1695369835)",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1802,8 +1802,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
-          "rawQuery": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
+          "query": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
+          "rawQuery": "SELECT ClusterName, Reason, count(Kind) AS Pods FROM default.events\nWHERE EventTime >= toDateTime(1695369559) AND EventTime <= toDateTime(1695369859) AND Kind IN 'Pod' \nGROUP BY ClusterName,Reason",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1908,8 +1908,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nGROUP BY ClusterName",
-          "rawQuery": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nGROUP BY ClusterName",
+          "query": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName",
+          "rawQuery": "SELECT ClusterName, count(Deprecated) AS DeprecatedAPIs FROM default.DeprecatedAPIs\nWHERE EventTime >= toDateTime(1695369580) AND EventTime <= toDateTime(1695369880)\nGROUP BY ClusterName",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -2014,8 +2014,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nGROUP BY ClusterName",
-          "rawQuery": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nGROUP BY ClusterName",
+          "query": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName",
+          "rawQuery": "SELECT ClusterName, count(Deleted) AS DeletedAPIs FROM default.DeletedAPIs\nWHERE EventTime >= toDateTime(1695369607) AND EventTime <= toDateTime(1695369907)\nGROUP BY ClusterName",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -2120,8 +2120,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nGROUP BY ClusterName",
-          "rawQuery": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nGROUP BY ClusterName",
+          "query": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName",
+          "rawQuery": "SELECT ClusterName, count(CurrentImage) AS Outdated_Images FROM default.outdated_images\nWHERE EventTime >= toDateTime(1695369627) AND EventTime <= toDateTime(1695369927)\nGROUP BY ClusterName",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -2331,8 +2331,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName",
-          "rawQuery": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName",
+          "query": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName",
+          "rawQuery": "SELECT ClusterName, count(Resource) AS Resources FROM default.getall_resources\nWHERE EventTime >= toDateTime(1695369653) AND EventTime <= toDateTime(1695369953)\nGROUP BY ClusterName",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -2436,8 +2436,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
-          "rawQuery": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
+          "query": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
+          "rawQuery": "SELECT ClusterName, Kind, count(Resource) AS Resources FROM default.getall_resources\nWHERE EventTime >= toDateTime(1695369674) AND EventTime <= toDateTime(1695369974)\nGROUP BY ClusterName,Kind\nORDER BY Resources DESC",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -2484,7 +2484,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -2499,7 +2500,7 @@
             "h": 16,
             "w": 24,
             "x": 0,
-            "y": 102
+            "y": 70
           },
           "id": 14,
           "options": {
@@ -2526,8 +2527,8 @@
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.getall_resources",
-              "rawQuery": "SELECT * FROM default.getall_resources",
+              "query": "SELECT * FROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)",
+              "rawQuery": "SELECT * FROM default.getall_resources\nWHERE EventTime >= toDateTime(1695369699) AND EventTime <= toDateTime(1695369999)",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -2587,7 +2588,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -2602,11 +2604,13 @@
             "h": 16,
             "w": 24,
             "x": 0,
-            "y": 250
+            "y": 87
           },
           "id": 10,
           "options": {
+            "cellHeight": "sm",
             "footer": {
+              "countRows": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -2615,7 +2619,7 @@
             },
             "showHeader": true
           },
-          "pluginVersion": "9.3.2",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -2627,8 +2631,8 @@
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.outdated_images\nWHERE VersionsBehind > 0",
-              "rawQuery": "SELECT * FROM default.outdated_images\nWHERE VersionsBehind > 0",
+              "query": "SELECT * FROM default.outdated_images\nWHERE $timeFilterByColumn(EventTime) AND VersionsBehind > 0",
+              "rawQuery": "SELECT * FROM default.outdated_images\nWHERE EventTime >= toDateTime(1695369722) AND EventTime <= toDateTime(1695370022) AND VersionsBehind > 0",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -2689,7 +2693,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -2704,11 +2709,13 @@
             "h": 11,
             "w": 24,
             "x": 0,
-            "y": 251
+            "y": 72
           },
           "id": 6,
           "options": {
+            "cellHeight": "sm",
             "footer": {
+              "countRows": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -2717,7 +2724,7 @@
             },
             "showHeader": true
           },
-          "pluginVersion": "9.3.2",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -2729,8 +2736,8 @@
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.DeletedAPIs",
-              "rawQuery": "SELECT * FROM default.DeletedAPIs",
+              "query": "SELECT * FROM default.DeletedAPIs\nWHERE $timeFilterByColumn(EventTime)",
+              "rawQuery": "SELECT * FROM default.DeletedAPIs\nWHERE EventTime >= toDateTime(1695369749) AND EventTime <= toDateTime(1695370049)",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -2791,7 +2798,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -2806,11 +2814,13 @@
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 252
+            "y": 73
           },
           "id": 2,
           "options": {
+            "cellHeight": "sm",
             "footer": {
+              "countRows": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -2819,7 +2829,7 @@
             },
             "showHeader": true
           },
-          "pluginVersion": "9.3.2",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -2831,8 +2841,8 @@
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.DeprecatedAPIs",
-              "rawQuery": "SELECT * FROM default.DeprecatedAPIs",
+              "query": "SELECT * FROM default.DeprecatedAPIs\nWHERE $timeFilterByColumn(EventTime)",
+              "rawQuery": "SELECT * FROM default.DeprecatedAPIs\nWHERE EventTime >= toDateTime(1695369773) AND EventTime <= toDateTime(1695370073)",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -2864,7 +2874,7 @@
     "list": []
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
