@@ -169,6 +169,10 @@ helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Add
 ```
 2. Replace "<NATS IP Address>" with the IP address of your NATS service **kubviz-client-nats-external**.
 
+**NOTE:** 
+
+A time-based job scheduler is added for each plugins. They allow you to schedule and automate the execution of plugins at specific times, intervals. Each plugin execution can be configured to run at a precise time or at regular intervals.
+
 #### How to Verify if Everything is Up and Running
 
 After completing the installation of both the client and agent, you can use the following command to verify if they are up and running.
@@ -203,10 +207,6 @@ kubectl --namespace kubviz port-forward $POD_NAME 3000
 ```
 
 3. Access "localhost:3000" in your web browser, where you'll be prompted to enter your credentials. Utilize the username "admin" and the password obtained from step 1 to proceed.  
-
-**NOTE:** 
-
-A time-based job scheduler is added for each plugins. They allow you to schedule and automate the execution of plugins at specific times, intervals. Each plugin execution can be configured to run at a precise time or at regular intervals.
 
 ## Use Cases
 
