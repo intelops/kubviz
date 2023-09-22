@@ -202,7 +202,11 @@ export POD_NAME=$(kubectl get pods --namespace kubviz -l "app.kubernetes.io/name
 kubectl --namespace kubviz port-forward $POD_NAME 3000
 ```
 
-3. Access "localhost:3000" in your web browser, where you'll be prompted to enter your credentials. Utilize the username "admin" and the password obtained from step 1 to proceed.   
+3. Access "localhost:3000" in your web browser, where you'll be prompted to enter your credentials. Utilize the username "admin" and the password obtained from step 1 to proceed.  
+
+**NOTE:** 
+
+A time-based job scheduler is added for each plugins. They allow you to schedule and automate the execution of plugins at specific times, intervals. Each plugin execution can be configured to run at a precise time or at regular intervals.
 
 ## Use Cases
 
