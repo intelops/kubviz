@@ -3,6 +3,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "client.fullname" . }}-kubescore-dashboard
+  annotations:
+    grafana_folder: "Kubviz"
   labels:
     {{ .Values.dashboards.label }}: {{ .Values.dashboards.labelValue | quote }}
 data:
@@ -30,7 +32,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 10,
+      "id": 5,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -47,8 +49,11 @@ data:
               },
               "custom": {
                 "align": "center",
-                "displayMode": "color-text",
-                "filterable": true
+                "cellOptions": {
+                  "type": "color-text"
+                },
+                "filterable": true,
+                "inspect": false
               },
               "mappings": [],
               "thresholds": {
@@ -86,7 +91,7 @@ data:
             },
             "showHeader": true
           },
-          "pluginVersion": "8.4.6",
+          "pluginVersion": "10.0.3",
           "targets": [
             {
               "datasource": {
@@ -98,34 +103,33 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.kubescore",
-              "rawQuery": "SELECT * FROM default.kubescore",
+              "query": "SELECT * FROM default.kubescore\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
+              "rawQuery": "SELECT * FROM default.kubescore\nWHERE EventTime >= toDateTime(1694245574) AND EventTime <= toDateTime(1694267174)\nORDER BY EventTime DESC",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
           ],
           "title": "KubeScore",
-          "transparent": true,
           "type": "table"
         }
       ],
       "refresh": "",
-      "schemaVersion": 35,
+      "schemaVersion": 38,
       "style": "dark",
       "tags": [],
       "templating": {
         "list": []
       },
       "time": {
-        "from": "now-6h",
+        "from": "now-24h",
         "to": "now"
       },
       "timepicker": {},
       "timezone": "",
       "title": "KubeScore",
       "uid": "d8f0fceb-7621-45bc-9710-89e11fe57a79",
-      "version": 2,
+      "version": 1,
       "weekStart": ""
     }
 {{- end }}

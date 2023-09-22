@@ -63,7 +63,14 @@ spec:
 #              port: http
           env:
           - name: NATS_TOKEN
+            {{- if and .Values.nats.enabled .Values.nats.auth.enabled .Values.nats.auth.token }}
             value: {{ .Values.nats.auth.token }}
+            {{- else if and .Values.nats.enabled .Values.nats.auth.enabled .Values.nats.auth.secret }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.nats.auth.secret.name }}
+                key: {{ .Values.nats.auth.secret.key }}
+            {{- end }}
           - name: NATS_ADDRESS
             value: {{ include "client.fullname" . }}-nats
           - name: DB_ADDRESS

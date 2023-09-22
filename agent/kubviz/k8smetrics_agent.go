@@ -53,7 +53,9 @@ const (
 var (
 	ClusterName string = os.Getenv("CLUSTER_NAME")
 	token       string = os.Getenv("NATS_TOKEN")
-	natsurl     string = os.Getenv("NATS_ADDRESS")
+
+	natsurl string = os.Getenv("NATS_ADDRESS")
+
 	//for local testing provide the location of kubeconfig
 	// inside the civo file paste your kubeconfig
 	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)

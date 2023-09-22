@@ -482,11 +482,13 @@ data:
     system_account: {{ . }}
     {{- end }}
 
-    {{- with .Values.auth.token }}
     authorization {
-      token: "{{ . }}"
-
-
+      {{- if .Values.auth.token }}
+      token: "{{ .Values.auth.token }}"
+      {{- else if .Values.auth.secret }}
+      token: $AUTH_TOKEN
+      {{- end }}
+           
       {{- if $.Values.auth.timeout }}
       timeout: {{ $.Values.auth.timeout }}
       {{- end }}
@@ -537,8 +539,6 @@ data:
     }
 
     accounts: {{- toRawJson . }}
-    {{- end }}
-
     {{- end }}
 
     {{- end }}

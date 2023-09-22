@@ -49,11 +49,32 @@ spec:
           - name: CLUSTER_NAME
             value: {{ .Values.clusterName }}
           - name: NATS_TOKEN
+            {{- if .Values.nats.auth.token }}
             value: {{ .Values.nats.auth.token }}
+            {{- else if .Values.nats.auth.secret }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.nats.auth.secret.name }}
+                key: {{ .Values.nats.auth.secret.key }}
+            {{- end }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
           - name: SCHEDULING_INTERVAL
-            value: {{ .Values.schedulingInterval }}
+            value: "{{ .Values.schedule.schedulingInterval }}"
+          - name: SCHEDULER_ENABLE
+            value: "{{ .Values.schedule.enabled }}"
+          - name: OUTDATED_INTERVAL
+            value: "{{ .Values.schedule.outdatedInterval }}"
+          - name: GETALL_INTERVAL
+            value: "{{ .Values.schedule.getallInterval }}"
+          - name: KUBESCORE_INTERVAL
+            value: "{{ .Values.schedule.kubescoreInterval }}"
+          - name: RAKKESS_INTERVAL
+            value: "{{ .Values.schedule.rakkessInterval }}"
+          - name: KUBEPREUPGRADE_INTERVAL
+            value: "{{ .Values.schedule.kubepreupgradeInterval }}"
+          - name: TRIVY_INTERVAL
+            value: "{{ .Values.schedule.trivyInterval }}"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 {{- if .Values.git_bridge.enabled }}
@@ -68,7 +89,14 @@ spec:
           - name: CLUSTER_NAME
             value: {{ .Values.clusterName }}
           - name: NATS_TOKEN
+            {{- if .Values.nats.auth.token }}
             value: {{ .Values.nats.auth.token }}
+            {{- else if .Values.nats.auth.secret }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.nats.auth.secret.name }}
+                key: {{ .Values.nats.auth.secret.key }}
+            {{- end }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
           resources:
@@ -86,7 +114,14 @@ spec:
           - name: CLUSTER_NAME
             value: {{ .Values.clusterName }}
           - name: NATS_TOKEN
+            {{- if .Values.nats.auth.token }}
             value: {{ .Values.nats.auth.token }}
+            {{- else if .Values.nats.auth.secret }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.nats.auth.secret.name }}
+                key: {{ .Values.nats.auth.secret.key }}
+            {{- end }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
           resources:

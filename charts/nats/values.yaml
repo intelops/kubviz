@@ -531,8 +531,13 @@ auth:
   #     name: operator-jwt
   #     key: KO.jwt
 
-  # Token authentication
-  # token:
+  # Use key if you want to provide the token via Helm Values
+  # token: 
+
+  # Use a secret reference if you want to get a token from a secret
+  # secret:
+  #   name: "nats-token"
+  #   key: "key"
 
   # NKey authentication
   # nkeys:

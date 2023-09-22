@@ -142,10 +142,23 @@ tolerations: []
 
 affinity: {}
 
-schedulingInterval: "24h"
+schedule:
+  enabled: false
+  schedulingInterval: "24h"
+  outdatedInterval: "@every 18h"
+  getallInterval: "@every 19h"
+  kubescoreInterval: "@every 20h"
+  rakkessInterval: "@every 21h"
+  kubepreupgradeInterval: "@every 22h"
+  trivyInterval: "@every 24h"
 
 clusterName: "kubviz"
 nats:
   host: kubviz-client-nats 
   auth:
-    token: "UfmrJOYwYCCsgQvxvcfJ3BdI6c8WBbnD"
+    # Use token if you want to provide the token via Helm Values
+    token: ""
+    # Use a secret reference if you want to get a token from a secret
+    secret:
+      name: ""
+      key: ""
