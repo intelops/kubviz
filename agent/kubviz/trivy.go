@@ -15,7 +15,7 @@ import (
 )
 
 func executeCommandTrivy(command string) ([]byte, error) {
-	ulimitCmd := exec.Command("/bin/sh", "-c", "ulimit -t 5 -v 500000")
+	ulimitCmd := exec.Command("/bin/sh", "-c", "ulimit -t unlimited -v unlimited")
 	var ulimitOut, ulimitErr bytes.Buffer
 	ulimitCmd.Stdout = &ulimitOut
 	ulimitCmd.Stderr = &ulimitErr
