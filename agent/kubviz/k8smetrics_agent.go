@@ -68,14 +68,14 @@ func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
 	if err != nil {
 		return err
 	}
-	err = RunTrivyImageScans(config, js)
-	if err != nil {
-		return err
-	}
-	err = RunTrivySbomScan(config, js)
-	if err != nil {
-		return err
-	}
+	// err = RunTrivyImageScans(config, js)
+	// if err != nil {
+	// 	return err
+	// }
+	// err = RunTrivySbomScan(config, js)
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 
 }
@@ -118,19 +118,19 @@ func main() {
 	go publishMetrics(clientset, js, clusterMetricsChan)
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
-		err := outDatedImages(config, js)
-		LogErr(err)
-		err = KubePreUpgradeDetector(config, js)
-		LogErr(err)
-		err = GetAllResources(config, js)
-		LogErr(err)
-		err = RakeesOutput(config, js)
-		LogErr(err)
+		// err := outDatedImages(config, js)
+		// LogErr(err)
+		// err = KubePreUpgradeDetector(config, js)
+		// LogErr(err)
+		// err = GetAllResources(config, js)
+		// LogErr(err)
+		// err = RakeesOutput(config, js)
+		// LogErr(err)
 		// getK8sEvents(clientset)
-		err = runTrivyScans(config, js)
+		err := runTrivyScans(config, js)
 		LogErr(err)
-		err = RunKubeScore(clientset, js)
-		LogErr(err)
+		// err = RunKubeScore(clientset, js)
+		// LogErr(err)
 	}
 
 	collectAndPublishMetrics()
