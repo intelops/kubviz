@@ -1,0 +1,478 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 12,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "baidu": {
+          "callback": "bmapReady",
+          "key": ""
+        },
+        "editor": {
+          "format": "auto",
+          "height": 600
+        },
+        "gaode": {
+          "key": "",
+          "plugin": "AMap.Scale,AMap.ToolBar"
+        },
+        "getOption": "// Check if data.series exists\nif (data.series && data.series.length > 0) {\n  const eventTypes = data.series[0].fields[0].values;\n  const authors = data.series[0].fields[1].values;\n  const repoNames = data.series[0].fields[2].values;\n  const total = data.series[0].fields[3].values; // Assuming you have a field named \"Total\"\n\n  // Create nodes and links\n  const nodes = [];\n  const links = [];\n\n  authors.forEach((author, index) => {\n    const sourceNode = {\n      name: author,\n      category: 0, // Category for source nodes\n      symbolSize: 60, // Size for source nodes\n    };\n\n    const eventTypeNode = {\n      name: eventTypes[index],\n      category: 1, // Category for eventType nodes\n      symbolSize: 40, // Size for eventType nodes\n    };\n\n    const repoNode = {\n      name: repoNames[index],\n      category: 2, // Category for repo nodes\n      symbolSize: 30, // Size for repo nodes\n    };\n\n    const totalNode = {\n      name: `Total: ${total[index]}`, // Assuming you have an array \"total\"\n      category: 3, // Category for total nodes\n      symbolSize: 20, // Size for total nodes\n    };\n\n    // Ensure source, eventType, repo, and total nodes are unique before adding them\n    if (!nodes.some((node) => node.name === sourceNode.name)) {\n      nodes.push(sourceNode);\n    }\n\n    if (!nodes.some((node) => node.name === eventTypeNode.name)) {\n      nodes.push(eventTypeNode);\n    }\n\n    if (!nodes.some((node) => node.name === repoNode.name)) {\n      nodes.push(repoNode);\n    }\n\n    if (!nodes.some((node) => node.name === totalNode.name)) {\n      nodes.push(totalNode);\n    }\n\n    // Create links between author, eventType, repo, and total nodes\n    links.push({\n      source: author,\n      target: eventTypes[index],\n    });\n\n    links.push({\n      source: eventTypes[index],\n      target: repoNames[index],\n    });\n\n    links.push({\n      source: eventTypes[index],\n      target: totalNode.name,\n    });\n  });\n\n  // Create categories for nodes\n  const categories = [\n    {\n      name: 'Authors',\n    },\n    {\n      name: 'Event Type',\n    },\n    {\n      name: 'Repo Names',\n    },\n    {\n      name: 'Total', // Add a category for \"Total\" nodes\n    },\n  ];\n\n  // Create ECharts option\n  const option = {\n    tooltip: {\n      trigger: 'item',\n      formatter: '{b}',\n    },\n    legend: {\n      x: 'left',\n      data: ['Authors', 'Event Types', 'Repo Names', 'Total'], // Add \"Total\" to legend data\n    },\n    series: [\n      {\n        type: 'graph',\n        layout: 'force',\n        roam: true,\n        label: {\n          show: true,\n          textStyle: {  // Add textStyle property to configure text style\n            color: '#000', // Set the text color to a brighter color, such as white (#FFF)\n          },\n        },\n        force: {\n          repulsion: 100,\n          gravity: 0.1,\n          edgeLength: 150,\n        },\n        data: nodes,\n        links: links,\n        draggable: true,\n        categories: categories,\n        edgeSymbol: [\"none\", \"arrow\"],\n\n        // Increase the size of arrow marks\n        edgeSymbolSize: [10, 10], // Set the arrow size here\n        lineStyle: {\n          color: \"#000000\",\n          curveness: 0,\n          opacity: 0.3,\n        },\n      },\n    ],\n  };\n\n  // Return the ECharts option\n  return option;\n} else {\n  // Handle the case when data.series does not exist\n  return {};\n}\n",
+        "google": {
+          "callback": "gmapReady",
+          "key": ""
+        },
+        "map": "none",
+        "renderer": "canvas",
+        "themeEditor": {
+          "config": "{}",
+          "height": 400,
+          "name": "default"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT EventType, Author, RepoName , count(*) AS Total\nFROM \"default\".\"azure_devops\" \nWHERE $timeFilterByColumn(TimeStamp) AND EventType IN ($eventType) AND Author IN ($Author)\nGROUP BY EventType, Author, RepoName",
+          "rawQuery": "SELECT EventType, Author, RepoName , count(*) AS Total\nFROM \"default\".\"azure_devops\" \nWHERE TimeStamp >= toDateTime(1694534229) AND TimeStamp <= toDateTime(1694620629) AND EventType IN ('git.push') AND Author IN ('Anila Soman')\nGROUP BY EventType, Author, RepoName",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "Azure Contributions",
+      "type": "volkovlabs-echarts-panel"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "id": 5,
+      "options": {
+        "baidu": {
+          "callback": "bmapReady",
+          "key": ""
+        },
+        "editor": {
+          "format": "auto",
+          "height": 600
+        },
+        "gaode": {
+          "key": "",
+          "plugin": "AMap.Scale,AMap.ToolBar"
+        },
+        "getOption": "// Extract Author and Push_Events data from the series\nconst categories = data.series[0].fields.find((f) => f.name === 'Author').values;\nconst pushEvents = data.series[0].fields.find((f) => f.name === 'Push_Events').values;\n\n// Create the ECharts options\nconst options = {\n  grid: {\n    bottom: '3%',\n    containLabel: true,\n    left: '3%',\n    right: '4%',\n    top: '4%',\n  },\n  toolbox: {\n    right: '5%', // Adjust the right margin to position it on the top right\n    top: '0%', // Adjust the top margin to position it on the top right\n    feature: {\n      dataZoom: {\n        yAxisIndex: 'none',\n      },\n      restore: {},\n    },\n  },\n  tooltip: {\n    trigger: 'axis',\n    axisPointer: {\n      type: 'shadow',\n    },\n  },\n  xAxis: {\n    type: 'category',\n    data: categories,\n  },\n  yAxis: {\n    type: 'value',\n  },\n  legend: {\n    data: ['Push_Events'],\n    orient: 'vertical', // Change the orientation to vertical\n    left: '5%', // Adjust the left margin to position it on the top left\n    top: '5%', // Adjust the top margin to position it on the top left\n  },\n  series: [\n    {\n      data: pushEvents,\n      type: 'line',\n      areaStyle: {\n        color: 'rgba(0, 128, 255, 0.3)', // Set the area (shadow) color\n      },\n      name: 'Push_Events',\n    },\n  ],\n};\n\nreturn options;\n",
+        "google": {
+          "callback": "gmapReady",
+          "key": ""
+        },
+        "map": "none",
+        "renderer": "canvas",
+        "themeEditor": {
+          "config": "{}",
+          "height": 400,
+          "name": "default"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT Author, count(*) AS Push_Events\nFROM default.azure_devops\nWHERE $timeFilterByColumn(TimeStamp) AND EventType = 'git.push'\nGROUP BY Author",
+          "rawQuery": "SELECT Author, count(*) AS Push_Events\nFROM default.azure_devops\nWHERE TimeStamp >= toDateTime(1694534188) AND TimeStamp <= toDateTime(1694620588) AND EventType = 'git.push'\nGROUP BY Author",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "Number of Azure push events grouped by author",
+      "type": "volkovlabs-echarts-panel"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "id": 6,
+      "options": {
+        "baidu": {
+          "callback": "bmapReady",
+          "key": ""
+        },
+        "editor": {
+          "format": "auto",
+          "height": 600
+        },
+        "gaode": {
+          "key": "",
+          "plugin": "AMap.Scale,AMap.ToolBar"
+        },
+        "getOption": "// Extract Author and Merge_Events data from the series\nconst categories = data.series[0].fields.find((f) => f.name === 'Author').values;\nconst mergeEvents = data.series[0].fields.find((f) => f.name === 'Merge_Events').values;\n\n// Create the ECharts options\nconst options = {\n  grid: {\n    bottom: '3%',\n    containLabel: true,\n    left: '3%',\n    right: '4%',\n    top: '4%',\n  },\n  toolbox: {\n    right: '5%', // Adjust the right margin to position it on the top right\n    top: '0%', // Adjust the top margin to position it on the top right\n    feature: {\n      dataZoom: {\n        yAxisIndex: 'none',\n      },\n      restore: {},\n    },\n  },\n  tooltip: {\n    trigger: 'axis',\n    axisPointer: {\n      type: 'shadow',\n    },\n  },\n  xAxis: {\n    type: 'category',\n    data: categories,\n  },\n  yAxis: {\n    type: 'value',\n  },\n  legend: {\n    data: ['Merge_Events'],\n    orient: 'vertical',\n    left: '5%',\n    top: '5%',\n  },\n  series: [\n    {\n      data: mergeEvents,\n      type: 'line',\n      name: 'Merge_Events',\n      areaStyle: {\n        color: 'rgba(255, 0, 0, 0.3)', // Set the area (shadow) color\n      },\n      lineStyle: {\n        color: 'red', // Set the line color\n      },\n    },\n  ],\n};\n\nreturn options;",
+        "google": {
+          "callback": "gmapReady",
+          "key": ""
+        },
+        "map": "none",
+        "renderer": "canvas",
+        "themeEditor": {
+          "config": "{}",
+          "height": 400,
+          "name": "default"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT Author, count(*) AS Merge_Events\nFROM default.azure_devops \nWHERE $timeFilterByColumn(TimeStamp) AND EventType = 'git.pullrequest.merged'\nGROUP BY Author",
+          "rawQuery": "SELECT Author, count(*) AS Merge_Events\nFROM default.azure_devops \nWHERE TimeStamp >= toDateTime(1694534208) AND TimeStamp <= toDateTime(1694620608) AND EventType = 'git.pullrequest.merged'\nGROUP BY Author",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "Number of Azure Merge events grouped by author",
+      "type": "volkovlabs-echarts-panel"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-red",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT count(*) AS Azure FROM default.azure_devops\nWHERE $timeFilterByColumn(TimeStamp) AND EventType = 'git.push'",
+          "rawQuery": "SELECT count(*) AS Azure FROM default.azure_devops\nWHERE TimeStamp >= toDateTime(1694534146) AND TimeStamp <= toDateTime(1694620546) AND EventType = 'git.push'",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "Azure Push event counts",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-red",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT count(*) AS Azure FROM default.azure_devops\nWHERE $timeFilterByColumn(TimeStamp) AND EventType = 'git.pullrequest.merged'",
+          "rawQuery": "SELECT count(*) AS Azure FROM default.azure_devops\nWHERE TimeStamp >= toDateTime(1694534169) AND TimeStamp <= toDateTime(1694620569) AND EventType = 'git.pullrequest.merged'",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "Azure Merge events count",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "vertamedia-clickhouse-datasource",
+        "uid": "vertamedia-clickhouse-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "dateTimeType": "DATETIME",
+          "extrapolate": true,
+          "format": "table",
+          "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+          "intervalFactor": 1,
+          "query": "SELECT * FROM default.azure_devops\nWHERE $timeFilterByColumn(TimeStamp) AND EventType IN ($eventType) AND Author IN ($Author)",
+          "rawQuery": "SELECT * FROM default.azure_devops\nWHERE TimeStamp >= toDateTime(1694534128) AND TimeStamp <= toDateTime(1694620528) AND EventType IN ('git.push') AND Author IN ('Anila Soman')",
+          "refId": "A",
+          "round": "0s",
+          "skip_comments": true
+        }
+      ],
+      "title": "Azure Events",
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "vertamedia-clickhouse-datasource"
+        },
+        "definition": "SELECT EventType FROM default.azure_devops",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "eventType",
+        "options": [],
+        "query": "SELECT EventType FROM default.azure_devops",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "vertamedia-clickhouse-datasource",
+          "uid": "vertamedia-clickhouse-datasource"
+        },
+        "definition": "SELECT Author FROM default.azure_devops",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "Author",
+        "options": [],
+        "query": "SELECT Author FROM default.azure_devops",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Azure",
+  "uid": "dd66838a-ffda-4de2-944f-1828d1671fc9",
+  "version": 2,
+  "weekStart": ""
+}
