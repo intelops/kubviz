@@ -30,7 +30,7 @@ func executeCommandTrivy(command string) ([]byte, error) {
 }
 func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	var report report.ConsolidatedReport
-	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 20m -f json --cache-dir /tmp/.cache --debug"
+	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 60m -f json --cache-dir /tmp/.cache --debug"
 
 	// Log the command before execution
 	log.Printf("Executing command: %s\n", cmdString)
