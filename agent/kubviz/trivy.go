@@ -15,12 +15,23 @@ import (
 )
 
 func executeCommandTrivy(command string) ([]byte, error) {
+	ulimitCmd := exec.Command("/bin/sh", "-c", "ulimit -t 5 -v 500000")
+	var ulimitOut, ulimitErr bytes.Buffer
+	ulimitCmd.Stdout = &ulimitOut
+	ulimitCmd.Stderr = &ulimitErr
+
+	err := ulimitCmd.Run()
+
+	if err != nil {
+		log.Println("Execute ulimit Command Error", err.Error())
+		return nil, err
+	}
 	cmd := exec.Command("/bin/sh", "-c", command)
 	var outc, errc bytes.Buffer
 	cmd.Stdout = &outc
 	cmd.Stderr = &errc
 
-	err := cmd.Run()
+	err = cmd.Run()
 
 	if err != nil {
 		log.Println("Execute Trivy Command Error", err.Error())
