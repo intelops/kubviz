@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"compress/gzip"
 	"encoding/json"
 	"log"
 	exec "os/exec"
@@ -29,24 +28,9 @@ func executeCommandTrivy(command string) ([]byte, error) {
 
 	return outc.Bytes(), err
 }
-
-// Compress data using gzip
-func compressData(data []byte) ([]byte, error) {
-	var compressedData bytes.Buffer
-	gz := gzip.NewWriter(&compressedData)
-	_, err := gz.Write(data)
-	if err != nil {
-		return nil, err
-	}
-	if err := gz.Close(); err != nil {
-		return nil, err
-	}
-	return compressedData.Bytes(), nil
-}
-
 func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	var report report.ConsolidatedReport
-	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 40m -f json --cache-dir /tmp/.cache"
+	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 20m -f json --cache-dir /tmp/.cache --debug"
 
 	// Log the command before execution
 	log.Printf("Executing command: %s\n", cmdString)
@@ -57,6 +41,8 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	// Handle errors and process the command output as needed
 	if err != nil {
 		log.Printf("Error executing command: %v\n", err)
+		log.Printf("Command output: %s\n", out)
+
 	}
 	// Log the command output for debugging purposes
 	log.Printf("Command output: %s\n", out)
@@ -75,40 +61,24 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 		log.Printf("Error occurred while Unmarshalling json for k8s cluster scan: %v", err)
 		return err
 	}
-
-	// Compress the Trivy scan report data
-	compressedReport, err := compressData([]byte(jsonPart))
-	if err != nil {
-		log.Printf("Error compressing Trivy scan report: %v", err)
-		return err
-	}
-
-	// Create a new TrivyReport struct with all the data
-	trivyReport := model.Trivy{
-		ID:                 uuid.New().String(),
-		ClusterName:        ClusterName,
-		Report:             report,
-		CompressedReport:   compressedReport,
-		UncompressedReport: []byte(jsonPart),
-	}
-
-	// Publish the TrivyReport
-	err = publishTrivyK8sReport(trivyReport, js)
+	err = publishTrivyK8sReport(report, js)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func publishTrivyK8sReport(trivyReport model.Trivy, js nats.JetStreamContext) error {
-	// Create a JSON message for the TrivyReport
-	metricsJson, _ := json.Marshal(trivyReport)
-
-	// Publish the JSON message to the specified NATS subject
+func publishTrivyK8sReport(report report.ConsolidatedReport, js nats.JetStreamContext) error {
+	metrics := model.Trivy{
+		ID:          uuid.New().String(),
+		ClusterName: ClusterName,
+		Report:      report,
+	}
+	metricsJson, _ := json.Marshal(metrics)
 	_, err := js.Publish(constants.TRIVY_K8S_SUBJECT, metricsJson)
 	if err != nil {
 		return err
 	}
-	log.Printf("Trivy k8s cluster report with ID:%s has been published\n", trivyReport.ID)
+	log.Printf("Trivy k8s cluster report with ID:%s has been published\n", metrics.ID)
 	return nil
 }
