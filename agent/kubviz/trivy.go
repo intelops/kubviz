@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	exec "os/exec"
+	"runtime/debug"
 	"strings"
 
 	"github.com/aquasecurity/trivy/pkg/k8s/report"
@@ -42,6 +43,7 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	if err != nil {
 		log.Printf("Error executing command: %v\n", err)
 		log.Printf("Command output: %s\n", out)
+		log.Printf("Stack trace: %v\n", string(debug.Stack()))
 
 	}
 	// Log the command output for debugging purposes
