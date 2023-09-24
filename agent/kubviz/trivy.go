@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"log"
+	"os"
 	exec "os/exec"
+	"os/signal"
 	"runtime/debug"
 	"strings"
+	"syscall"
 
 	"github.com/aquasecurity/trivy/pkg/k8s/report"
 	"github.com/google/uuid"
@@ -29,13 +32,21 @@ func executeCommandTrivy(command string) ([]byte, error) {
 
 	return outc.Bytes(), err
 }
+func cleanup() {
+	log.Println("Performing cleanup...")
+	// Add your cleanup logic here
+}
+
 func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	var report report.ConsolidatedReport
 	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 20m -f json --cache-dir /tmp/.cache --debug"
 
 	// Log the command before execution
 	log.Printf("Executing command: %s\n", cmdString)
+	sigCh := make(chan os.Signal, 1)
 
+	// Register the signals to handle
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	// Execute the command
 	out, err := executeCommandTrivy(cmdString)
 
@@ -67,6 +78,15 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	if err != nil {
 		return err
 	}
+	go func() {
+		sig := <-sigCh
+		switch sig {
+		case syscall.SIGINT, syscall.SIGTERM:
+			log.Printf("Received termination signal: %v\n", sig)
+			cleanup()  // Perform any necessary cleanup
+			os.Exit(1) // Exit with a non-zero status code
+		}
+	}()
 	return nil
 }
 
