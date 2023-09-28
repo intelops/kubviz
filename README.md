@@ -50,7 +50,7 @@ KubViz offers a seamless integration with Git repositories, empowering you to ef
 
 KubViz also monitors changes in your container registry, providing visibility into image updates. By tracking these changes, KubViz helps you proactively manage container security and compliance.
 
-It comprehensively scans the kubernetes containers for the security flaws such as vulnerabilities and misconfigurations and creates SBOM.
+It comprehensively scans Kubernetes containers for security flaws, such as vulnerabilities and misconfigurations, and creates an SBOM (Software Bill of Materials).
 
 ## Architecture diagram
 
@@ -86,6 +86,10 @@ token=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 ```bash
 helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token"
 ```
+
+**NOTE:** 
+- If you want to get a token from a secret, use a secret reference with the secret's name and key.
+
 **NOTE:** 
 - If you want to enable Grafana with the client deployment, add `--set grafana.enabled=true` to the helm upgrade command.
 
@@ -123,6 +127,10 @@ helm upgrade -i kubviz-agent kubviz/agent -n kubviz \
   --set container_bridge.enabled=true \
   --set "container_bridge.ingress.hosts[0].host=<INGRESS HOSTNAME>",container_bridge.ingress.hosts[0].paths[0].path=/,container_bridge.ingress.hosts[0].paths[0].pathType=Prefix,container_bridge.ingress.tls[0].secretName=<SECRET-NAME>,container_bridge.ingress.tls[0].hosts[0]=<INGRESS HOSTNAME>
 ```
+
+**NOTE:** 
+If you want to get a token from a secret, use a secret reference with the secret's name and key.
+
 3. Replace "INGRESS HOSTNAME" with the desired hostname for the Git Bridge and Container Bridge Ingress configurations.
 4. Replace "SECRET-NAME" with the desired secretname for the Git Bridge and Container Bridge Ingress configurations.
 
@@ -254,7 +262,7 @@ Use KubViz to monitor your cluster events, including:
 
 ### Container Registry Events Tracking
 
-<img src=".readme_assets/containerBridgeDocker.jpeg" alt="Container Registry Events Tracking" width="525" align="right">
+<img src=".readme_assets/gitcontainerNew.jpeg" alt="Container Registry Events Tracking" width="525" align="right">
 
 <br>
 
@@ -285,7 +293,7 @@ Use KubViz to monitor your cluster events, including:
 
 <br>
 
-- You can generate Software Bill of Materials (SBOM) reports for images within a Kubernetes cluster using KubViz in the CycloneDX format, which will be presented as JSON reports.
+- Generate reports for Software Bill of Materials (SBOM) from images within your Kubernetes cluster using KubViz in the CycloneDX format. These reports will be available in JSON format.
 
 <br>
 
