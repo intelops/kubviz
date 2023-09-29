@@ -130,8 +130,8 @@ func main() {
 		// getK8sEvents(clientset)
 		err = runTrivyScans(config, js)
 		LogErr(err)
-		// err = RunKubeScore(clientset, js)
-		// LogErr(err)
+		err = RunKubeScore(clientset, js)
+		LogErr(err)
 	}
 
 	collectAndPublishMetrics()
