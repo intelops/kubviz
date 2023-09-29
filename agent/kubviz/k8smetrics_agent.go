@@ -64,18 +64,19 @@ var (
 )
 
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
-	err := RunTrivyK8sClusterScan(js)
+	err := RunTrivyImageScans(config, js)
 	if err != nil {
 		return err
 	}
-	// err = RunTrivyImageScans(config, js)
-	// if err != nil {
-	// 	return err
-	// }
-	// err = RunTrivySbomScan(config, js)
-	// if err != nil {
-	// 	return err
-	// }
+	err = RunTrivySbomScan(config, js)
+	if err != nil {
+		return err
+	}
+	err = RunTrivyK8sClusterScan(js)
+	if err != nil {
+		return err
+	}
+
 	return nil
 
 }
@@ -118,25 +119,23 @@ func main() {
 	go publishMetrics(clientset, js, clusterMetricsChan)
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
-		// err := outDatedImages(config, js)
-		// LogErr(err)
-		// err = KubePreUpgradeDetector(config, js)
-		// LogErr(err)
-		// err = GetAllResources(config, js)
-		// LogErr(err)
-		// err = RakeesOutput(config, js)
-		// LogErr(err)
+		err := outDatedImages(config, js)
+		LogErr(err)
+		err = KubePreUpgradeDetector(config, js)
+		LogErr(err)
+		err = GetAllResources(config, js)
+		LogErr(err)
+		err = RakeesOutput(config, js)
+		LogErr(err)
 		// getK8sEvents(clientset)
-		err := runTrivyScans(config, js)
+		err = runTrivyScans(config, js)
 		LogErr(err)
 		// err = RunKubeScore(clientset, js)
 		// LogErr(err)
 	}
 
 	collectAndPublishMetrics()
-	if schedulingIntervalStr == "" {
-		schedulingIntervalStr = "20m"
-	}
+
 	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
 		scheduler := initScheduler(config, js, *cfg, clientset)
 
@@ -301,7 +300,7 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.AgentConfigurations, clientset *kubernetes.Clientset) (s *Scheduler) {
 	log := logging.NewLogger()
 	s = NewScheduler(log)
-	if cfg.OutdatedInterval != "" {
+	if cfg.OutdatedInterval != "" && cfg.OutdatedInterval != "0" {
 		sj, err := NewOutDatedImagesJob(config, js, cfg.OutdatedInterval)
 		if err != nil {
 			log.Fatal("no time interval", err)
@@ -311,7 +310,7 @@ func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.Age
 			log.Fatal("failed to do job", err)
 		}
 	}
-	if cfg.GetAllInterval != "" {
+	if cfg.GetAllInterval != "" && cfg.GetAllInterval != "0" {
 		sj, err := NewKetallJob(config, js, cfg.GetAllInterval)
 		if err != nil {
 			log.Fatal("no time interval", err)
@@ -321,7 +320,7 @@ func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.Age
 			log.Fatal("failed to do job", err)
 		}
 	}
-	if cfg.KubeScoreInterval != "" {
+	if cfg.KubeScoreInterval != "" && cfg.KubeScoreInterval != "0" {
 		sj, err := NewKubescoreJob(clientset, js, cfg.KubeScoreInterval)
 		if err != nil {
 			log.Fatal("no time interval", err)
@@ -331,7 +330,7 @@ func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.Age
 			log.Fatal("failed to do job", err)
 		}
 	}
-	if cfg.RakkessInterval != "" {
+	if cfg.RakkessInterval != "" && cfg.RakkessInterval != "0" {
 		sj, err := NewRakkessJob(config, js, cfg.RakkessInterval)
 		if err != nil {
 			log.Fatal("no time interval", err)
@@ -341,7 +340,7 @@ func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.Age
 			log.Fatal("failed to do job", err)
 		}
 	}
-	if cfg.KubePreUpgradeInterval != "" {
+	if cfg.KubePreUpgradeInterval != "" && cfg.KubePreUpgradeInterval != "0" {
 		sj, err := NewKubePreUpgradeJob(config, js, cfg.KubePreUpgradeInterval)
 		if err != nil {
 			log.Fatal("no time interval", err)
@@ -351,7 +350,7 @@ func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.Age
 			log.Fatal("failed to do job", err)
 		}
 	}
-	if cfg.TrivyInterval != "" {
+	if cfg.TrivyInterval != "" && cfg.TrivyInterval != "0" {
 		sj, err := NewTrivyJob(config, js, cfg.TrivyInterval)
 		if err != nil {
 			log.Fatal("no time interval", err)
