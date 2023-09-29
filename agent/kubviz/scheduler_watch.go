@@ -84,7 +84,7 @@ func (v *KubePreUpgradeJob) CronSpec() string {
 
 func (j *KubePreUpgradeJob) Run() {
 	// Call the Kubepreupgrade function with the provided config and js
-	err := GetAllResources(j.config, j.js)
+	err := KubePreUpgradeDetector(j.config, j.js)
 	LogErr(err)
 }
 
