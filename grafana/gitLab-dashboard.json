@@ -193,7 +193,7 @@
           "skip_comments": true
         }
       ],
-      "title": "Number of GitHub Merge events grouped by author",
+      "title": "Number of GitLab Merge events grouped by author",
       "type": "volkovlabs-echarts-panel"
     },
     {

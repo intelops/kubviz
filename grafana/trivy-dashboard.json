@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 86,
+  "id": 125,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -155,6 +155,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -225,6 +226,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -292,6 +294,7 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
+          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "percentage",
             "steps": [
@@ -360,6 +363,7 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
+          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "percentage",
             "steps": [
@@ -431,6 +435,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -501,6 +506,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -571,6 +577,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -641,6 +648,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -711,6 +719,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -781,6 +790,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -851,6 +861,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -921,6 +932,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -992,6 +1004,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1062,6 +1075,7 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
+          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1139,6 +1153,7 @@
             "inspect": false
           },
           "mappings": [],
+          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1211,6 +1226,7 @@
             "inspect": false
           },
           "mappings": [],
+          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1283,6 +1299,7 @@
             "inspect": false
           },
           "mappings": [],
+          "noValue": "Trivy Image not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1355,11 +1372,13 @@
             "inspect": false
           },
           "mappings": [],
+          "noValue": "Trivy SBOM not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -1423,6 +1442,6 @@
   "timezone": "",
   "title": "Trivy",
   "uid": "f9b0a865-f419-410a-b7d9-9a3f79a70d48",
-  "version": 3,
+  "version": 1,
   "weekStart": ""
 }

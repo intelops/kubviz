@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 8,
+  "id": 126,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -114,13 +114,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -190,13 +184,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Outdated Images",
-              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -266,13 +254,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Kubedata",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1689917173495&to=1689918073495"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -342,13 +324,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "DeletedAPIs",
-              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -418,13 +394,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "DeprecatedAPIs",
-              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -494,13 +464,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Kubernetes Resources",
-              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -776,13 +740,7 @@
             "fixedColor": "#249b6a",
             "mode": "fixed"
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -851,13 +809,7 @@
       "description": "This panel displays the total number of pods with Created state.",
       "fieldConfig": {
         "defaults": {
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -928,13 +880,7 @@
       "description": "This panel displays the total number of pods with backOff state.",
       "fieldConfig": {
         "defaults": {
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1005,13 +951,7 @@
       "description": "This panel displays the total number of pods with Unhealthy state.",
       "fieldConfig": {
         "defaults": {
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1086,13 +1026,7 @@
             "fixedColor": "#249b6a",
             "mode": "fixed"
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1161,13 +1095,7 @@
       "description": "This panel displays the total number of nodes which is in not ready state",
       "fieldConfig": {
         "defaults": {
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1238,13 +1166,7 @@
       "description": "This panel displays the total number of nodes which is in ready state",
       "fieldConfig": {
         "defaults": {
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1315,13 +1237,7 @@
       "description": "This panel displays the total number of nodes which is in NodeHasNoDiskPressure state",
       "fieldConfig": {
         "defaults": {
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1403,13 +1319,7 @@
             "filterable": true,
             "inspect": false
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Kubedata",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1689917173495&to=1689918073495"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1730,13 +1640,7 @@
             "filterable": true,
             "inspect": false
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "KubeData",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1690551079516&to=1690551979516"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1845,13 +1749,7 @@
               "mode": "off"
             }
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "DeprecatedAPIs",
-              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1951,13 +1849,7 @@
               "mode": "off"
             }
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "DeletedAPIs",
-              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2057,13 +1949,7 @@
               "mode": "off"
             }
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Outdated Images",
-              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2162,13 +2048,7 @@
               "mode": "off"
             }
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Kubedata",
-              "url": "https://grafana.alpha.optimizor.app/d/Qq-FK1rVz/kubedata?orgId=1&from=1689917173495&to=1689918073495"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2268,13 +2148,7 @@
               "mode": "off"
             }
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Kubernetes Resources",
-              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2360,13 +2234,7 @@
             "filterable": true,
             "inspect": false
           },
-          "links": [
-            {
-              "targetBlank": true,
-              "title": "Kubernetes Resources",
-              "url": "https://grafana.alpha.optimizor.app/d/o2M7hbrVk/kubviz-features?orgId=1&from=1689896094681&to=1689917694681"
-            }
-          ],
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2588,8 +2456,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2693,8 +2560,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2798,8 +2664,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2881,6 +2746,6 @@
   "timezone": "",
   "title": "Kubviz Dashboard",
   "uid": "eT4fox94z",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }
