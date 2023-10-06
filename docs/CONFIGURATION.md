@@ -34,6 +34,9 @@ Possible values are:
 Values | Platform |
 ------ | -------- | 
 `/event/docker/hub` | DockerHub |
+`/event/azure/container` | Azure |
+`/event/jfrog/container` | JFrog |
+`/event/quay/container` | Quay |
 
 
 

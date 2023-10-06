@@ -26,7 +26,7 @@
 
 ## KubViz
 
-Visualize Kubernetes & DevSecOps Workflows. Tracks changes/events real-time across your entire K8s clusters, git repos, container registries, etc. , analyzing their effects and providing you with the context you need to troubleshoot efficiently. Get the Observability you need, easily.
+Visualize Kubernetes & DevSecOps Workflows. Tracks changes/events real-time across your entire K8s clusters, git repos, container registries, Container image Vulnerability scanning, misconfiguration, SBOM etc. , analyzing their effects and providing you with the context you need to troubleshoot efficiently. Get the Observability you need, easily.
 
 ## Table of Contents
 - [How KubViz works](#how-kubviz-works)
@@ -50,7 +50,8 @@ KubViz offers a seamless integration with Git repositories, empowering you to ef
 
 KubViz also monitors changes in your container registry, providing visibility into image updates. By tracking these changes, KubViz helps you proactively manage container security and compliance.
 
-It comprehensively scans the kubernetes containers for the security flaws such as vulnerabilities and misconfigurations.
+It comprehensively scans Kubernetes containers for security flaws, such as vulnerabilities and misconfigurations, and creates an SBOM (Software Bill of Materials).
+
 ## Architecture diagram
 
 ![Arch. Diagram](.readme_assets/kubviz.png)
@@ -85,6 +86,10 @@ token=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 ```bash
 helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token"
 ```
+
+**NOTE:** 
+- If you want to get a token from a secret, use a secret reference with the secret's name and key.
+
 **NOTE:** 
 - If you want to enable Grafana with the client deployment, add `--set grafana.enabled=true` to the helm upgrade command.
 
@@ -122,6 +127,10 @@ helm upgrade -i kubviz-agent kubviz/agent -n kubviz \
   --set container_bridge.enabled=true \
   --set "container_bridge.ingress.hosts[0].host=<INGRESS HOSTNAME>",container_bridge.ingress.hosts[0].paths[0].path=/,container_bridge.ingress.hosts[0].paths[0].pathType=Prefix,container_bridge.ingress.tls[0].secretName=<SECRET-NAME>,container_bridge.ingress.tls[0].hosts[0]=<INGRESS HOSTNAME>
 ```
+
+**NOTE:** 
+If you want to get a token from a secret, use a secret reference with the secret's name and key.
+
 3. Replace "INGRESS HOSTNAME" with the desired hostname for the Git Bridge and Container Bridge Ingress configurations.
 4. Replace "SECRET-NAME" with the desired secretname for the Git Bridge and Container Bridge Ingress configurations.
 
@@ -168,6 +177,10 @@ helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Add
 ```
 2. Replace "<NATS IP Address>" with the IP address of your NATS service **kubviz-client-nats-external**.
 
+**NOTE:** 
+
+A time-based job scheduler is added for each plugins. They allow you to schedule and automate the execution of plugins at specific times, intervals. Each plugin execution can be configured to run at a precise time or at regular intervals.
+
 #### How to Verify if Everything is Up and Running
 
 After completing the installation of both the client and agent, you can use the following command to verify if they are up and running.
@@ -207,7 +220,7 @@ kubectl --namespace kubviz port-forward $POD_NAME 3000
 
 ### Cluster Event Tracking
 
-<img src=".readme_assets/kubedata.jpeg" alt="Cluster Events" width="525" align="right">
+<img src=".readme_assets/kubeDataNew.jpeg" alt="Cluster Events" width="525" align="right">
 
 <br>
 
@@ -221,7 +234,7 @@ Use KubViz to monitor your cluster events, including:
 
 <br clear="all">
 
-<img src=".readme_assets/deleted_apis.png" alt="Deprecated Kubernetes APIs" width="525" align="right">
+<img src=".readme_assets/depricatedAPINew.jpeg" alt="Deprecated Kubernetes APIs" width="525" align="right">
 
 <br>
 
@@ -235,7 +248,7 @@ Use KubViz to monitor your cluster events, including:
 
 ### Git Repository Events Tracking
 
-<img src=".readme_assets/newGitBridge.jpeg" alt="gitBridge" width="525" align="right">
+<img src=".readme_assets/GitBridgeNew.jpeg" alt="gitBridge" width="525" align="right">
 
 <br>
 
@@ -249,7 +262,7 @@ Use KubViz to monitor your cluster events, including:
 
 ### Container Registry Events Tracking
 
-<img src=".readme_assets/containerBridgeDocker.jpeg" alt="Container Registry Events Tracking" width="525" align="right">
+<img src=".readme_assets/gitcontainerNew.jpeg" alt="Container Registry Events Tracking" width="525" align="right">
 
 <br>
 
@@ -261,13 +274,27 @@ Use KubViz to monitor your cluster events, including:
 
 ### Kubernetes Container Security Tracking
 
-<img src=".readme_assets/TrivyK8s.jpeg" alt="Kubernetes Container Security Tracking" width="525" align="right">
+<img src=".readme_assets/trivyk8sNew.jpeg" alt="Kubernetes Container Security Tracking" width="525" align="right">
 
 <br>
 
 - Using KubViz you can comprehensively scan the kubernetes containers for the security flaws such as vulnerabilities and misconfigurations.
 - Detects comprehensive vulnerabilities in OS packages (Alpine, Red Hat Universal Base Image, Red Hat Enterprise Linux, CentOS, Oracle Linux, Debian, Ubuntu, Amazon Linux, openSUSE Leap, SUSE Enterprise Linux, Photon OS and Distroless).
 - Detects configuration issues in Kubernetes cluster
+<br>
+
+<img src=".readme_assets/vul-misconfig.jpeg" alt="Kubernetes Container Security Tracking" width="525" align="right">
+
+<br clear="all">
+
+### SBOM
+
+<img src=".readme_assets/sbom.jpeg" alt="sbom" width="525" align="right">
+
+<br>
+
+- Generate reports for Software Bill of Materials (SBOM) from images within your Kubernetes cluster using KubViz in the CycloneDX format. These reports will be available in JSON format.
+
 <br>
 
 <br clear="all">
