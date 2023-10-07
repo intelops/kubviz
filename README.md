@@ -179,7 +179,7 @@ helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Add
 
 **NOTE:** 
 
-A time-based job scheduler is added for each plugins. They allow you to schedule and automate the execution of plugins at specific times, intervals. Each plugin execution can be configured to run at a precise time or at regular intervals.
+A time-based job scheduler is added for each plugins. They allow you to schedule and automate the execution of plugins at specific times, intervals. Each plugin execution can be configured to run at a precise time or at regular intervals.If we pass interval as '0' value its disable the plugins from scheduling.
 
 #### How to Verify if Everything is Up and Running
 
