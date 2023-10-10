@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "client.fullname" . }}-gitlab-dashboard
   annotations:
-    grafana_folder: "Kubviz"
+    grafana_folder: "Gitbridge"
   labels:
     {{ .Values.dashboards.label }}: {{ .Values.dashboards.labelValue | quote }}
 data:

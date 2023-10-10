@@ -11,6 +11,6 @@ data:
     datasources:
       - name: vertamedia-clickhouse-datasource
         type: vertamedia-clickhouse-datasource
-        url: http://kubviz-client-clickhouse:8123
+        url: {{ include "client.fullname" . }}-clickhouse:8123
         access: proxy
 {{- end }}
