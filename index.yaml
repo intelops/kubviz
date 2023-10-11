@@ -255,6 +255,29 @@ entries:
   client:
   - apiVersion: v2
     appVersion: v1.0.0
+    created: "2023-10-11T06:09:54.722868122Z"
+    dependencies:
+    - condition: nats.enabled
+      name: nats
+      repository: https://intelops.github.io/kubviz/
+      version: 0.13.5
+    - condition: clickhouse.enabled
+      name: clickhouse
+      repository: https://intelops.github.io/kubviz/
+      version: 1.0.2
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
+      version: 1.0.3
+    description: A Helm chart for kubeviz client
+    digest: cc1541eaa9dcf89e568bfb69bbe74067c6ae54d6ea63862da810c3417aae8954
+    name: client
+    type: application
+    urls:
+    - https://github.com/intelops/kubviz/releases/download/client-1.1.6/client-1.1.6.tgz
+    version: 1.1.6
+  - apiVersion: v2
+    appVersion: v1.0.0
     created: "2023-10-06T16:48:19.168045561Z"
     dependencies:
     - condition: nats.enabled
