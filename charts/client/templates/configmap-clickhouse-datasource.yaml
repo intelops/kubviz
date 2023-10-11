@@ -13,6 +13,6 @@ data:
         type: grafana-clickhouse-datasource
         jsonData:
           port: 9000
-          server: kubviz-client-clickhouse
+          server: {{ include "client.fullname" . }}-clickhouse
           tlsSkipVerify: true
 {{- end }}
