@@ -159,6 +159,6 @@ nats:
     # Use token if you want to provide the token via Helm Values
     token: ""
     # Use a secret reference if you want to get a token from a secret
-    secret:
-      name: ""
-      key: ""
+    # secret:
+    #   name: ""
+    #   key: ""
