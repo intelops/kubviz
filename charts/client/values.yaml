@@ -100,6 +100,10 @@ clickhouse:
 
 grafana:
   enabled: false
+  sidecar:
+    dashboards:
+      provider:
+        allowUiUpdates: true
   plugins:
   - vertamedia-clickhouse-datasource
   - grafana-clickhouse-datasource
