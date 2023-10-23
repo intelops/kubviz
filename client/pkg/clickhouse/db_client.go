@@ -50,17 +50,40 @@ type DBInterface interface {
 
 func NewDBClient(conf *config.Config) (DBInterface, error) {
 	ctx := context.Background()
-	log.Println("Connecting to Clickhouse DB and creating schemas...")
-	splconn, err := clickhouse.Open(&clickhouse.Options{
-		Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
-		Debug: true,
-		Debugf: func(format string, v ...any) {
-			fmt.Printf(format, v)
-		},
-		Settings: clickhouse.Settings{
-			"allow_experimental_object_type": 1,
-		},
-	})
+	var connOptions clickhouse.Options
+
+	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
+		connOptions = clickhouse.Options{
+			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Debug: true,
+			Auth: clickhouse.Auth{
+				Username: conf.ClickHouseUsername,
+				Password: conf.ClickHousePassword,
+			},
+			Debugf: func(format string, v ...interface{}) {
+				fmt.Printf(format, v...)
+			},
+			Settings: clickhouse.Settings{
+				"allow_experimental_object_type": 1,
+			},
+		}
+		fmt.Printf("Connecting to ClickHouse using usename and password")
+	} else {
+		connOptions = clickhouse.Options{
+			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Debug: true,
+			Debugf: func(format string, v ...interface{}) {
+				fmt.Printf(format, v...)
+			},
+			Settings: clickhouse.Settings{
+				"allow_experimental_object_type": 1,
+			},
+		}
+		fmt.Printf("Connecting to ClickHouse  without  usename and password")
+
+	}
+
+	splconn, err := clickhouse.Open(&connOptions)
 	if err != nil {
 		return nil, err
 	}
