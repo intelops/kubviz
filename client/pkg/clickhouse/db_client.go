@@ -67,7 +67,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 				"allow_experimental_object_type": 1,
 			},
 		}
-		fmt.Printf("Connecting to ClickHouse using usename and password")
+		fmt.Printf("Connecting to ClickHouse using username and password")
 	} else {
 		connOptions = clickhouse.Options{
 			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
