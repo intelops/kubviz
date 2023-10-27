@@ -54,7 +54,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 
 	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
 		connOptions = clickhouse.Options{
-			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Addr:  []string{fmt.Sprintf("%s:%d?%s&%s", conf.DBAddress, conf.DbPort, conf.ClickHouseUsername, conf.ClickHousePassword)},
 			Debug: true,
 			Auth: clickhouse.Auth{
 				Username: conf.ClickHouseUsername,
@@ -92,7 +92,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
-			fmt.Println(err)
+			fmt.Println("Authentication error:", err) // Print the error message here
 		}
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
-			fmt.Println(err)
+			fmt.Println("Authenticate error:", err)
 		}
 		return nil, err
 	}
