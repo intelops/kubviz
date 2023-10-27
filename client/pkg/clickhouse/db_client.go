@@ -55,7 +55,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
 		fmt.Println("Using provided username and password")
 		connOptions = clickhouse.Options{
-			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Addr:  []string{fmt.Sprintf("%s:%d?username=%s&password=%s", conf.DBAddress, conf.DbPort, conf.ClickHouseUsername, conf.ClickHousePassword)},
 			Debug: true,
 			Auth: clickhouse.Auth{
 				Username: conf.ClickHouseUsername,
