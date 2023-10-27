@@ -57,6 +57,10 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		connOptions = clickhouse.Options{
 			Addr:  []string{fmt.Sprintf("%s:%d?username=%s&password=%s", conf.DBAddress, conf.DbPort, conf.ClickHouseUsername, conf.ClickHousePassword)},
 			Debug: true,
+			Auth: clickhouse.Auth{
+				Username: conf.ClickHouseUsername,
+				Password: conf.ClickHousePassword,
+			},
 			Debugf: func(format string, v ...interface{}) {
 				fmt.Printf(format, v...)
 			},
@@ -101,22 +105,29 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 	// 		return nil, err
 	// 	}
 	// }
-	stdconn := clickhouse.OpenDB(&clickhouse.Options{
-		Addr:  []string{fmt.Sprintf("%s:%d?username=%s&password=%s", conf.DBAddress, conf.DbPort, conf.ClickHouseUsername, conf.ClickHousePassword)},
-		Debug: true,
-		Auth: clickhouse.Auth{
-			Username: conf.ClickHouseUsername,
-			Password: conf.ClickHousePassword,
-		},
-	})
+	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
+		fmt.Println("Using provided username and password")
+		connOptions = clickhouse.Options{
+			Addr: []string{fmt.Sprintf("%s:%d?username=%s&password=%s", conf.DBAddress, conf.DbPort, conf.ClickHouseUsername, conf.ClickHousePassword)},
+		}
+	} else {
+		fmt.Println("Using connection without username and password")
+		connOptions = clickhouse.Options{
+			Addr: []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+		}
+	}
+
+	stdconn := clickhouse.OpenDB(&connOptions)
+
 	if err := stdconn.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
-			fmt.Println("Authenticate error:", err)
+			fmt.Println("Authentication error:", err)
 		}
 		return nil, err
 	}
+
 	return &DBClient{splconn: splconn, conn: stdconn, conf: conf}, nil
 }
 
