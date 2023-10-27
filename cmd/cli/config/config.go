@@ -24,7 +24,12 @@ func OpenClickHouseConn() (*sql.DB, *Config, error) {
 	}
 	conn := clickhouse.OpenDB(&clickhouse.Options{
 		Addr: []string{
-			fmt.Sprintf("%s:%d?username=%s&password=%s", cfg.DBAddress, cfg.DbPort, cfg.ClickHouseUsername, cfg.ClickHousePassword)},
+			fmt.Sprintf("%s:%d", cfg.DBAddress, cfg.DbPort)},
+		Debug: true,
+		Auth: clickhouse.Auth{
+			Username: cfg.ClickHouseUsername,
+			Password: cfg.ClickHousePassword,
+		},
 	})
 	if err := conn.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
