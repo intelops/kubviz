@@ -106,7 +106,13 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 	// 	}
 	// }
 	stdconn := clickhouse.OpenDB(&clickhouse.Options{
-		Addr: []string{fmt.Sprintf("%s:%d?username=%s&password=%s", conf.DBAddress, conf.DbPort, conf.ClickHouseUsername, conf.ClickHousePassword)}})
+		Addr:  []string{fmt.Sprintf("%s:%d?username=%s&password=%s", conf.DBAddress, conf.DbPort, conf.ClickHouseUsername, conf.ClickHousePassword)},
+		Debug: true,
+		Auth: clickhouse.Auth{
+			Username: conf.ClickHouseUsername,
+			Password: conf.ClickHousePassword,
+		},
+	})
 	if err := stdconn.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
