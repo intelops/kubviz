@@ -57,10 +57,6 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		connOptions = clickhouse.Options{
 			Addr:  []string{fmt.Sprintf("%s:%d?username=%s&password=%s", conf.DBAddress, conf.DbPort, conf.ClickHouseUsername, conf.ClickHousePassword)},
 			Debug: true,
-			Auth: clickhouse.Auth{
-				Username: conf.ClickHouseUsername,
-				Password: conf.ClickHousePassword,
-			},
 			Debugf: func(format string, v ...interface{}) {
 				fmt.Printf(format, v...)
 			},
