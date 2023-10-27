@@ -50,38 +50,38 @@ type DBInterface interface {
 
 func NewDBClient(conf *config.Config) (DBInterface, error) {
 	ctx := context.Background()
-	// var connOptions clickhouse.Options
+	var connOptions clickhouse.Options
 
-	// if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
-	connOptions := clickhouse.Options{
-		Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
-		Debug: true,
-		Auth: clickhouse.Auth{
-			Username: "admin",
-			Password: "admin",
-		},
-		Debugf: func(format string, v ...interface{}) {
-			fmt.Printf(format, v...)
-		},
-		Settings: clickhouse.Settings{
-			"allow_experimental_object_type": 1,
-		},
+	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
+		connOptions = clickhouse.Options{
+			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Debug: true,
+			Auth: clickhouse.Auth{
+				Username: conf.ClickHouseUsername,
+				Password: conf.ClickHousePassword,
+			},
+			Debugf: func(format string, v ...interface{}) {
+				fmt.Printf(format, v...)
+			},
+			Settings: clickhouse.Settings{
+				"allow_experimental_object_type": 1,
+			},
+		}
+		fmt.Printf("Connecting to ClickHouse using username and password")
+	} else {
+		connOptions = clickhouse.Options{
+			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Debug: true,
+			Debugf: func(format string, v ...interface{}) {
+				fmt.Printf(format, v...)
+			},
+			Settings: clickhouse.Settings{
+				"allow_experimental_object_type": 1,
+			},
+		}
+		fmt.Printf("Connecting to ClickHouse  without  usename and password")
+
 	}
-	fmt.Printf("Connecting to ClickHouse using username and password")
-	// } else {
-	// 	connOptions = clickhouse.Options{
-	// 		Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
-	// 		Debug: true,
-	// 		Debugf: func(format string, v ...interface{}) {
-	// 			fmt.Printf(format, v...)
-	// 		},
-	// 		Settings: clickhouse.Settings{
-	// 			"allow_experimental_object_type": 1,
-	// 		},
-	// 	}
-	// 	fmt.Printf("Connecting to ClickHouse  without  usename and password")
-
-	// }
 
 	splconn, err := clickhouse.Open(&connOptions)
 	if err != nil {
