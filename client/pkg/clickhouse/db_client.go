@@ -105,19 +105,21 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 	// 		return nil, err
 	// 	}
 	// }
+	var connOption clickhouse.Options
+
 	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
 		fmt.Println("Using provided username and password")
-		connOptions = clickhouse.Options{
+		connOption = clickhouse.Options{
 			Addr: []string{fmt.Sprintf("%s:%d?username=%s&password=%s", conf.DBAddress, conf.DbPort, conf.ClickHouseUsername, conf.ClickHousePassword)},
 		}
 	} else {
 		fmt.Println("Using connection without username and password")
-		connOptions = clickhouse.Options{
+		connOption = clickhouse.Options{
 			Addr: []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
 		}
 	}
 
-	stdconn := clickhouse.OpenDB(&connOptions)
+	stdconn := clickhouse.OpenDB(&connOption)
 
 	if err := stdconn.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
