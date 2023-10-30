@@ -127,7 +127,7 @@ func main() {
 		LogErr(err)
 		err = RakeesOutput(config, js)
 		LogErr(err)
-		// getK8sEvents(clientset)
+		//getK8sEvents(clientset)
 		err = runTrivyScans(config, js)
 		LogErr(err)
 		err = RunKubeScore(clientset, js)
