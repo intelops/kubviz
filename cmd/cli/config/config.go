@@ -22,11 +22,11 @@ func OpenClickHouseConn() (*sql.DB, *Config, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	var conns clickhouse.Options
+	var options clickhouse.Options
 
 	if cfg.ClickHouseUsername != "" && cfg.ClickHousePassword != "" {
 		fmt.Println("Using provided username and password")
-		conns = clickhouse.Options{
+		options = clickhouse.Options{
 			Addr:  []string{fmt.Sprintf("%s:%d", cfg.DBAddress, cfg.DbPort)},
 			Debug: true,
 			Auth: clickhouse.Auth{
@@ -36,12 +36,12 @@ func OpenClickHouseConn() (*sql.DB, *Config, error) {
 		}
 	} else {
 		fmt.Println("Using connection without username and password")
-		conns = clickhouse.Options{
+		options = clickhouse.Options{
 			Addr: []string{fmt.Sprintf("%s:%d", cfg.DBAddress, cfg.DbPort)},
 		}
 	}
 
-	conn := clickhouse.OpenDB(&conns)
+	conn := clickhouse.OpenDB(&options)
 	if err := conn.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			return nil, nil, fmt.Errorf("[%d] %s %s", exception.Code, exception.Message, exception.StackTrace)
