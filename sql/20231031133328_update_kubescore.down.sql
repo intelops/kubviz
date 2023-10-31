@@ -11,4 +11,4 @@ ALTER TABLE kubescore
 
 -- Reset the index granularity to its previous value
 ALTER TABLE kubescore
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

@@ -11,4 +11,4 @@ ALTER TABLE getall_resources
 
 -- Reset the index granularity to its previous value
 ALTER TABLE getall_resources
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

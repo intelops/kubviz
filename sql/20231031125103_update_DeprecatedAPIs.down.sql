@@ -11,4 +11,4 @@ ALTER TABLE DeprecatedAPIs
 
 -- Reset the index granularity to its previous value
 ALTER TABLE DeprecatedAPIs
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

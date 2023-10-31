@@ -11,4 +11,4 @@ ALTER TABLE DeletedAPIs
 
 -- Reset the index granularity to its previous value
 ALTER TABLE DeletedAPIs
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

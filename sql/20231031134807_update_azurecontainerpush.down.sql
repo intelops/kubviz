@@ -11,4 +11,4 @@ ALTER TABLE azurecontainerpush
 
 -- Reset the index granularity to its previous value
 ALTER TABLE azurecontainerpush
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

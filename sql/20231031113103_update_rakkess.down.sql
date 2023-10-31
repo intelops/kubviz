@@ -11,4 +11,4 @@ ALTER TABLE rakkess
 
 -- Reset the index granularity to its previous value
 ALTER TABLE rakkess
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

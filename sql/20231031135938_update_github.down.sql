@@ -11,4 +11,4 @@ ALTER TABLE github
 
 -- Reset the index granularity to its previous value
 ALTER TABLE github
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

@@ -11,4 +11,4 @@ ALTER TABLE trivy_misconfig
 
 -- Reset the index granularity to its previous value
 ALTER TABLE trivy_misconfig
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

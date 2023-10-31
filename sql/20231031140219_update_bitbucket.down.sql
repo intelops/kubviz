@@ -11,4 +11,4 @@ ALTER TABLE bitbucket
 
 -- Reset the index granularity to its previous value
 ALTER TABLE bitbucket
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

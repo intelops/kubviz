@@ -11,4 +11,4 @@ ALTER TABLE outdated_images
 
 -- Reset the index granularity to its previous value
 ALTER TABLE outdated_images
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

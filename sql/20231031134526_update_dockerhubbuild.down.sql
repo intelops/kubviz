@@ -11,4 +11,4 @@ ALTER TABLE dockerhubbuild
 
 -- Reset the index granularity to its previous value
 ALTER TABLE dockerhubbuild
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

@@ -11,4 +11,4 @@ ALTER TABLE azure_devops
 
 -- Reset the index granularity to its previous value
 ALTER TABLE azure_devops
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

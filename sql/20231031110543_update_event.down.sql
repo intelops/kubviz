@@ -1,3 +1,4 @@
+
 ALTER TABLE events
     ENGINE = PreviousEngine;
 
@@ -11,4 +12,4 @@ ALTER TABLE events
 
 -- Reset the index granularity to its previous value
 ALTER TABLE events
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

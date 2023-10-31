@@ -11,4 +11,4 @@ ALTER TABLE trivysbom
 
 -- Reset the index granularity to its previous value
 ALTER TABLE trivysbom
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;

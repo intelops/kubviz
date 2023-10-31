@@ -11,4 +11,4 @@ ALTER TABLE quaycontainerpush
 
 -- Reset the index granularity to its previous value
 ALTER TABLE quaycontainerpush
-    SETTINGS index_granularity = PreviousIndexGranularity
+    SETTINGS index_granularity = PreviousIndexGranularity;
