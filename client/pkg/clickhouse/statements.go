@@ -17,8 +17,12 @@ const kubvizTable DBStatement = `
 		Event        String,
 		FirstTime   String,
 		LastTime    String
-	) engine=File(TabSeparated)
-`
+	) ENGINE = MergeTree()
+	ORDER BY (ClusterName, EventTime) 
+	TTL EventTime + INTERVAL 30 DAY
+	SETTINGS index_granularity = 8192;
+	`
+
 const rakeesTable DBStatement = `
 CREATE TABLE IF NOT EXISTS rakkess (
 	ClusterName String,
@@ -28,7 +32,10 @@ CREATE TABLE IF NOT EXISTS rakkess (
 	List String,
 	Update String,
 	EventTime DateTime('UTC')
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, EventTime) 
+TTL EventTime + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const kubePugDepricatedTable DBStatement = `
@@ -40,7 +47,10 @@ CREATE TABLE IF NOT EXISTS DeprecatedAPIs (
 	Deprecated UInt8,
 	Scope String,
 	EventTime DateTime('UTC')
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, EventTime) 
+TTL EventTime + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const kubepugDeletedTable DBStatement = `
@@ -54,7 +64,10 @@ CREATE TABLE IF NOT EXISTS DeletedAPIs (
 	Deleted UInt8,
 	Scope String,
 	EventTime DateTime('UTC')
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, EventTime) 
+TTL EventTime + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const jfrogContainerPushEventTable DBStatement = `
@@ -69,7 +82,10 @@ CREATE TABLE IF NOT EXISTS jfrogcontainerpush (
 	Tag String,
 	Event String,
 	EventTime DateTime('UTC')
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, EventTime) 
+TTL EventTime + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const ketallTable DBStatement = `
@@ -80,7 +96,10 @@ const ketallTable DBStatement = `
 		Resource String,
 		Age String,
 		EventTime DateTime('UTC')
-	) engine=File(TabSeparated)
+	) ENGINE = MergeTree()
+	ORDER BY (ClusterName, EventTime) 
+	TTL EventTime + INTERVAL 30 DAY
+	SETTINGS index_granularity = 8192;
 	`
 
 const outdateTable DBStatement = `
@@ -93,7 +112,10 @@ CREATE TABLE IF NOT EXISTS outdated_images (
 	LatestVersion String,
 	VersionsBehind Int64,
 	EventTime DateTime('UTC')
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, EventTime) 
+TTL EventTime + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const kubescoreTable DBStatement = `
@@ -103,7 +125,10 @@ CREATE TABLE IF NOT EXISTS kubescore (
 	cluster_name String,
 	recommendations String,
 	EventTime DateTime('UTC')
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, EventTime) 
+TTL EventTime + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const trivyTableVul DBStatement = `
@@ -145,7 +170,10 @@ const trivyTableMisconfig DBStatement = `
 		misconfig_severity String,
 		misconfig_status String,
 		EventTime DateTime('UTC')
-	) engine=File(TabSeparated)
+	) ENGINE = MergeTree()
+	ORDER BY (ClusterName, EventTime) 
+	TTL EventTime + INTERVAL 30 DAY
+	SETTINGS index_granularity = 8192;
 	`
 
 const trivyTableImage DBStatement = `
@@ -173,7 +201,10 @@ const dockerHubBuildTable DBStatement = `
 		Owner String,
 		Event String,
 		EventTime DateTime('UTC')
-	) engine=File(TabSeparated)
+	) ENGINE = MergeTree()
+	ORDER BY (ClusterName, EventTime) 
+	TTL EventTime + INTERVAL 30 DAY
+	SETTINGS index_granularity = 8192;
 	`
 
 const azureContainerPushEventTable DBStatement = `
@@ -186,7 +217,10 @@ const azureContainerPushEventTable DBStatement = `
 		Size Int32,
 		SHAID String,
 		EventTime DateTime('UTC')
-	) engine=File(TabSeparated)
+	) ENGINE = MergeTree()
+	ORDER BY (ClusterName, EventTime) 
+	TTL EventTime + INTERVAL 30 DAY
+	SETTINGS index_granularity = 8192;
 	`
 
 const quayContainerPushEventTable DBStatement = `
@@ -199,7 +233,10 @@ const quayContainerPushEventTable DBStatement = `
 		tag String,
 		Event String,
 		EventTime DateTime('UTC')
-	) engine=File(TabSeparated)
+	) ENGINE = MergeTree()
+	ORDER BY (ClusterName, EventTime) 
+	TTL EventTime + INTERVAL 30 DAY
+	SETTINGS index_granularity = 8192;
 	`
 
 const trivySbomTable DBStatement = `
@@ -225,7 +262,10 @@ const trivySbomTable DBStatement = `
 		component_license_exp String,
 		component_purl String,
 		dependency_ref String
-	) engine=File(TabSeparated)
+	) ENGINE = MergeTree()
+	ORDER BY (ClusterName, EventTime) 
+	TTL metadata_timestamp + INTERVAL 30 DAY
+	SETTINGS index_granularity = 8192;
 	`
 
 const InsertDockerHubBuild DBStatement = "INSERT INTO dockerhubbuild (PushedBy, ImageTag, RepositoryName, DateCreated, Owner, Event, EventTime) VALUES (?, ?, ?, ?, ?, ?, ?)"

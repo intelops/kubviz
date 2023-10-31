@@ -12,7 +12,10 @@ CREATE TABLE IF NOT EXISTS azure_devops (
 	RepoName String,
 	TimeStamp DateTime('UTC'),
 	Event String
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, TimeStamp) 
+TTL TimeStamp + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const InsertAzureDevops DBStatement = "INSERT INTO azure_devops ( Author, Provider, CommitID, CommitUrl, EventType, RepoName, TimeStamp, Event) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
@@ -27,7 +30,10 @@ CREATE TABLE IF NOT EXISTS github (
 	RepoName String,
 	TimeStamp DateTime('UTC'),
 	Event String
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, TimeStamp) 
+TTL TimeStamp + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const InsertGithub DBStatement = "INSERT INTO github ( Author, Provider, CommitID, CommitUrl, EventType, RepoName, TimeStamp, Event) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
@@ -42,7 +48,10 @@ CREATE TABLE IF NOT EXISTS gitlab (
 	RepoName String,
 	TimeStamp DateTime('UTC'),
 	Event String
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, TimeStamp) 
+TTL TimeStamp + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const InsertGitlab DBStatement = "INSERT INTO gitlab ( Author, Provider, CommitID, CommitUrl, EventType, RepoName, TimeStamp, Event) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
@@ -57,7 +66,10 @@ CREATE TABLE IF NOT EXISTS bitbucket (
 	RepoName String,
 	TimeStamp DateTime('UTC'),
 	Event String
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, TimeStamp) 
+TTL TimeStamp + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
 
 const InsertBitbucket DBStatement = "INSERT INTO bitbucket ( Author, Provider, CommitID, CommitUrl, EventType, RepoName, TimeStamp, Event) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
@@ -72,7 +84,9 @@ CREATE TABLE IF NOT EXISTS gitea (
 	RepoName String,
 	TimeStamp DateTime('UTC'),
 	Event String
-) engine=File(TabSeparated)
+) ENGINE = MergeTree()
+ORDER BY (ClusterName, TimeStamp) 
+TTL TimeStamp + INTERVAL 30 DAY
+SETTINGS index_granularity = 8192;
 `
-
 const InsertGitea DBStatement = "INSERT INTO gitea ( Author, Provider, CommitID, CommitUrl, EventType, RepoName, TimeStamp, Event) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"

@@ -20,4 +20,7 @@ CREATE TABLE IF NOT EXISTS trivysbom (
 	component_license_exp String,
 	component_purl        String,
 	dependency_ref        String
-) engine=File(TabSeparated);
+) ENGINE = MergeTree()
+	ORDER BY (ClusterName, metadata_timestamp) 
+	TTL metadata_timestamp + INTERVAL 30 DAY
+	SETTINGS index_granularity = 8192;
