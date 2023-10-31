@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS rakkess (
 	EventTime   DateTime('UTC')
 ) ENGINE = MergeTree()
 	ORDER BY (ClusterName, EventTime) 
-	TTL EventTime + INTERVAL 30 DAY
+	TTL EventTime + INTERVAL 10 MINUTE
 	SETTINGS index_granularity = 8192;
 	
