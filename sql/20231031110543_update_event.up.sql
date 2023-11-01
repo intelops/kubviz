@@ -16,4 +16,4 @@ CREATE TABLE IF NOT EXISTS new_events (
 ORDER BY ClusterName
 TTL EventTime + INTERVAL 30 DAY
 SETTINGS index_granularity = 8192;
-
+INSERT INTO new_events SELECT * FROM events;
