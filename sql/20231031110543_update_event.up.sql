@@ -2,10 +2,7 @@
 CREATE TABLE new_events
 ENGINE = MergeTree()
 ORDER BY (ClusterName, EventTime)
-TTL EventTime TO EventTime + INTERVAL 10 MINUTE AS
-SELECT * FROM events;
-
--- You may need to update indexes, constraints, and other properties as well.
+TTL EventTime TO EventTime + INTERVAL 10 MINUTE;
 
 -- Copy data from the old table to the new one
 INSERT INTO new_events SELECT * FROM events;
