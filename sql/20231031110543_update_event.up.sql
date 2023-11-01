@@ -17,4 +17,4 @@ CREATE TABLE IF NOT EXISTS new_events (
     TTL EventTime + INTERVAL 10 MINUTE
     SETTINGS index_granularity = 8192;
 
-ALTER TABLE new_events RENAME TO events;
+
