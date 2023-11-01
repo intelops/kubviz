@@ -17,8 +17,3 @@ ORDER BY ClusterName
 TTL EventTime + INTERVAL 30 DAY
 SETTINGS index_granularity = 8192;
 
-INSERT INTO new_events SELECT * FROM events;
-
-RENAME TABLE events TO old_events, new_events TO events;
-
-DROP TABLE old_events;
