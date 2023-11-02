@@ -99,12 +99,6 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		return nil, err
 	}
 
-	// tables := []DBStatement{kubvizTable, rakeesTable, kubePugDepricatedTable, kubepugDeletedTable, ketallTable, trivyTableImage, trivySbomTable, outdateTable, clickhouseExperimental, containerGithubTable, kubescoreTable, trivyTableVul, trivyTableMisconfig, dockerHubBuildTable, azureContainerPushEventTable, quayContainerPushEventTable, jfrogContainerPushEventTable, DBStatement(dbstatement.AzureDevopsTable), DBStatement(dbstatement.GithubTable), DBStatement(dbstatement.GitlabTable), DBStatement(dbstatement.BitbucketTable), DBStatement(dbstatement.GiteaTable)}
-	// for _, table := range tables {
-	// 	if err = splconn.Exec(context.Background(), string(table)); err != nil {
-	// 		return nil, err
-	// 	}
-	// }
 	var connOption clickhouse.Options
 
 	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
