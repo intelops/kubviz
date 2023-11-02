@@ -6,5 +6,8 @@ CREATE TABLE IF NOT EXISTS quaycontainerpush (
 	homePage      String,
 	tag           String,
 	Event         String,
-    EventTime DateTime('UTC')
-) engine=File(TabSeparated);
+    EventTime DateTime('UTC'),
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+) ENGINE = MergeTree() 
+ORDER BY ExpiryDate 
+TTL ExpiryDate;

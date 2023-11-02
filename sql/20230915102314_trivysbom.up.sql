@@ -19,5 +19,8 @@ CREATE TABLE IF NOT EXISTS trivysbom (
 	component_hash_content String,
 	component_license_exp String,
 	component_purl        String,
-	dependency_ref        String
-) engine=File(TabSeparated);
+	dependency_ref        String,
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+) ENGINE = MergeTree() 
+ORDER BY ExpiryDate 
+TTL ExpiryDate;

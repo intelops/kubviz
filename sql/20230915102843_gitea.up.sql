@@ -6,5 +6,8 @@ CREATE TABLE IF NOT EXISTS gitea (
 	EventType    String,
 	RepoName     String,
 	TimeStamp    DateTime('UTC'),
-	Event        String
-) engine=File(TabSeparated);
+	Event        String,
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+) ENGINE = MergeTree() 
+ORDER BY ExpiryDate 
+TTL ExpiryDate;

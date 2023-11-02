@@ -6,5 +6,9 @@ CREATE TABLE IF NOT EXISTS outdated_images (
 	CurrentTag      String,
 	LatestVersion   String,
 	VersionsBehind  Int64,
-    EventTime       DateTime('UTC')
-) engine=File(TabSeparated);
+    EventTime       DateTime('UTC'),
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+) ENGINE = MergeTree() 
+ORDER BY ExpiryDate 
+TTL ExpiryDate;
+
