@@ -5,5 +5,8 @@ CREATE TABLE IF NOT EXISTS dockerhubbuild (
 	DateCreated   String,
 	Owner         String,
 	Event         String,
-    EventTime     DateTime('UTC')
-) engine=File(TabSeparated);
+    EventTime     DateTime('UTC'),
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+) ENGINE = MergeTree() 
+ORDER BY ExpiryDate 
+TTL ExpiryDate;

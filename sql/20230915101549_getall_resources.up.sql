@@ -4,5 +4,9 @@ CREATE TABLE IF NOT EXISTS getall_resources (
 	Kind        String,
 	Resource    String,
 	Age         String,
-    EventTime   DateTime('UTC')
-) engine=File(TabSeparated);
+    EventTime   DateTime('UTC'),
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+) ENGINE = MergeTree() 
+ORDER BY ExpiryDate 
+TTL ExpiryDate;
+

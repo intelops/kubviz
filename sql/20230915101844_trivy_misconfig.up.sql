@@ -14,5 +14,9 @@ CREATE TABLE IF NOT EXISTS trivy_misconfig (
 	misconfig_resolution String,
 	misconfig_severity String,
 	misconfig_status   String,
-    EventTime          DateTime('UTC')
-) engine=File(TabSeparated);
+    EventTime          DateTime('UTC'),
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+) ENGINE = MergeTree() 
+ORDER BY ExpiryDate 
+TTL ExpiryDate;
+

@@ -10,5 +10,8 @@ CREATE TABLE IF NOT EXISTS trivyimage (
 	vul_title           String,
 	vul_severity        String,
 	vul_published_date  DateTime('UTC'),
-	vul_last_modified_date DateTime('UTC')
-) engine=File(TabSeparated);
+	vul_last_modified_date DateTime('UTC'),
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+) ENGINE = MergeTree() 
+ORDER BY ExpiryDate 
+TTL ExpiryDate;

@@ -11,5 +11,8 @@ CREATE TABLE IF NOT EXISTS events (
 	Host        String,
 	Event       String,
 	FirstTime   String,
-	LastTime    String
-) engine=File(TabSeparated);
+	LastTime    String,
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+) ENGINE = MergeTree() 
+ORDER BY ExpiryDate 
+TTL ExpiryDate;
