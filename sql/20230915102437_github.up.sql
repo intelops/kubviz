@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS github (
 	RepoName     String,
 	TimeStamp    DateTime('UTC'),
 	Event        String,
-	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+	ExpiryDate DateTime DEFAULT now() + INTERVAL 1 MONTH
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
 TTL ExpiryDate;
