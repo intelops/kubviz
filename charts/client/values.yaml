@@ -104,6 +104,21 @@ grafana:
   - vertamedia-clickhouse-datasource
   - grafana-clickhouse-datasource
   - volkovlabs-echarts-panel
+  grafana.ini:
+    database:
+      enabled: true
+      type: postgres
+      host: kubviz-client-postgresql.kubviz.svc.cluster.local:5432
+      name: tracetest
+      ssl_mode: disable
+      user: tracetest
+      password: $__file{/etc/secrets/postgresql/postgres-password}
+      #ssl_mode = require
+  extraSecretMounts: 
+  - name: my-postgresql-mount 
+    mountPath: /etc/secrets/postgresql
+    secretName: kubviz-client-postgresql
+    readOnly: true
 
 dashboards:
   enabled: true
