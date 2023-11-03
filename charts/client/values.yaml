@@ -108,16 +108,16 @@ grafana:
     database:
       enabled: true
       type: postgres
-      host: kubviz-client-postgresql.kubviz.svc.cluster.local:5432
-      name: tracetest
+      host: postgresql.kubviz.svc.cluster.local:5432
+      name: postgres
       ssl_mode: disable
-      user: tracetest
+      user: postgres
       password: $__file{/etc/secrets/postgresql/postgres-password}
       #ssl_mode = require
   extraSecretMounts: 
   - name: my-postgresql-mount 
     mountPath: /etc/secrets/postgresql
-    secretName: kubviz-client-postgresql
+    secretName: postgresql
     readOnly: true
 
 dashboards:
