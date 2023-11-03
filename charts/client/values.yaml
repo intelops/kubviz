@@ -99,7 +99,7 @@ clickhouse:
     replicas: "1"
 
 grafana:
-  enabled: false
+  enabled: true
   plugins:
   - vertamedia-clickhouse-datasource
   - grafana-clickhouse-datasource
@@ -108,7 +108,7 @@ grafana:
     database:
       enabled: true
       type: postgres
-      host: postgresql.kubviz.svc.cluster.local:5432
+      host: kubviz-client-postgresql.kubviz.svc.cluster.local:5432
       name: postgres
       ssl_mode: disable
       user: postgres
@@ -117,8 +117,13 @@ grafana:
   extraSecretMounts: 
   - name: my-postgresql-mount 
     mountPath: /etc/secrets/postgresql
-    secretName: postgresql
+    secretName: kubviz-client-postgresql
     readOnly: true
+    
+postgresql:
+  enabled: true
+  metrics:
+    enabled: false
 
 dashboards:
   enabled: true

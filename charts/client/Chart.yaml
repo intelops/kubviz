@@ -35,3 +35,7 @@ dependencies:
     condition: grafana.enabled
     version: 1.0.3
     repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
+  - name: postgresql
+    condition: postgresql.enabled
+    version: 1.0.0
+    repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
