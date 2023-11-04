@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS trivysbom (
 	component_license_exp String,
 	component_purl        String,
 	dependency_ref        String,
-	ExpiryDate DateTime DEFAULT now() + INTERVAL 1 MONTH
+	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
 TTL ExpiryDate;

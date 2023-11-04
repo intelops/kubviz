@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS github (
+CREATE TABLE IF NOT EXISTS gitlab (
 	Author       String,
 	Provider     String,
 	CommitID     String,
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS github (
 	RepoName     String,
 	TimeStamp    DateTime('UTC'),
 	Event        String,
-	ExpiryDate DateTime DEFAULT now() + INTERVAL 1 MONTH
+	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
 TTL ExpiryDate;

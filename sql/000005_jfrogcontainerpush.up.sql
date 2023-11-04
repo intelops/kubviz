@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS jfrogcontainerpush (
 	Tag            String,
 	Event          String,
     EventTime      DateTime('UTC'),
-	ExpiryDate DateTime DEFAULT now() + INTERVAL 1 MONTH
+	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
 TTL ExpiryDate;
