@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS azure_devops (
+CREATE TABLE IF NOT EXISTS bitbucket (
 	Author       String,
 	Provider     String,
 	CommitID     String,
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS azure_devops (
 	RepoName     String,
 	TimeStamp    DateTime('UTC'),
 	Event        String,
-	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
 TTL ExpiryDate;
