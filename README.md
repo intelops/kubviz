@@ -214,7 +214,17 @@ export POD_NAME=$(kubectl get pods --namespace kubviz -l "app.kubernetes.io/name
 kubectl --namespace kubviz port-forward $POD_NAME 3000
 ```
 
-3. Access "localhost:3000" in your web browser, where you'll be prompted to enter your credentials. Utilize the username "admin" and the password obtained from step 1 to proceed.   
+3. Access "localhost:3000" in your web browser, where you'll be prompted to enter your credentials. Utilize the username "admin" and the password obtained from step 1 to proceed.
+
+#### TTL - Time-To-Live Feature
+
+We've implemented a Time-To-Live (TTL) feature to streamline the management of data within your ClickHouse tables. With TTL, historical data can be automatically relocated to alternative storage or purged to optimize storage space. This feature is particularly valuable for scenarios like time-series data or logs where older data gradually loses its relevance over time.
+
+#### Configuring TTL
+
+The TTL value is customizable, empowering you to define the specific duration after which data is marked as 'expired'.
+
+To guide you through the process of setting up a TTL, [please follow these steps](docs/CONFIGURATION_TTL.md)
 
 ## Use Cases
 
