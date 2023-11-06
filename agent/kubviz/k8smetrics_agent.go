@@ -64,11 +64,11 @@ var (
 )
 
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
-	err := RunTrivyImageScans(config, js)
-	if err != nil {
-		return err
-	}
-	err = RunTrivySbomScan(config, js)
+	// err := RunTrivyImageScans(config, js)
+	// if err != nil {
+	// 	return err
+	// }
+	err := RunTrivySbomScan(config, js)
 	if err != nil {
 		return err
 	}
