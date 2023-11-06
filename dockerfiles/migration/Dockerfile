@@ -16,7 +16,7 @@ WORKDIR /
 COPY --from=builder /workspace/migration .
 COPY --from=builder /workspace/sql /sql
 COPY --from=builder /workspace/script /script
-
+RUN chmod -R 777 /sql
 USER 65532:65532
 
 ENTRYPOINT ["/migration"]

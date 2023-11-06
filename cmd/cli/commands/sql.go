@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/golang-migrate/migrate/v4"
-	cm "github.com/golang-migrate/migrate/v4/database/clickhouse"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/intelops/kubviz/cmd/cli/config"
 	"github.com/spf13/cobra"
@@ -47,28 +45,15 @@ migration sql -e --no`,
 
 		if executeFlag {
 			if yesFlag {
-				db, cfg, err := config.OpenClickHouseConn()
+				cfg, err := config.New()
 				if err != nil {
-					log.Fatalf("Failed to open ClickHouse connection: %v", err)
+					log.Fatalf("failed to parse the env : %v", err.Error())
+					return
 				}
-				defer db.Close()
-				driver, err := cm.WithInstance(db, &cm.Config{})
-				if err != nil {
-					log.Fatalf("Failed to create migrate driver: %v", err)
+				if err := cfg.Migrate(); err != nil {
+					log.Fatalf("failed to migrate : %v", err.Error())
+					return
 				}
-
-				m, err := migrate.NewWithDatabaseInstance(
-					fmt.Sprintf("file://%s", cfg.SchemaPath),
-					"clickhouse",
-					driver,
-				)
-				if err != nil {
-					log.Fatalf("Clickhouse Migration initialization failed: %v", err)
-				}
-				if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-					log.Fatalf("Migration failed: %v", err)
-				}
-				fmt.Println("Clickhouse Migrations applied successfully!")
 			} else {
 				fmt.Println("Clickhouse Migration skipped due to --no flag.")
 			}
