@@ -640,6 +640,7 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
 				com.Licenses[0].Expression,
 				com.Purl,
 				depend.Ref,
+				result.Vulnerabilities,
 			); err != nil {
 				log.Fatal(err)
 			}
