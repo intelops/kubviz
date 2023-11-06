@@ -600,6 +600,11 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 
 	}
 }
+
+// func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
+// 	log.Println("***started inserting value")
+// 	for _,result :=range metrics.Report.BomFormat
+// }
 func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
 	log.Println("####started inserting value")
 	result := metrics.Report
@@ -607,7 +612,7 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
 	if err != nil {
 		log.Println("error in conn Begin", err)
 	}
-	defer tx.Rollback()
+	//defer tx.Rollback()
 	stmt, err := tx.Prepare(InsertTrivySbom)
 	if err != nil {
 		log.Println("error in prepare", err)
@@ -642,11 +647,13 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
 				depend.Ref,
 				result.Vulnerabilities,
 			); err != nil {
+				tx.Rollback()
 				log.Fatal(err)
 			}
 		}
 	}
 	if err := tx.Commit(); err != nil {
+		tx.Rollback()
 		log.Fatal(err)
 	}
 	log.Println("value inserted")
