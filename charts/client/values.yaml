@@ -98,30 +98,6 @@ clickhouse:
   clickhouse:
     replicas: "1"
 
-postgresql:
-  enabled: false
-  auth:
-    ## @param auth.enablePostgresUser Assign a password to the "postgres" admin user. Otherwise, remote access will be blocked for this user
-    ##
-    enablePostgresUser: true
-    ## @param auth.postgresPassword Password for the "postgres" admin user. Ignored if `auth.existingSecret` is provided
-    ##
-    postgresPassword: ""
-    ## @param auth.username Name for a custom user to create
-    ##
-    username: ""
-    ## @param auth.password Password for the custom user to create. Ignored if `auth.existingSecret` is provided
-    ##
-    password: ""
-    ## @param auth.database Name for a custom database to create
-    ##
-    database: ""
-    ## @param auth.existingSecret Name of existing secret to use for PostgreSQL credentials. `auth.postgresPassword`, `auth.password`, and `auth.replicationPassword` will be ignored and picked up from this secret. The secret might also contains the key `ldap-password` if LDAP is enabled. `ldap.bind_password` will be ignored and picked from this secret in this case.
-    ##
-    existingSecret: ""
-  metrics:
-    enabled: false 
-
 grafana:
   enabled: false
   plugins:
@@ -132,20 +108,20 @@ grafana:
     dashboards:
       provider:
         allowUiUpdates: true
-  # grafana.ini:
-  #   database:
-  #     enabled: true
-  #     type: postgres
-  #     host: kubviz-client-postgresql:5432
-  #     name: postgres
-  #     ssl_mode: disable
-  #     user: postgres
-  #     password: $__file{/etc/secrets/postgresql/postgres-password}
-  # extraSecretMounts: 
-  # - name: my-postgresql-mount 
-  #   mountPath: /etc/secrets/postgresql
-  #   secretName: kubviz-client-postgresql
-  #   readOnly: true
+  postgresql:
+    enabled: false
+  database: 
+    type: postgres
+    host: kubviz-client-postgresql:5432
+    name: postgres
+    ssl_mode: disable
+    user: postgres
+    password: $__file{/etc/secrets/postgresql/postgres-password}
+    secretMount:
+      name: postgresql-mount
+      mountPath: /etc/secrets/postgresql
+      secretName: kubviz-client-postgresql
+      readOnly: true
 
 dashboards:
   enabled: true

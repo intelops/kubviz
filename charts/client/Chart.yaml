@@ -31,12 +31,8 @@ dependencies:
     condition: clickhouse.enabled
     version: 1.0.2
     repository: https://intelops.github.io/kubviz/
-  - name: postgresql
-    condition: postgresql.enabled
-    version: 1.0.0
-    repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
   - name: grafana
     condition: grafana.enabled
-    version: 1.0.3
+    version: 1.0.4
     repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
     
