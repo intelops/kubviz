@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS quaycontainerpush (
 	tag           String,
 	Event         String,
     EventTime DateTime('UTC'),
-	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
 TTL ExpiryDate;
