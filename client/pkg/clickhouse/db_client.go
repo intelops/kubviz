@@ -627,7 +627,7 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 		}
 		stmt.Close()
 	}else {
-		log.Println("No Data Available")
+		log.Println("sbom payload not available for db insertion, skipping db insertion")
 
 	}
 	
