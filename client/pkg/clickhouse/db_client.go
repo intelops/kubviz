@@ -33,7 +33,7 @@ type DBInterface interface {
 	InsertGitEvent(string)
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
 	InsertTrivyImageMetrics(metrics model.TrivyImage)
-	InsertTrivySbomMetrics(metrics model.Reports)
+	InsertTrivySbomMetrics(metrics model.Sbom)
 	InsertTrivyMetrics(metrics model.Trivy)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
@@ -600,55 +600,31 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 
 	}
 }
-func (c *DBClient) InsertTrivySbomMetrics(metrics model.Reports) {
+func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	log.Println("####started inserting value")
 	result := metrics.Report
-	tx, err := c.conn.Begin()
-	if err != nil {
-		log.Println("error in conn Begin", err)
-	}
-	defer tx.Rollback()
-	stmt, err := tx.Prepare(InsertTrivySbom)
-	if err != nil {
-		log.Println("error in prepare", err)
-	}
-	defer stmt.Close()
-	for _, com := range result.Components {
-		if len(result.Metadata.Tools) == 0 || len(com.Properties) == 0 || len(com.Hashes) == 0 || len(com.Licenses) == 0 {
-			continue
-		}
-		for _, depend := range result.Dependencies {
-			if _, err := stmt.Exec(
-				metrics.ID,
-				result.Schema,
-				result.BomFormat,
-				result.SpecVersion,
-				result.SerialNumber,
-				int32(result.Version),
-				result.Metadata.Timestamp,
-				result.Metadata.Tools[0].Vendor,
-				result.Metadata.Tools[0].Name,
-				result.Metadata.Tools[0].Version,
-				com.BomRef,
-				com.Type,
-				com.Name,
-				com.Version,
-				com.Properties[0].Name,
-				com.Properties[0].Value,
-				com.Hashes[0].Alg,
-				com.Hashes[0].Content,
-				com.Licenses[0].Expression,
-				com.Purl,
-				depend.Ref,
-			); err != nil {
-				log.Fatal(err)
-			}
-		}
-	}
-	if err := tx.Commit(); err != nil {
+	var (
+		tx, _   = c.conn.Begin()
+		stmt, _ = tx.Prepare(InsertTrivySbom)
+	)
+	if _,err:= stmt.Exec(
+		metrics.ID,
+		result.CycloneDX.Metadata.Component.Name,
+		result.CycloneDX.Metadata.Component.Version,
+		result.CycloneDX.Metadata.Component.PackageURL,
+		result.CycloneDX.Metadata.Component.MIMEType,
+		result.CycloneDX.Metadata.Component.BOMRef,
+		result.CycloneDX.SerialNumber,
+		result.CycloneDX.Version,
+		result.CycloneDX.BOMFormat,
+	); err!=nil {
 		log.Fatal(err)
 	}
-	log.Println("value inserted")
+	if err:=tx.Commit();err!=nil {
+		log.Fatal(err)
+	}
+	stmt.Close()
+	
 }
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
