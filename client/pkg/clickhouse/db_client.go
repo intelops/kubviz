@@ -607,19 +607,38 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(InsertTrivySbom)
 	)
-	if _,err:= stmt.Exec(
-		metrics.ID,
-		result.CycloneDX.Metadata.Component.Name,
-		result.CycloneDX.Metadata.Component.Version,
-		result.CycloneDX.Metadata.Component.PackageURL,
-		result.CycloneDX.Metadata.Component.MIMEType,
-		result.CycloneDX.Metadata.Component.BOMRef,
-		result.CycloneDX.SerialNumber,
-		result.CycloneDX.Version,
-		result.CycloneDX.BOMFormat,
-	); err!=nil {
-		log.Fatal(err)
+	if result.CycloneDX != nil {
+		if _,err:= stmt.Exec(
+			metrics.ID,
+			result.CycloneDX.Metadata.Component.Name,
+			result.CycloneDX.Metadata.Component.PackageURL,
+			result.CycloneDX.Metadata.Component.BOMRef,
+			result.CycloneDX.SerialNumber,
+			result.CycloneDX.Version,
+			result.CycloneDX.BOMFormat,
+			result.CycloneDX.Metadata.Component.Version,
+			result.CycloneDX.Metadata.Component.MIMEType,
+		); err!=nil {
+			log.Fatal(err)
+		}
+
+	}else {
+		if _,err:= stmt.Exec(
+			metrics.ID,
+			"-",
+			"-",
+			"-",
+			"-",
+			"-",
+			"-",
+			"-",
+			"-",
+		); err!=nil {
+			log.Fatal(err)
+		}
+
 	}
+	
 	if err:=tx.Commit();err!=nil {
 		log.Fatal(err)
 	}
