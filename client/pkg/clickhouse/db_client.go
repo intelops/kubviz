@@ -603,11 +603,12 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	log.Println("####started inserting value")
 	result := metrics.Report
-	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(InsertTrivySbom)
-	)
+
 	if result.CycloneDX != nil {
+        var (
+            tx, _   = c.conn.Begin()
+            stmt, _ = tx.Prepare(InsertTrivySbom)
+        )
 		if _,err:= stmt.Exec(
 			metrics.ID,
 			result.CycloneDX.Metadata.Component.Name,
@@ -621,28 +622,14 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 		); err!=nil {
 			log.Fatal(err)
 		}
-
-	}else {
-		if _,err:= stmt.Exec(
-			metrics.ID,
-			"-",
-			"-",
-			"-",
-			"-",
-			"-",
-			"-",
-			"-",
-			"-",
-		); err!=nil {
+		if err:=tx.Commit();err!=nil {
 			log.Fatal(err)
 		}
+		stmt.Close()
+	}else {
+		log.Println("No Data Available")
 
 	}
-	
-	if err:=tx.Commit();err!=nil {
-		log.Fatal(err)
-	}
-	stmt.Close()
 	
 }
 func (c *DBClient) Close() {
