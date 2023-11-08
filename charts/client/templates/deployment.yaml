@@ -40,7 +40,29 @@ spec:
           - name: SCHEMA_PATH
             value : {{ .Values.migration.schema.path }}
           - name: DB_ADDRESS
+      {{- if .Values.clickhouse.enabled }}
             value: {{ include "client.fullname" . }}-clickhouse
+      {{- else }}
+            value: {{ .Values.existingClickhouse.host }}
+          - name: CLICKHOUSE_USERNAME
+            {{- if not .Values.existingClickhouse.secret }}
+            value: {{ .Values.existingClickhouse.username }}
+            {{- else }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.existingClickhouse.secret.name }}
+                key: {{ .Values.existingClickhouse.secret.usernamekey }}
+            {{- end }}
+          - name: CLICKHOUSE_PASSWORD
+            {{- if not .Values.existingClickhouse.secret }}
+            value: {{ .Values.existingClickhouse.password }}
+            {{- else }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.existingClickhouse.secret.name }}
+                key: {{ .Values.existingClickhouse.secret.passwordkey }}
+            {{- end }}
+      {{- end }}
           - name: DB_PORT
             value: "9000"
       containers:
@@ -74,7 +96,29 @@ spec:
           - name: NATS_ADDRESS
             value: {{ include "client.fullname" . }}-nats
           - name: DB_ADDRESS
+      {{- if .Values.clickhouse.enabled }}
             value: {{ include "client.fullname" . }}-clickhouse
+      {{- else }}
+            value: {{ .Values.existingClickhouse.host }}
+          - name: CLICKHOUSE_USERNAME
+            {{- if not .Values.existingClickhouse.secret }}
+            value: {{ .Values.existingClickhouse.username }}
+            {{- else }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.existingClickhouse.secret.name }}
+                key: {{ .Values.existingClickhouse.secret.usernamekey }}
+            {{- end }}
+          - name: CLICKHOUSE_PASSWORD
+            {{- if not .Values.existingClickhouse.secret }}
+            value: {{ .Values.existingClickhouse.password }}
+            {{- else }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.existingClickhouse.secret.name }}
+                key: {{ .Values.existingClickhouse.secret.passwordkey }}
+            {{- end }}
+      {{- end }}
           - name: DB_PORT
             value: "9000"
           resources:

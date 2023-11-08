@@ -98,6 +98,17 @@ clickhouse:
   clickhouse:
     replicas: "1"
 
+existingClickhouse:
+  host: clickhouse
+  # Use username and password if you want to provide the token via Helm Values
+  username: ""
+  password: ""
+  # Use a secret reference if you want to get a username and password from a secret
+  secret: {}
+    # name: ""
+    # usernamekey: ""
+    # passwordkey: ""
+
 grafana:
   enabled: false
   plugins:
@@ -122,6 +133,14 @@ grafana:
       mountPath: /etc/secrets/postgresql
       secretName: kubviz-client-postgresql
       readOnly: true
+  clickhouse:
+    enabled: false
+    username: ""
+    password: ""
+    existingSecret: {}
+      # name: ""
+      # usernamekey: ""
+      # passwordkey: ""
 
 dashboards:
   enabled: true
