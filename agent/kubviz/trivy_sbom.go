@@ -7,6 +7,7 @@ import (
 	"log"
 	"os/exec"
 
+	"github.com/aquasecurity/trivy/pkg/sbom/cyclonedx"
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
@@ -14,8 +15,8 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func publishTrivySbomReport(report model.Sbom, js nats.JetStreamContext) error {
-	metrics := model.Reports{
+func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) error {
+	metrics := model.Sbom{
 		ID:     uuid.New().String(),
 		Report: report,
 	}
@@ -67,7 +68,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			continue // Move on to the next image
 		}
 
-		var report model.Sbom
+		var report cyclonedx.BOM
 		err = json.Unmarshal(out, &report)
 		if err != nil {
 			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
