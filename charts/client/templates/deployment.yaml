@@ -65,6 +65,10 @@ spec:
       {{- end }}
           - name: DB_PORT
             value: "9000"
+          - name: TTL_INTERVAL
+            value: "{{ .Values.ttl.ttlInterval }}"
+          - name: TTL_UNIT
+            value: {{ .Values.ttl.ttlUnit }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -121,6 +125,10 @@ spec:
       {{- end }}
           - name: DB_PORT
             value: "9000"
+          - name: TTL_INTERVAL
+            value: "{{ .Values.ttl.ttlInterval }}"
+          - name: TTL_UNIT
+            value: {{ .Values.ttl.ttlUnit }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
