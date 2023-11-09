@@ -32,7 +32,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 126,
+      "id": 32,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -189,6 +189,381 @@ data:
             "type": "vertamedia-clickhouse-datasource",
             "uid": "{{ .Values.datasources.uid }}"
           },
+          "gridPos": {
+            "h": 9,
+            "w": 13,
+            "x": 0,
+            "y": 6
+          },
+          "id": 72,
+          "options": {
+            "baidu": {
+              "callback": "bmapReady",
+              "key": ""
+            },
+            "editor": {
+              "format": "auto",
+              "height": 600
+            },
+            "gaode": {
+              "key": "",
+              "plugin": "AMap.Scale,AMap.ToolBar"
+            },
+            "getOption": "// Check if data.series exists\nif (data.series && data.series.length > 0) {\n  const reasons = data.series[0].fields[0].values;\n  const kinds = data.series[0].fields[1].values;\n  const eventTimes = data.series[0].fields[2].values;\n\n  // Create nodes and links\n  const nodes = [];\n  const links = [];\n\n  reasons.forEach((reason, index) => {\n    const sourceNode = {\n      name: reason,\n      category: 0, // Category for source nodes\n      symbolSize: 60, // Size for source nodes\n    };\n\n    const kindNode = {\n      name: kinds[index],\n      category: 1, // Category for kind nodes\n      symbolSize: 40, // Size for kind nodes\n    };\n\n    const eventTimeNode = {\n      name: eventTimes[index],\n      category: 2, // Category for eventTime nodes\n      symbolSize: 20, // Size for eventTime nodes\n    };\n\n    // Ensure source, kind, and eventTime nodes are unique before adding them\n    if (!nodes.some((node) => node.name === sourceNode.name)) {\n      nodes.push(sourceNode);\n    }\n\n    if (!nodes.some((node) => node.name === kindNode.name)) {\n      nodes.push(kindNode);\n    }\n\n    if (!nodes.some((node) => node.name === eventTimeNode.name)) {\n      nodes.push(eventTimeNode);\n    }\n\n    // Create links between reason, kind, and eventTime nodes\n    links.push({\n      source: reason,\n      target: kinds[index],\n    });\n\n    links.push({\n      source: kinds[index],\n      target: eventTimes[index],\n    });\n  });\n\n  // Create categories for nodes\n  const categories = [\n    {\n      name: 'Reasons',\n    },\n    {\n      name: 'Nodes',\n    },\n    {\n      name: 'Event Times',\n    },\n  ];\n\n  // Create ECharts option\n  const option = {\n    tooltip: {\n      trigger: 'item',\n      formatter: '{b}',\n    },\n    legend: {\n      x: 'left',\n      data: ['Reasons', 'Nodes', 'Event Times'],\n    },\n    series: [\n      {\n        type: 'graph',\n        layout: 'circular',\n        roam: true,\n        label: {\n          show: true,\n          textStyle: {\n            color: '#000',\n          },\n        },\n        force: {\n          repulsion: 100,\n          gravity: 0.1,\n          edgeLength: 150,\n        },\n        data: nodes,\n        links: links,\n        draggable: true,\n        categories: categories,\n        edgeSymbol: [\"none\", \"arrow\"],\n        edgeSymbolSize: [12, 12],\n        lineStyle: {\n          color: \"#000000\",\n          curveness: 0,\n          opacity: 0.3,\n        },\n      },\n    ],\n  };\n\n  // Return the ECharts option\n  return option;\n} else {\n  // Handle the case when data.series does not exist\n  return {};\n}",
+            "google": {
+              "callback": "gmapReady",
+              "key": ""
+            },
+            "map": "none",
+            "renderer": "canvas",
+            "themeEditor": {
+              "config": "{}",
+              "height": 400,
+              "name": "default"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT Reason, Host, EventTime\nFROM default.events\nWHERE Kind IN ('Node') AND Reason IN ('NodeNotReady')",
+              "rawQuery": "SELECT Reason, Host, EventTime\nFROM default.events\nWHERE Kind IN ('Node') AND Reason IN ('NodeNotReady')",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "NodeNotReady Events for Nodes",
+          "type": "volkovlabs-echarts-panel"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 11,
+            "x": 13,
+            "y": 6
+          },
+          "id": 70,
+          "options": {
+            "baidu": {
+              "callback": "bmapReady",
+              "key": ""
+            },
+            "editor": {
+              "format": "auto",
+              "height": 600
+            },
+            "gaode": {
+              "key": "",
+              "plugin": "AMap.Scale,AMap.ToolBar"
+            },
+            "getOption": "let kind = [];\nlet resources = [];\n\ndata.series.map((s) => {\n  kind = s.fields.find((f) => f.name === 'Kind').values;\n  resources = s.fields.find((f) => f.name === 'Resources').values;\n});\n\n// Create an empty array to store doughnut chart data\nconst doughnutChartData = [];\n\n// Define colors for doughnut slices\nconst doughnutSliceColors = ['#235894', '#FFFF00', '#FF0000', '#00FF00', '#FFA500'];\n\n// Map severity and counts to doughnut chart data\nkind.forEach((kinddata, index) => {\n  doughnutChartData.push({\n    value: resources[index],\n    name: kinddata,\n    itemStyle: {\n      borderRadius: [10, 10, 10, 10], // Add rounded corners\n      color: doughnutSliceColors[index % doughnutSliceColors.length],\n      borderWidth: 2,\n      borderColor: '#fff',\n    },\n  });\n});\n\nreturn {\n  backgroundColor: '#FFFFFF', // Set the background color to white\n  tooltip: {\n    trigger: 'item',\n  },\n  legend: {\n    top: '5%',\n    left: 'center',\n  },\n  series: [\n    {\n      name: 'Access From',\n      type: 'pie',\n      radius: ['40%', '70%'],\n      avoidLabelOverlap: false,\n      label: {\n        show: false,\n        position: 'center',\n      },\n      emphasis: {\n        label: {\n          show: true,\n          fontSize: 40,\n          fontWeight: 'bold',\n        },\n      },\n      labelLine: {\n        show: false,\n      },\n      data: doughnutChartData, // Use the modified doughnut chart data\n    },\n  ],\n};",
+            "google": {
+              "callback": "gmapReady",
+              "key": ""
+            },
+            "map": "none",
+            "renderer": "canvas",
+            "themeEditor": {
+              "config": "{}",
+              "height": 400,
+              "name": "default"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName, Kind, count(Resource) AS Resources\nFROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime) AND Kind In ('Deployment','Job','Secret', 'ConfigMap', 'Service')\nGROUP BY  ClusterName, Kind",
+              "rawQuery": "SELECT ClusterName, Kind, count(Resource) AS Resources\nFROM default.getall_resources\nWHERE EventTime >= toDateTime(1698841487) AND EventTime <= toDateTime(1698927887) AND Kind In ('Deployment','Job','Secret', 'ConfigMap', 'Service')\nGROUP BY  ClusterName, Kind",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Resource Distribution",
+          "type": "volkovlabs-echarts-panel"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 30,
+                "gradientMode": "hue",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 15
+          },
+          "id": 69,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "time_series",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": " SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE $timeFilterByColumn(EventTime) AND Kind = 'Pod' AND Reason = 'Created'\n    GROUP BY EventTime, Kind, Reason",
+              "rawQuery": "SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE EventTime >= toDateTime(1698839664) AND EventTime <= toDateTime(1698926064) AND Kind = 'Pod' AND Reason = 'Created'\n    GROUP BY EventTime, Kind, Reason",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "time_series",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": " SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE $timeFilterByColumn(EventTime) AND Kind = 'Pod' AND Reason = 'BackOff'\n    GROUP BY EventTime, Kind, Reason",
+              "rawQuery": "SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE EventTime >= toDateTime(1698839664) AND EventTime <= toDateTime(1698926064) AND Kind = 'Pod' AND Reason = 'BackOff'\n    GROUP BY EventTime, Kind, Reason",
+              "refId": "B",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "time_series",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE $timeFilterByColumn(EventTime) AND Kind = 'Pod' AND Reason = 'NodeNotReady'\n    GROUP BY EventTime, Kind, Reason",
+              "rawQuery": "SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE EventTime >= toDateTime(1698839664) AND EventTime <= toDateTime(1698926064) AND Kind = 'Pod' AND Reason = 'NodeNotReady'\n    GROUP BY EventTime, Kind, Reason",
+              "refId": "C",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "time_series",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": " SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE $timeFilterByColumn(EventTime) AND Kind = 'Pod' AND Reason = 'Scheduled'\n    GROUP BY EventTime, Kind, Reason",
+              "rawQuery": "SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE EventTime >= toDateTime(1698839664) AND EventTime <= toDateTime(1698926064) AND Kind = 'Pod' AND Reason = 'Scheduled'\n    GROUP BY EventTime, Kind, Reason",
+              "refId": "D",
+              "round": "0s",
+              "skip_comments": true
+            },
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "time_series",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "intervalFactor": 1,
+              "query": "SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE $timeFilterByColumn(EventTime) AND Kind = 'Pod' AND Reason = 'FailedScheduling'\n    GROUP BY EventTime, Kind, Reason",
+              "rawQuery": "SELECT EventTime, Kind, Reason, count(*) as total_count\n    FROM default.events\n    WHERE EventTime >= toDateTime(1698839664) AND EventTime <= toDateTime(1698926064) AND Kind = 'Pod' AND Reason = 'FailedScheduling'\n    GROUP BY EventTime, Kind, Reason",
+              "refId": "E",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Pod Events by Reason Over Time",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "center",
+                "cellOptions": {
+                  "type": "color-text"
+                },
+                "filterable": true,
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Age"
+                },
+                "properties": [
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "lcd",
+                      "type": "gauge"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 15
+          },
+          "id": 71,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "10.0.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "{{ .Values.datasources.uid }}"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName, Resource, Age\nFROM default.getall_resources\nWHERE $timeFilterByColumn(EventTime)",
+              "rawQuery": "SELECT ClusterName, Resource, Age\nFROM default.getall_resources\nWHERE EventTime >= toDateTime(1696336208) AND EventTime <= toDateTime(1698928208)",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Resource Details by Cluster and Age",
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "{{ .Values.datasources.uid }}"
+          },
           "description": "This panel displays the total count of outdated images from all cluster.",
           "fieldConfig": {
             "defaults": {
@@ -217,7 +592,7 @@ data:
             "h": 4,
             "w": 5,
             "x": 0,
-            "y": 6
+            "y": 22
           },
           "id": 18,
           "options": {
@@ -287,7 +662,7 @@ data:
             "h": 4,
             "w": 5,
             "x": 5,
-            "y": 6
+            "y": 22
           },
           "id": 20,
           "options": {
@@ -357,7 +732,7 @@ data:
             "h": 4,
             "w": 5,
             "x": 10,
-            "y": 6
+            "y": 22
           },
           "id": 22,
           "options": {
@@ -427,7 +802,7 @@ data:
             "h": 4,
             "w": 5,
             "x": 15,
-            "y": 6
+            "y": 22
           },
           "id": 24,
           "options": {
@@ -497,7 +872,7 @@ data:
             "h": 4,
             "w": 4,
             "x": 20,
-            "y": 6
+            "y": 22
           },
           "id": 26,
           "options": {
@@ -600,7 +975,7 @@ data:
             "h": 6,
             "w": 13,
             "x": 0,
-            "y": 10
+            "y": 26
           },
           "id": 53,
           "options": {
@@ -701,7 +1076,7 @@ data:
             "h": 6,
             "w": 11,
             "x": 13,
-            "y": 10
+            "y": 26
           },
           "id": 65,
           "options": {
@@ -757,8 +1132,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -773,7 +1147,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 0,
-            "y": 16
+            "y": 32
           },
           "id": 57,
           "options": {
@@ -826,8 +1200,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -846,7 +1219,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 6,
-            "y": 16
+            "y": 32
           },
           "id": 63,
           "options": {
@@ -897,8 +1270,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -917,7 +1289,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 12,
-            "y": 16
+            "y": 32
           },
           "id": 61,
           "options": {
@@ -968,8 +1340,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -988,7 +1359,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 18,
-            "y": 16
+            "y": 32
           },
           "id": 62,
           "options": {
@@ -1043,8 +1414,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1059,7 +1429,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 0,
-            "y": 20
+            "y": 36
           },
           "id": 56,
           "options": {
@@ -1112,8 +1482,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -1132,7 +1501,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 6,
-            "y": 20
+            "y": 36
           },
           "id": 58,
           "options": {
@@ -1183,8 +1552,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -1203,7 +1571,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 12,
-            "y": 20
+            "y": 36
           },
           "id": 59,
           "options": {
@@ -1254,8 +1622,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -1274,7 +1641,7 @@ data:
             "h": 4,
             "w": 6,
             "x": 18,
-            "y": 20
+            "y": 36
           },
           "id": 60,
           "options": {
@@ -1336,8 +1703,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "light-yellow",
@@ -1381,7 +1747,7 @@ data:
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 24
+            "y": 40
           },
           "id": 44,
           "options": {
@@ -1435,8 +1801,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -1455,7 +1820,7 @@ data:
             "h": 5,
             "w": 8,
             "x": 0,
-            "y": 32
+            "y": 48
           },
           "id": 66,
           "options": {
@@ -1505,8 +1870,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -1525,7 +1889,7 @@ data:
             "h": 5,
             "w": 8,
             "x": 8,
-            "y": 32
+            "y": 48
           },
           "id": 68,
           "options": {
@@ -1575,8 +1939,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -1595,7 +1958,7 @@ data:
             "h": 5,
             "w": 8,
             "x": 16,
-            "y": 32
+            "y": 48
           },
           "id": 67,
           "options": {
@@ -1657,8 +2020,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1690,7 +2052,7 @@ data:
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 37
+            "y": 53
           },
           "id": 64,
           "options": {
@@ -1766,8 +2128,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1782,7 +2143,7 @@ data:
             "h": 9,
             "w": 12,
             "x": 0,
-            "y": 45
+            "y": 61
           },
           "id": 34,
           "options": {
@@ -1866,8 +2227,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1882,7 +2242,7 @@ data:
             "h": 9,
             "w": 12,
             "x": 12,
-            "y": 45
+            "y": 61
           },
           "id": 36,
           "options": {
@@ -1966,8 +2326,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1982,7 +2341,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 54
+            "y": 70
           },
           "id": 28,
           "options": {
@@ -2065,8 +2424,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2081,7 +2439,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 54
+            "y": 70
           },
           "id": 32,
           "options": {
@@ -2165,8 +2523,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2181,7 +2538,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 54
+            "y": 70
           },
           "id": 30,
           "options": {
@@ -2251,8 +2608,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "light-yellow",
@@ -2288,7 +2644,7 @@ data:
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 62
+            "y": 78
           },
           "id": 42,
           "options": {
@@ -2335,7 +2691,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 69
+            "y": 85
           },
           "id": 16,
           "panels": [
@@ -2363,8 +2719,7 @@ data:
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green",
-                        "value": null
+                        "color": "green"
                       },
                       {
                         "color": "red",
@@ -2379,7 +2734,7 @@ data:
                 "h": 16,
                 "w": 24,
                 "x": 0,
-                "y": 70
+                "y": 110
               },
               "id": 14,
               "options": {
@@ -2440,7 +2795,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 70
+            "y": 86
           },
           "id": 12,
           "panels": [
@@ -2482,7 +2837,7 @@ data:
                 "h": 16,
                 "w": 24,
                 "x": 0,
-                "y": 87
+                "y": 127
               },
               "id": 10,
               "options": {
@@ -2543,7 +2898,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 71
+            "y": 87
           },
           "id": 8,
           "panels": [
@@ -2586,7 +2941,7 @@ data:
                 "h": 11,
                 "w": 24,
                 "x": 0,
-                "y": 72
+                "y": 112
               },
               "id": 6,
               "options": {
@@ -2647,7 +3002,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 72
+            "y": 88
           },
           "id": 4,
           "panels": [
@@ -2690,7 +3045,7 @@ data:
                 "h": 8,
                 "w": 24,
                 "x": 0,
-                "y": 73
+                "y": 113
               },
               "id": 2,
               "options": {
