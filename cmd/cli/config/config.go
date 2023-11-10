@@ -1,10 +1,6 @@
 package config
 
 import (
-	"database/sql"
-	"fmt"
-
-	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -14,40 +10,15 @@ type Config struct {
 	ClickHouseUsername string `envconfig:"CLICKHOUSE_USERNAME"`
 	ClickHousePassword string `envconfig:"CLICKHOUSE_PASSWORD"`
 	SchemaPath         string `envconfig:"SCHEMA_PATH" default:"/sql"`
+	TtlInterval        string `envconfig:"TTL_INTERVAL" default:"1"`
+	TtlUnit            string `envconfig:"TTL_UNIT" default:"MONTH"`
 }
 
-func OpenClickHouseConn() (*sql.DB, *Config, error) {
+func New() (*Config, error) {
 	var cfg Config
 	err := envconfig.Process("", &cfg)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	var options clickhouse.Options
-
-	if cfg.ClickHouseUsername != "" && cfg.ClickHousePassword != "" {
-		fmt.Println("Using provided username and password")
-		options = clickhouse.Options{
-			Addr:  []string{fmt.Sprintf("%s:%d", cfg.DBAddress, cfg.DbPort)},
-			Debug: true,
-			Auth: clickhouse.Auth{
-				Username: cfg.ClickHouseUsername,
-				Password: cfg.ClickHousePassword,
-			},
-		}
-	} else {
-		fmt.Println("Using connection without username and password")
-		options = clickhouse.Options{
-			Addr: []string{fmt.Sprintf("%s:%d", cfg.DBAddress, cfg.DbPort)},
-		}
-	}
-
-	conn := clickhouse.OpenDB(&options)
-	if err := conn.Ping(); err != nil {
-		if exception, ok := err.(*clickhouse.Exception); ok {
-			return nil, nil, fmt.Errorf("[%d] %s %s", exception.Code, exception.Message, exception.StackTrace)
-		} else {
-			return nil, nil, err
-		}
-	}
-	return conn, &cfg, nil
+	return &cfg, nil
 }

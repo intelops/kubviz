@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS outdated_images (
 	LatestVersion   String,
 	VersionsBehind  Int64,
     EventTime       DateTime('UTC'),
-	ExpiryDate DateTime DEFAULT now() + INTERVAL 6 MONTH
+	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
 TTL ExpiryDate;

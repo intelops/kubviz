@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/aquasecurity/trivy/pkg/types"
@@ -47,6 +48,7 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 		if err != nil {
 			return err
 		}
+		cleanupCache("/tmp/.cache")
 	}
 	return nil
 }
@@ -64,4 +66,13 @@ func publishImageScanReports(report types.Report, js nats.JetStreamContext) erro
 	}
 	log.Printf("Trivy image report with ID:%s has been published\n", metrics.ID)
 	return nil
+}
+
+func cleanupCache(cacheDir string) {
+	err := os.RemoveAll(cacheDir)
+	if err != nil {
+		log.Printf("Failed to clean up cache directory %s: %v", cacheDir, err)
+	} else {
+		log.Printf("Cache directory %s cleaned up successfully", cacheDir)
+	}
 }

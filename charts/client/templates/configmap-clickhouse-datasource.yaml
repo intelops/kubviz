@@ -13,6 +13,23 @@ data:
         type: grafana-clickhouse-datasource
         jsonData:
           port: 9000
+ {{- if .Values.clickhouse.enabled }}
           server: {{ include "client.fullname" . }}-clickhouse
+ {{- else }}
+          server: {{ .Values.existingClickhouse.host }}
           tlsSkipVerify: true
+  {{- if not .Values.clickhouse.enabled }}
+    {{- if not .Values.existingClickhouse.secret }}
+          username: {{ .Values.existingClickhouse.username }}
+    {{- else }}
+          username: $CLICKHOUSE_USERNAME
+    {{- end }}
+        secureJsonData:
+      {{- if not .Values.existingClickhouse.secret }}
+          password: {{ .Values.existingClickhouse.password }}
+      {{- else }}
+          password: $CLICKHOUSE_PASSWORD
+      {{- end }}
+  {{- end }}
+ {{- end }}
 {{- end }}

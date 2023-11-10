@@ -98,12 +98,49 @@ clickhouse:
   clickhouse:
     replicas: "1"
 
+existingClickhouse:
+  host: clickhouse
+  # Use username and password if you want to provide the token via Helm Values
+  username: ""
+  password: ""
+  # Use a secret reference if you want to get a username and password from a secret
+  secret: {}
+    # name: ""
+    # usernamekey: ""
+    # passwordkey: ""
+
 grafana:
   enabled: false
   plugins:
   - vertamedia-clickhouse-datasource
   - grafana-clickhouse-datasource
   - volkovlabs-echarts-panel
+  sidecar:
+    dashboards:
+      provider:
+        allowUiUpdates: true
+  postgresql:
+    enabled: false
+  database: 
+    type: postgres
+    host: kubviz-client-postgresql:5432
+    name: postgres
+    ssl_mode: disable
+    user: postgres
+    password: $__file{/etc/secrets/postgresql/postgres-password}
+    secretMount:
+      name: postgresql-mount
+      mountPath: /etc/secrets/postgresql
+      secretName: kubviz-client-postgresql
+      readOnly: true
+  clickhouse:
+    enabled: false
+    username: ""
+    password: ""
+    existingSecret: {}
+      # name: ""
+      # usernamekey: ""
+      # passwordkey: ""
 
 dashboards:
   enabled: true
@@ -124,3 +161,7 @@ migration:
     tag: "v1.1.3"
   schema:
     path: "/sql"
+
+ttl:
+  ttlInterval: "1"
+  ttlUnit: MONTH

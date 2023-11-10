@@ -63,6 +63,7 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	if err != nil {
 		return err
 	}
+	cleanupCache("/tmp/.cache")
 	return nil
 }
 
