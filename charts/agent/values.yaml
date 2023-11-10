@@ -43,7 +43,7 @@ service:
   port: 80
 
 git_bridge:
-  enabled: false
+  enabled: true
   image:
     repository: ghcr.io/intelops/kubviz/git-agent
     pullPolicy: Always
@@ -77,7 +77,7 @@ git_bridge:
 
 
 container_bridge:
-  enabled: false
+  enabled: true
   image:
     repository: ghcr.io/intelops/kubviz/container-agent
     pullPolicy: Always
@@ -125,9 +125,11 @@ resources:
   limits:
     cpu: 2
     memory: 2Gi
+    ephemeral-storage: 1Gi
   requests:
     cpu: 200m
     memory: 256Mi
+    ephemeral-storage: 256Mi
 
 autoscaling:
   enabled: false
