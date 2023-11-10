@@ -78,6 +78,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 
 		// Publish the report using the given function
 		publishTrivySbomReport(report, js)
+		cleanupCache("/tmp/.cache")
 	}
 	return nil
 }
