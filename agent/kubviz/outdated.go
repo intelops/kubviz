@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/intelops/kubviz/constants"
 	"log"
 	"os"
 	"regexp"
@@ -15,10 +14,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/intelops/kubviz/constants"
+
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
 
-	"github.com/docker/docker/api/types"
+	types "github.com/docker/docker/api/types/registry"
 	"github.com/genuinetools/reg/registry"
 	semver "github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
@@ -137,7 +138,7 @@ func ParseImageName(imageName string) (string, string, string, error) {
 	matches := dockerImageNameRegex.FindStringSubmatch(imageName)
 
 	if len(matches) != 5 {
-		return "", "", "", fmt.Errorf("Expected 5 matches in regex, but found %d", len(matches))
+		return "", "", "", fmt.Errorf("expected 5 matches in regex, but found %d", len(matches))
 	}
 
 	hostname := matches[1]
@@ -184,9 +185,7 @@ func ListImages(config *rest.Config) ([]model.RunningImage, error) {
 		for _, pod := range pods.Items {
 			for _, initContainerStatus := range pod.Status.InitContainerStatuses {
 				pullable := initContainerStatus.ImageID
-				if strings.HasPrefix(pullable, "docker-pullable://") {
-					pullable = strings.TrimPrefix(pullable, "docker-pullable://")
-				}
+				pullable = strings.TrimPrefix(pullable, "docker-pullable://")
 				runningImage := model.RunningImage{
 					Pod:           pod.Name,
 					Namespace:     pod.Namespace,
@@ -199,9 +198,8 @@ func ListImages(config *rest.Config) ([]model.RunningImage, error) {
 
 			for _, containerStatus := range pod.Status.ContainerStatuses {
 				pullable := containerStatus.ImageID
-				if strings.HasPrefix(pullable, "docker-pullable://") {
-					pullable = strings.TrimPrefix(pullable, "docker-pullable://")
-				}
+				pullable = strings.TrimPrefix(pullable, "docker-pullable://")
+
 				runningImage := model.RunningImage{
 					Pod:           pod.Name,
 					Namespace:     pod.Namespace,
@@ -393,8 +391,8 @@ func fetchTags(reg *registry.Registry, imageName string) ([]string, error) {
 }
 
 func parseTags(tags []string) ([]*semver.Version, []string, error) {
-	semverTags := make([]*semver.Version, 0, 0)
-	nonSemverTags := make([]string, 0, 0)
+	semverTags := make([]*semver.Version, 0)
+	nonSemverTags := make([]string, 0)
 
 	for _, tag := range tags {
 		v, err := semver.NewVersion(tag)
@@ -449,12 +447,12 @@ func splitOutlierSemvers(allSemverTags []*semver.Version) ([]*semver.Version, []
 	return outliers, remaining, nil
 }
 
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE")
-}
+// func homeDir() string {
+// 	if h := os.Getenv("HOME"); h != "" {
+// 		return h
+// 	}
+// 	return os.Getenv("USERPROFILE")
+// }
 
 type VersionTag struct {
 	Sort    int    `json:"sort"`
@@ -547,7 +545,7 @@ func (c SemverTagCollection) Unique() ([]*semver.Version, error) {
 		}
 	}
 
-	result := make([]*semver.Version, 0, 0)
+	result := make([]*semver.Version, 0)
 	for _, u := range unique {
 		result = append(result, u)
 	}

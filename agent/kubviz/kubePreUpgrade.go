@@ -57,7 +57,6 @@ var result *model.Result
 func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamContext) error {
 	for _, deprecatedAPI := range result.DeprecatedAPIs {
 		deprecatedAPI.ClusterName = ClusterName
-		fmt.Println("deprecatedAPI", deprecatedAPI)
 		deprecatedAPIJson, _ := json.Marshal(deprecatedAPI)
 		_, err := js.Publish(constants.EventSubject_depricated, deprecatedAPIJson)
 		if err != nil {
@@ -90,7 +89,7 @@ func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(filename)
+	defer os.RemoveAll(swaggerdir)
 	swaggerfile := filename
 	kubernetesAPIs, err := PopulateKubeAPIMap(swaggerfile)
 	if err != nil {
@@ -178,23 +177,32 @@ func getKubeAPIValues(value map[string]interface{}) (model.KubeAPI, bool) {
 	return model.KubeAPI{}, false
 }
 func downloadFile(filename, url string) error {
-	log.Debugf("Downloading file from %s", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Error(err)
+		return err
 	}
 	if resp.StatusCode > 305 {
 		log.Errorf("could not download the swagger file %s", url)
+		return fmt.Errorf("failed to download file, status code: %d", resp.StatusCode)
 	}
+	contentLength := resp.ContentLength
+	log.Infof("The size of the file to be downloaded for kubepreupgrade plugin is %d bytes", contentLength)
+
 	defer resp.Body.Close()
 	out, err := os.Create(filename)
 	if err != nil {
 		log.Error(err)
 	}
 	defer out.Close()
-	_, err = io.Copy(out, resp.Body)
+	bytesCopied, err := io.Copy(out, resp.Body)
+	if err != nil {
+		log.WithError(err).Error("Failed to copy the file contents")
+		return err
+	}
+	log.Infof("Downloaded %d bytes for file %s", bytesCopied, filename)
 
-	return err
+	return nil
 }
 
 func getGroupVersionKind(value map[string]interface{}) (group, version, kind string) {
