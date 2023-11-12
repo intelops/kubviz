@@ -129,8 +129,7 @@ resources:
   requests:
     cpu: 200m
     memory: 256Mi
-    ephemeral-storage: 256Mi
-
+    
 autoscaling:
   enabled: false
   minReplicas: 1
