@@ -93,6 +93,12 @@ helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$to
 **NOTE:** 
 - If you want to enable Grafana with the client deployment, add `--set grafana.enabled=true` to the helm upgrade command.
 
+- Kubviz provides a setup for Grafana with Postgres data persistence, ensuring that even if the grafana pod/service goes down, the data will persist, safeguarding crucial information for visualization and analysis.
+
+```bash
+helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token" --set grafana.enabled=true --set grafana.postgresql=true
+```
+
 - If grafana already exist use the same upgrade command without --set grafana.enabled=true flag. 
 
 ```bash
@@ -102,6 +108,7 @@ helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$to
 Parameter | Description | Default
 --------- | ----------- | -------
 `grafana.enabled` | If true, create grafana | `false`
+`grafana.postgresql` | If true, create postgresql | `false`
 
 - The KubViz client will also install NATS and Clickhouse. The NATS service is exposed as a LoadBalancer, and you need to note the external IP of the service **kubviz-client-nats-external** and pass it during the KubViz agent installation.
 
