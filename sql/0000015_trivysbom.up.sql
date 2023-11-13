@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS trivysbom (
 	package_url           String,
 	bom_ref 			  String,
 	serial_number         String,
-	version 			  INTEGER
+	version 			  INTEGER,
 	bom_format 			  String,
 	component_version     String,
 	component_mime_type   String,
