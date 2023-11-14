@@ -31,18 +31,12 @@ func executeCommandTrivy(command string) ([]byte, error) {
 func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	var report report.ConsolidatedReport
 	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 60m -f json --cache-dir /tmp/.cache --debug"
-
-	// Log the command before execution
-	log.Printf("Executing command: %s\n", cmdString)
-
-	// Execute the command
+	clearCacheCmd := "trivy k8s --clear-cache"
 	out, err := executeCommandTrivy(cmdString)
-
-	// Handle errors and process the command output as needed
 	if err != nil {
 		log.Printf("Error executing command: %v\n", err)
+		return err
 	}
-	// Log the command output for debugging purposes
 	log.Printf("Command output: %s\n", out)
 	outStr := string(out)
 	parts := strings.SplitN(outStr, "{", 2)
@@ -59,11 +53,15 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 		log.Printf("Error occurred while Unmarshalling json for k8s cluster scan: %v", err)
 		return err
 	}
+	_, err = executeCommandTrivy(clearCacheCmd)
+	if err != nil {
+		log.Printf("Error executing command: %v\n", err)
+		return err
+	}
 	err = publishTrivyK8sReport(report, js)
 	if err != nil {
 		return err
 	}
-	cleanupCache("/tmp/.cache")
 	return nil
 }
 
