@@ -61,10 +61,18 @@ resources:
   limits:
     cpu: 200m
     memory: 256Mi
-    ephemeral-storage: 100Mi
+    ephemeralstorage: 100Mi
   requests:
     cpu: 100m
     memory: 128Mi
+
+persistence:
+  enabled: false
+  existingClaim: ""
+  storageClass: ""
+  mountPath: /mnt/client
+  accessMode: ReadWriteOnce
+  size: 5Gi
 
 autoscaling:
   enabled: false

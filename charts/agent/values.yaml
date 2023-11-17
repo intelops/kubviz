@@ -52,10 +52,17 @@ git_bridge:
     limits:
       cpu: 200m
       memory: 256Mi
-      ephemeral-storage: 100Mi
+      ephemeralstorage: 100Mi
     requests:
       cpu: 200m
       memory: 256Mi
+  persistence:
+    enabled: false
+    existingClaim: ""
+    storageClass: ""
+    mountPath: /mnt/agent/gb
+    accessMode: ReadWriteOnce
+    size: 5Gi
   ingress:
     enabled: true
     annotations:
@@ -87,10 +94,17 @@ container_bridge:
     limits:
       cpu: 200m
       memory: 256Mi
-      ephemeral-storage: 100Mi
+      ephemeralstorage: 100Mi
     requests:
       cpu: 200m
       memory: 256Mi
+  persistence:
+    enabled: false
+    existingClaim: ""
+    storageClass: ""
+    mountPath: /mnt/agent/cb
+    accessMode: ReadWriteOnce
+    size: 5Gi
   ingress:
     enabled: true
     annotations:
@@ -127,10 +141,18 @@ resources:
   limits:
     cpu: 2
     memory: 2Gi
-    ephemeral-storage: 1Gi
+    ephemeralstorage: 1Gi
   requests:
     cpu: 200m
     memory: 256Mi
+
+persistence:
+  enabled: false
+  existingClaim: ""
+  storageClass: ""
+  mountPath: /mnt/agent/kbz
+  accessMode: ReadWriteOnce
+  size: 5Gi
     
 autoscaling:
   enabled: false

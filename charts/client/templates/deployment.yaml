@@ -129,8 +129,27 @@ spec:
             value: "{{ .Values.ttl.ttlInterval }}"
           - name: TTL_UNIT
             value: {{ .Values.ttl.ttlUnit }}
+        {{- if .Values.persistence.enabled }}  
+          volumeMounts:
+          - name: data
+            mountPath: {{ .Values.persistence.mountPath }}
+        {{- end }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+              {{- if not .Values.persistence.enabled }}
+              ephemeral-storage: {{ .Values.resources.limits.ephemeralstorage }}
+              {{- end }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+      {{- if .Values.persistence.enabled }}
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ include "client.fullname" . }}-data
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
