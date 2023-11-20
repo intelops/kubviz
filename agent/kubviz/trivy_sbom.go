@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 
 	"github.com/aquasecurity/trivy/pkg/sbom/cyclonedx"
@@ -47,18 +48,20 @@ func executeCommandSbom(command string) ([]byte, error) {
 
 func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 	clearCacheCmd := "trivy image --clear-cache"
-
-	log.Println("trivy sbom run started")
+	pvcMountPath := "/mnt/agent/kbz"
+	trivySbomCacheDir := fmt.Sprintf("%s/trivy-sbomcache", pvcMountPath)
+	err := os.MkdirAll(trivySbomCacheDir, 0755)
+	if err != nil {
+		log.Printf("Error creating Trivy cache directory: %v\n", err)
+		return err
+	}
 	images, err := ListImages(config)
-
 	if err != nil {
 		log.Printf("failed to list images: %v", err)
 	}
 	for _, image := range images {
-
-		command := fmt.Sprintf("trivy image --format cyclonedx %s %s", image.PullableImage, "--cache-dir /tmp/.cache")
-		out, err := executeCommandSbom(command)
-
+		sbomcmd := fmt.Sprintf("trivy image --format cyclonedx %s --cache-dir %s", image.PullableImage, trivySbomCacheDir)
+		out, err := executeCommandSbom(sbomcmd)
 		if err != nil {
 			log.Printf("Error executing Trivy for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
@@ -69,7 +72,6 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			log.Printf("Trivy output is empty for image sbom %s", image.PullableImage)
 			continue // Move on to the next image
 		}
-
 		var report cyclonedx.BOM
 		err = json.Unmarshal(out, &report)
 		if err != nil {
