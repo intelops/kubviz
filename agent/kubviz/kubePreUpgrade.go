@@ -104,7 +104,6 @@ func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error
 
 func PopulateKubeAPIMap(swagfile string) (model.KubernetesAPIs, error) {
 	var kubeAPIs = make(model.KubernetesAPIs)
-	// log.Infof("Populating the PopulateKubeAPIMap")
 	jsonFile, err := os.Open(swagfile)
 	if err != nil {
 		log.Error(err)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -15,6 +16,15 @@ import (
 )
 
 func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
+
+	pvcMountPath := "/mnt/agent/kbz"
+	trivyImageCacheDir := fmt.Sprintf("%s/trivy-imagecache", pvcMountPath)
+	err := os.MkdirAll(trivyImageCacheDir, 0755)
+	if err != nil {
+		log.Printf("Error creating Trivy Image cache directory: %v\n", err)
+		return err
+	}
+
 	clearCacheCmd := "trivy image --clear-cache"
 
 	images, err := ListImages(config)
@@ -25,7 +35,8 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 
 	for _, image := range images {
 		var report types.Report
-		out, err := executeCommand("trivy image " + image.PullableImage + " --timeout 60m -f json -q --cache-dir /tmp/.cache")
+		scanCmd := fmt.Sprintf("trivy image %s --timeout 60m -f json -q --cache-dir %s", image.PullableImage, trivyImageCacheDir)
+		out, err := executeCommand(scanCmd)
 		if err != nil {
 			log.Printf("Error scanning image %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
