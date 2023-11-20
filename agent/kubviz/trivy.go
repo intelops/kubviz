@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
+	"os"
 	exec "os/exec"
 	"strings"
 
@@ -29,8 +31,15 @@ func executeCommandTrivy(command string) ([]byte, error) {
 	return outc.Bytes(), err
 }
 func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
+	pvcMountPath := "/mnt/agent/kbz"
+	trivyCacheDir := fmt.Sprintf("%s/trivy-cache", pvcMountPath)
+	err := os.MkdirAll(trivyCacheDir, 0755)
+	if err != nil {
+		log.Printf("Error creating Trivy cache directory: %v\n", err)
+		return err
+	}
 	var report report.ConsolidatedReport
-	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 60m -f json --cache-dir /tmp/.cache --debug"
+	cmdString := fmt.Sprintf("trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 60m -f json --cache-dir %s --debug", trivyCacheDir)
 	clearCacheCmd := "trivy k8s --clear-cache"
 	out, err := executeCommandTrivy(cmdString)
 	if err != nil {
