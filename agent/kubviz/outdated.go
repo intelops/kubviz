@@ -447,6 +447,13 @@ func splitOutlierSemvers(allSemverTags []*semver.Version) ([]*semver.Version, []
 	return outliers, remaining, nil
 }
 
+// func homeDir() string {
+// 	if h := os.Getenv("HOME"); h != "" {
+// 		return h
+// 	}
+// 	return os.Getenv("USERPROFILE")
+// }
+
 type VersionTag struct {
 	Sort    int    `json:"sort"`
 	Version string `json:"version"`
