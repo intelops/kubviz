@@ -85,12 +85,3 @@ func publishImageScanReports(report types.Report, js nats.JetStreamContext) erro
 	log.Printf("Trivy image report with ID:%s has been published\n", metrics.ID)
 	return nil
 }
-
-func cleanupCache(cacheDir string) {
-	err := os.RemoveAll(cacheDir)
-	if err != nil {
-		log.Printf("Failed to clean up cache directory %s: %v", cacheDir, err)
-	} else {
-		log.Printf("Cache directory %s cleaned up successfully", cacheDir)
-	}
-}
