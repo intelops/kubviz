@@ -79,19 +79,21 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 }
 
 func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error {
-	swaggerdir, err := os.MkdirTemp("", "kubepug")
+	pvcMountPath := "/mnt/agent/kbz"
+	uniqueDir := fmt.Sprintf("%s/kubepug", pvcMountPath)
+	err := os.Mkdir(uniqueDir, 0755)
 	if err != nil {
 		return err
 	}
-	filename := fmt.Sprintf("%s/swagger-%s.json", swaggerdir, k8sVersion)
+
+	filename := fmt.Sprintf("%s/swagger-%s.json", uniqueDir, k8sVersion)
 	url := fmt.Sprintf("%s/%s/%s", baseURL, k8sVersion, fileURL)
 	err = downloadFile(filename, url)
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(swaggerdir)
-	swaggerfile := filename
-	kubernetesAPIs, err := PopulateKubeAPIMap(swaggerfile)
+	defer os.RemoveAll(filename)
+	kubernetesAPIs, err := PopulateKubeAPIMap(filename)
 	if err != nil {
 		return err
 	}
