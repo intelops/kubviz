@@ -81,7 +81,7 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error {
 	pvcMountPath := "/mnt/agent/kbz"
 	uniqueDir := fmt.Sprintf("%s/kubepug", pvcMountPath)
-	err := os.Mkdir(uniqueDir, 0755)
+	err := os.MkdirAll(uniqueDir, 0755)
 	if err != nil {
 		return err
 	}
