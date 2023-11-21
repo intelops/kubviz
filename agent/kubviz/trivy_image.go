@@ -16,7 +16,6 @@ import (
 )
 
 func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
-
 	pvcMountPath := "/mnt/agent/kbz"
 	trivyImageCacheDir := fmt.Sprintf("%s/trivy-imagecache", pvcMountPath)
 	err := os.MkdirAll(trivyImageCacheDir, 0755)
@@ -24,7 +23,6 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 		log.Printf("Error creating Trivy Image cache directory: %v\n", err)
 		return err
 	}
-
 	clearCacheCmd := "trivy image --clear-cache"
 
 	images, err := ListImages(config)

@@ -85,7 +85,6 @@ func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error
 	if err != nil {
 		return err
 	}
-
 	filename := fmt.Sprintf("%s/swagger-%s.json", uniqueDir, k8sVersion)
 	url := fmt.Sprintf("%s/%s/%s", baseURL, k8sVersion, fileURL)
 	err = downloadFile(filename, url)
@@ -104,6 +103,7 @@ func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error
 
 func PopulateKubeAPIMap(swagfile string) (model.KubernetesAPIs, error) {
 	var kubeAPIs = make(model.KubernetesAPIs)
+	// log.Infof("Populating the PopulateKubeAPIMap")
 	jsonFile, err := os.Open(swagfile)
 	if err != nil {
 		log.Error(err)
