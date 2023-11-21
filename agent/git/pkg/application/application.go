@@ -13,6 +13,8 @@ import (
 	"github.com/intelops/kubviz/agent/git/pkg/config"
 
 	"github.com/gin-gonic/gin"
+
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 type Application struct {
@@ -41,6 +43,7 @@ func New(conf *config.Config, conn *clients.NATSContext) *Application {
 
 func (app *Application) Routes() *gin.Engine {
 	router := gin.New()
+	router.Use(otelgin.Middleware("git-server"))
 	api.RegisterHandlers(router, app)
 	return router
 }

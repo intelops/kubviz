@@ -90,7 +90,7 @@ func (n *NATSContext) Close() {
 	n.conn.Close()
 }
 
-func (n *NATSContext) Publish(metric []byte, repo string, eventkey model.EventKey, eventvalue model.EventValue) error {
+func (n *NATSContext) Publish(metric []byte, repo string, eventkey model.EventKey, eventvalue model.EventValue) error {	
 	msg := nats.NewMsg(eventSubject)
 	msg.Data = metric
 	msg.Header.Set("GitProvider", repo)

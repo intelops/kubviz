@@ -9,11 +9,19 @@ import (
 	"github.com/intelops/kubviz/agent/git/api"
 	"github.com/intelops/kubviz/gitmodels/azuremodel"
 	"github.com/intelops/kubviz/model"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
+
+var tracer = otel.Tracer("gin-server")
 
 func (app *Application) PostGitea(c *gin.Context) {
 	log.Println("gitea handler called...")
 	defer log.Println("gitea handler exited...")
+
+	_, span := tracer.Start(c.Request.Context(), "PostGitea")
+	span.SetAttributes(attribute.String("http.method", "POST"))
+	defer span.End()
 
 	event := c.Request.Header.Get(string(model.GiteaHeader))
 	if len(event) == 0 {
@@ -31,6 +39,10 @@ func (app *Application) PostGitea(c *gin.Context) {
 func (app *Application) PostAzure(c *gin.Context) {
 	log.Println("azure handler called...")
 	defer log.Println("azure handler exited...")
+
+	_, span := tracer.Start(c.Request.Context(), "PostAzure")
+	span.SetAttributes(attribute.String("http.method", "POST"))
+	defer span.End()
 
 	jsonData, err := c.GetRawData()
 	if err != nil {
@@ -59,6 +71,10 @@ func (app *Application) PostAzure(c *gin.Context) {
 func (app *Application) PostGithub(c *gin.Context) {
 	log.Println("github handler called...")
 	defer log.Println("github handler exited...")
+
+	_, span := tracer.Start(c.Request.Context(), "PostGithub")
+	span.SetAttributes(attribute.String("http.method", "POST"))
+	defer span.End()
 	
 	event := c.Request.Header.Get(string(model.GithubHeader))
 	if len(event) == 0 {
@@ -81,6 +97,10 @@ func (app *Application) PostGitlab(c *gin.Context) {
 	log.Println("gitlab handler called...")
 	defer log.Println("gitlab handler exited...")
 
+	_, span := tracer.Start(c.Request.Context(), "PostGitlab")
+	span.SetAttributes(attribute.String("http.method", "POST"))
+	defer span.End()
+
 	event := c.Request.Header.Get(string(model.GitlabHeader))
 	if len(event) == 0 {
 		log.Println("error getting the gitlab event from header")
@@ -101,6 +121,10 @@ func (app *Application) PostGitlab(c *gin.Context) {
 func (app *Application) PostBitbucket(c *gin.Context) {
 	log.Println("bitbucket handler called...")
 	defer log.Println("bitbucket handler exited...")
+
+	_, span := tracer.Start(c.Request.Context(), "PostBitbucket")
+	span.SetAttributes(attribute.String("http.method", "POST"))
+	defer span.End()
 
 	event := c.Request.Header.Get(string(model.BitBucketHeader))
 	if len(event) == 0 {
