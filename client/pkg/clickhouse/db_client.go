@@ -617,6 +617,13 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 }
 func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	log.Println("####started inserting value")
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "InsertTrivySbomMetrics")
+	span.SetAttributes(attribute.String("NewNATSContext", "NATSContext"))
+	defer span.End()
+
 	result := metrics.Report
 
 	if result.CycloneDX != nil {
@@ -721,6 +728,12 @@ func (c *DBClient) RetriveKubepugEvent() ([]model.Result, error) {
 	return events, nil
 }
 func (c *DBClient) RetrieveKubvizEvent() ([]model.DbEvent, error) {
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "RetrieveKubvizEvent")
+	span.SetAttributes(attribute.String("NewNATSContext", "NATSContext"))
+	defer span.End()
+
 	rows, err := c.conn.Query("SELECT ClusterName, Id, EventTime, OpType, Name, Namespace, Kind, Message, Reason, Host, Event, FirstTime, LastTime FROM events")
 	if err != nil {
 		log.Printf("Error: %s", err)

@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/intelops/go-common/logging"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
@@ -27,6 +29,7 @@ import (
 	"fmt"
 
 	"github.com/intelops/kubviz/agent/config"
+	"github.com/intelops/kubviz/agent/git/pkg/opentelemetrygit"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -63,7 +66,16 @@ var (
 	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
+var tracer = otel.Tracer("git")
+
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "PostGithub")
+	span.SetAttributes(attribute.String("CreateStream", "nats.JetStreamContext"))
+	defer span.End()
+
 	err := RunTrivyImageScans(config, js)
 	if err != nil {
 		return err
@@ -83,6 +95,17 @@ func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	tp, err := opentelemetrygit.InitTracer()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer provider: %v", err)
+		}
+	}()
+
 	env := Production
 	clusterMetricsChan := make(chan error, 1)
 	cfg, err := config.GetAgentConfigurations()
@@ -165,11 +188,24 @@ func main() {
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
 func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "PostGithub")
+	span.SetAttributes(attribute.String("CreateStream", "nats.JetStreamContext"))
+	defer span.End()
+
 	watchK8sEvents(clientset, js)
 	errCh <- nil
 }
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext) (bool, error) {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "PostGithub")
+	span.SetAttributes(attribute.String("CreateStream", "nats.JetStreamContext"))
+	defer span.End()
+
 	metrics := model.Metrics{
 		ID:          id,
 		Type:        mtype,
@@ -187,6 +223,13 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 
 // createStream creates a stream by using JetStreamContext
 func createStream(js nats.JetStreamContext) error {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "PostGithub")
+	span.SetAttributes(attribute.String("CreateStream", "nats.JetStreamContext"))
+	defer span.End()
+
 	// Check if the METRICS stream already exists; if not, create it.
 	stream, err := js.StreamInfo(constants.StreamName)
 	log.Printf("Retrieved stream %s", fmt.Sprintf("%v", stream))
@@ -206,6 +249,13 @@ func createStream(js nats.JetStreamContext) error {
 }
 
 func getK8sClient(config *rest.Config) *kubernetes.Clientset {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "getK8sClient")
+	span.SetAttributes(attribute.String("getK8sClient", "getK8sClient"))
+	defer span.End()
+
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	checkErr(err)
@@ -213,6 +263,7 @@ func getK8sClient(config *rest.Config) *kubernetes.Clientset {
 }
 
 func getK8sPods(clientset *kubernetes.Clientset) string {
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	pods, err := clientset.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
@@ -264,6 +315,13 @@ func LogErr(err error) {
 	}
 }
 func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "watchK8sEvents")
+	span.SetAttributes(attribute.String("getK8sClient", "getK8sClient"))
+	defer span.End()
+
 	watchlist := cache.NewListWatchFromClient(
 		clientset.CoreV1().RESTClient(),
 		"events",

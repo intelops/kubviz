@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,13 +10,22 @@ import (
 
 	"github.com/aquasecurity/trivy/pkg/sbom/cyclonedx"
 	"github.com/google/uuid"
+	"github.com/intelops/kubviz/agent/git/pkg/opentelemetrygit"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel/attribute"
 	"k8s.io/client-go/rest"
 )
 
 func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) error {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "watchK8sEvents")
+	span.SetAttributes(attribute.String("getK8sClient", "getK8sClient"))
+	defer span.End()
+
 	metrics := model.Sbom{
 		ID:     uuid.New().String(),
 		Report: report,
@@ -31,6 +41,13 @@ func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) erro
 }
 
 func executeCommandSbom(command string) ([]byte, error) {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "watchK8sEvents")
+	span.SetAttributes(attribute.String("getK8sClient", "getK8sClient"))
+	defer span.End()
+
 	cmd := exec.Command("/bin/sh", "-c", command)
 	var outc, errc bytes.Buffer
 	cmd.Stdout = &outc
@@ -46,6 +63,13 @@ func executeCommandSbom(command string) ([]byte, error) {
 }
 
 func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "watchK8sEvents")
+	span.SetAttributes(attribute.String("getK8sClient", "getK8sClient"))
+	defer span.End()
+
 	clearCacheCmd := "trivy image --clear-cache"
 
 	log.Println("trivy sbom run started")

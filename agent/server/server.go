@@ -6,6 +6,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 func EnableProfile(r *gin.Engine) {
@@ -32,6 +33,7 @@ func EnableProfile(r *gin.Engine) {
 
 func StartServer() {
 	r := gin.Default()
+	r.Use(otelgin.Middleware("git-server"))
 	EnableProfile(r)
 	log.Fatal(r.Run(":8080"))
 }
