@@ -15,7 +15,7 @@ import (
 func InitTracer() (*sdktrace.TracerProvider, error) {
 	ctx := context.Background()
 
-    collectorURL := "otelcollector.azureagent.optimizor.app:80"
+	collectorURL := "otelcollector.azureagent.optimizor.app:80"
 
 	client := otlptracegrpc.NewClient(
 		otlptracegrpc.WithEndpoint(collectorURL),
@@ -45,7 +45,12 @@ func InitTracer() (*sdktrace.TracerProvider, error) {
 	propagator := propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
 	otel.SetTextMapPropagator(propagator)
 
-    return tp, nil
+	return tp, nil
+}
+
+func BuildContext(ctx context.Context) context.Context {
+	newCtx, _ := context.WithCancel(ctx)
+	return newCtx
 }
 
 // func initTracer() (*sdktrace.TracerProvider, error) {

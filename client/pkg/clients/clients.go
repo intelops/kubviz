@@ -1,13 +1,17 @@
 package clients
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/intelops/kubviz/agent/git/pkg/opentelemetrygit"
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
 	"github.com/intelops/kubviz/client/pkg/config"
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 type NATSContext struct {
@@ -17,9 +21,17 @@ type NATSContext struct {
 	dbClient clickhouse.DBInterface
 }
 
+var tracer = otel.Tracer("git")
+
 func NewNATSContext(conf *config.Config, dbClient clickhouse.DBInterface) (*NATSContext, error) {
 	log.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "NewNATSContext")
+	span.SetAttributes(attribute.String("NewNATSContext", "ClientNATSContext"))
+	defer span.End()
 
 	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
 	if err != nil {
@@ -60,6 +72,13 @@ func NewNATSContext(conf *config.Config, dbClient clickhouse.DBInterface) (*NATS
 	return ctx, nil
 }
 func (n *NATSContext) createStream() (nats.JetStreamContext, error) {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "createStream")
+	span.SetAttributes(attribute.String("createStream", "clientcreateStream"))
+	defer span.End()
+
 	// Creates JetStreamContext
 	stream, err := n.conn.JetStream()
 	if err != nil {

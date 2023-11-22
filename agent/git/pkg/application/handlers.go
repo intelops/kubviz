@@ -13,7 +13,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 )
 
-var tracer = otel.Tracer("gin-server")
+var tracer = otel.Tracer("git")
 
 func (app *Application) PostGitea(c *gin.Context) {
 	log.Println("gitea handler called...")
@@ -75,7 +75,7 @@ func (app *Application) PostGithub(c *gin.Context) {
 	_, span := tracer.Start(c.Request.Context(), "PostGithub")
 	span.SetAttributes(attribute.String("http.method", "POST"))
 	defer span.End()
-	
+
 	event := c.Request.Header.Get(string(model.GithubHeader))
 	if len(event) == 0 {
 		log.Println("error getting the github event from header")

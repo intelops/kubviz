@@ -10,9 +10,12 @@ import (
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 
+	"github.com/intelops/kubviz/agent/git/pkg/opentelemetrygit"
 	"github.com/intelops/kubviz/client/pkg/config"
 	"github.com/intelops/kubviz/gitmodels/dbstatement"
 	"github.com/intelops/kubviz/model"
@@ -48,8 +51,15 @@ type DBInterface interface {
 	Close()
 }
 
+var tracer = otel.Tracer("git")
+
 func NewDBClient(conf *config.Config) (DBInterface, error) {
 	ctx := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(ctx), "NewDBClient")
+	span.SetAttributes(attribute.String("NewDBClient", "NewDBClient"))
+	defer span.End()
+
 	var connOptions clickhouse.Options
 
 	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
@@ -440,6 +450,11 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 }
 func (c *DBClient) InsertGitEvent(event string) {
 	ctx := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(ctx), "InsertGitEvent")
+	span.SetAttributes(attribute.String("InsertGitEvent", "InsertGitEvent"))
+	defer span.End()
+
 	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO git_json")
 	if err != nil {
 		log.Fatal(err)
@@ -605,11 +620,11 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	result := metrics.Report
 
 	if result.CycloneDX != nil {
-        var (
-            tx, _   = c.conn.Begin()
-            stmt, _ = tx.Prepare(InsertTrivySbom)
-        )
-		if _,err:= stmt.Exec(
+		var (
+			tx, _   = c.conn.Begin()
+			stmt, _ = tx.Prepare(InsertTrivySbom)
+		)
+		if _, err := stmt.Exec(
 			metrics.ID,
 			result.CycloneDX.Metadata.Component.Name,
 			result.CycloneDX.Metadata.Component.PackageURL,
@@ -619,18 +634,18 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 			result.CycloneDX.BOMFormat,
 			result.CycloneDX.Metadata.Component.Version,
 			result.CycloneDX.Metadata.Component.MIMEType,
-		); err!=nil {
+		); err != nil {
 			log.Fatal(err)
 		}
-		if err:=tx.Commit();err!=nil {
+		if err := tx.Commit(); err != nil {
 			log.Fatal(err)
 		}
 		stmt.Close()
-	}else {
+	} else {
 		log.Println("sbom payload not available for db insertion, skipping db insertion")
 
 	}
-	
+
 }
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
@@ -795,6 +810,13 @@ func (c *DBClient) InsertContainerEventGithub(event string) {
 }
 
 func (c *DBClient) InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) error {
+
+	ctx := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(ctx), "InsertGitCommon")
+	span.SetAttributes(attribute.String("InsertGitCommon", "InsertGitCommon"))
+	defer span.End()
+
 	tx, err := c.conn.Begin()
 	if err != nil {
 		return err

@@ -1,10 +1,14 @@
 package clients
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/intelops/kubviz/agent/git/pkg/config"
+	"github.com/intelops/kubviz/agent/git/pkg/opentelemetrygit"
 	"github.com/intelops/kubviz/model"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"log"
 	"time"
@@ -26,9 +30,17 @@ type NATSContext struct {
 	stream nats.JetStreamContext
 }
 
+var tracer = otel.Tracer("git")
+
 func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	fmt.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "PostGithub")
+	span.SetAttributes(attribute.String("NewNATSContext", "NATSContext"))
+	defer span.End()
 
 	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
 	if err != nil {
@@ -51,6 +63,13 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 }
 
 func (n *NATSContext) CreateStream() (nats.JetStreamContext, error) {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "PostGithub")
+	span.SetAttributes(attribute.String("CreateStream", "nats.JetStreamContext"))
+	defer span.End()
+
 	// Creates JetStreamContext
 	stream, err := n.conn.JetStream()
 	if err != nil {
@@ -67,6 +86,13 @@ func (n *NATSContext) CreateStream() (nats.JetStreamContext, error) {
 
 // createStream creates a stream by using JetStreamContext
 func (n *NATSContext) checkNAddStream(js nats.JetStreamContext) error {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "PostGithub")
+	span.SetAttributes(attribute.String("checkNAddStream", "checkNAddStream"))
+	defer span.End()
+
 	// Check if the METRICS stream already exists; if not, create it.
 	stream, err := js.StreamInfo(StreamName)
 	if err != nil {
@@ -90,7 +116,14 @@ func (n *NATSContext) Close() {
 	n.conn.Close()
 }
 
-func (n *NATSContext) Publish(metric []byte, repo string, eventkey model.EventKey, eventvalue model.EventValue) error {	
+func (n *NATSContext) Publish(metric []byte, repo string, eventkey model.EventKey, eventvalue model.EventValue) error {
+
+	context := context.Background()
+
+	_, span := tracer.Start(opentelemetrygit.BuildContext(context), "PostGithub")
+	span.SetAttributes(attribute.String("Publish", "gitPublish"))
+	defer span.End()
+
 	msg := nats.NewMsg(eventSubject)
 	msg.Data = metric
 	msg.Header.Set("GitProvider", repo)
