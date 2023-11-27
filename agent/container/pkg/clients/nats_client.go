@@ -1,11 +1,15 @@
 package clients
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/intelops/kubviz/agent/container/pkg/config"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/nats-io/nats.go"
 )
@@ -112,6 +116,13 @@ func (n *NATSContext) Close() {
 // The repository information in the header can be used by subscribers to filter or route the event based on its origin or destination.
 // An error is returned if the publishing process fails, such as if the connection is lost or if there are issues with the JetStream.
 func (n *NATSContext) Publish(event []byte, repo string) error {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("container-nats-client")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "Publish")
+	span.SetAttributes(attribute.String("repo-name", repo))
+	defer span.End()
+	
 	msg := nats.NewMsg(eventSubject)
 	msg.Data = event
 	msg.Header.Set("REPO_NAME", repo)

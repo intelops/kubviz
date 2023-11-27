@@ -10,6 +10,9 @@ import (
 	"strings"
 
 	"github.com/intelops/kubviz/constants"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -79,6 +82,13 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 }
 
 func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("kubepreupgrade")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "KubePreUpgradeDetector")
+	span.SetAttributes(attribute.String("kubepug-plugin", "kubepug-output"))
+	defer span.End()
+	
 	swaggerdir, err := os.MkdirTemp("", "kubepug")
 	if err != nil {
 		return err

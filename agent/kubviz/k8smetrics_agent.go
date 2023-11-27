@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/intelops/go-common/logging"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
@@ -19,6 +21,7 @@ import (
 
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -64,6 +67,13 @@ var (
 )
 
 func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("trivy-scan")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "runTrivyScans")
+	span.SetAttributes(attribute.String("trivy-plugin", "trivy-run"))
+	defer span.End()
+	
 	err := RunTrivyImageScans(config, js)
 	if err != nil {
 		return err
@@ -116,6 +126,17 @@ func main() {
 		}
 		clientset = getK8sClient(config)
 	}
+
+	tp, err := opentelemetry.InitTracer()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer provider: %v", err)
+		}
+	}()
+	
 	go publishMetrics(clientset, js, clusterMetricsChan)
 	go server.StartServer()
 	collectAndPublishMetrics := func() {

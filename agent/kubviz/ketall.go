@@ -6,6 +6,9 @@ import (
 	"time"
 
 	"github.com/intelops/kubviz/constants"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
@@ -29,6 +32,13 @@ func PublishAllResources(result model.Resource, js nats.JetStreamContext) error 
 }
 
 func GetAllResources(config *rest.Config, js nats.JetStreamContext) error {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("ketall")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "GetAllResources")
+	span.SetAttributes(attribute.String("ketall-plugin", "ketall-output"))
+	defer span.End()
+	
 	// TODO: upto this uncomment for production
 	// Create a new discovery client to discover all resources in the cluster
 	dc := discovery.NewDiscoveryClientForConfigOrDie(config)

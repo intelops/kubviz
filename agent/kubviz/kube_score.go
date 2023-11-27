@@ -9,12 +9,22 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
 func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext) error {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("kubescore")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunKubeScore")
+	span.SetAttributes(attribute.String("kubescore-run", "kubescore-output"))
+	defer span.End()
+	
 	nsList, err := clientset.CoreV1().
 		Namespaces().
 		List(context.Background(), metav1.ListOptions{})
@@ -64,6 +74,13 @@ func publishKubescoreMetrics(id string, ns string, recommendations string, js na
 }
 
 func executeCommand(command string) (string, error) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("kubescore")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommand")
+	span.SetAttributes(attribute.String("kubescore", "kubescore-command-running"))
+	defer span.End()
+
 	cmd := exec.Command("/bin/sh", "-c", command)
 	stdout, err := cmd.Output()
 

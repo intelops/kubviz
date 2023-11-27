@@ -15,6 +15,9 @@ import (
 	"time"
 
 	"github.com/intelops/kubviz/constants"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
@@ -68,6 +71,13 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 }
 
 func outDatedImages(config *rest.Config, js nats.JetStreamContext) error {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("outdated")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "outDatedImages")
+	span.SetAttributes(attribute.String("outdated-plugin", "outdated-output"))
+	defer span.End()
+	
 	images, err := ListImages(config)
 	if err != nil {
 		log.Println("unable to list images")

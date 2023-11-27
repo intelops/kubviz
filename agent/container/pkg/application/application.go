@@ -11,7 +11,9 @@ import (
 	"github.com/intelops/kubviz/agent/container/pkg/clients"
 	"github.com/intelops/kubviz/agent/container/pkg/config"
 	"github.com/intelops/kubviz/agent/container/pkg/handler"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/kelseyhightower/envconfig"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 type Application struct {
@@ -43,6 +45,13 @@ func New() *Application {
 	}
 
 	r := gin.Default()
+
+	config, err := opentelemetry.GetConfigurations()
+	if err != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	
+	r.Use(otelgin.Middleware(config.ServiceName))
 	apiServer.BindRequest(r)
 
 	httpServer := &http.Server{

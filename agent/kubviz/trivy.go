@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"log"
 	exec "os/exec"
@@ -11,10 +12,20 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 func executeCommandTrivy(command string) ([]byte, error) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("trivy-cluster")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandTrivy")
+	span.SetAttributes(attribute.String("trivy-k8s", "command-running"))
+	defer span.End()
+
 	cmd := exec.Command("/bin/sh", "-c", command)
 	var outc, errc bytes.Buffer
 	cmd.Stdout = &outc
@@ -29,7 +40,15 @@ func executeCommandTrivy(command string) ([]byte, error) {
 	return outc.Bytes(), err
 }
 func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
+
 	var report report.ConsolidatedReport
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("trivy-cluster")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyK8sClusterScan")
+	span.SetAttributes(attribute.String("cluster-name", report.ClusterName))
+	defer span.End()
+
 	cmdString := "trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 60m -f json --cache-dir /tmp/.cache --debug"
 	clearCacheCmd := "trivy k8s --clear-cache"
 	out, err := executeCommandTrivy(cmdString)

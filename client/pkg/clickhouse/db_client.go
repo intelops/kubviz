@@ -10,12 +10,15 @@ import (
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 
 	"github.com/intelops/kubviz/client/pkg/config"
 	"github.com/intelops/kubviz/gitmodels/dbstatement"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 )
 
 type DBClient struct {
@@ -133,6 +136,13 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 }
 
 func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushEventPayload) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("insert-container-azure")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertContainerEventAzure")
+	span.SetAttributes(attribute.String("container-azure-insert", "insert"))
+	defer span.End()
+	
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertAzureContainerPushEvent))
@@ -176,6 +186,13 @@ func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushE
 }
 
 func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("insert-container-quay")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertContainerEventQuay")
+	span.SetAttributes(attribute.String("container-quay-insert", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertQuayContainerPushEvent))
@@ -221,6 +238,13 @@ func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload
 }
 
 func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushEventPayload) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("insert-container-jfrog")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertContainerEventJfrog")
+	span.SetAttributes(attribute.String("container-jfrog-insert", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertJfrogContainerPushEvent))
@@ -266,6 +290,13 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 }
 
 func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("insert-rakees-metrics")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertRakeesMetrics")
+	span.SetAttributes(attribute.String("rakees", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertRakees))
@@ -291,6 +322,13 @@ func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 }
 
 func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("insert-ketall-event")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertKetallEvent")
+	span.SetAttributes(attribute.String("ketall", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertKetall))
@@ -315,6 +353,13 @@ func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
 }
 
 func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("insert-outdated-event")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertOutdatedEvent")
+	span.SetAttributes(attribute.String("outdated", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertOutdated))
@@ -341,6 +386,13 @@ func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
 }
 
 func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("insert-depricated-event")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertDeprecatedAPI")
+	span.SetAttributes(attribute.String("depricated", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertDepricatedApi))
@@ -374,6 +426,13 @@ func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 }
 
 func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("insert-deletedapi")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertDeletedAPI")
+	span.SetAttributes(attribute.String("deletedapi", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertDeletedApi))
@@ -408,6 +467,13 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 }
 
 func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("insert-kubviz-event")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertKubvizEvent")
+	span.SetAttributes(attribute.String("kubvizevent", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertKubvizEvent))
@@ -440,6 +506,12 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 }
 func (c *DBClient) InsertGitEvent(event string) {
 	ctx := context.Background()
+
+	tracer := otel.Tracer("insert-git-event")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertGitEvent")
+	span.SetAttributes(attribute.String("git", "insert"))
+	defer span.End()
+
 	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO git_json")
 	if err != nil {
 		log.Fatal(err)
@@ -455,6 +527,12 @@ func (c *DBClient) InsertGitEvent(event string) {
 }
 func (c *DBClient) InsertContainerEvent(event string) {
 	ctx := context.Background()
+
+	tracer := otel.Tracer("insert-container-event")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertContainerEvent")
+	span.SetAttributes(attribute.String("container", "insert"))
+	defer span.End()
+
 	batch, err := c.splconn.PrepareBatch(ctx, "INSERT INTO container_bridge")
 	if err != nil {
 		log.Fatal(err)
@@ -470,6 +548,14 @@ func (c *DBClient) InsertContainerEvent(event string) {
 }
 
 func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations) {
+
+	ctx := context.Background()
+
+	tracer := otel.Tracer("insert-kubescore-event")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertKubeScoreMetrics")
+	span.SetAttributes(attribute.String("kubescore", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(InsertKubeScore)
@@ -493,6 +579,14 @@ func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations
 }
 
 func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
+
+	ctx := context.Background()
+
+	tracer := otel.Tracer("insert-trivy-metrics")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertTrivyMetrics")
+	span.SetAttributes(attribute.String("trivy", "insert"))
+	defer span.End()
+
 	for _, finding := range metrics.Report.Findings {
 		for _, result := range finding.Results {
 			for _, vulnerability := range result.Vulnerabilities {
@@ -564,6 +658,14 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 
 }
 func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
+
+	ctx := context.Background()
+
+	tracer := otel.Tracer("insert-trivy-image")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertTrivyImageMetrics")
+	span.SetAttributes(attribute.String("trivy-image", "insert"))
+	defer span.End()
+
 	for _, result := range metrics.Report.Results {
 		for _, vulnerability := range result.Vulnerabilities {
 			var (
@@ -602,6 +704,14 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 }
 func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	log.Println("####started inserting value")
+
+	ctx := context.Background()
+
+	tracer := otel.Tracer("insert-trivy-sbom")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertTrivySbomMetrics")
+	span.SetAttributes(attribute.String("trivy-sbom", "insert"))
+	defer span.End()
+
 	result := metrics.Report
 
 	if result.CycloneDX != nil {
@@ -732,6 +842,14 @@ func (c *DBClient) RetrieveKubvizEvent() ([]model.DbEvent, error) {
 }
 
 func (c *DBClient) InsertContainerEventDockerHub(build model.DockerHubBuild) {
+
+	ctx := context.Background()
+
+	tracer := otel.Tracer("insert-container-dockerhub")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertContainerEventDockerHub")
+	span.SetAttributes(attribute.String("container-dockerhub", "insert"))
+	defer span.End()
+
 	var (
 		tx, _   = c.conn.Begin()
 		stmt, _ = tx.Prepare(string(InsertDockerHubBuild))
@@ -757,6 +875,14 @@ func (c *DBClient) InsertContainerEventDockerHub(build model.DockerHubBuild) {
 }
 
 func (c *DBClient) InsertContainerEventGithub(event string) {
+
+	ctx := context.Background()
+
+	tracer := otel.Tracer("insert-container-github")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertContainerEventGithub")
+	span.SetAttributes(attribute.String("container-github", "insert"))
+	defer span.End()
+
 	var image model.GithubImage
 	err := json.Unmarshal([]byte(event), &image)
 	if err != nil {
