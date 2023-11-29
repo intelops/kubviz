@@ -678,5 +678,6 @@ podManagementPolicy: Parallel
 upgrade: false
 
 service:
-  type: LoadBalancer
+  type: NodePort
+  #type: LoadBalancer
 
