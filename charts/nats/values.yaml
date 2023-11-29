@@ -104,6 +104,7 @@ nats:
   client:
     port: 4222
     portName: "client"
+    nodePort: 31200
 
   # Server settings.
   limits:
@@ -678,6 +679,5 @@ podManagementPolicy: Parallel
 upgrade: false
 
 service:
-  type: NodePort
-  #type: LoadBalancer
+  type: LoadBalancer
 

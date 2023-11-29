@@ -40,7 +40,9 @@ spec:
     {{- if .Values.appProtocol.enabled }}
     appProtocol: tcp
     {{- end }}
+    {{- if eq .Values.service.type "NodePort" }}
     nodePort: {{ .Values.nats.client.nodePort }}
+    {{- end }}
   - name: cluster
     port: 6222
     {{- if .Values.appProtocol.enabled }}
