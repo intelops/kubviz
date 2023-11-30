@@ -134,9 +134,19 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 
 func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushEventPayload) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertAzureContainerPushEvent))
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+
+	stmt, err := tx.Prepare(string(InsertAzureContainerPushEvent))
+	if err != nil {
+		 log.Printf("error preparing statement: %v", err)
+		 return
+	}
+
 	defer stmt.Close()
 
 	currentTime := time.Now().UTC()
@@ -177,9 +187,21 @@ func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushE
 
 func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertQuayContainerPushEvent))
+		tx, err   = c.conn.Begin()
 	)
+
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+
+	stmt, err := tx.Prepare(string(InsertQuayContainerPushEvent))
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
+
+
 	defer stmt.Close()
 
 	currentTime := time.Now().UTC()
@@ -222,9 +244,19 @@ func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload
 
 func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushEventPayload) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertJfrogContainerPushEvent))
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+
+	stmt, err := tx.Prepare(string(InsertJfrogContainerPushEvent))
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
+
 	defer stmt.Close()
 
 	currentTime := time.Now().UTC()
@@ -267,9 +299,18 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 
 func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertRakees))
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+	stmt, err := tx.Prepare(string(InsertRakees))
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
+
 	defer stmt.Close()
 
 	currentTime := time.Now().UTC()
@@ -292,9 +333,18 @@ func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 
 func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertKetall))
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+	stmt, err := tx.Prepare(string(InsertKetall))
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
+
 	defer stmt.Close()
 
 	currentTime := time.Now().UTC()
@@ -316,9 +366,18 @@ func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
 
 func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertOutdated))
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+	stmt, err := tx.Prepare(string(InsertOutdated))
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
+
 	defer stmt.Close()
 
 	currentTime := time.Now().UTC()
@@ -342,9 +401,18 @@ func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
 
 func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertDepricatedApi))
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+	stmt, err := tx.Prepare(string(InsertDepricatedApi))
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
+
 	defer stmt.Close()
 
 	deprecated := uint8(0)
@@ -375,9 +443,18 @@ func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 
 func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertDeletedApi))
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+	stmt, err := tx.Prepare(string(InsertDeletedApi))
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
+
 	defer stmt.Close()
 	deleted := uint8(0)
 	if deletedAPI.Deleted {
@@ -409,9 +486,18 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 
 func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertKubvizEvent))
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+	stmt, err := tx.Prepare(string(InsertKubvizEvent))
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
+
 	defer stmt.Close()
 	eventJson, _ := json.Marshal(metrics.Event)
 	formattedFirstTimestamp := metrics.Event.FirstTimestamp.Time.UTC().Format("2006-01-02 15:04:05")
@@ -471,9 +557,17 @@ func (c *DBClient) InsertContainerEvent(event string) {
 
 func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(InsertKubeScore)
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+	stmt, err := tx.Prepare(InsertKubeScore)
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
 	defer stmt.Close()
 
 	currentTime := time.Now().UTC()
@@ -497,9 +591,17 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 		for _, result := range finding.Results {
 			for _, vulnerability := range result.Vulnerabilities {
 				var (
-					tx, _   = c.conn.Begin()
-					stmt, _ = tx.Prepare(InsertTrivyVul)
+					tx, err   = c.conn.Begin()
 				)
+				if err != nil {
+					log.Printf("error beginning transaction: %v", err)
+					return
+				}
+				stmt, err := tx.Prepare(InsertTrivyVul)
+				if err != nil {
+					log.Printf("error preparing statement: %v", err)
+					return
+			   }
 				if _, err := stmt.Exec(
 					metrics.ID,
 					metrics.ClusterName,
@@ -528,9 +630,18 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 
 			for _, misconfiguration := range result.Misconfigurations {
 				var (
-					tx, _   = c.conn.Begin()
-					stmt, _ = tx.Prepare(InsertTrivyMisconfig)
+					tx, err   = c.conn.Begin()
 				)
+				if err != nil {
+					log.Printf("error beginning transaction: %v", err)
+					return
+				}
+				stmt, err := tx.Prepare(InsertTrivyMisconfig)
+				if err != nil {
+					log.Printf("error preparing statement: %v", err)
+					return
+			   }
+
 				defer stmt.Close()
 
 				currentTime := time.Now().UTC()
@@ -567,9 +678,18 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 	for _, result := range metrics.Report.Results {
 		for _, vulnerability := range result.Vulnerabilities {
 			var (
-				tx, _   = c.conn.Begin()
-				stmt, _ = tx.Prepare(InsertTrivyImage)
+				tx, err   = c.conn.Begin()
 			)
+			if err != nil {
+				log.Printf("error beginning transaction: %v", err)
+				return
+			}
+			stmt, err := tx.Prepare(InsertTrivyImage)
+			if err != nil {
+				log.Printf("error preparing statement: %v", err)
+				return
+		   }
+
 			if _, err := stmt.Exec(
 				metrics.ID,
 				metrics.ClusterName,
@@ -606,9 +726,18 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 
 	if result.CycloneDX != nil {
         var (
-            tx, _   = c.conn.Begin()
-            stmt, _ = tx.Prepare(InsertTrivySbom)
+            tx, err   = c.conn.Begin()
         )
+		if err != nil {
+			log.Printf("error beginning transaction: %v", err)
+			return
+		}
+		stmt, err := tx.Prepare(InsertTrivySbom)
+		if err != nil {
+			log.Printf("error preparing statement: %v", err)
+			return
+	   }
+
 		if _,err:= stmt.Exec(
 			metrics.ID,
 			result.CycloneDX.Metadata.Component.Name,
@@ -733,9 +862,18 @@ func (c *DBClient) RetrieveKubvizEvent() ([]model.DbEvent, error) {
 
 func (c *DBClient) InsertContainerEventDockerHub(build model.DockerHubBuild) {
 	var (
-		tx, _   = c.conn.Begin()
-		stmt, _ = tx.Prepare(string(InsertDockerHubBuild))
+		tx, err   = c.conn.Begin()
 	)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return
+	}
+	stmt, err := tx.Prepare(string(InsertDockerHubBuild))
+
+	if err != nil {
+		log.Printf("error preparing statement: %v", err)
+		return
+   }
 	defer stmt.Close()
 
 	currentTime := time.Now().UTC()
