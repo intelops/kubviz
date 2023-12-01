@@ -104,7 +104,7 @@ nats:
   client:
     port: 4222
     portName: "client"
-    nodePort: 31200
+    nodePort:  31675
 
   # Server settings.
   limits:
