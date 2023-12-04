@@ -1,31 +1,58 @@
+CHART NAME: {{ .Chart.Name  }}
+CHART VERSION: {{ .Chart.Version  }}
+APP VERSION: {{ .Chart.AppVersion  }}
+
 ** Please be patient while the chart is being deployed **
 
-1. Get the Clickhouse URL by running:
+{{- if .Values.diagnosticMode.enabled }}
+The chart has been deployed in diagnostic mode. All probes have been disabled and the command has been overwritten with:
 
-{{- if .Values.clickhouse.ingress.enabled }}
+  command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 4 }}
+  args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 4 }}
 
-  export HOSTNAME=$(kubectl get ingress --namespace {{ .Release.Namespace }} {{ template "clickhouse.fullname" . }} -o jsonpath='{.spec.rules[0].host}')
-  echo "Clickhouse URL: http://$HOSTNAME/"
+Get the list of pods by executing:
+
+  kubectl get pods --namespace {{ include "common.names.namespace" . | quote }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+Access the pod you want to debug by executing
+
+  kubectl exec --namespace {{ include "common.names.namespace" . | quote }} -ti <NAME OF THE POD> -- bash
+
+In order to replicate the container startup scripts execute this command:
+
+    /opt/bitnami/scripts/clickhouse/entrypoint.sh /opt/bitnami/scripts/clickhouse/run.sh
 
 {{- else }}
 
-  echo URL            : http://127.0.0.1:8080/
-  echo Management URL : http://127.0.0.1:8080/manager
-  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "clickhouse.fullname" . }} 8123:{{ .Values.clickhouse.http_port }}
-  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "clickhouse.fullname" . }} 9000:{{ .Values.clickhouse.tcp_port }}
-  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "clickhouse.fullname" . }} 9009:{{ .Values.clickhouse.interserver_http_port }}
+ClickHouse is available in the following address:
+
+{{- if .Values.externalAccess.enabled }}
+
+NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+
+    kubectl get svc --namespace {{ template "common.names.namespace" . }} -l "app.kubernetes.io/name={{ template "common.names.fullname" . }},app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/component=clickhouse" -w
+
+{{- else if (eq "LoadBalancer" .Values.service.type) }}
+
+    export SERVICE_IP=$(kubectl get svc --namespace {{ template "common.names.namespace" . }} {{ template "common.names.fullname" . }} --template "{{ "{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}" }}")
+
+{{- else if (eq "NodePort" .Values.service.type)}}
+
+    export NODE_IP=$(kubectl get nodes --namespace {{ template "common.names.namespace" . }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    export NODE_PORT=$(kubectl get --namespace {{ template "common.names.namespace" . }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "common.names.fullname" . }})
+
+{{- else if (eq "ClusterIP" .Values.service.type)}}
+
+    kubectl port-forward --namespace {{ template "common.names.namespace" . }} svc/{{ template "common.names.fullname" . }} {{ .Values.service.ports.tcp }}:9000 &
 
 {{- end }}
 
-2. Get the Tabix URL by running:
+Credentials:
 
-{{- if .Values.tabix.ingress.enabled }}
+    echo "Username      : {{ .Values.auth.username }}"
+    echo "Password      : $(kubectl get secret --namespace {{ .Release.Namespace }} {{ include "clickhouse.secretName" . }} -o jsonpath="{.data.{{ include "clickhouse.secretKey" .}}}" | base64 -d)"
 
-  export HOSTNAME=$(kubectl get ingress --namespace {{ .Release.Namespace }} {{ template "clickhouse.fullname" . }}-tabix -o jsonpath='{.spec.rules[0].host}')
-  echo "Tabix URL: http://$HOSTNAME/"
-  
-{{- else }}
-
-  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "clickhouse.fullname" . }}-tabix 80
-  
 {{- end }}
+
+{{- include "common.warnings.rollingTag" .Values.image }}
+{{- include "clickhouse.validateValues" . }}
