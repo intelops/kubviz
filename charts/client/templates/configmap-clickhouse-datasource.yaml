@@ -15,10 +15,13 @@ data:
           port: 9000
  {{- if .Values.clickhouse.enabled }}
           server: {{ include "client.fullname" . }}-clickhouse
+          tlsSkipVerify: true
+          username: {{ .Values.clickhouse.user }}
+        secureJsonData:
+          password: {{ .Values.clickhouse.password }}
  {{- else }}
           server: {{ .Values.existingClickhouse.host }}
           tlsSkipVerify: true
-  {{- if not .Values.clickhouse.enabled }}
     {{- if not .Values.existingClickhouse.secret }}
           username: {{ .Values.existingClickhouse.username }}
     {{- else }}
@@ -30,6 +33,5 @@ data:
       {{- else }}
           password: $CLICKHOUSE_PASSWORD
       {{- end }}
-  {{- end }}
  {{- end }}
 {{- end }}
