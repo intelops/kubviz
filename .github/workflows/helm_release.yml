@@ -23,7 +23,6 @@ jobs:
       - name: Add Helm repos
         run: |
           helm repo add tools https://kube-tarian.github.io/helmrepo-supporting-tools
-          helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.1.0
