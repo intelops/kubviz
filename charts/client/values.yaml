@@ -61,10 +61,11 @@ resources:
   limits:
     cpu: 200m
     memory: 256Mi
-    ephemeral-storage: 100Mi
+    ephemeral-storage: 50Mi
   requests:
     cpu: 100m
     memory: 128Mi
+    ephemeral-storage: 50Mi
 
 autoscaling:
   enabled: false
@@ -96,8 +97,9 @@ nats:
 
 clickhouse:
   enabled: true
-  clickhouse:
-    replicas: "1"
+  user: admin
+  password: admin
+  replicasCount: 1
 
 existingClickhouse:
   host: clickhouse

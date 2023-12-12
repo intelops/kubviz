@@ -13,11 +13,15 @@ data:
         type: vertamedia-clickhouse-datasource
  {{- if .Values.clickhouse.enabled }}
         url: {{ include "client.fullname" . }}-clickhouse:8123
+        access: proxy
+        basicAuth: true
+        basicAuthUser: {{ .Values.clickhouse.user }}
+        secureJsonData:
+          basicAuthPassword: {{ .Values.clickhouse.password }} 
  {{- else }}
         url: {{ .Values.existingClickhouse.host }}:8123
         access: proxy
-  {{- if not .Values.clickhouse.enabled }}
-        basicAuth: true
+        basicAuth: true  
     {{- if not .Values.existingClickhouse.secret }}
         basicAuthUser: {{ .Values.existingClickhouse.username }}
     {{- else }}
@@ -29,6 +33,5 @@ data:
     {{- else }}
           basicAuthPassword: $CLICKHOUSE_PASSWORD
     {{- end }}
-  {{- end }}
  {{- end }}
 {{- end }}
