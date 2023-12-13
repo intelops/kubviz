@@ -145,14 +145,12 @@ func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushE
 	
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 
 	stmt, err := tx.Prepare(string(InsertAzureContainerPushEvent))
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 
 	defer stmt.Close()
@@ -202,14 +200,12 @@ func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 
 	stmt, err := tx.Prepare(string(InsertQuayContainerPushEvent))
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 
 	defer stmt.Close()
@@ -262,14 +258,12 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 
 	stmt, err := tx.Prepare(string(InsertJfrogContainerPushEvent))
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 	defer stmt.Close()
 
@@ -321,13 +315,11 @@ func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 	stmt, err := tx.Prepare(string(InsertRakees))
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 	defer stmt.Close()
 
@@ -359,13 +351,11 @@ func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 	stmt, err := tx.Prepare(string(InsertKetall))
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 	defer stmt.Close()
 
@@ -396,13 +386,11 @@ func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 	stmt, err := tx.Prepare(string(InsertOutdated))
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 	defer stmt.Close()
 
@@ -434,13 +422,11 @@ func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 	stmt, err := tx.Prepare(string(InsertDepricatedApi))
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 	defer stmt.Close()
 
@@ -480,13 +466,11 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 	stmt, err := tx.Prepare(string(InsertDeletedApi))
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 
 	defer stmt.Close()
@@ -528,13 +512,11 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 	stmt, err := tx.Prepare(string(InsertKubvizEvent))
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 	defer stmt.Close()
 	eventJson, _ := json.Marshal(metrics.Event)
@@ -616,13 +598,11 @@ func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 	stmt, err := tx.Prepare(InsertKubeScore)
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 
 	defer stmt.Close()
@@ -657,13 +637,11 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 			for _, vulnerability := range result.Vulnerabilities {
 				tx, err := c.conn.Begin()
 				if err != nil {
-					log.Printf("error beginning transaction: %v", err)
-					return
+					log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 				}
 				stmt, err := tx.Prepare(InsertTrivyVul)
 				if err != nil {
-					log.Printf("error preparing statement: %v", err)
-					return
+					log.Fatalf("error preparing statement: %v", err)
 				}
 				if _, err := stmt.Exec(
 					metrics.ID,
@@ -694,13 +672,11 @@ func (c *DBClient) InsertTrivyMetrics(metrics model.Trivy) {
 			for _, misconfiguration := range result.Misconfigurations {
 				tx, err := c.conn.Begin()
 				if err != nil {
-					log.Printf("error beginning transaction: %v", err)
-					return
+					log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 				}
 				stmt, err := tx.Prepare(InsertTrivyMisconfig)
 				if err != nil {
-					log.Printf("error preparing statement: %v", err)
-					return
+					log.Fatalf("error preparing statement: %v", err)
 				}
 
 				defer stmt.Close()
@@ -748,13 +724,11 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 		for _, vulnerability := range result.Vulnerabilities {
 			tx, err := c.conn.Begin()
 			if err != nil {
-				log.Printf("error beginning transaction: %v", err)
-				return
+				log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 			}
 			stmt, err := tx.Prepare(InsertTrivyImage)
 			if err != nil {
-				log.Printf("error preparing statement: %v", err)
-				return
+				log.Fatalf("error preparing statement: %v", err)
 			}
 
 			if _, err := stmt.Exec(
@@ -802,13 +776,11 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	if result.CycloneDX != nil {
 		tx, err := c.conn.Begin()
 		if err != nil {
-			log.Printf("error beginning transaction: %v", err)
-			return
+			log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 		}
 		stmt, err := tx.Prepare(InsertTrivySbom)
 		if err != nil {
-			log.Printf("error preparing statement: %v", err)
-			return
+			log.Fatalf("error preparing statement: %v", err)
 		}
 
 		if _, err := stmt.Exec(
@@ -944,14 +916,12 @@ func (c *DBClient) InsertContainerEventDockerHub(build model.DockerHubBuild) {
 
 	tx, err := c.conn.Begin()
 	if err != nil {
-		log.Printf("error beginning transaction: %v", err)
-		return
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
 	stmt, err := tx.Prepare(string(InsertDockerHubBuild))
 
 	if err != nil {
-		log.Printf("error preparing statement: %v", err)
-		return
+		log.Fatalf("error preparing statement: %v", err)
 	}
 
 	defer stmt.Close()

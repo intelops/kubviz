@@ -75,8 +75,24 @@ spec:
             value: "{{ .Values.schedule.kubepreupgradeInterval }}"
           - name: TRIVY_INTERVAL
             value: "{{ .Values.schedule.trivyInterval }}"
+          {{- if .Values.persistence.enabled }}  
+          volumeMounts:
+          - name: data
+            mountPath: {{ .Values.persistence.mountPath }}
+          {{- end }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+              {{- if not .Values.persistence.enabled }}
+              ephemeral-storage: {{ .Values.resources.limits.ephemeralstorage }}
+              {{- end }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+              {{- if not .Values.persistence.enabled }}
+              ephemeral-storage: {{ .Values.resources.requests.ephemeralstorage }}
+              {{- end }}
 {{- if .Values.git_bridge.enabled }}
         - name: git-bridge
           image: "{{ .Values.git_bridge.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -99,8 +115,24 @@ spec:
             {{- end }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
+          {{- if .Values.git_bridge.persistence.enabled }}  
+          volumeMounts:
+          - name: data
+            mountPath: {{ .Values.git_bridge.persistence.mountPath }}
+          {{- end }}
           resources:
-            {{- toYaml .Values.git_bridge.resources | nindent 12 }}
+            limits:
+              cpu: {{ .Values.git_bridge.resources.limits.cpu }}
+              memory: {{ .Values.git_bridge.resources.limits.memory }}
+              {{- if not .Values.git_bridge.persistence.enabled }}
+              ephemeral-storage: {{ .Values.git_bridge.resources.limits.ephemeralstorage }}
+              {{- end }}
+            requests:
+              cpu: {{ .Values.git_bridge.resources.requests.cpu }}
+              memory: {{ .Values.git_bridge.resources.requests.memory }}
+              {{- if not .Values.git_bridge.persistence.enabled }}
+              ephemeral-storage: {{ .Values.git_bridge.resources.requests.ephemeralstorage }}
+              {{- end }}
 {{- end }}
 {{- if .Values.container_bridge.enabled }}
         - name: container-bridge
@@ -124,9 +156,31 @@ spec:
             {{- end }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
+          {{- if .Values.container_bridge.persistence.enabled }}  
+          volumeMounts:
+          - name: data
+            mountPath: {{ .Values.container_bridge.persistence.mountPath }}
+          {{- end }}
           resources:
-            {{- toYaml .Values.container_bridge.resources | nindent 12 }}
+            limits:
+              cpu: {{ .Values.container_bridge.resources.limits.cpu }}
+              memory: {{ .Values.container_bridge.resources.limits.memory }}
+              {{- if not .Values.container_bridge.persistence.enabled }}
+              ephemeral-storage: {{ .Values.container_bridge.resources.limits.ephemeralstorage }}
+              {{- end }}
+            requests:
+              cpu: {{ .Values.container_bridge.resources.requests.cpu }}
+              memory: {{ .Values.container_bridge.resources.requests.memory }}
+              {{- if not .Values.container_bridge.persistence.enabled }}
+              ephemeral-storage: {{ .Values.container_bridge.resources.requests.ephemeralstorage }}
+              {{- end }}
 {{- end }}
+      {{- if .Values.persistence.enabled }}
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ include "agent.fullname" . }}-data
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
