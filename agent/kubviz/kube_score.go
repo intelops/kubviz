@@ -23,13 +23,19 @@ func RunKubeScore(config *rest.Config, js nats.JetStreamContext) error {
 	//defer wg.Done()
 	var report []json_v2.ScoredObject
 	cmd := fmt.Sprintf(`kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c "kubectl get {} --all-namespaces -oyaml && echo ---" | kube-score score - -o json`)
-	//log.Printf("Command:  %#v,", cmd)
+	log.Printf("Command: %s", cmd)
+
+	// Execute the command
 	out, err := executeCommand(cmd)
 	if err != nil {
-		log.Printf("Error scanning image %s:", err)
+		log.Printf("Error executing command: %s", err)
 		return err
 	}
 
+	// Log the output of the kubectl command
+	log.Printf("kubectl Command Output: %s", out)
+
+	// Continue with the rest of the code...
 	err = json.Unmarshal([]byte(out), &report)
 	if err != nil {
 		log.Printf("Error occurred while Unmarshalling json: %v", err)
