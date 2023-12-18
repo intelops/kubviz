@@ -69,10 +69,12 @@ func executeCommand(command string) (string, error) {
 	stdout, err := cmd.Output()
 
 	if err != nil {
-		log.Println("Execute Command Error", err.Error())
+		log.Printf("Error executing command: %s", err)
+		return "", err
 	}
 
 	// Print the output
-	log.Println(string(stdout))
+	log.Printf("Command Output: %s", string(stdout))
+
 	return string(stdout), nil
 }
