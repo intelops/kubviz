@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	exec "os/exec"
 
@@ -21,8 +22,8 @@ func RunKubeScore(config *rest.Config, js nats.JetStreamContext) error {
 	// }
 	//defer wg.Done()
 	var report []json_v2.ScoredObject
-	cmd := `kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c "kubectl get {} --all-namespaces -oyaml && echo ---" | kube-score score - -o json`
-	log.Printf("Command:  %#v,", cmd)
+	cmd := fmt.Sprintf(`kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c "kubectl get {} --all-namespaces -oyaml && echo ---" | kube-score score - -o json`)
+	//log.Printf("Command:  %#v,", cmd)
 	out, err := executeCommand(cmd)
 	if err != nil {
 		log.Printf("Error scanning image %s:", err)
