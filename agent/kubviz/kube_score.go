@@ -10,16 +10,15 @@ import (
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
 	"github.com/zegl/kube-score/renderer/json_v2"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
 func RunKubeScore(config *rest.Config, js nats.JetStreamContext) error {
-	_, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Printf("Error creating Kubernetes clientset: %v", err)
-		return err
-	}
+	// _, err := kubernetes.NewForConfig(config)
+	// if err != nil {
+	// 	log.Printf("Error creating Kubernetes clientset: %v", err)
+	// 	return err
+	// }
 	//defer wg.Done()
 	var report []json_v2.ScoredObject
 	cmd := `kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c "kubectl get {} --all-namespaces -oyaml && echo ---" | kube-score score - -o json`
