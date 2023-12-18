@@ -532,15 +532,6 @@ func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations
 
 	currentTime := time.Now().UTC()
 
-	// if _, err := stmt.Exec(
-	// 	metrics.ID,
-	// 	metrics.Namespace,
-	// 	metrics.ClusterName,
-	// 	metrics.Recommendations,
-	// 	currentTime,
-	// ); err != nil {
-	// 	log.Fatal(err)
-	// }
 	for _, result := range metrics.Report {
 		for _, check := range result.Checks {
 			for _, comments := range check.Comments {

@@ -130,7 +130,7 @@ func main() {
 		// //getK8sEvents(clientset)
 		// err = runTrivyScans(config, js)
 		// LogErr(err)
-		err = RunKubeScore(config, js)
+		err = RunKubeScore(clientset, js)
 		LogErr(err)
 	}
 
@@ -321,7 +321,7 @@ func initScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.Age
 		}
 	}
 	if cfg.KubeScoreInterval != "" && cfg.KubeScoreInterval != "0" {
-		sj, err := NewKubescoreJob(config, js, cfg.KubeScoreInterval)
+		sj, err := NewKubescoreJob(clientset, js, cfg.KubeScoreInterval)
 		if err != nil {
 			log.Fatal("no time interval", err)
 		}

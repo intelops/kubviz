@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/nats-io/nats.go"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
@@ -32,7 +33,7 @@ type KubePreUpgradeJob struct {
 	frequency string
 }
 type KubescoreJob struct {
-	config    *rest.Config
+	clientset *kubernetes.Clientset
 	js        nats.JetStreamContext
 	frequency string
 }
@@ -87,9 +88,9 @@ func (j *KubePreUpgradeJob) Run() {
 	LogErr(err)
 }
 
-func NewKubescoreJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*KubescoreJob, error) {
+func NewKubescoreJob(clientset *kubernetes.Clientset, js nats.JetStreamContext, frequency string) (*KubescoreJob, error) {
 	return &KubescoreJob{
-		config:    config,
+		clientset: clientset,
 		js:        js,
 		frequency: frequency,
 	}, nil
@@ -100,7 +101,7 @@ func (v *KubescoreJob) CronSpec() string {
 
 func (j *KubescoreJob) Run() {
 	// Call the Kubescore function with the provided config and js
-	err := RunKubeScore(j.config, j.js)
+	err := RunKubeScore(j.clientset, j.js)
 	LogErr(err)
 }
 func NewRakkessJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*RakkessJob, error) {
