@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS kubescore (
 	path 			String,
 	summary 		String,
 	file_name 		String,
-	file_row  		BIGINT,
+	file_row  		String,
     EventTime       DateTime('UTC'),
 	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
 ) ENGINE = MergeTree() 
