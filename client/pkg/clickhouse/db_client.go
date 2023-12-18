@@ -523,6 +523,7 @@ func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations
 	if err != nil {
 		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
+	defer tx.Rollback()
 	stmt, err := tx.Prepare(InsertKubeScore)
 	if err != nil {
 		log.Fatalf("error preparing statement: %v", err)
@@ -531,14 +532,40 @@ func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations
 
 	currentTime := time.Now().UTC()
 
-	if _, err := stmt.Exec(
-		metrics.ID,
-		metrics.Namespace,
-		metrics.ClusterName,
-		metrics.Recommendations,
-		currentTime,
-	); err != nil {
-		log.Fatal(err)
+	// if _, err := stmt.Exec(
+	// 	metrics.ID,
+	// 	metrics.Namespace,
+	// 	metrics.ClusterName,
+	// 	metrics.Recommendations,
+	// 	currentTime,
+	// ); err != nil {
+	// 	log.Fatal(err)
+	// }
+	for _, result := range metrics.Report {
+		for _, check := range result.Checks {
+			for _, comments := range check.Comments {
+
+				if _, err := stmt.Exec(
+					metrics.ID,
+					metrics.ClusterName,
+					result.ObjectName,
+					result.TypeMeta.Kind,
+					result.TypeMeta.APIVersion,
+					result.ObjectMeta.Name,
+					result.ObjectMeta.Namespace,
+					check.Check.TargetType,
+					comments.Description,
+					comments.Path,
+					comments.Summary,
+					result.FileName,
+					result.FileRow,
+					currentTime,
+				); err != nil {
+					log.Println("Error while inserting KubeScore metrics:", err)
+				}
+			}
+
+		}
 	}
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)

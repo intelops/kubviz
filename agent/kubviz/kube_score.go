@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	exec "os/exec"
@@ -10,57 +9,53 @@ import (
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/zegl/kube-score/renderer/json_v2"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
-func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext) error {
-	nsList, err := clientset.CoreV1().
-		Namespaces().
-		List(context.Background(), metav1.ListOptions{})
+func RunKubeScore(config *rest.Config, js nats.JetStreamContext) error {
+	_, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Println("Error occurred while getting client set for kube-score: ", err)
+		log.Printf("Error creating Kubernetes clientset: %v", err)
 		return err
 	}
-
-	log.Printf("Namespace size: %d", len(nsList.Items))
-	for _, n := range nsList.Items {
-		log.Printf("Publishing kube-score recommendations for namespace: %s\n", n.Name)
-		publish(n.Name, js)
-	}
-	return nil
-}
-
-func publish(ns string, js nats.JetStreamContext) error {
-	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - "
+	//defer wg.Done()
+	var report []json_v2.ScoredObject
+	cmd := `kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c "kubectl get {} --all-namespaces -oyaml && echo ---" | kube-score score - -o json`
 	log.Printf("Command:  %#v,", cmd)
 	out, err := executeCommand(cmd)
 	if err != nil {
-		log.Println("Error occurred while running kube-score: ", err)
+		log.Printf("Error scanning image %s:", err)
 		return err
 	}
-	err = publishKubescoreMetrics(uuid.New().String(), ns, out, js)
+
+	err = json.Unmarshal([]byte(out), &report)
 	if err != nil {
+		log.Printf("Error occurred while Unmarshalling json: %v", err)
 		return err
 	}
+
+	publishKubescoreMetrics(report, js)
 	return nil
 }
 
-func publishKubescoreMetrics(id string, ns string, recommendations string, js nats.JetStreamContext) error {
+func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamContext) {
 	metrics := model.KubeScoreRecommendations{
-		ID:              id,
-		Namespace:       ns,
-		Recommendations: recommendations,
-		ClusterName:     ClusterName,
+		ID:          uuid.New().String(),
+		ClusterName: ClusterName,
+		Report:      report,
 	}
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.KUBESCORE_SUBJECT, metricsJson)
+	metricsJson, err := json.Marshal(metrics)
 	if err != nil {
-		return err
+		log.Printf("Error marshaling metrics to JSON: %v", err)
+		return
 	}
-	log.Printf("Recommendations with ID:%s has been published\n", id)
-	log.Printf("Recommendations  :%#v", recommendations)
-	return nil
+	_, err = js.Publish(constants.KUBESCORE_SUBJECT, metricsJson)
+	if err != nil {
+		log.Printf("error occures while publish %v", err)
+		return
+	}
 }
 
 func executeCommand(command string) (string, error) {
