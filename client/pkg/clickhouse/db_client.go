@@ -549,7 +549,7 @@ func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations
 					comments.Path,
 					comments.Summary,
 					result.FileName,
-					result.FileRow,
+					int64(result.FileRow),
 					currentTime,
 				); err != nil {
 					log.Println("Error while inserting KubeScore metrics:", err)
