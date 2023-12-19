@@ -54,7 +54,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		log.Printf("Error creating Trivy cache directory: %v\n", err)
 		return err
 	}
-	clearCacheCmd := "trivy image --clear-cache"
+	// clearCacheCmd := "trivy image --clear-cache"
 
 	log.Println("trivy sbom run started")
 	images, err := ListImages(config)
@@ -85,11 +85,11 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			continue // Move on to the next image in case of an error
 		}
 		// log.Println("report", report)
-		_, err = executeCommandTrivy(clearCacheCmd)
-		if err != nil {
-			log.Printf("Error executing command: %v\n", err)
-			return err
-		}
+		// _, err = executeCommandTrivy(clearCacheCmd)
+		// if err != nil {
+		// 	log.Printf("Error executing command: %v\n", err)
+		// 	return err
+		// }
 		// Publish the report using the given function
 		publishTrivySbomReport(report, js)
 	}
