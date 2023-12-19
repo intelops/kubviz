@@ -10,6 +10,7 @@ import (
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
+	"github.com/zegl/kube-score/renderer/json_v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
@@ -32,34 +33,42 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext) err
 }
 
 func publish(ns string, js nats.JetStreamContext) error {
-	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - "
+	var report []json_v2.ScoredObject
+	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - -o json"
 	log.Printf("Command:  %#v,", cmd)
 	out, err := executeCommand(cmd)
 	if err != nil {
 		log.Println("Error occurred while running kube-score: ", err)
 		return err
 	}
-	err = publishKubescoreMetrics(uuid.New().String(), ns, out, js)
+	// 	// Continue with the rest of the code...
+	err = json.Unmarshal([]byte(out), &report)
+	if err != nil {
+		log.Printf("Error occurred while Unmarshalling json: %v", err)
+		return err
+	}
+
+	publishKubescoreMetrics(report, js)
+	//err = publishKubescoreMetrics(uuid.New().String(), ns, out, js)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func publishKubescoreMetrics(id string, ns string, recommendations string, js nats.JetStreamContext) error {
+func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamContext) error {
 	metrics := model.KubeScoreRecommendations{
-		ID:              id,
-		Namespace:       ns,
-		Recommendations: recommendations,
-		ClusterName:     ClusterName,
+		ID:          uuid.New().String(),
+		ClusterName: ClusterName,
+		Report:      report,
 	}
 	metricsJson, _ := json.Marshal(metrics)
 	_, err := js.Publish(constants.KUBESCORE_SUBJECT, metricsJson)
 	if err != nil {
 		return err
 	}
-	log.Printf("Recommendations with ID:%s has been published\n", id)
-	log.Printf("Recommendations  :%#v", recommendations)
+	//log.Printf("Recommendations with ID:%s has been published\n", id)
+	log.Printf("Recommendations  :%#v", report)
 	return nil
 }
 
