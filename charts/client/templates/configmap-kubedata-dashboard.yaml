@@ -32,20 +32,138 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 31,
+      "id": 146,
       "links": [],
       "liveNow": false,
       "panels": [
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 11,
+          "options": {
+            "baidu": {
+              "callback": "bmapReady",
+              "key": ""
+            },
+            "editor": {
+              "format": "auto",
+              "height": 600
+            },
+            "gaode": {
+              "key": "",
+              "plugin": "AMap.Scale,AMap.ToolBar"
+            },
+            "getOption": "let option; // Initialize the option variable\n\nif (typeof data === 'undefined' || !data.series || !data.series[0] || !data.series[0].fields) {\n  // Data is not available or doesn't have the expected structure\n  option = {\n    title: {\n      text: 'Data not available',\n      textStyle: {\n        fontSize: 24,\n        fontWeight: 'bold',\n      },\n      left: 'center',\n      top: 'middle',\n    },\n  };\n} else {\n  // Extract data from your JSON as before\n  const clusterNames = data.series[0].fields[0].values;\n  const namespaces = data.series[0].fields[1].values;\n  const reasons = data.series[0].fields[2].values;\n  const pods = data.series[0].fields[3].values;\n\n  // Create a hierarchical structure from the data without a root node\n  const hierarchy = {\n    name: 'root', // Use 'root' as a placeholder\n    children: [],\n  };\n\n  const seenClusterNames = new Set();\n  const seenNamespaces = new Set();\n\n  for (let i = 0; i < clusterNames.length; i++) {\n    const clusterName = clusterNames[i];\n    const namespace = namespaces[i];\n    const reason = reasons[i];\n    const pod = pods[i];\n\n    if (!seenClusterNames.has(clusterName)) {\n      seenClusterNames.add(clusterName);\n      const clusterNode = { name: clusterName, children: [] };\n      hierarchy.children.push(clusterNode);\n      seenNamespaces.clear(); // Reset seenNamespaces for each cluster\n    }\n\n    const clusterNode = hierarchy.children.find((node) => node.name === clusterName);\n\n    if (!seenNamespaces.has(namespace)) {\n      seenNamespaces.add(namespace);\n      const namespaceNode = { name: namespace, children: [] };\n      clusterNode.children.push(namespaceNode);\n    }\n\n    const namespaceNode = clusterNode.children.find((node) => node.name === namespace);\n    const reasonNode = { name: reason, children: [{ name: `Count: ${pod}` }] };\n    namespaceNode.children.push(reasonNode);\n  }\n\n  // Create the tree chart using ECharts\n  option = {\n    tooltip: {\n      trigger: 'item',\n      triggerOn: 'mousemove',\n      formatter: function (params) {\n        const node = params.data;\n        let tooltip = '';\n        if (node.column) {\n          tooltip += `${node.column}: ${node.name}`;\n        } else {\n          tooltip += node.name;\n        }\n        return tooltip;\n      },\n    },\n    series: [\n      {\n        type: 'tree',\n        data: hierarchy.children, // Use the children directly\n        top: '1%',\n        left: '7%',\n        bottom: '1%',\n        right: '20%',\n        symbolSize: 7,\n        label: {\n          position: 'left',\n          verticalAlign: 'middle',\n          align: 'centre',\n          fontSize: 15, // Increase the text size for regular nodes\n          fontWeight: 'bold', // Set the font weight to bold\n        },\n        leaves: {\n          label: {\n            position: 'right',\n            verticalAlign: 'middle',\n            align: 'left',\n            fontSize: 15, // Increase the text size for leaves\n            fontWeight: 'bold', // Set the font weight to bold\n          },\n        },\n        emphasis: {\n          focus: 'descendant',\n        },\n        expandAndCollapse: true,\n        animationDuration: 550,\n        animationDurationUpdate: 750,\n      },\n    ],\n  };\n}\n\nreturn option;",
+            "google": {
+              "callback": "gmapReady",
+              "key": ""
+            },
+            "map": "none",
+            "renderer": "canvas",
+            "themeEditor": {
+              "config": "{}",
+              "height": 400,
+              "name": "default"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "vertamedia-clickhouse-datasource"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT ClusterName, Namespace, Reason, count(*) AS Pods\nFROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN ('Pod') AND ClusterName IN ($clusterName) AND Namespace IN ($namespace) AND Reason IN ($reason)\nGROUP BY ClusterName, Namespace, Reason",
+              "rawQuery": "SELECT ClusterName, Namespace, Reason, count(*) AS Pods\nFROM default.events\nWHERE EventTime >= toDateTime(1702949773) AND EventTime <= toDateTime(1702992973) AND Kind IN ('Pod') AND ClusterName IN ('capten-controlplane','kubviz','dev') AND Namespace IN ('argo-cd','crossplane','default','kubescape-prometheus','kubviz','kyverno','linkerd','observability','openebs-cstor','testkube','capten','falco','tekton','crossplane-system','test5','tek','tekton-pipelines','harbor','tekton-pipelines-resolvers','quality-trace','kube-system','cert-manager','emojivoto','local-path-storage','test-linkerd','external-secrets','policy-reporter','velero','tracetest') AND Reason IN ('BackOff','FailedMount','Unhealthy','SyncPackage','SelectComposition','SyncFailed','CannotUpdateExternalResource','RenderCRD','OfferClaim','EstablishComposite','SuccessfulCreate','InjectionSkipped','Scheduled','Pulled','Created','Started','Completed','SawCompletedJob','BindClusterRole','ApplyClusterRoles','CannotInitializeManagedResource','InstallPackageRevision','CreatedUsers','CreatedSuperuser','ApplyRoles','Synced','Killing','Init','ExternalProvisioning','Provisioning','Running','FailedScheduling','ProvisioningSucceeded','ScalingReplicaSet','Pending','Updated','FailUpdate','Degraded','Pulling','Healthy','Succeeded','IssuedLeafCertificate','Failed','Offline','EvictionThresholdMet','NodeHasDiskPressure','NodeHasNoDiskPressure','FreeDiskSpaceFailed','CreateCertificate','Issuing','Generated','Requested','cert-manager.io','OrderCreated','OrderPending','Presented','DomainVerified','Complete','CertificateIssued','SuccessfulDelete','ConfigureCompositeResource','BindCompositeResource','ImageGCFailed','ClaimLost','Evicted','RecreatingFailedPod','LeaderElection','InternalError','Reused','IssuerUpdated','OperationStarted','ResourceUpdated','OperationCompleted','MultiplePodDisruptionBudgets','MissingJob','InvalidOrder','TaintManagerEviction','SystemOOM','FailedKillPod','NodeHasSufficientMemory','NodeHasSufficientPID','NodeNotReady','FailedPreStopHook','NodeReady','Pool Imported','AlreadyPresent','StartingCassandra','UpdateCompleted','LabeledPodAsSeed','StartedCassandra','ComposeResources','UpdatedExternalResource','CannotDeleteExternalResource','DeletedExternalResource','ReconcileInProgress','ReconcileCompleted','ReconcileStarted','ProgressHostsCompleted','ReconcileFailed','UnlabeledPodAsSeed','CannotObserveExternalResource','DeletingStuckPod','DeleteCompositeResource','ResourceDeleted','PublishConnectionSecret','UnpackPackage','ResolveDependencies','ExceededGracePeriod','ProvisioningFailed','CannotCreateExternalResource','FailStatusSync','FailCreate','CannotUpdateManagedResource','CannotResolveResourceReferences','CreatedExternalResource','FailedSync','RegisteredNode','OwnerRefInvalidNamespace','NoPods','DeadlineExceeded','Create','FailedGetScale','NodeAllocatableEnforced','Starting','LintPackage','SandboxChanged','WaitForFirstConsumer','FailedGetResourceMetric','FailedCreate','Injected','Resizing','ExternalExpanding','VolumeResizeFailed','VolumeResizeSuccessful','FileSystemResizeRequired','FileSystemResizeSuccessful','CreatedResource','FailedToUpdateEndpoint','UpdateCertificate','FailedUpdateStatus','UpdateFailed','FailedComputeMetricsReplicas','FailedToCreateEndpoint','FailedAttachVolume','FailedToUpdateEndpointSlices','FailedDelete','Pool Expansion','Error')\nGROUP BY ClusterName, Namespace, Reason",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Pod  Scenario Counts by Cluster, Namespace",
+          "type": "volkovlabs-echarts-panel"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 9
+          },
+          "id": 12,
+          "options": {
+            "baidu": {
+              "callback": "bmapReady",
+              "key": ""
+            },
+            "editor": {
+              "format": "auto",
+              "height": 600
+            },
+            "gaode": {
+              "key": "",
+              "plugin": "AMap.Scale,AMap.ToolBar"
+            },
+            "getOption": "let option; // Initialize the option variable\n\nif (typeof data === 'undefined' || !data.series || !data.series[0] || !data.series[0].fields) {\n  // Data is not available or doesn't have the expected structure\n  option = {\n    title: {\n      text: 'Data not available',\n      textStyle: {\n        fontSize: 24,\n        fontWeight: 'bold',\n      },\n      left: 'center',\n      top: 'middle',\n    },\n  };\n} else {\n  // Extract data from your JSON as before\n  const reasons = data.series[0].fields[0].values;\n  const counts = data.series[0].fields[1].values;\n\n  // Check if reasons and counts are defined and not empty\n  if (!reasons || !counts || reasons.length === 0 || counts.length === 0) {\n    // Display a message when no data is available\n    option = {\n      title: {\n        text: 'Data not available',\n        textStyle: {\n          fontSize: 24,\n          fontWeight: 'bold',\n        },\n        left: 'center',\n        top: 'middle',\n      },\n    };\n  } else {\n    // Data is available, proceed with the chart creation\n    // Create an array of data items, each containing name and value\n    const seriesData = reasons.map((reason, index) => ({\n      name: reason,\n      value: counts[index],\n    }));\n\n    // Define a custom color for the bars\n    const customColor = 'rgb(0, 123, 255)'; // Change this to your desired color\n\n    // Apache ECharts option\n    option = {\n      xAxis: {\n        type: 'category',\n        data: reasons, // Use the reasons directly for xAxis data\n        axisLabel: {\n          interval: 0, // Display all labels on the xAxis\n        },\n      },\n      yAxis: {\n        type: 'value',\n      },\n      legend: {\n        data: ['Pods'], // Legend name\n        left: 'left',   // Position the legend on the left side\n        bottom: 'bottom', // Position the legend at the bottom\n      },\n      series: [\n        {\n          name: 'Pods',  // Series name for the legend\n          data: seriesData,\n          type: 'bar',\n          label: {\n            show: true,\n            position: 'top',\n            formatter: '{c}',\n          },\n          itemStyle: {\n            barBorderRadius: [5, 5, 0, 0], // Adjust the values to control the curvature\n            color: customColor, // Set the custom color for the bars\n          },\n        },\n      ],\n    };\n  }\n}\n\nreturn option;",
+            "google": {
+              "callback": "gmapReady",
+              "key": ""
+            },
+            "map": "none",
+            "renderer": "canvas",
+            "themeEditor": {
+              "config": "{}",
+              "height": 400,
+              "name": "default"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "vertamedia-clickhouse-datasource"
+              },
+              "dateTimeType": "DATETIME",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "intervalFactor": 1,
+              "query": "SELECT Reason, count(Reason) AS Pods\nFROM default.events\nWHERE $timeFilterByColumn(EventTime) AND Kind IN ('Pod') AND ClusterName IN ($clusterName) AND Namespace In ($namespace)\nGROUP BY Reason",
+              "rawQuery": "SELECT Reason, count(Reason) AS Pods\nFROM default.events\nWHERE EventTime >= toDateTime(1702949951) AND EventTime <= toDateTime(1702993151) AND Kind IN ('Pod') AND ClusterName IN ('capten-controlplane','kubviz','dev') AND Namespace In ('quality-trace','crossplane-system','observability','default','testkube','openebs-cstor','kyverno','kubescape-prometheus','tekton-pipelines','capten','tek','test-linkerd','linkerd','argo-cd','tracetest','emojivoto','falco','kube-system','crossplane','kubviz','tekton','test5','harbor','tekton-pipelines-resolvers','cert-manager','local-path-storage','external-secrets','policy-reporter','velero')\nGROUP BY Reason",
+              "refId": "A",
+              "round": "0s",
+              "skip_comments": true
+            }
+          ],
+          "title": "Total Pod Counts by Reason",
+          "type": "volkovlabs-echarts-panel"
+        },
+        {
+          "datasource": {
+            "type": "vertamedia-clickhouse-datasource",
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "gridPos": {
             "h": 14,
             "w": 24,
             "x": 0,
-            "y": 0
+            "y": 19
           },
           "id": 6,
           "options": {
@@ -78,7 +196,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -98,13 +216,13 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "gridPos": {
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 14
+            "y": 33
           },
           "id": 8,
           "options": {
@@ -137,7 +255,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -157,13 +275,13 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "gridPos": {
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 14
+            "y": 33
           },
           "id": 9,
           "options": {
@@ -196,7 +314,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -216,13 +334,13 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "gridPos": {
             "h": 13,
             "w": 24,
             "x": 0,
-            "y": 22
+            "y": 41
           },
           "id": 7,
           "options": {
@@ -238,7 +356,7 @@ data:
               "key": "",
               "plugin": "AMap.Scale,AMap.ToolBar"
             },
-            "getOption": "let option; // Initialize the option variable\n\nif (typeof data === 'undefined' || !data.series || !data.series[0] || !data.series[0].fields) {\n  // Data is not available or doesn't have the expected structure\n  option = {\n    title: {\n      text: 'Data not available',\n      textStyle: {\n        fontSize: 24,\n        fontWeight: 'bold',\n      },\n      left: 'center',\n      top: 'middle',\n    },\n  };\n} else {\n\n  // Extract data from your JSON\n  const clusters = data.series[0].fields[0].values;\n  const hosts = data.series[0].fields[1].values;\n  const reasons = data.series[0].fields[2].values;\n  const eventTimes = data.series[0].fields[3].values;\n\n  // Create a hierarchical structure for the tree chart starting with ClusterName\n  const hierarchy = {\n    name: 'Cluster Hierarchy',\n    children: [],\n  };\n\n  for (let i = 0; i < clusters.length; i++) {\n    const cluster = clusters[i];\n    const host = hosts[i];\n    const reason = reasons[i];\n    const eventTime = eventTimes[i];\n\n    // Find or create the cluster node\n    let clusterNode = hierarchy.children.find((node) => node.name === cluster);\n    if (!clusterNode) {\n      clusterNode = { name: cluster, children: [] };\n      hierarchy.children.push(clusterNode);\n    }\n\n    // Find or create the host node under the cluster\n    let hostNode = clusterNode.children.find((node) => node.name === host);\n    if (!hostNode) {\n      hostNode = { name: host, children: [] };\n      clusterNode.children.push(hostNode);\n    }\n\n    // Find or create the reason node under the host\n    let reasonNode = hostNode.children.find((node) => node.name === reason);\n    if (!reasonNode) {\n      reasonNode = { name: reason, children: [] };\n      hostNode.children.push(reasonNode);\n    }\n\n    // Create the eventTime node under the reason\n    reasonNode.children.push({ name: eventTime });\n  }\n\n  // Create the tree chart using ECharts\n  const option = {\n    tooltip: {\n      trigger: 'item',\n      triggerOn: 'mousemove',\n    },\n    series: [\n      {\n        type: 'tree',\n        data: hierarchy.children, // Start directly from the Cluster Hierarchy node\n        top: '1%',\n        left: '7%',\n        bottom: '1%',\n        right: '20%', // Adjust the right margin to provide more space for labels\n        symbolSize: 7,\n        label: {\n          position: 'inside', // Position labels inside the node\n          verticalAlign: 'middle',\n          align: 'center', // Center-align labels\n          fontSize: 15,\n          fontWeight: 'bold',\n        },\n        leaves: {\n          label: {\n            position: 'right', // Position labels inside the node\n            verticalAlign: 'middle',\n            align: 'left', // Center-align labels\n            fontSize: 15,\n            fontWeight: 'bold',\n          },\n        },\n        emphasis: {\n          focus: 'descendant',\n        },\n        expandAndCollapse: true,\n        animationDuration: 550,\n        animationDurationUpdate: 750,\n      },\n    ],\n  };\n}\nreturn option;",
+            "getOption": "let option; // Initialize the option variable\n\nif (typeof data === 'undefined' || !data.series || !data.series[0] || !data.series[0].fields) {\n  // Data is not available or doesn't have the expected structure\n  option = {\n    title: {\n      text: 'Data not available',\n      textStyle: {\n        fontSize: 24,\n        fontWeight: 'bold',\n      },\n      left: 'center',\n      top: 'middle',\n    },\n  };\n} else {\n  // Extract data from your JSON\n  const clusters = data.series[0].fields[0].values;\n  const hosts = data.series[0].fields[1].values;\n  const reasons = data.series[0].fields[2].values;\n  const eventTimes = data.series[0].fields[3].values;\n\n  // Create a hierarchical structure for the tree chart starting with ClusterName\n  const hierarchy = {\n    name: 'Root', // You can customize the name of the root node if needed\n    children: [],\n  };\n\n  for (let i = 0; i < clusters.length; i++) {\n    const cluster = clusters[i];\n    const host = hosts[i];\n    const reason = reasons[i];\n    const eventTime = eventTimes[i];\n\n    // Find or create the cluster node\n    let clusterNode = hierarchy.children.find((node) => node.name === cluster);\n    if (!clusterNode) {\n      clusterNode = { name: cluster, children: [] };\n      hierarchy.children.push(clusterNode);\n    }\n\n    // Find or create the host node under the cluster\n    let hostNode = clusterNode.children.find((node) => node.name === host);\n    if (!hostNode) {\n      hostNode = { name: host, children: [] };\n      clusterNode.children.push(hostNode);\n    }\n\n    // Find or create the reason node under the host\n    let reasonNode = hostNode.children.find((node) => node.name === reason);\n    if (!reasonNode) {\n      reasonNode = { name: reason, children: [] };\n      hostNode.children.push(reasonNode);\n    }\n\n    // Create the eventTime node under the reason\n    reasonNode.children.push({ name: eventTime });\n  }\n\n  // Create the tree chart using ECharts\n  option = {\n    tooltip: {\n      trigger: 'item',\n      triggerOn: 'mousemove',\n    },\n    series: [\n      {\n        type: 'tree',\n        data: hierarchy.children, // Use the children directly as root nodes\n        top: '1%',\n        left: '7%',\n        bottom: '1%',\n        right: '20%', // Adjust the right margin to provide more space for labels\n        symbolSize: 7,\n        label: {\n          position: 'inside', // Position labels inside the node\n          verticalAlign: 'middle',\n          align: 'center', // Center-align labels\n          fontSize: 15,\n          fontWeight: 'bold',\n        },\n        leaves: {\n          label: {\n            position: 'right', // Position labels inside the node\n            verticalAlign: 'middle',\n            align: 'left', // Center-align labels\n            fontSize: 15,\n            fontWeight: 'bold',\n          },\n        },\n        emphasis: {\n          focus: 'descendant',\n        },\n        expandAndCollapse: true,\n        animationDuration: 550,\n        animationDurationUpdate: 750,\n      },\n    ],\n  };\n}\n\nreturn option;\n",
             "google": {
               "callback": "gmapReady",
               "key": ""
@@ -255,7 +373,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -275,13 +393,13 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "gridPos": {
             "h": 11,
             "w": 24,
             "x": 0,
-            "y": 35
+            "y": 54
           },
           "id": 5,
           "options": {
@@ -314,7 +432,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -334,7 +452,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "description": "This stats panel shows the pod creation events.",
           "fieldConfig": {
@@ -348,7 +466,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -363,7 +482,7 @@ data:
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 46
+            "y": 65
           },
           "id": 4,
           "options": {
@@ -385,7 +504,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -405,7 +524,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "description": "This table panal shows all the kubernetes datas.\nif its not showing the data check the time range and refresh.it will take some time to load the data. wait for sometime before clicking refresh another time.",
           "fieldConfig": {
@@ -441,7 +560,7 @@ data:
             "h": 16,
             "w": 24,
             "x": 0,
-            "y": 53
+            "y": 72
           },
           "id": 2,
           "options": {
@@ -461,7 +580,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -493,7 +612,7 @@ data:
             },
             "datasource": {
               "type": "vertamedia-clickhouse-datasource",
-              "uid": "{{ .Values.datasources.uid }}"
+              "uid": "vertamedia-clickhouse-datasource"
             },
             "definition": "SELECT Namespace FROM  default.events",
             "hide": 0,
@@ -516,7 +635,7 @@ data:
             },
             "datasource": {
               "type": "vertamedia-clickhouse-datasource",
-              "uid": "{{ .Values.datasources.uid }}"
+              "uid": "vertamedia-clickhouse-datasource"
             },
             "definition": "SELECT Reason FROM default.events",
             "hide": 0,
@@ -539,7 +658,7 @@ data:
             },
             "datasource": {
               "type": "vertamedia-clickhouse-datasource",
-              "uid": "{{ .Values.datasources.uid }}"
+              "uid": "vertamedia-clickhouse-datasource"
             },
             "definition": "SELECT Kind FROM default.events",
             "hide": 0,
@@ -562,7 +681,7 @@ data:
             },
             "datasource": {
               "type": "vertamedia-clickhouse-datasource",
-              "uid": "{{ .Values.datasources.uid }}"
+              "uid": "vertamedia-clickhouse-datasource"
             },
             "definition": "SELECT ClusterName FROM default.events",
             "hide": 0,
@@ -587,7 +706,8 @@ data:
       "timezone": "",
       "title": "Kubedata",
       "uid": "Qq-FK1rVz",
-      "version": 1,
+      "version": 2,
       "weekStart": ""
     }
+
 {{- end }}
