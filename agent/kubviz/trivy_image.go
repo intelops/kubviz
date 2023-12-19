@@ -23,7 +23,7 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 		log.Printf("Error creating Trivy Image cache directory: %v\n", err)
 		return err
 	}
-	clearCacheCmd := "trivy image --clear-cache"
+	// clearCacheCmd := "trivy image --clear-cache"
 
 	images, err := ListImages(config)
 	if err != nil {
@@ -56,11 +56,11 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 			log.Printf("Error occurred while Unmarshalling json for image: %v", err)
 			continue // Move on to the next image in case of an error
 		}
-		_, err = executeCommandTrivy(clearCacheCmd)
-		if err != nil {
-			log.Printf("Error executing command: %v\n", err)
-			return err
-		}
+		// _, err = executeCommandTrivy(clearCacheCmd)
+		// if err != nil {
+		// 	log.Printf("Error executing command: %v\n", err)
+		// 	return err
+		// }
 		err = publishImageScanReports(report, js)
 		if err != nil {
 			return err
