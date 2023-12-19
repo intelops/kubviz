@@ -39,7 +39,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
+            "uid": "{{ .Values.datasources.uid }}"
           },
           "gridPos": {
             "h": 9,
@@ -78,7 +78,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "vertamedia-clickhouse-datasource"
+                "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -98,7 +98,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
+            "uid": "{{ .Values.datasources.uid }}"
           },
           "gridPos": {
             "h": 10,
@@ -137,7 +137,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "vertamedia-clickhouse-datasource"
+                "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -157,7 +157,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
+            "uid": "{{ .Values.datasources.uid }}"
           },
           "gridPos": {
             "h": 14,
@@ -196,7 +196,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "vertamedia-clickhouse-datasource"
+                "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -216,7 +216,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
+            "uid": "{{ .Values.datasources.uid }}"
           },
           "gridPos": {
             "h": 8,
@@ -255,7 +255,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "vertamedia-clickhouse-datasource"
+                "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -275,7 +275,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
+            "uid": "{{ .Values.datasources.uid }}"
           },
           "gridPos": {
             "h": 8,
@@ -314,7 +314,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "vertamedia-clickhouse-datasource"
+                "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -334,7 +334,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
+            "uid": "{{ .Values.datasources.uid }}"
           },
           "gridPos": {
             "h": 13,
@@ -373,7 +373,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "vertamedia-clickhouse-datasource"
+                "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -393,7 +393,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
+            "uid": "{{ .Values.datasources.uid }}"
           },
           "gridPos": {
             "h": 11,
@@ -432,7 +432,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "vertamedia-clickhouse-datasource"
+                "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -452,7 +452,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
+            "uid": "{{ .Values.datasources.uid }}"
           },
           "description": "This stats panel shows the pod creation events.",
           "fieldConfig": {
@@ -504,7 +504,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "vertamedia-clickhouse-datasource"
+                "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -524,7 +524,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "vertamedia-clickhouse-datasource"
+            "uid": "{{ .Values.datasources.uid }}"
           },
           "description": "This table panal shows all the kubernetes datas.\nif its not showing the data check the time range and refresh.it will take some time to load the data. wait for sometime before clicking refresh another time.",
           "fieldConfig": {
@@ -580,7 +580,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "vertamedia-clickhouse-datasource"
+                "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -612,7 +612,7 @@ data:
             },
             "datasource": {
               "type": "vertamedia-clickhouse-datasource",
-              "uid": "vertamedia-clickhouse-datasource"
+              "uid": "{{ .Values.datasources.uid }}"
             },
             "definition": "SELECT Namespace FROM  default.events",
             "hide": 0,
@@ -635,7 +635,7 @@ data:
             },
             "datasource": {
               "type": "vertamedia-clickhouse-datasource",
-              "uid": "vertamedia-clickhouse-datasource"
+              "uid": "{{ .Values.datasources.uid }}"
             },
             "definition": "SELECT Reason FROM default.events",
             "hide": 0,
@@ -658,7 +658,7 @@ data:
             },
             "datasource": {
               "type": "vertamedia-clickhouse-datasource",
-              "uid": "vertamedia-clickhouse-datasource"
+              "uid": "{{ .Values.datasources.uid }}"
             },
             "definition": "SELECT Kind FROM default.events",
             "hide": 0,
@@ -681,7 +681,7 @@ data:
             },
             "datasource": {
               "type": "vertamedia-clickhouse-datasource",
-              "uid": "vertamedia-clickhouse-datasource"
+              "uid": "{{ .Values.datasources.uid }}"
             },
             "definition": "SELECT ClusterName FROM default.events",
             "hide": 0,
