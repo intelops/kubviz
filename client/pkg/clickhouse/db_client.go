@@ -705,7 +705,7 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 			result.CycloneDX.Metadata.Component.PackageURL,
 			result.CycloneDX.Metadata.Component.BOMRef,
 			result.CycloneDX.SerialNumber,
-			result.CycloneDX.Version,
+			int32(result.CycloneDX.Version),
 			result.CycloneDX.BOMFormat,
 			result.CycloneDX.Metadata.Component.Version,
 			result.CycloneDX.Metadata.Component.MIMEType,

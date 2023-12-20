@@ -205,26 +205,14 @@ const quayContainerPushEventTable DBStatement = `
 const trivySbomTable DBStatement = `
 	CREATE TABLE IF NOT EXISTS trivysbom (
 		id UUID,
-		schema String,
-		bom_format String,
-		spec_version String,
-		serial_number String,
+		image_name String,
+		package_url String,
+		bom_ref String,
+		serial_number  String,
 		version INTEGER,
-		metadata_timestamp DateTime('UTC'),
-		metatool_vendor String,
-		metatool_name String,
-		metatool_version String,
-		component_bom_ref String,
-		component_type String,
-		component_name String,
+		bom_format String,
 		component_version String,
-		component_property_name String,
-		component_property_value String,
-		component_hash_alg String,
-		component_hash_content String,
-		component_license_exp String,
-		component_purl String,
-		dependency_ref String
+		component_mime_type String
 	) engine=File(TabSeparated)
 	`
 
@@ -242,6 +230,6 @@ const InsertTrivyVul string = "INSERT INTO trivy_vul (id, cluster_name, namespac
 const InsertTrivyImage string = "INSERT INTO trivyimage (id, cluster_name, artifact_name, vul_id,  vul_pkg_id, vul_pkg_name,  vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date) VALUES ( ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertTrivyMisconfig string = "INSERT INTO trivy_misconfig (id, cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status, EventTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertAzureContainerPushEvent DBStatement = "INSERT INTO azurecontainerpush (RegistryURL, RepositoryName, Tag, ImageName, Event, Size, SHAID, EventTime) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)"
-const InsertTrivySbom string = "INSERT INTO trivysbom (id, image_name, package_url, bom_ref, serial_number, version, bom_format, component_version, component_mimetype) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const InsertTrivySbom string = "INSERT INTO trivysbom (id, image_name, package_url, bom_ref, serial_number, version, bom_format, component_version, component_mime_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertQuayContainerPushEvent DBStatement = "INSERT INTO quaycontainerpush (name, repository, nameSpace, dockerURL, homePage, tag, Event, EventTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertJfrogContainerPushEvent DBStatement = "INSERT INTO jfrogcontainerpush (Domain, EventType, RegistryURL, RepositoryName, SHAID, Size, ImageName, Tag, Event, EventTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
