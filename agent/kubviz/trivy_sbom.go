@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/aquasecurity/trivy/pkg/sbom/cyclonedx"
 	"github.com/google/uuid"
@@ -72,6 +73,19 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			continue // Move on to the next image in case of an error
 		}
 
+		files, err := os.ReadDir("/mnt/agent/kbz/trivy-sbomcache")
+    		if err != nil {
+        	log.Fatal(err)
+    	}
+
+    	var fileNames []string
+    	for _, val := range files {
+        fileNames = append(fileNames, val.Name())
+    	}
+
+    	joinedFileNames := strings.Join(fileNames, " ")
+    	fmt.Printf("file names: %#v", joinedFileNames)
+
 		// Check if the output is empty or invalid JSON
 		if len(out) == 0 {
 			log.Printf("Trivy output is empty for image sbom %s", image.PullableImage)
@@ -84,6 +98,9 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
+
+		log.Printf("sbom before publish: %#v",report.CycloneDX)
+
 		// log.Println("report", report)
 		// _, err = executeCommandTrivy(clearCacheCmd)
 		// if err != nil {
