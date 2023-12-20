@@ -100,6 +100,13 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		}
 
 		//log.Printf("sbom before publish: %#v",report.CycloneDX)
+		log.Printf("sbom before publish-BOMFormat: %#v",report.CycloneDX.BOMFormat)
+		log.Printf("sbom before publish-SerialNumber: %#v",report.CycloneDX.SerialNumber)
+		log.Printf("sbom before publish-Version: %#v",report.CycloneDX.Version)
+		log.Printf("sbom before publish-BOMRef: %#v",report.CycloneDX.Metadata.Component.BOMRef)
+		log.Printf("sbom before publish-MIMEType: %#v",report.CycloneDX.Metadata.Component.MIMEType)
+		log.Printf("sbom before publish-Name: %#v",report.CycloneDX.Metadata.Component.Name)
+		log.Printf("sbom before publish-PackageURL: %#v",report.CycloneDX.Metadata.Component.PackageURL)
 
 		// log.Println("report", report)
 		// _, err = executeCommandTrivy(clearCacheCmd)
@@ -109,7 +116,13 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		// }
 		// Publish the report using the given function
 		publishTrivySbomReport(report, js)
-		log.Printf("sbom after publish: %#v",report.CycloneDX)
+		log.Printf("sbom after publish BOMFormat: %#v",report.CycloneDX.BOMFormat)
+		log.Printf("sbom after publish SerialNumber: %#v",report.CycloneDX.SerialNumber)
+		log.Printf("sbom after publish Version: %#v",report.CycloneDX.Version)
+		log.Printf("sbom after publish BOMRef: %#v",report.CycloneDX.Metadata.Component.BOMRef)
+		log.Printf("sbom after publish MIMEType: %#v",report.CycloneDX.Metadata.Component.MIMEType)
+		log.Printf("sbom after publish Name: %#v",report.CycloneDX.Metadata.Component.Name)
+		log.Printf("sbom after publish PackageURL: %#v",report.CycloneDX.Metadata.Component.PackageURL)
 	}
 	return nil
 }
