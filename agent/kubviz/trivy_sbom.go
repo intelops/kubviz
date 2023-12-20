@@ -84,7 +84,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
     	}
 
     	joinedFileNames := strings.Join(fileNames, " ")
-    	fmt.Printf("file names: %#v", joinedFileNames)
+    	log.Printf("file names: %#v", joinedFileNames)
 
 		// Check if the output is empty or invalid JSON
 		if len(out) == 0 {
@@ -99,7 +99,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			continue // Move on to the next image in case of an error
 		}
 
-		log.Printf("sbom before publish: %#v",report.CycloneDX)
+		//log.Printf("sbom before publish: %#v",report.CycloneDX)
 
 		// log.Println("report", report)
 		// _, err = executeCommandTrivy(clearCacheCmd)
@@ -109,6 +109,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		// }
 		// Publish the report using the given function
 		publishTrivySbomReport(report, js)
+		log.Printf("sbom after publish: %#v",report.CycloneDX)
 	}
 	return nil
 }

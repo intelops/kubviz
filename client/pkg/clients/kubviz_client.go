@@ -124,7 +124,10 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 					log.Println("failed to unmarshal in nats", err)
 				}
 				log.Printf("Trivy sbom Metrics Received: %#v,", metrics)
+				log.Printf("subscribe code: %#v ",metrics.Report.CycloneDX.Metadata.Component.BOMRef)
 				conn.InsertTrivySbomMetrics(metrics)
+				log.Printf("subscribe code after insert: %#v ", metrics.Report.CycloneDX.BOMFormat)
+
 				log.Println()
 			},
 		},

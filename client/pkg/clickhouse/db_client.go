@@ -688,6 +688,7 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	log.Println("####started inserting value")
 	result := metrics.Report
+	log.Printf("InsertTrivySbomMetrics func: %#v ", metrics.Report.CycloneDX.BOMFormat)
 
 	if result.CycloneDX != nil {
 		tx, err := c.conn.Begin()
@@ -720,6 +721,8 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 		log.Println("sbom payload not available for db insertion, skipping db insertion")
 
 	}
+	log.Printf("InsertTrivySbomMetrics func end : %#v ", metrics.Report.CycloneDX.BOMFormat)
+
 
 }
 func (c *DBClient) Close() {
