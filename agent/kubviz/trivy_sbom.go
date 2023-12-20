@@ -100,7 +100,6 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		}
 
 		//log.Printf("sbom before publish: %#v",report.CycloneDX)
-		log.Printf("sbom before publish-BOMFormat: %#v",report.CycloneDX.BOMFormat)
 		log.Printf("sbom before publish-SerialNumber: %#v",report.CycloneDX.SerialNumber)
 		log.Printf("sbom before publish-Version: %#v",report.CycloneDX.Version)
 		log.Printf("sbom before publish-BOMRef: %#v",report.CycloneDX.Metadata.Component.BOMRef)
@@ -116,7 +115,6 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		// }
 		// Publish the report using the given function
 		publishTrivySbomReport(report, js)
-		log.Printf("sbom after publish BOMFormat: %#v",report.CycloneDX.BOMFormat)
 		log.Printf("sbom after publish SerialNumber: %#v",report.CycloneDX.SerialNumber)
 		log.Printf("sbom after publish Version: %#v",report.CycloneDX.Version)
 		log.Printf("sbom after publish BOMRef: %#v",report.CycloneDX.Metadata.Component.BOMRef)
