@@ -6,8 +6,6 @@ CREATE TABLE IF NOT EXISTS trivysbom (
 	serial_number         String,
 	version 			  INTEGER,
 	bom_format 			  String,
-	component_version     String,
-	component_mime_type   String,
 	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 

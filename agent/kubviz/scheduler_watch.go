@@ -133,6 +133,6 @@ func (v *TrivyJob) CronSpec() string {
 
 func (j *TrivyJob) Run() {
 	// Call the Trivy function with the provided config and js
-	err := runTrivyScans(j.config, j.js)
+	err := RunTrivySbomScan(j.config, j.js)
 	LogErr(err)
 }
