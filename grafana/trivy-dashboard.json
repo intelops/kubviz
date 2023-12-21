@@ -21,7 +21,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 125,
+  "id": 171,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -155,7 +155,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -226,7 +225,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -294,7 +292,6 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
-          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "percentage",
             "steps": [
@@ -363,7 +360,6 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
-          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "percentage",
             "steps": [
@@ -435,7 +431,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -506,7 +501,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -577,7 +571,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -648,7 +641,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -719,7 +711,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -790,7 +781,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -861,7 +851,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -932,7 +921,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1004,7 +992,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1075,7 +1062,6 @@
             "mode": "continuous-GrYlRd"
           },
           "mappings": [],
-          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1153,7 +1139,6 @@
             "inspect": false
           },
           "mappings": [],
-          "noValue": "Trivy Vulnerabilities Not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1226,7 +1211,6 @@
             "inspect": false
           },
           "mappings": [],
-          "noValue": "Trivy Misconfigurations not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1270,8 +1254,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT \"cluster_name\", \"EventTime\", \"namespace\", \"kind\", \"name\", \"misconfig_id\", \"misconfig_avdid\", \"misconfig_type\", \"misconfig_title\", \"misconfig_desc\", \"misconfig_msg\", \"misconfig_query\", \"misconfig_resolution\", \"misconfig_severity\", \"misconfig_status\" \nFROM \"default\".\"trivy_misconfig\"\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
-          "rawQuery": "SELECT \"cluster_name\", \"EventTime\", \"namespace\", \"kind\", \"name\", \"misconfig_id\", \"misconfig_avdid\", \"misconfig_type\", \"misconfig_title\", \"misconfig_desc\", \"misconfig_msg\", \"misconfig_query\", \"misconfig_resolution\", \"misconfig_severity\", \"misconfig_status\" \nFROM \"default\".\"trivy_misconfig\"\nWHERE EventTime >= toDateTime(1694966455) AND EventTime <= toDateTime(1695052855)\nORDER BY EventTime DESC",
+          "query": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"misconfig_id\", \"misconfig_avdid\", \"misconfig_type\", \"misconfig_title\", \"misconfig_desc\", \"misconfig_msg\", \"misconfig_query\", \"misconfig_resolution\", \"misconfig_severity\", \"misconfig_status\" \nFROM \"default\".\"trivy_misconfig\"\nWHERE $timeFilterByColumn(EventTime)",
+          "rawQuery": "SELECT \"cluster_name\", \"namespace\", \"kind\", \"name\", \"misconfig_id\", \"misconfig_avdid\", \"misconfig_type\", \"misconfig_title\", \"misconfig_desc\", \"misconfig_msg\", \"misconfig_query\", \"misconfig_resolution\", \"misconfig_severity\", \"misconfig_status\" \nFROM \"default\".\"trivy_misconfig\"\nWHERE EventTime >= toDateTime(1694156566) AND EventTime <= toDateTime(1694242966)",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
@@ -1299,7 +1283,6 @@
             "inspect": false
           },
           "mappings": [],
-          "noValue": "Trivy Image not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1372,7 +1355,6 @@
             "inspect": false
           },
           "mappings": [],
-          "noValue": "Trivy SBOM not available",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1416,8 +1398,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT \"schema\", \"bom_format\", \"spec_version\", \"serial_number\", \"version\", \"metadata_timestamp\", \"metatool_vendor\", \"metatool_name\", \"metatool_version\", \"component_bom_ref\", \"component_type\", \"component_name\", \"component_version\", \"component_property_name\", \"component_property_value\", \"component_hash_alg\", \"component_hash_content\", \"component_license_exp\", \"component_purl\", \"dependency_ref\" \nFROM \"default\".\"trivysbom\"\nWHERE $timeFilterByColumn(metadata_timestamp)\nORDER BY metadata_timestamp DESC",
-          "rawQuery": "SELECT \"schema\", \"bom_format\", \"spec_version\", \"serial_number\", \"version\", \"metadata_timestamp\", \"metatool_vendor\", \"metatool_name\", \"metatool_version\", \"component_bom_ref\", \"component_type\", \"component_name\", \"component_version\", \"component_property_name\", \"component_property_value\", \"component_hash_alg\", \"component_hash_content\", \"component_license_exp\", \"component_purl\", \"dependency_ref\" \nFROM \"default\".\"trivysbom\"\nWHERE metadata_timestamp >= toDateTime(1693581733) AND metadata_timestamp <= toDateTime(1694186533)\nORDER BY metadata_timestamp DESC",
+          "query": "SELECT * FROM default.trivysbom",
+          "rawQuery": "SELECT * FROM default.trivysbom",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
