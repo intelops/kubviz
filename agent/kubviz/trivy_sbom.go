@@ -33,10 +33,19 @@ func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) erro
 	log.Println("reverifying after marshal")
 	var checker model.Sbom
 	err = json.Unmarshal(metricsJson, &checker)
+	log.Println("component name :", checker.Report.CycloneDX.Metadata.Component.Name)
+	log.Println("package url :", checker.Report.CycloneDX.Metadata.Component.PackageURL)
+	log.Println("bom ref :", checker.Report.CycloneDX.Metadata.Component.BOMRef)
+	log.Println("serial number :", checker.Report.CycloneDX.SerialNumber)
+	log.Println("cyclone dx version :", checker.Report.CycloneDX.Version)
+	log.Println("bom format :", checker.Report.CycloneDX.BOMFormat)
+	log.Println("component version :", checker.Report.CycloneDX.Metadata.Component.Version)
+	log.Println("mime type :", checker.Report.CycloneDX.Metadata.Component.MIMEType)
 	if err != nil {
 		log.Println("error occurred while unmarshalling sbom metrics in agent", err.Error())
 		return err
 	}
+
 	_, err = js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
 	if err != nil {
 		return err
