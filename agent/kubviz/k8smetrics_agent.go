@@ -63,28 +63,10 @@ var (
 	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
-func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
-	err := RunTrivySbomScan(config, js)
-	if err != nil {
-		return err
-	}
-	err = RunTrivyImageScans(config, js)
-	if err != nil {
-		return err
-	}
-	err = RunTrivyK8sClusterScan(js)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
-}
-
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	env := Production
-	clusterMetricsChan := make(chan error, 1)
+	// clusterMetricsChan := make(chan error, 1)
 	cfg, err := config.GetAgentConfigurations()
 	if err != nil {
 		log.Fatal("Failed to retrieve agent configurations", err)
@@ -116,22 +98,26 @@ func main() {
 		}
 		clientset = getK8sClient(config)
 	}
-	go publishMetrics(clientset, js, clusterMetricsChan)
+	// go publishMetrics(clientset, js, clusterMetricsChan)
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
-		err := outDatedImages(config, js)
-		LogErr(err)
-		err = KubePreUpgradeDetector(config, js)
-		LogErr(err)
-		err = GetAllResources(config, js)
-		LogErr(err)
-		err = RakeesOutput(config, js)
-		LogErr(err)
+		// err := outDatedImages(config, js)
+		// LogErr(err)
+		// err = KubePreUpgradeDetector(config, js)
+		// LogErr(err)
+		// err = GetAllResources(config, js)
+		// LogErr(err)
+		// err = RakeesOutput(config, js)
+		// LogErr(err)
 		// //getK8sEvents(clientset)
-		err = runTrivyScans(config, js)
+		err = RunTrivySbomScan(config, js)
 		LogErr(err)
-		err = RunKubeScore(clientset, js)
-		LogErr(err)
+		// err = RunTrivyImageScans(config, js)
+		// LogErr(err)
+		// err = RunTrivyK8sClusterScan(js)
+		// LogErr(err)
+		// err = RunKubeScore(clientset, js)
+		// LogErr(err)
 	}
 
 	collectAndPublishMetrics()
