@@ -135,4 +135,8 @@ func (j *TrivyJob) Run() {
 	// Call the Trivy function with the provided config and js
 	err := RunTrivySbomScan(j.config, j.js)
 	LogErr(err)
+	err = RunTrivyImageScans(j.config, j.js)
+	LogErr(err)
+	err = RunTrivyK8sClusterScan(j.js)
+	LogErr(err)
 }
