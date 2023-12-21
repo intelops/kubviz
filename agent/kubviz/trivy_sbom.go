@@ -87,15 +87,15 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		);
 		*/
 		log.Println("sbom log from agent side:")
-		log.Println("component name", report.CycloneDX.Metadata.Component.Name)
-		log.Println("package url", report.CycloneDX.Metadata.Component.PackageURL)
-		log.Println("bom ref", report.CycloneDX.Metadata.Component.BOMRef)
-		log.Println("serial number", report.CycloneDX.SerialNumber)
-		log.Println("cyclone dx version", report.CycloneDX.Version)
-		log.Println("bom format", report.CycloneDX.BOMFormat)
-		log.Println("component version", report.CycloneDX.Metadata.Component.Version)
-		log.Println("mime type", report.CycloneDX.Metadata.Component.MIMEType)
-
+		log.Println("sbom log from client side:")
+		log.Println("component name :", report.CycloneDX.Metadata.Component.Name)
+		log.Println("package url :", report.CycloneDX.Metadata.Component.PackageURL)
+		log.Println("bom ref :", report.CycloneDX.Metadata.Component.BOMRef)
+		log.Println("serial number :", report.CycloneDX.SerialNumber)
+		log.Println("cyclone dx version :", report.CycloneDX.Version)
+		log.Println("bom format :", report.CycloneDX.BOMFormat)
+		log.Println("component version :", report.CycloneDX.Metadata.Component.Version)
+		log.Println("mime type :", report.CycloneDX.Metadata.Component.MIMEType)
 		publishTrivySbomReport(report, js)
 	}
 	return nil
