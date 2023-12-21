@@ -63,24 +63,6 @@ var (
 	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
 )
 
-func runTrivyScans(config *rest.Config, js nats.JetStreamContext) error {
-	err := RunTrivySbomScan(config, js)
-	if err != nil {
-		return err
-	}
-	err = RunTrivyImageScans(config, js)
-	if err != nil {
-		return err
-	}
-	err = RunTrivyK8sClusterScan(js)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
-}
-
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	env := Production
@@ -128,7 +110,11 @@ func main() {
 		err = RakeesOutput(config, js)
 		LogErr(err)
 		// //getK8sEvents(clientset)
-		err = runTrivyScans(config, js)
+		err = RunTrivySbomScan(config, js)
+		LogErr(err)
+		err = RunTrivyImageScans(config, js)
+		LogErr(err)
+		err = RunTrivyK8sClusterScan(js)
 		LogErr(err)
 		err = RunKubeScore(clientset, js)
 		LogErr(err)
