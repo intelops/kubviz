@@ -685,12 +685,12 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 
 	}
 }
+
 func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	log.Println("####started inserting value")
-	result := metrics.Report
 	log.Printf("InsertTrivySbomMetrics start func: %#v ", metrics.Report.CycloneDX.Metadata.Component.Name)
 
-	if result.CycloneDX != nil {
+	for _, result := range metrics.Report.CycloneDX.Components {
 		tx, err := c.conn.Begin()
 		if err != nil {
 			log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
@@ -699,17 +699,16 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 		if err != nil {
 			log.Fatalf("error preparing statement: %v", err)
 		}
-
 		if _, err := stmt.Exec(
 			metrics.ID,
-			result.CycloneDX.Metadata.Component.Name,
-			result.CycloneDX.Metadata.Component.PackageURL,
-			result.CycloneDX.Metadata.Component.BOMRef,
-			result.CycloneDX.SerialNumber,
-			int32(result.CycloneDX.Version),
-			result.CycloneDX.BOMFormat,
-			result.CycloneDX.Metadata.Component.Version,
-			result.CycloneDX.Metadata.Component.MIMEType,
+			metrics.Report.CycloneDX.Metadata.Component.Name,
+			metrics.Report.CycloneDX.Metadata.Component.PackageURL,
+			metrics.Report.CycloneDX.Metadata.Component.BOMRef,
+			metrics.Report.CycloneDX.SerialNumber,
+			int32(metrics.Report.CycloneDX.Version),
+			metrics.Report.CycloneDX.BOMFormat,
+			metrics.Report.CycloneDX.Metadata.Component.Version,
+			result.MIMEType,
 		); err != nil {
 			log.Fatal(err)
 		}
@@ -717,14 +716,52 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 			log.Fatal(err)
 		}
 		stmt.Close()
-	} else {
-		log.Println("sbom payload not available for db insertion, skipping db insertion")
 
 	}
 	log.Printf("InsertTrivySbomMetrics end func end : %#v ", metrics.Report.CycloneDX.Metadata.Component.Name)
 
-
 }
+
+// func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
+// 	log.Println("####started inserting value")
+// 	result := metrics.Report
+// 	log.Printf("InsertTrivySbomMetrics start func: %#v ", metrics.Report.CycloneDX.Metadata.Component.Name)
+
+// 	if result.CycloneDX != nil {
+// 		tx, err := c.conn.Begin()
+// 		if err != nil {
+// 			log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
+// 		}
+// 		stmt, err := tx.Prepare(InsertTrivySbom)
+// 		if err != nil {
+// 			log.Fatalf("error preparing statement: %v", err)
+// 		}
+
+// 		if _, err := stmt.Exec(
+// 			metrics.ID,
+// 			result.CycloneDX.Metadata.Component.Name,
+// 			result.CycloneDX.Metadata.Component.PackageURL,
+// 			result.CycloneDX.Metadata.Component.BOMRef,
+// 			result.CycloneDX.SerialNumber,
+// 			int32(result.CycloneDX.Version),
+// 			result.CycloneDX.BOMFormat,
+// 			result.CycloneDX.Metadata.Component.Version,
+// 			result.CycloneDX.Metadata.Component.MIMEType,
+// 		); err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		if err := tx.Commit(); err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		stmt.Close()
+// 	} else {
+// 		log.Println("sbom payload not available for db insertion, skipping db insertion")
+
+// 	}
+// 	log.Printf("InsertTrivySbomMetrics end func end : %#v ", metrics.Report.CycloneDX.Metadata.Component.Name)
+
+// }
+
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
 }
