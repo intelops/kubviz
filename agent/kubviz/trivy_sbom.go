@@ -27,6 +27,9 @@ func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) erro
 		log.Println("error occurred while marshalling sbom metrics in agent", err.Error())
 		return err
 	}
+	sizeInBytes := len(metricsJson)
+	sizeInMegabytes := float64(sizeInBytes) / (1024.0 * 1024.0)
+	log.Printf("Size of JSON payload: %.2f MB", sizeInMegabytes)
 	log.Println("reverifying after marshal")
 	var checker model.Sbom
 	err = json.Unmarshal(metricsJson, &checker)
