@@ -701,13 +701,13 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 		}
 		if _, err := stmt.Exec(
 			metrics.ID,
-			metrics.Report.CycloneDX.Metadata.Component.Name,
-			metrics.Report.CycloneDX.Metadata.Component.PackageURL,
-			metrics.Report.CycloneDX.Metadata.Component.BOMRef,
-			metrics.Report.CycloneDX.SerialNumber,
-			int32(metrics.Report.CycloneDX.Version),
-			metrics.Report.CycloneDX.BOMFormat,
-			metrics.Report.CycloneDX.Metadata.Component.Version,
+			metrics.Report.SBOM.CycloneDX.Metadata.Component.Name,
+			metrics.Report.SBOM.CycloneDX.Metadata.Component.PackageURL,
+			metrics.Report.SBOM.CycloneDX.Metadata.Component.BOMRef,
+			metrics.Report.SBOM.CycloneDX.SerialNumber,
+			int32(metrics.Report.SBOM.CycloneDX.Version),
+			metrics.Report.SBOM.CycloneDX.BOMFormat,
+			metrics.Report.SBOM.CycloneDX.Metadata.Component.Version,
 			result.MIMEType,
 		); err != nil {
 			log.Fatal(err)
