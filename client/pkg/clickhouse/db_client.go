@@ -33,7 +33,7 @@ type DBInterface interface {
 	InsertGitEvent(string)
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
 	InsertTrivyImageMetrics(metrics model.TrivyImage)
-	InsertTrivySbomMetrics(metrics model.Sbom)
+	InsertTrivySbomMetrics(metrics model.SbomData)
 	InsertTrivyMetrics(metrics model.Trivy)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
@@ -685,42 +685,33 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 
 	}
 }
-func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
+func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 	log.Println("####started inserting value")
-	result := metrics.Report
-
-	if result.CycloneDX != nil {
-		tx, err := c.conn.Begin()
-		if err != nil {
-			log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
-		}
-		stmt, err := tx.Prepare(InsertTrivySbom)
-		if err != nil {
-			log.Fatalf("error preparing statement: %v", err)
-		}
-
-		if _, err := stmt.Exec(
-			metrics.ID,
-			result.CycloneDX.Metadata.Component.Name,
-			result.CycloneDX.Metadata.Component.PackageURL,
-			result.CycloneDX.Metadata.Component.BOMRef,
-			result.CycloneDX.SerialNumber,
-			int32(result.CycloneDX.Version),
-			result.CycloneDX.BOMFormat,
-			result.CycloneDX.Metadata.Component.Version,
-			result.CycloneDX.Metadata.Component.MIMEType,
-		); err != nil {
-			log.Fatal(err)
-		}
-		if err := tx.Commit(); err != nil {
-			log.Fatal(err)
-		}
-		stmt.Close()
-	} else {
-		log.Println("sbom payload not available for db insertion, skipping db insertion")
-
+	tx, err := c.conn.Begin()
+	if err != nil {
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
 	}
-
+	stmt, err := tx.Prepare(InsertTrivySbom)
+	if err != nil {
+		log.Fatalf("error preparing statement: %v", err)
+	}
+	if _, err := stmt.Exec(
+		metrics.ID,
+		metrics.ComponentName,
+		metrics.PackageUrl,
+		metrics.BomRef,
+		metrics.SerialNumber,
+		int32(metrics.CycloneDxVersion),
+		metrics.BomFormat,
+		" ",
+		" ",
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	stmt.Close()
 }
 func (c *DBClient) Close() {
 	_ = c.conn.Close()

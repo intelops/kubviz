@@ -118,35 +118,20 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			Consumer: constants.Trivy_Sbom_Consumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
-				var metrics model.Sbom
+				var metrics model.SbomData
 				err := json.Unmarshal(msg.Data, &metrics)
 				if err != nil {
 					log.Println("failed to unmarshal from nats", err)
 					return
 				}
-				/* if _, err := stmt.Exec(
-					metrics.ID,
-					result.CycloneDX.Metadata.Component.Name,
-					result.CycloneDX.Metadata.Component.PackageURL,
-					result.CycloneDX.Metadata.Component.BOMRef,
-					result.CycloneDX.SerialNumber,
-					int32(result.CycloneDX.Version),
-					result.CycloneDX.BOMFormat,
-					result.CycloneDX.Metadata.Component.Version,
-					result.CycloneDX.Metadata.Component.MIMEType,
-				);
-				*/
-				report := metrics.Report
+
 				log.Println("sbom log from client side:")
-				log.Println("component name :", report.CycloneDX.Metadata.Component.Name)
-				log.Println("package url :", report.CycloneDX.Metadata.Component.PackageURL)
-				log.Println("bom ref :", report.CycloneDX.Metadata.Component.BOMRef)
-				log.Println("serial number :", report.CycloneDX.SerialNumber)
-				log.Println("cyclone dx version :", report.CycloneDX.Version)
-				log.Println("bom format :", report.CycloneDX.BOMFormat)
-				log.Println("component version :", report.CycloneDX.Metadata.Component.Version)
-				log.Println("mime type :", report.CycloneDX.Metadata.Component.MIMEType)
-				log.Printf("Trivy sbom Metrics Received: %#v,", metrics)
+				log.Println("component name :", metrics.ComponentName)
+				log.Println("package url :", metrics.PackageUrl)
+				log.Println("bom ref :", metrics.BomRef)
+				log.Println("serial number :", metrics.SerialNumber)
+				log.Println("cyclone dx version :", metrics.CycloneDxVersion)
+				log.Println("bom format :", metrics.BomFormat)
 				conn.InsertTrivySbomMetrics(metrics)
 				log.Println()
 			},

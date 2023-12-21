@@ -9,4 +9,12 @@ type Sbom struct {
 	Report cyclonedx.BOM
 }
 
-
+type SbomData struct {
+	ID               string
+	ComponentName    string
+	PackageUrl       string
+	BomRef           string
+	SerialNumber     string
+	CycloneDxVersion int
+	BomFormat        string
+}

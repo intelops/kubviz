@@ -18,9 +18,14 @@ import (
 
 func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) error {
 	log.Println("log from publishing in agent")
-	metrics := model.Sbom{
-		ID:     uuid.New().String(),
-		Report: report,
+	metrics := model.SbomData{
+		ID:               uuid.New().String(),
+		ComponentName:    report.CycloneDX.Metadata.Component.Name,
+		PackageUrl:       report.CycloneDX.Metadata.Component.PackageURL,
+		BomRef:           report.CycloneDX.Metadata.Component.BOMRef,
+		SerialNumber:     report.CycloneDX.SerialNumber,
+		CycloneDxVersion: report.CycloneDX.Version,
+		BomFormat:        report.CycloneDX.BOMFormat,
 	}
 	metricsJson, err := json.Marshal(metrics)
 	if err != nil {
@@ -31,21 +36,18 @@ func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) erro
 	sizeInMegabytes := float64(sizeInBytes) / (1024.0 * 1024.0)
 	log.Printf("Size of JSON payload: %.2f MB", sizeInMegabytes)
 	log.Println("reverifying after marshal")
-	var checker model.Sbom
+	var checker model.SbomData
 	err = json.Unmarshal(metricsJson, &checker)
-	log.Println("component name :", checker.Report.CycloneDX.Metadata.Component.Name)
-	log.Println("package url :", checker.Report.CycloneDX.Metadata.Component.PackageURL)
-	log.Println("bom ref :", checker.Report.CycloneDX.Metadata.Component.BOMRef)
-	log.Println("serial number :", checker.Report.CycloneDX.SerialNumber)
-	log.Println("cyclone dx version :", checker.Report.CycloneDX.Version)
-	log.Println("bom format :", checker.Report.CycloneDX.BOMFormat)
-	log.Println("component version :", checker.Report.CycloneDX.Metadata.Component.Version)
-	log.Println("mime type :", checker.Report.CycloneDX.Metadata.Component.MIMEType)
+	log.Println("component name :", checker.ComponentName)
+	log.Println("package url :", checker.PackageUrl)
+	log.Println("bom ref :", checker.BomRef)
+	log.Println("serial number :", checker.SerialNumber)
+	log.Println("cyclone dx version :", checker.CycloneDxVersion)
+	log.Println("bom format :", checker.BomFormat)
 	if err != nil {
 		log.Println("error occurred while unmarshalling sbom metrics in agent", err.Error())
 		return err
 	}
-
 	_, err = js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
 	if err != nil {
 		return err
@@ -102,28 +104,6 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
 			return err
 		}
-
-		/* if _, err := stmt.Exec(
-			metrics.ID,
-			result.CycloneDX.Metadata.Component.Name,
-			result.CycloneDX.Metadata.Component.PackageURL,
-			result.CycloneDX.Metadata.Component.BOMRef,
-			result.CycloneDX.SerialNumber,
-			int32(result.CycloneDX.Version),
-			result.CycloneDX.BOMFormat,
-			result.CycloneDX.Metadata.Component.Version,
-			result.CycloneDX.Metadata.Component.MIMEType,
-		);
-		*/
-		log.Println("sbom log from agent side:")
-		log.Println("component name :", report.CycloneDX.Metadata.Component.Name)
-		log.Println("package url :", report.CycloneDX.Metadata.Component.PackageURL)
-		log.Println("bom ref :", report.CycloneDX.Metadata.Component.BOMRef)
-		log.Println("serial number :", report.CycloneDX.SerialNumber)
-		log.Println("cyclone dx version :", report.CycloneDX.Version)
-		log.Println("bom format :", report.CycloneDX.BOMFormat)
-		log.Println("component version :", report.CycloneDX.Metadata.Component.Version)
-		log.Println("mime type :", report.CycloneDX.Metadata.Component.MIMEType)
 		publishTrivySbomReport(report, js)
 	}
 	return nil
