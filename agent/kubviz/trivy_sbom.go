@@ -17,12 +17,24 @@ import (
 )
 
 func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) error {
+	log.Println("log from publishing in agent")
 	metrics := model.Sbom{
 		ID:     uuid.New().String(),
 		Report: report,
 	}
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
+	metricsJson, err := json.Marshal(metrics)
+	if err != nil {
+		log.Println("error occurred while marshalling sbom metrics in agent", err.Error())
+		return err
+	}
+	log.Println("reverifying after marshal")
+	var checker model.Sbom
+	err = json.Unmarshal(metricsJson, &checker)
+	if err != nil {
+		log.Println("error occurred while unmarshalling sbom metrics in agent", err.Error())
+		return err
+	}
+	_, err = js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
 	if err != nil {
 		return err
 	}
@@ -38,6 +50,7 @@ func executeCommandSbom(command string) ([]byte, error) {
 	err := cmd.Run()
 	if err != nil {
 		log.Println("Execute SBOM Command Error", err.Error())
+		return nil, err
 	}
 	return outc.Bytes(), err
 }
@@ -62,6 +75,10 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			log.Printf("Error executing Trivy for image sbom %s: %v", image.PullableImage, err)
 			continue
 		}
+		if out == nil {
+			log.Printf("Trivy output is nil for image sbom %s", image.PullableImage)
+			continue
+		}
 		if len(out) == 0 {
 			log.Printf("Trivy output is empty for image sbom %s", image.PullableImage)
 			continue
@@ -71,7 +88,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		err = json.Unmarshal(out, &report)
 		if err != nil {
 			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
-			continue
+			return err
 		}
 
 		/* if _, err := stmt.Exec(
@@ -87,7 +104,6 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		);
 		*/
 		log.Println("sbom log from agent side:")
-		log.Println("sbom log from client side:")
 		log.Println("component name :", report.CycloneDX.Metadata.Component.Name)
 		log.Println("package url :", report.CycloneDX.Metadata.Component.PackageURL)
 		log.Println("bom ref :", report.CycloneDX.Metadata.Component.BOMRef)

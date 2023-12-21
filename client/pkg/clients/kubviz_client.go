@@ -122,6 +122,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 				err := json.Unmarshal(msg.Data, &metrics)
 				if err != nil {
 					log.Println("failed to unmarshal from nats", err)
+					return
 				}
 				/* if _, err := stmt.Exec(
 					metrics.ID,
