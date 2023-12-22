@@ -701,6 +701,7 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 			metrics.ID,
 			metrics.ClusterName,
 			metrics.ComponentName,
+			metrics.PackageName,
 			metrics.PackageUrl,
 			metrics.BomRef,
 			metrics.SerialNumber,

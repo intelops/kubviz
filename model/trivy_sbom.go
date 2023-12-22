@@ -13,6 +13,7 @@ type SbomData struct {
 	ID               string
 	ClusterName string
 	ComponentName    string
+	PackageName string
 	PackageUrl       string
 	BomRef           string
 	SerialNumber     string
