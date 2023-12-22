@@ -19,6 +19,7 @@ import (
 func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) error {
 	metrics := model.SbomData{
 		ID:               uuid.New().String(),
+		ClusterName: ClusterName,
 		ComponentName:    report.CycloneDX.Metadata.Component.Name,
 		PackageUrl:       report.CycloneDX.Metadata.Component.PackageURL,
 		BomRef:           report.CycloneDX.Metadata.Component.BOMRef,
@@ -92,6 +93,12 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			continue // Move on to the next image in case of an error
 		}
 		publishTrivySbomReport(report, js)
+
+		for _, packageInfo := range report.Packages {
+			for _, pkg := range packageInfo.Packages {
+				log.Printf("****Package name: %#v", pkg.Name)
+			}
+		}
 	}
 	return nil
 }

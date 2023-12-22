@@ -699,6 +699,7 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 
 		if _, err := stmt.Exec(
 			metrics.ID,
+			metrics.ClusterName,
 			metrics.ComponentName,
 			metrics.PackageUrl,
 			metrics.BomRef,
@@ -712,6 +713,8 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 			log.Fatal(err)
 		}
 		stmt.Close()
+
+		log.Printf("**Clustername :%#v",metrics.ClusterName)
 }
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
