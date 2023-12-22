@@ -20,14 +20,12 @@ func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) erro
 
 	for _,packageinfo :=range report.Packages {
 		for _, pkg := range packageinfo.Packages {
-			//log.Println(pkg.Name)
-
 
 	metrics := model.SbomData{
 		ID:               uuid.New().String(),
-		ClusterName: ClusterName,
+		ClusterName: 	ClusterName,
 		ComponentName:    report.CycloneDX.Metadata.Component.Name,
-		PackageName: pkg.Name,
+		PackageName: 	pkg.Name,
 		PackageUrl:       report.CycloneDX.Metadata.Component.PackageURL,
 		BomRef:           report.CycloneDX.Metadata.Component.BOMRef,
 		SerialNumber:     report.CycloneDX.SerialNumber,
@@ -44,10 +42,8 @@ func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) erro
 		return err
 	}
 	log.Printf("Trivy sbom report with Id %v has been published\n", metrics.ID)
-
 }
 }
-
 	return nil
 }
 
