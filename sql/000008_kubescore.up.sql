@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS kubescore (
-	id 				UUID,
 	clustername 	String,
+	id 				UUID,
 	object_name 	String,
 	kind 			String,
 	apiVersion 		String,

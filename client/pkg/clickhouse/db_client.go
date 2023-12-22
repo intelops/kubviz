@@ -537,8 +537,8 @@ func (c *DBClient) InsertKubeScoreMetrics(metrics model.KubeScoreRecommendations
 			for _, comments := range check.Comments {
 
 				if _, err := stmt.Exec(
-					metrics.ID,
 					metrics.ClusterName,
+					metrics.ID,
 					result.ObjectName,
 					result.TypeMeta.Kind,
 					result.TypeMeta.APIVersion,
