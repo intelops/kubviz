@@ -699,7 +699,9 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 
 		if _, err := stmt.Exec(
 			metrics.ID,
+			metrics.ClusterName,
 			metrics.ComponentName,
+			metrics.PackageName,
 			metrics.PackageUrl,
 			metrics.BomRef,
 			metrics.SerialNumber,
