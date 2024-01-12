@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,7 +12,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"k8s.io/client-go/rest"
 )
 
@@ -24,6 +28,12 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 		return err
 	}
 	// clearCacheCmd := "trivy image --clear-cache"
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("trivy-image")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyImageScans")
+	span.SetAttributes(attribute.String("trivy-image-scan-agent", "image-scan"))
+	defer span.End()
 
 	images, err := ListImages(config)
 	if err != nil {

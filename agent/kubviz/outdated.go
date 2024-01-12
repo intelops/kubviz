@@ -15,6 +15,9 @@ import (
 	"time"
 
 	"github.com/intelops/kubviz/constants"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
@@ -56,6 +59,13 @@ func truncateTagName(tagName string) string {
 	return truncatedTagName
 }
 func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext) error {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("outdated-images")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishOutdatedImages")
+	span.SetAttributes(attribute.String("outdated-plugin-agent", "outdated-output"))
+	defer span.End()
+	
 	metrics := out
 	metrics.ClusterName = ClusterName
 	metricsJson, _ := json.Marshal(metrics)

@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/intelops/go-common/logging"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
@@ -19,6 +21,7 @@ import (
 
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -98,6 +101,17 @@ func main() {
 		}
 		clientset = getK8sClient(config)
 	}
+
+	tp, err := opentelemetry.InitTracer()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer provider: %v", err)
+		}
+	}()
+	
 	go publishMetrics(clientset, js, clusterMetricsChan)
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
@@ -151,11 +165,25 @@ func main() {
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
 func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("kubviz-publish-metrics")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishMetrics")
+	span.SetAttributes(attribute.String("kubviz-agent", "publish-metrics"))
+	defer span.End()
+	
 	watchK8sEvents(clientset, js)
 	errCh <- nil
 }
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext) (bool, error) {
+	
+	ctx:=context.Background()
+	tracer := otel.Tracer("kubviz-publish-k8smetrics")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishK8sMetrics")
+	span.SetAttributes(attribute.String("kubviz-agent", "publish-k8smetrics"))
+	defer span.End()
+	
 	metrics := model.Metrics{
 		ID:          id,
 		Type:        mtype,
@@ -250,6 +278,13 @@ func LogErr(err error) {
 	}
 }
 func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("kubviz-watch-k8sevents")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "watchK8sEvents")
+	span.SetAttributes(attribute.String("kubviz-agent", "watch-k8sevents"))
+	defer span.End()
+
 	watchlist := cache.NewListWatchFromClient(
 		clientset.CoreV1().RESTClient(),
 		"events",
