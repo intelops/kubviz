@@ -9,11 +9,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/intelops/kubviz/model"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 var ErrInvalidPayloads = errors.New("invalid or malformed jfrog Container Registry webhook payload")
 
 func (ah *APIHandler) PostEventJfrogContainer(c *gin.Context) {
+
+	tracer := otel.Tracer("jfrog-container")
+	_, span := tracer.Start(c.Request.Context(), "PostEventJfrogContainer")
+	span.SetAttributes(attribute.String("http.method", "POST"))
+	defer span.End()
+	
 	defer func() {
 		_, _ = io.Copy(io.Discard, c.Request.Body)
 		_ = c.Request.Body.Close()

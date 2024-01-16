@@ -9,8 +9,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
 	"github.com/zegl/kube-score/renderer/json_v2"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
@@ -57,6 +60,13 @@ func publish(ns string, js nats.JetStreamContext) error {
 }
 
 func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamContext) error {
+	
+	ctx:=context.Background()
+	tracer := otel.Tracer("kubescore")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishKubescoreMetrics")
+	span.SetAttributes(attribute.String("kubescore-plugin-agent", "kubescore-output"))
+	defer span.End()
+	
 	metrics := model.KubeScoreRecommendations{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,
@@ -73,6 +83,13 @@ func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamCon
 }
 
 func executeCommand(command string) (string, error) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("kubescore")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommand")
+	span.SetAttributes(attribute.String("kubescore-agent", "kubescore-command-running"))
+	defer span.End()
+
 	cmd := exec.Command("/bin/sh", "-c", command)
 	stdout, err := cmd.Output()
 

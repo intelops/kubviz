@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log"
@@ -15,7 +16,10 @@ import (
 	"github.com/intelops/kubviz/gitmodels/azuremodel"
 	"github.com/intelops/kubviz/gitmodels/dbstatement"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // ErrHeaderEmpty defines an error occur when header is empty in git stream
@@ -36,6 +40,13 @@ const (
 // the respective funcs to insert data into clickhouse DB
 func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 	log.Printf("Creating nats consumer %s with subject: %s \n", bridgeConsumer, bridgeSubject)
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("git-client")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "SubscribeGitBridgeNats")
+	span.SetAttributes(attribute.String("git-subscribe", "Subscribe"))
+	defer span.End()
+	
 	n.stream.Subscribe(string(bridgeSubject), func(msg *nats.Msg) {
 		msg.Ack()
 		gitprovider := msg.Header.Get("GitProvider")

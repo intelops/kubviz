@@ -10,6 +10,9 @@ import (
 	"syscall"
 
 	"github.com/intelops/kubviz/constants"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/agent/kubviz/rakkess"
 	"github.com/intelops/kubviz/model"
@@ -34,6 +37,13 @@ func accessToOutcome(access rakkess.Access) (rakkess.Outcome, error) {
 }
 
 func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("rakees")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RakeesOutput")
+	span.SetAttributes(attribute.String("rakees-plugin-agent", "rakees-output"))
+	defer span.End()
+	
 	// Create a new Kubernetes client
 	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
