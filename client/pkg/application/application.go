@@ -21,7 +21,7 @@ func Start() *Application {
 	if err := envconfig.Process("", cfg); err != nil {
 		log.Fatalf("Could not parse env Config: %v", err)
 	}
-	dbClient, err := clickhouse.NewDBClient(cfg)
+	dbClient, _, err := clickhouse.NewDBClient(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

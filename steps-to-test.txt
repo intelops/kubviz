@@ -33,5 +33,46 @@ docker tag ubuntu:latest localhost:5001/ubuntu:v1
 docker push localhost:5001/ubuntu:v1
 
 
-# test commit
-# test mr build
+
+tables connected with namespace in common: outdated , kubescore , resources
+
+sample query:
+query {
+    allNamespaceData {
+      namespace
+      outdatedImages {
+        clusterName
+        namespace
+        pod
+        currentImage
+        currentTag
+        latestVersion
+        versionsBehind
+        eventTime
+      }
+      kubeScores {
+        id
+        clusterName
+        objectName
+        kind
+        apiVersion
+        name
+        namespace
+        targetType
+        description
+        path
+        summary
+        fileName
+        fileRow
+        eventTime
+      }
+      resources {
+        clusterName
+        namespace
+        kind
+        resource
+        age
+        eventTime
+      }
+    }
+  }

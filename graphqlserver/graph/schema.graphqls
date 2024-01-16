@@ -1,0 +1,47 @@
+type Query {
+  allNamespaceData: [NamespaceData!]!
+}
+
+type NamespaceData {
+  namespace: String!
+  outdatedImages: [OutdatedImage!]!
+  kubeScores: [KubeScore!]!
+  resources: [Resource!]!
+}
+
+type OutdatedImage {
+  clusterName: String!
+  namespace: String!
+  pod: String!
+  currentImage: String!
+  currentTag: String!
+  latestVersion: String!
+  versionsBehind: Int!
+  eventTime: String!
+}
+
+type KubeScore {
+  id: ID!
+  clusterName: String!
+  objectName: String!
+  kind: String!
+  apiVersion: String!
+  name: String!
+  namespace: String!
+  targetType: String!
+  description: String!
+  path: String!
+  summary: String!
+  fileName: String!
+  fileRow: Int!
+  eventTime: String!
+}
+
+type Resource {
+  clusterName: String!
+  namespace: String!
+  kind: String!
+  resource: String!
+  age: String!
+  eventTime: String!
+}

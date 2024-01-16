@@ -48,7 +48,7 @@ type DBInterface interface {
 	Close()
 }
 
-func NewDBClient(conf *config.Config) (DBInterface, error) {
+func NewDBClient(conf *config.Config) (DBInterface, *sql.DB, error) {
 	ctx := context.Background()
 	var connOptions clickhouse.Options
 
@@ -87,7 +87,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 
 	splconn, err := clickhouse.Open(&connOptions)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err := splconn.Ping(ctx); err != nil {
@@ -96,7 +96,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		} else {
 			fmt.Println("Authentication error:", err) // Print the error message here
 		}
-		return nil, err
+		return nil, nil, err
 	}
 
 	var connOption clickhouse.Options
@@ -126,10 +126,10 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		} else {
 			fmt.Println("Authentication error:", err)
 		}
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &DBClient{splconn: splconn, conn: stdconn, conf: conf}, nil
+	return &DBClient{splconn: splconn, conn: stdconn, conf: conf}, stdconn, nil
 }
 
 func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushEventPayload) {
@@ -688,32 +688,32 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 	log.Println("####started inserting value")
 
-		tx, err := c.conn.Begin()
-		if err != nil {
-			log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
-		}
-		stmt, err := tx.Prepare(InsertTrivySbom)
-		if err != nil {
-			log.Fatalf("error preparing statement: %v", err)
-		}
+	tx, err := c.conn.Begin()
+	if err != nil {
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
+	}
+	stmt, err := tx.Prepare(InsertTrivySbom)
+	if err != nil {
+		log.Fatalf("error preparing statement: %v", err)
+	}
 
-		if _, err := stmt.Exec(
-			metrics.ID,
-			metrics.ClusterName,
-			metrics.ComponentName,
-			metrics.PackageName,
-			metrics.PackageUrl,
-			metrics.BomRef,
-			metrics.SerialNumber,
-			int32(metrics.CycloneDxVersion),
-			metrics.BomFormat,
-		); err != nil {
-			log.Fatal(err)
-		}
-		if err := tx.Commit(); err != nil {
-			log.Fatal(err)
-		}
-		stmt.Close()
+	if _, err := stmt.Exec(
+		metrics.ID,
+		metrics.ClusterName,
+		metrics.ComponentName,
+		metrics.PackageName,
+		metrics.PackageUrl,
+		metrics.BomRef,
+		metrics.SerialNumber,
+		int32(metrics.CycloneDxVersion),
+		metrics.BomFormat,
+	); err != nil {
+		log.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	stmt.Close()
 }
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
