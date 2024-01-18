@@ -44,6 +44,8 @@ service:
   type: ClusterIP
   port: 80
 
+
+
 git_bridge:
   enabled: false
   image:
@@ -84,6 +86,7 @@ git_bridge:
     #  - secretName: chart-example-tls
     #    hosts:
     #      - chart-example.local
+
 
 
 
@@ -128,6 +131,7 @@ container_bridge:
     #    hosts:
     #      - chart-example.local
 
+    
 ingress:
   enabled: false
   annotations: {}
@@ -181,6 +185,11 @@ schedule:
   rakkessInterval: "@every 21h"
   kubepreupgradeInterval: "@every 22h"
   trivyInterval: "@every 24h"
+
+opentelemetry:
+  isEnabled: false
+  url: "otelcollector.local"
+  appName: "kubviz"
 
 clusterName: "kubviz"
 nats:

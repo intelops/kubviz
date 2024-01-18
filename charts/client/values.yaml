@@ -168,3 +168,9 @@ migration:
 ttl:
   ttlInterval: "1"
   ttlUnit: MONTH
+
+opentelemetry:
+  isEnabled: false
+  url: "otelcollector.local"
+  appName: "kubviz"
+ 
