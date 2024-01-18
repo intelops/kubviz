@@ -51,7 +51,9 @@ func (r *queryResolver) AllNamespaceData(ctx context.Context) ([]*model.Namespac
 	return namespaceDataList, nil
 }
 func (r *Resolver) fetchNamespacesFromDatabase(ctx context.Context) ([]string, error) {
-
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
 	query := `SELECT DISTINCT Namespace FROM events`
 
 	rows, err := r.DB.QueryContext(ctx, query)
@@ -76,7 +78,9 @@ func (r *Resolver) fetchNamespacesFromDatabase(ctx context.Context) ([]string, e
 	return namespaces, nil
 }
 func (r *Resolver) fetchOutdatedImages(ctx context.Context, namespace string) ([]*model.OutdatedImage, error) {
-
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
 	query := `SELECT ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind, EventTime FROM outdated_images WHERE Namespace = ?`
 
 	rows, err := r.DB.QueryContext(ctx, query, namespace)
@@ -102,7 +106,9 @@ func (r *Resolver) fetchOutdatedImages(ctx context.Context, namespace string) ([
 }
 
 func (r *Resolver) fetchKubeScores(ctx context.Context, namespace string) ([]*model.KubeScore, error) {
-
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
 	query := `SELECT id, ClusterName, ObjectName, Kind, ApiVersion, Name, Namespace, TargetType, Description, Path, Summary, FileName, FileRow, EventTime FROM kubescore WHERE Namespace = ?`
 
 	rows, err := r.DB.QueryContext(ctx, query, namespace)
@@ -127,7 +133,9 @@ func (r *Resolver) fetchKubeScores(ctx context.Context, namespace string) ([]*mo
 	return kubeScores, nil
 }
 func (r *Resolver) fetchResources(ctx context.Context, namespace string) ([]*model.Resource, error) {
-
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
 	query := `SELECT ClusterName, Namespace, Kind, Resource, Age, EventTime FROM getall_resources WHERE Namespace = ?`
 
 	rows, err := r.DB.QueryContext(ctx, query, namespace)
