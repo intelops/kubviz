@@ -75,6 +75,12 @@ spec:
             value: "{{ .Values.schedule.kubepreupgradeInterval }}"
           - name: TRIVY_INTERVAL
             value: "{{ .Values.schedule.trivyInterval }}"
+          - name: IS_OPTEL_ENABLED
+            value: "{{ .Values.opentelemetry.isEnabled }}"
+          - name : OPTEL_URL
+            value: {{ .Values.opentelemetry.url }}
+          - name : APPLICATION_NAME
+            value : {{ .Values.opentelemetry.appName }}
           {{- if .Values.persistence.enabled }}  
           volumeMounts:
           - name: data
@@ -115,6 +121,12 @@ spec:
             {{- end }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
+          - name: IS_OPTEL_ENABLED
+            value: "{{ .Values.opentelemetry.isEnabled }}"
+          - name : OPTEL_URL
+            value: {{ .Values.opentelemetry.url }}
+          - name : APPLICATION_NAME
+            value : {{ .Values.opentelemetry.appName }}
           {{- if .Values.git_bridge.persistence.enabled }}  
           volumeMounts:
           - name: data
@@ -156,6 +168,12 @@ spec:
             {{- end }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
+          - name: IS_OPTEL_ENABLED
+            value: "{{ .Values.opentelemetry.isEnabled }}"
+          - name : OPTEL_URL
+            value: {{ .Values.opentelemetry.url }}
+          - name : APPLICATION_NAME
+            value : {{ .Values.opentelemetry.appName }}
           {{- if .Values.container_bridge.persistence.enabled }}  
           volumeMounts:
           - name: data

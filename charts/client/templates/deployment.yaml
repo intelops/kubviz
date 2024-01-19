@@ -139,6 +139,12 @@ spec:
             value: "{{ .Values.ttl.ttlInterval }}"
           - name: TTL_UNIT
             value: {{ .Values.ttl.ttlUnit }}
+          - name: IS_OPTEL_ENABLED
+            value: "{{ .Values.opentelemetry.isEnabled }}"
+          - name : OPTEL_URL
+            value: {{ .Values.opentelemetry.url }}
+          - name : APPLICATION_NAME
+            value : {{ .Values.opentelemetry.appName }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
