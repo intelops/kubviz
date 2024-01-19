@@ -3,6 +3,16 @@ entries:
   agent:
   - apiVersion: v2
     appVersion: v1.1.4
+    created: "2024-01-19T08:21:20.016747833Z"
+    description: A Helm chart for kubeviz agent
+    digest: 7d2ec87105aba865760dca0c72945f41be86a733f9a062f39e3c16ff7005b448
+    name: agent
+    type: application
+    urls:
+    - https://github.com/intelops/kubviz/releases/download/agent-1.1.11/agent-1.1.11.tgz
+    version: 1.1.11
+  - apiVersion: v2
+    appVersion: v1.1.4
     created: "2023-12-29T15:53:10.887755962Z"
     description: A Helm chart for kubeviz agent
     digest: 4d5a5b07df01bb43869a3a4b567c54ceb780c807a2509465eb3ec8c0ec0d0b2e
@@ -323,6 +333,29 @@ entries:
     - https://github.com/kube-tarian/kubviz/releases/download/clickhouse-1.0.1/clickhouse-1.0.1.tgz
     version: 1.0.1
   client:
+  - apiVersion: v2
+    appVersion: v1.1.4
+    created: "2024-01-19T08:21:20.169731574Z"
+    dependencies:
+    - condition: nats.enabled
+      name: nats
+      repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
+      version: 1.0.0
+    - condition: clickhouse.enabled
+      name: clickhouse
+      repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
+      version: 1.0.2
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
+      version: 1.0.5
+    description: A Helm chart for kubeviz client
+    digest: 53fa13d0549a05dc631a5185597609cd041e2a9ffec1cb9352cc0c56cb6241e8
+    name: client
+    type: application
+    urls:
+    - https://github.com/intelops/kubviz/releases/download/client-1.1.16/client-1.1.16.tgz
+    version: 1.1.16
   - apiVersion: v2
     appVersion: v1.1.4
     created: "2024-01-03T14:55:58.651586619Z"
