@@ -1,5 +1,136 @@
 type Query {
   allNamespaceData: [NamespaceData!]!
+  allEvents: [Event!]!
+  allRakkess: [Rakkess!]!
+  allDeprecatedAPIs: [DeprecatedAPI!]!
+  allDeletedAPIs: [DeletedAPI!]!
+  allGetAllResources: [GetAllResource!]!
+  allTrivySBOMs: [TrivySBOM!]!
+  allTrivyImages: [TrivyImage!]!
+  allKubeScores: [Kubescore!]!
+  allTrivyVuls: [TrivyVul!]!
+  allTrivyMisconfigs: [TrivyMisconfig!]!
+}
+
+type TrivyMisconfig {
+    id: ID!
+    clusterName: String
+    namespace: String
+    kind: String
+    name: String
+    misconfigId: String
+    misconfigAvdid: String
+    misconfigType: String
+    misconfigTitle: String
+    misconfigDesc: String
+    misconfigMsg: String
+    misconfigQuery: String
+    misconfigResolution: String
+    misconfigSeverity: String
+    misconfigStatus: String
+    eventTime: String
+    expiryDate: String
+}
+
+type TrivyVul {
+    id: ID!
+    clusterName: String
+    namespace: String
+    kind: String
+    name: String
+    vulId: String
+    vulVendorIds: String
+    vulPkgId: String
+    vulPkgName: String
+    vulPkgPath: String
+    vulInstalledVersion: String
+    vulFixedVersion: String
+    vulTitle: String
+    vulSeverity: String
+    vulPublishedDate: String
+    vulLastModifiedDate: String
+    expiryDate: String
+}
+
+type Kubescore {
+    id: ID!
+    clusterName: String
+    objectName: String
+    kind: String
+    apiVersion: String
+    name: String
+    namespace: String
+    targetType: String
+    description: String
+    path: String
+    summary: String
+    fileName: String
+    fileRow: Int
+    eventTime: String
+    expiryDate: String
+}
+
+type TrivyImage {
+    id: ID!
+    clusterName: String
+    artifactName: String
+    vulId: String
+    vulPkgId: String
+    vulPkgName: String
+    vulInstalledVersion: String
+    vulFixedVersion: String
+    vulTitle: String
+    vulSeverity: String
+    vulPublishedDate: String
+    vulLastModifiedDate: String
+    expiryDate: String
+}
+
+type TrivySBOM {
+    id: ID!
+    clusterName: String
+    imageName: String
+    packageName: String
+    packageUrl: String
+    bomRef: String
+    serialNumber: String
+    version: Int
+    bomFormat: String
+    expiryDate: String
+}
+
+type GetAllResource {
+    ClusterName: String
+    Namespace: String
+    Kind: String
+    Resource: String
+    Age: String
+    EventTime: String
+    ExpiryDate: String
+}
+
+type DeletedAPI {
+    ClusterName: String
+    ObjectName: String
+    Group: String
+    Kind: String
+    Version: String
+    Name: String
+    Deleted: Boolean
+    Scope: String
+    EventTime: String
+    ExpiryDate: String
+}
+
+type DeprecatedAPI {
+    ClusterName: String
+    ObjectName: String
+    Description: String
+    Kind: String
+    Deprecated: Boolean
+    Scope: String
+    EventTime: String
+    ExpiryDate: String
 }
 
 type NamespaceData {
@@ -44,4 +175,32 @@ type Resource {
   resource: String!
   age: String!
   eventTime: String!
+}
+
+type Event {
+    ClusterName: String
+    Id: String
+    EventTime: String
+    OpType: String
+    Name: String
+    Namespace: String
+    Kind: String
+    Message: String
+    Reason: String
+    Host: String
+    Event: String
+    FirstTime: String
+    LastTime: String
+    ExpiryDate: String
+}
+
+type Rakkess {
+    ClusterName: String
+    Name: String
+    Create: String
+    Delete: String
+    List: String
+    Update: String
+    EventTime: String
+    ExpiryDate: String
 }
