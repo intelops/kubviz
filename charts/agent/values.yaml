@@ -192,6 +192,10 @@ opentelemetry:
   appName: "kubviz"
 
 clusterName: "kubviz"
+
+externalSecrets:
+  create: false
+
 nats:
   host: kubviz-client-nats 
   auth:
