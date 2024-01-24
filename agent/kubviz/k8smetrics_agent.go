@@ -21,6 +21,7 @@ import (
 
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/mtlsnats"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -64,6 +65,11 @@ var (
 	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)
 	cluster_conf_loc      string = os.Getenv("CONFIG_LOCATION")
 	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
+
+	//mtls variables
+	CertificateFilePath string = os.Getenv("CERT_FILE")
+	KeyFilePath string = os.Getenv("KEY_FILE")
+	CAFilePath string = os.Getenv("CA_FILE")
 )
 
 func main() {
@@ -78,8 +84,22 @@ func main() {
 		config    *rest.Config
 		clientset *kubernetes.Clientset
 	)
+
+	tlsConfig, err := mtlsnats.GetTlsConfig()
+	if err != nil {
+		log.Println("error while getting tls config ", err)
+		time.Sleep(time.Minute * 30)
+		log.Fatal("error while getting tls config ", err)
+	}
+
 	// connecting with nats ...
-	nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+	//nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+	nc, err := nats.Connect(
+		natsurl,
+		nats.Name("K8s Metrics"),
+		nats.Token(token),
+		nats.Secure(tlsConfig),
+	)
 	checkErr(err)
 	// creating a jetstream connection using the nats connection
 	js, err := nc.JetStream()

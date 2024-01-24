@@ -6,6 +6,7 @@ import (
 
 	"github.com/intelops/kubviz/agent/git/pkg/config"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/mtlsnats"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -34,7 +35,20 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	fmt.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
 
-	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
+	//conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
+
+	tlsConfig, err := mtlsnats.GetTlsConfig()
+	if err != nil {
+		log.Println("error while getting tls config ", err)
+		time.Sleep(time.Minute * 30)
+		log.Fatal("error while getting tls config ", err)
+	}
+	conn, err := nats.Connect(conf.NatsAddress,
+		nats.Name("Github metrics"),
+		nats.Token(conf.NatsToken),
+		nats.Secure(tlsConfig),
+	)
+
 	if err != nil {
 		return nil, err
 	}
