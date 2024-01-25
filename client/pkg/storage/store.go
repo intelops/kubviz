@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	_ "github.com/ClickHouse/clickhouse-go"
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
 	"github.com/intelops/kubviz/client/pkg/config"
 )
@@ -24,12 +23,7 @@ func ExportExpiredData(tableName string, conf *config.Config) error {
 	}
 
 	// Construct SQL query
-
-	query := fmt.Sprintf("SELECT * FROM %s WHERE ExpiryDate <= now() + toIntervalDay(1)", tableName)
-	// oneDayBefore := time.Now().Add(-24 * time.Hour).Format("2006-01-02")
-
-	// // Construct SQL query to get data one day before the expiry date
-	// query := fmt.Sprintf("SELECT * FROM %s WHERE ExpiryDate <= '%s'", tableName, oneDayBefore)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE ExportedAt IS NULL", tableName)
 
 	// Query expired data
 	rows, err := clickhouseDB.Query(query)
@@ -70,8 +64,16 @@ func ExportExpiredData(tableName string, conf *config.Config) error {
 		csvFile.WriteString(fmt.Sprintf("%s\n", rowData))
 	}
 
+	// Update ExportedAt column with the current timestamp for exported rows
+	updateQuery := fmt.Sprintf("ALTER TABLE %s UPDATE ExportedAt = now() WHERE ExportedAt IS NULL", tableName)
+	_, err = clickhouseDB.Exec(updateQuery)
+	if err != nil {
+		return fmt.Errorf("error updating ExportedAt column: %v", err)
+	}
+
 	return nil
 }
+
 func getTableColumns(db clickhouse.DBInterface, tableName string) (string, error) {
 	// Query to get column names
 	query := fmt.Sprintf("DESCRIBE TABLE %s", tableName)

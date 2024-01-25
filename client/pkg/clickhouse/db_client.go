@@ -49,13 +49,16 @@ type DBInterface interface {
 	InsertContainerEventGithub(string)
 	InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) error
 	Query(query string, args ...interface{}) (*sql.Rows, error)
+	Exec(query string, args ...interface{}) (sql.Result, error)
 	Close()
 }
 
 func (c *DBClient) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return c.conn.Query(query, args...)
 }
-
+func (c *DBClient) Exec(query string, args ...interface{}) (sql.Result, error) {
+	return c.conn.Exec(query, args...)
+}
 func NewDBClient(conf *config.Config) (DBInterface, error) {
 	ctx := context.Background()
 	var connOptions clickhouse.Options

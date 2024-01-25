@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS kubescore (
 	file_name 		String,
 	file_row  		BIGINT,
     EventTime       DateTime('UTC'),
-	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
+	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}},
+    ExportedAt  DateTime DEFAULT NULL
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
 TTL ExpiryDate;
