@@ -80,6 +80,9 @@ tolerations: []
 
 affinity: {}
 
+externalSecrets:
+  create: false
+
 nats:
   enabled: true
   #Authentication setup
