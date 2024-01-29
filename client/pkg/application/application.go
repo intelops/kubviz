@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"os"
 	"os/signal"
@@ -37,7 +38,7 @@ func Start() *Application {
 	if err := envconfig.Process("", cfg); err != nil {
 		log.Fatalf("Could not parse env Config: %v", err)
 	}
-	dbClient, err := clickhouse.NewDBClient(cfg)
+	dbClient, conn, err := clickhouse.NewDBClient(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,7 +49,7 @@ func Start() *Application {
 	}
 	c := cron.New()
 	_, err = c.AddFunc("@daily", func() {
-		if err := exportDataForTables(cfg); err != nil {
+		if err := exportDataForTables(conn); err != nil {
 			log.Println("Error exporting data:", err)
 		}
 	})
@@ -83,11 +84,11 @@ func (app *Application) Close() {
 	app.dbClient.Close()
 }
 
-func exportDataForTables(cfg *config.Config) error {
+func exportDataForTables(db *sql.DB) error {
 	tables := []string{"events", "rakkess", "DeprecatedAPIs", "DeletedAPIs", "jfrogcontainerpush", "getall_resources", "outdated_images", "kubescore", "trivy_vul", "trivy_misconfig", "trivyimage", "dockerhubbuild", "azurecontainerpush", "quaycontainerpush", "trivysbom", "azure_devops", "github", "gitlab", "bitbucket", "gitea"}
 
 	for _, tableName := range tables {
-		err := storage.ExportExpiredData(tableName, cfg)
+		err := storage.ExportExpiredData(tableName, db)
 		if err != nil {
 			log.Printf("Error exporting data for table %s: %v", tableName, err)
 		} else {

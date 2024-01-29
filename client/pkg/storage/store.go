@@ -1,23 +1,16 @@
 package storage
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
-
-	"github.com/intelops/kubviz/client/pkg/clickhouse"
-	"github.com/intelops/kubviz/client/pkg/config"
+	"strings"
 )
 
 // ExportExpiredData exports expired data from a specific table in ClickHouse to an external storage (S3 in this case).
-func ExportExpiredData(tableName string, conf *config.Config) error {
-	// Create ClickHouse database client
-	clickhouseDB, err := clickhouse.NewDBClient(conf)
-	if err != nil {
-		return fmt.Errorf("error creating ClickHouse database client: %v", err)
-	}
-	defer clickhouseDB.Close()
+func ExportExpiredData(tableName string, db *sql.DB) error { // Create ClickHouse database client
 
-	columns, err := getTableColumns(clickhouseDB, tableName)
+	columns, err := getTableColumns(db, tableName)
 	if err != nil {
 		return fmt.Errorf("error getting columns for table %s: %v", tableName, err)
 	}
@@ -26,7 +19,7 @@ func ExportExpiredData(tableName string, conf *config.Config) error {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE ExportedAt IS NULL", tableName)
 
 	// Query expired data
-	rows, err := clickhouseDB.Query(query)
+	rows, err := db.Query(query)
 	if err != nil {
 		return fmt.Errorf("error querying ClickHouse: %v", err)
 	}
@@ -57,16 +50,23 @@ func ExportExpiredData(tableName string, conf *config.Config) error {
 
 		// Write the values to the CSV file
 		var rowData []string
+		// for _, value := range columnValues {
+		// 	rowData = append(rowData, fmt.Sprintf("%v", *value.(*interface{})))
+		// }
 		for _, value := range columnValues {
+			// Dereference the pointer to get the interface{} value, then format it as a string
 			rowData = append(rowData, fmt.Sprintf("%v", *value.(*interface{})))
 		}
-
-		csvFile.WriteString(fmt.Sprintf("%s\n", rowData))
+		csvline := strings.Join(rowData, ",") + "\n"
+		_, err = csvFile.WriteString(fmt.Sprintf("%s\n", csvline))
+		if err != nil {
+			return fmt.Errorf("error writing into csv file: %v", err)
+		}
 	}
 
 	// Update ExportedAt column with the current timestamp for exported rows
 	updateQuery := fmt.Sprintf("ALTER TABLE %s UPDATE ExportedAt = now() WHERE ExportedAt IS NULL", tableName)
-	_, err = clickhouseDB.Exec(updateQuery)
+	_, err = db.Exec(updateQuery)
 	if err != nil {
 		return fmt.Errorf("error updating ExportedAt column: %v", err)
 	}
@@ -74,7 +74,7 @@ func ExportExpiredData(tableName string, conf *config.Config) error {
 	return nil
 }
 
-func getTableColumns(db clickhouse.DBInterface, tableName string) (string, error) {
+func getTableColumns(db *sql.DB, tableName string) (string, error) {
 	// Query to get column names
 	query := fmt.Sprintf("DESCRIBE TABLE %s", tableName)
 	rows, err := db.Query(query)
@@ -91,5 +91,5 @@ func getTableColumns(db clickhouse.DBInterface, tableName string) (string, error
 		columns = append(columns, columnName)
 	}
 
-	return fmt.Sprintf("%s", columns), nil
+	return strings.Join(columns, ","), nil
 }

@@ -48,18 +48,10 @@ type DBInterface interface {
 	InsertContainerEventJfrog(model.JfrogContainerPushEventPayload)
 	InsertContainerEventGithub(string)
 	InsertGitCommon(metrics model.GitCommonAttribute, statement dbstatement.DBStatement) error
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-	Exec(query string, args ...interface{}) (sql.Result, error)
 	Close()
 }
 
-func (c *DBClient) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	return c.conn.Query(query, args...)
-}
-func (c *DBClient) Exec(query string, args ...interface{}) (sql.Result, error) {
-	return c.conn.Exec(query, args...)
-}
-func NewDBClient(conf *config.Config) (DBInterface, error) {
+func NewDBClient(conf *config.Config) (DBInterface, *sql.DB, error) {
 	ctx := context.Background()
 	var connOptions clickhouse.Options
 
@@ -98,7 +90,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 
 	splconn, err := clickhouse.Open(&connOptions)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err := splconn.Ping(ctx); err != nil {
@@ -107,7 +99,7 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		} else {
 			fmt.Println("Authentication error:", err) // Print the error message here
 		}
-		return nil, err
+		return nil, nil, err
 	}
 
 	var connOption clickhouse.Options
@@ -137,10 +129,10 @@ func NewDBClient(conf *config.Config) (DBInterface, error) {
 		} else {
 			fmt.Println("Authentication error:", err)
 		}
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &DBClient{splconn: splconn, conn: stdconn, conf: conf}, nil
+	return &DBClient{splconn: splconn, conn: stdconn, conf: conf}, stdconn, nil
 }
 
 func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushEventPayload) {
