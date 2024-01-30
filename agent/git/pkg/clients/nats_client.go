@@ -37,20 +37,33 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 
 	//conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
 
-	tlsConfig, err := mtlsnats.GetTlsConfig()
-	if err != nil {
-		log.Println("error while getting tls config ", err)
-		time.Sleep(time.Minute * 30)
-		log.Fatal("error while getting tls config ", err)
-	}
-	conn, err := nats.Connect(conf.NatsAddress,
-		nats.Name("Github metrics"),
-		nats.Token(conf.NatsToken),
-		nats.Secure(tlsConfig),
-	)
+	var conn *nats.Conn
+	var err error
+	var mtlsConfig mtlsnats.MtlsConfig
 
-	if err != nil {
-		return nil, err
+	if mtlsConfig.IsEnabled {
+		tlsConfig, err := mtlsnats.GetTlsConfig()
+		if err != nil {
+			log.Println("error while getting tls config ", err)
+			time.Sleep(time.Minute * 30)
+		} else {
+			conn, err = nats.Connect(conf.NatsAddress,
+				nats.Name("Github metrics"),
+				nats.Token(conf.NatsToken),
+				nats.Secure(tlsConfig),
+			)
+			if err != nil {
+				log.Println("error while connecting with mtls ", err)
+			}
+		}
+
+	}
+
+	if conn == nil {
+		conn, err = nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
+		if err != nil {
+			return nil, fmt.Errorf("error while connecting with token: %w", err)
+		}
 	}
 
 	ctx := &NATSContext{
@@ -109,13 +122,13 @@ func (n *NATSContext) Close() {
 }
 
 func (n *NATSContext) Publish(metric []byte, repo string, eventkey model.EventKey, eventvalue model.EventValue) error {
-	
-	ctx:=context.Background()
+
+	ctx := context.Background()
 	tracer := otel.Tracer("git-nats-client")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "GitPublish")
 	span.SetAttributes(attribute.String("repo-name", repo))
 	defer span.End()
-	
+
 	msg := nats.NewMsg(eventSubject)
 	msg.Data = metric
 	msg.Header.Set("GitProvider", repo)

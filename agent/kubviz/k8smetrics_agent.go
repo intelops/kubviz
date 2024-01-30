@@ -65,11 +65,6 @@ var (
 	// uncomment this line from Dockerfile.Kubviz (COPY --from=builder /workspace/civo /etc/myapp/civo)
 	cluster_conf_loc      string = os.Getenv("CONFIG_LOCATION")
 	schedulingIntervalStr string = os.Getenv("SCHEDULING_INTERVAL")
-
-	//mtls variables
-	CertificateFilePath string = os.Getenv("CERT_FILE")
-	KeyFilePath string = os.Getenv("KEY_FILE")
-	CAFilePath string = os.Getenv("CA_FILE")
 )
 
 func main() {
@@ -85,22 +80,36 @@ func main() {
 		clientset *kubernetes.Clientset
 	)
 
-	tlsConfig, err := mtlsnats.GetTlsConfig()
-	if err != nil {
-		log.Println("error while getting tls config ", err)
-		time.Sleep(time.Minute * 30)
-		log.Fatal("error while getting tls config ", err)
+	var mtlsConfig mtlsnats.MtlsConfig
+	var nc *nats.Conn
+
+	if mtlsConfig.IsEnabled {
+		tlsConfig, err := mtlsnats.GetTlsConfig()
+		if err != nil {
+			log.Println("error while getting tls config ", err)
+			time.Sleep(time.Minute * 30)
+		} else {
+			nc, err = nats.Connect(
+				natsurl,
+				nats.Name("K8s Metrics"),
+				nats.Token(token),
+				nats.Secure(tlsConfig),
+			)
+			if err != nil {
+				log.Println("error while connecting with mtls ", err)
+			}
+		}
+
+	}
+
+	if nc == nil {
+		nc, err = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+		checkErr(err)
 	}
 
 	// connecting with nats ...
 	//nc, err := nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
-	nc, err := nats.Connect(
-		natsurl,
-		nats.Name("K8s Metrics"),
-		nats.Token(token),
-		nats.Secure(tlsConfig),
-	)
-	checkErr(err)
+
 	// creating a jetstream connection using the nats connection
 	js, err := nc.JetStream()
 	checkErr(err)
@@ -131,7 +140,7 @@ func main() {
 			log.Printf("Error shutting down tracer provider: %v", err)
 		}
 	}()
-	
+
 	go publishMetrics(clientset, js, clusterMetricsChan)
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
@@ -186,24 +195,24 @@ func main() {
 // with subject "METRICS.created"
 func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("kubviz-publish-metrics")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishMetrics")
 	span.SetAttributes(attribute.String("kubviz-agent", "publish-metrics"))
 	defer span.End()
-	
+
 	watchK8sEvents(clientset, js)
 	errCh <- nil
 }
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext) (bool, error) {
-	
-	ctx:=context.Background()
+
+	ctx := context.Background()
 	tracer := otel.Tracer("kubviz-publish-k8smetrics")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishK8sMetrics")
 	span.SetAttributes(attribute.String("kubviz-agent", "publish-k8smetrics"))
 	defer span.End()
-	
+
 	metrics := model.Metrics{
 		ID:          id,
 		Type:        mtype,
@@ -299,7 +308,7 @@ func LogErr(err error) {
 }
 func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("kubviz-watch-k8sevents")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "watchK8sEvents")
 	span.SetAttributes(attribute.String("kubviz-agent", "watch-k8sevents"))

@@ -6,13 +6,16 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/kelseyhightower/envconfig"
 )
 
-var (
-	CertificateFilePath string = os.Getenv("CERT_FILE")
-	KeyFilePath string = os.Getenv("KEY_FILE")
-	CAFilePath string = os.Getenv("CA_FILE")
-)
+type MtlsConfig struct {
+	CertificateFilePath string `envconfig:"CERT_FILE" default:""`
+	KeyFilePath         string `envconfig:"KEY_FILE" default:""`
+	CAFilePath          string `envconfig:"CA_FILE" default:""`
+	IsEnabled           bool   `envconfig:"IS_ENABLED" default:"false"`
+}
 
 func ReadMtlsCerts(certificateFilePath, keyFilePath, CAFilePath string) (certPEM, keyPEM, CACertPEM []byte, err error) {
 	certPEM, err = ReadMtlsFileContents(certificateFilePath)
@@ -35,35 +38,43 @@ func ReadMtlsCerts(certificateFilePath, keyFilePath, CAFilePath string) (certPEM
 
 	return
 
-
 }
 
 func OpenMtlsCertFile(filepath string) (f *os.File, err error) {
 	f, err = os.Open(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to open mtls certificate file: %w",err)
+		return nil, fmt.Errorf("Failed to open mtls certificate file: %w", err)
 	}
 	return f, nil
 }
 
 func ReadMtlsFileContents(filePath string) ([]byte, error) {
-	file,err := OpenMtlsCertFile(filePath)
+	file, err := OpenMtlsCertFile(filePath)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	defer file.Close()
 
 	contents, err := io.ReadAll(file)
 	if err != nil {
-		return nil, fmt.Errorf("Error while reading file %s:%w",filePath, err)
+		return nil, fmt.Errorf("Error while reading file %s:%w", filePath, err)
 	}
 
-	return contents,nil
+	return contents, nil
 }
 
 func GetTlsConfig() (*tls.Config, error) {
-	certPEM, keyPEM, CACertPEM, err := ReadMtlsCerts(CertificateFilePath, KeyFilePath, CAFilePath)
+
+	var cfg MtlsConfig
+	err := envconfig.Process("", &cfg)
+
+	if err != nil {
+		return nil, fmt.Errorf("Unable to read mtls config %w", err)
+
+	}
+
+	certPEM, keyPEM, CACertPEM, err := ReadMtlsCerts(cfg.CertificateFilePath, cfg.KeyFilePath, cfg.CAFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to read mtls certificates %w", err)
 
@@ -77,10 +88,10 @@ func GetTlsConfig() (*tls.Config, error) {
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(CACertPEM)
 	tlsConfig := &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		RootCAs: caCertPool,
+		Certificates:       []tls.Certificate{cert},
+		RootCAs:            caCertPool,
 		InsecureSkipVerify: false,
 	}
 
 	return tlsConfig, nil
-} 
+}
