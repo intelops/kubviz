@@ -14,7 +14,7 @@ type MtlsConfig struct {
 	CertificateFilePath string `envconfig:"CERT_FILE" default:""`
 	KeyFilePath         string `envconfig:"KEY_FILE" default:""`
 	CAFilePath          string `envconfig:"CA_FILE" default:""`
-	IsEnabled           bool   `envconfig:"IS_ENABLED" default:"false"`
+	IsEnabled           bool   `envconfig:"ENABLE_MTLS_NATS" default:"false"`
 }
 
 func ReadMtlsCerts(certificateFilePath, keyFilePath, CAFilePath string) (certPEM, keyPEM, CACertPEM []byte, err error) {
