@@ -25,6 +25,29 @@ type Application struct {
 	dbClient clickhouse.DBInterface
 }
 
+const (
+	EventsTable             = "events"
+	RakkessTable            = "rakkess"
+	DeprecatedAPIsTable     = "DeprecatedAPIs"
+	DeletedAPIsTable        = "DeletedAPIs"
+	JfrogContainerPushTable = "jfrogcontainerpush"
+	GetAllResourcesTable    = "getall_resources"
+	OutdatedImagesTable     = "outdated_images"
+	KubeScoreTable          = "kubescore"
+	TrivyVulTable           = "trivy_vul"
+	TrivyMisconfigTable     = "trivy_misconfig"
+	TrivyImageTable         = "trivyimage"
+	DockerHubBuildTable     = "dockerhubbuild"
+	AzureContainerPushTable = "azurecontainerpush"
+	QuayContainerPushTable  = "quaycontainerpush"
+	TrivySBOMTable          = "trivysbom"
+	AzureDevOpsTable        = "azure_devops"
+	GitHubTable             = "github"
+	GitLabTable             = "gitlab"
+	BitbucketTable          = "bitbucket"
+	GiteaTable              = "gitea"
+)
+
 func Start() *Application {
 	log.Println("Client Application started...")
 
@@ -85,10 +108,12 @@ func (app *Application) Close() {
 }
 
 func exportDataForTables(db *sql.DB) error {
-	tables := []string{"events", "rakkess", "DeprecatedAPIs", "DeletedAPIs", "jfrogcontainerpush", "getall_resources", "outdated_images", "kubescore", "trivy_vul", "trivy_misconfig", "trivyimage", "dockerhubbuild", "azurecontainerpush", "quaycontainerpush", "trivysbom", "azure_devops", "github", "gitlab", "bitbucket", "gitea"}
-
+	pvcMountPath := "/mnt/client/kbz"
+	tables := []string{
+		EventsTable, RakkessTable, DeprecatedAPIsTable, DeletedAPIsTable, JfrogContainerPushTable, GetAllResourcesTable, OutdatedImagesTable, KubeScoreTable, TrivyVulTable, TrivyMisconfigTable, TrivyImageTable, DockerHubBuildTable, AzureContainerPushTable, QuayContainerPushTable, TrivySBOMTable, AzureDevOpsTable, GitHubTable, GitLabTable, BitbucketTable, GiteaTable,
+	}
 	for _, tableName := range tables {
-		err := storage.ExportExpiredData(tableName, db)
+		err := storage.ExportExpiredData(tableName, db, pvcMountPath)
 		if err != nil {
 			log.Printf("Error exporting data for table %s: %v", tableName, err)
 		} else {
