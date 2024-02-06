@@ -395,6 +395,135 @@ func (r *queryResolver) AllTrivyMisconfigs(ctx context.Context) ([]*model.TrivyM
 	return misconfigs, nil
 }
 
+// UniqueClusters is the resolver for the uniqueClusters field.
+func (r *queryResolver) UniqueClusters(ctx context.Context) ([]string, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+	query := `SELECT DISTINCT ClusterName FROM events`
+
+	rows, err := r.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var clusters []string
+	for rows.Next() {
+		var cluster string
+		if err := rows.Scan(&cluster); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		clusters = append(clusters, cluster)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return clusters, nil
+}
+
+// UniqueNamespaces is the resolver for the uniqueNamespaces field.
+func (r *queryResolver) UniqueNamespaces(ctx context.Context) ([]string, error) {
+	return r.fetchNamespacesFromDatabase(ctx)
+}
+
+// OutdatedImagesByClusterAndNamespace is the resolver for the outdatedImagesByClusterAndNamespace field.
+func (r *queryResolver) OutdatedImagesByClusterAndNamespace(ctx context.Context, clusterName string, namespace string) ([]*model.OutdatedImage, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" || namespace == "" {
+		return nil, fmt.Errorf("clusterName and namespace cannot be empty")
+	}
+
+	query := `SELECT ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind, EventTime FROM outdated_images WHERE ClusterName = ? AND Namespace = ?`
+
+	rows, err := r.DB.QueryContext(ctx, query, clusterName, namespace)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return []*model.OutdatedImage{}, nil
+		}
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var outdatedImages []*model.OutdatedImage
+	for rows.Next() {
+		var oi model.OutdatedImage
+		if err := rows.Scan(&oi.ClusterName, &oi.Namespace, &oi.Pod, &oi.CurrentImage, &oi.CurrentTag, &oi.LatestVersion, &oi.VersionsBehind, &oi.EventTime); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		outdatedImages = append(outdatedImages, &oi)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return outdatedImages, nil
+}
+
+// OutdatedImagesCount is the resolver for the outdatedImagesCount field.
+func (r *queryResolver) OutdatedImagesCount(ctx context.Context, clusterName string, namespace string) (int, error) {
+	if r.DB == nil {
+		return 0, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" || namespace == "" {
+		return 0, fmt.Errorf("clusterName and namespace cannot be empty")
+	}
+
+	query := `SELECT COUNT(*) FROM outdated_images WHERE ClusterName = ? AND Namespace = ?`
+
+	var count int
+	err := r.DB.QueryRowContext(ctx, query, clusterName, namespace).Scan(&count)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
+		return 0, fmt.Errorf("error executing query: %v", err)
+	}
+
+	return count, nil
+}
+
+// AllClusterNamespaceOutdatedCounts is the resolver for the allClusterNamespaceOutdatedCounts field.
+func (r *queryResolver) AllClusterNamespaceOutdatedCounts(ctx context.Context) ([]*model.ClusterNamespaceOutdatedCount, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	query := `
+        SELECT ClusterName, Namespace, COUNT(*) as outdatedCount
+        FROM outdated_images
+        GROUP BY ClusterName, Namespace
+    `
+
+	rows, err := r.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var results []*model.ClusterNamespaceOutdatedCount
+	for rows.Next() {
+		var result model.ClusterNamespaceOutdatedCount
+		if err := rows.Scan(&result.ClusterName, &result.Namespace, &result.OutdatedCount); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		results = append(results, &result)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return results, nil
+}
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 

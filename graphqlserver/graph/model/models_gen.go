@@ -2,6 +2,12 @@
 
 package model
 
+type ClusterNamespaceOutdatedCount struct {
+	ClusterName   string `json:"clusterName"`
+	Namespace     string `json:"namespace"`
+	OutdatedCount int    `json:"outdatedCount"`
+}
+
 type DeletedAPI struct {
 	ClusterName *string `json:"ClusterName,omitempty"`
 	ObjectName  *string `json:"ObjectName,omitempty"`

@@ -46,6 +46,12 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	ClusterNamespaceOutdatedCount struct {
+		ClusterName   func(childComplexity int) int
+		Namespace     func(childComplexity int) int
+		OutdatedCount func(childComplexity int) int
+	}
+
 	DeletedAPI struct {
 		ClusterName func(childComplexity int) int
 		Deleted     func(childComplexity int) int
@@ -151,17 +157,22 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		AllDeletedAPIs     func(childComplexity int) int
-		AllDeprecatedAPIs  func(childComplexity int) int
-		AllEvents          func(childComplexity int) int
-		AllGetAllResources func(childComplexity int) int
-		AllKubeScores      func(childComplexity int) int
-		AllNamespaceData   func(childComplexity int) int
-		AllRakkess         func(childComplexity int) int
-		AllTrivyImages     func(childComplexity int) int
-		AllTrivyMisconfigs func(childComplexity int) int
-		AllTrivySBOMs      func(childComplexity int) int
-		AllTrivyVuls       func(childComplexity int) int
+		AllClusterNamespaceOutdatedCounts   func(childComplexity int) int
+		AllDeletedAPIs                      func(childComplexity int) int
+		AllDeprecatedAPIs                   func(childComplexity int) int
+		AllEvents                           func(childComplexity int) int
+		AllGetAllResources                  func(childComplexity int) int
+		AllKubeScores                       func(childComplexity int) int
+		AllNamespaceData                    func(childComplexity int) int
+		AllRakkess                          func(childComplexity int) int
+		AllTrivyImages                      func(childComplexity int) int
+		AllTrivyMisconfigs                  func(childComplexity int) int
+		AllTrivySBOMs                       func(childComplexity int) int
+		AllTrivyVuls                        func(childComplexity int) int
+		OutdatedImagesByClusterAndNamespace func(childComplexity int, clusterName string, namespace string) int
+		OutdatedImagesCount                 func(childComplexity int, clusterName string, namespace string) int
+		UniqueClusters                      func(childComplexity int) int
+		UniqueNamespaces                    func(childComplexity int) int
 	}
 
 	Rakkess struct {
@@ -266,6 +277,11 @@ type QueryResolver interface {
 	AllKubeScores(ctx context.Context) ([]*model.Kubescore, error)
 	AllTrivyVuls(ctx context.Context) ([]*model.TrivyVul, error)
 	AllTrivyMisconfigs(ctx context.Context) ([]*model.TrivyMisconfig, error)
+	UniqueClusters(ctx context.Context) ([]string, error)
+	UniqueNamespaces(ctx context.Context) ([]string, error)
+	OutdatedImagesByClusterAndNamespace(ctx context.Context, clusterName string, namespace string) ([]*model.OutdatedImage, error)
+	OutdatedImagesCount(ctx context.Context, clusterName string, namespace string) (int, error)
+	AllClusterNamespaceOutdatedCounts(ctx context.Context) ([]*model.ClusterNamespaceOutdatedCount, error)
 }
 
 type executableSchema struct {
@@ -286,6 +302,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "ClusterNamespaceOutdatedCount.clusterName":
+		if e.complexity.ClusterNamespaceOutdatedCount.ClusterName == nil {
+			break
+		}
+
+		return e.complexity.ClusterNamespaceOutdatedCount.ClusterName(childComplexity), true
+
+	case "ClusterNamespaceOutdatedCount.namespace":
+		if e.complexity.ClusterNamespaceOutdatedCount.Namespace == nil {
+			break
+		}
+
+		return e.complexity.ClusterNamespaceOutdatedCount.Namespace(childComplexity), true
+
+	case "ClusterNamespaceOutdatedCount.outdatedCount":
+		if e.complexity.ClusterNamespaceOutdatedCount.OutdatedCount == nil {
+			break
+		}
+
+		return e.complexity.ClusterNamespaceOutdatedCount.OutdatedCount(childComplexity), true
 
 	case "DeletedAPI.ClusterName":
 		if e.complexity.DeletedAPI.ClusterName == nil {
@@ -847,6 +884,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.OutdatedImage.VersionsBehind(childComplexity), true
 
+	case "Query.allClusterNamespaceOutdatedCounts":
+		if e.complexity.Query.AllClusterNamespaceOutdatedCounts == nil {
+			break
+		}
+
+		return e.complexity.Query.AllClusterNamespaceOutdatedCounts(childComplexity), true
+
 	case "Query.allDeletedAPIs":
 		if e.complexity.Query.AllDeletedAPIs == nil {
 			break
@@ -923,6 +967,44 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AllTrivyVuls(childComplexity), true
+
+	case "Query.outdatedImagesByClusterAndNamespace":
+		if e.complexity.Query.OutdatedImagesByClusterAndNamespace == nil {
+			break
+		}
+
+		args, err := ec.field_Query_outdatedImagesByClusterAndNamespace_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.OutdatedImagesByClusterAndNamespace(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
+
+	case "Query.outdatedImagesCount":
+		if e.complexity.Query.OutdatedImagesCount == nil {
+			break
+		}
+
+		args, err := ec.field_Query_outdatedImagesCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.OutdatedImagesCount(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
+
+	case "Query.uniqueClusters":
+		if e.complexity.Query.UniqueClusters == nil {
+			break
+		}
+
+		return e.complexity.Query.UniqueClusters(childComplexity), true
+
+	case "Query.uniqueNamespaces":
+		if e.complexity.Query.UniqueNamespaces == nil {
+			break
+		}
+
+		return e.complexity.Query.UniqueNamespaces(childComplexity), true
 
 	case "Rakkess.ClusterName":
 		if e.complexity.Rakkess.ClusterName == nil {
@@ -1544,6 +1626,54 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_outdatedImagesByClusterAndNamespace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_outdatedImagesCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1581,6 +1711,138 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _ClusterNamespaceOutdatedCount_clusterName(ctx context.Context, field graphql.CollectedField, obj *model.ClusterNamespaceOutdatedCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterNamespaceOutdatedCount_clusterName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterNamespaceOutdatedCount_clusterName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterNamespaceOutdatedCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterNamespaceOutdatedCount_namespace(ctx context.Context, field graphql.CollectedField, obj *model.ClusterNamespaceOutdatedCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterNamespaceOutdatedCount_namespace(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Namespace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterNamespaceOutdatedCount_namespace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterNamespaceOutdatedCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterNamespaceOutdatedCount_outdatedCount(ctx context.Context, field graphql.CollectedField, obj *model.ClusterNamespaceOutdatedCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterNamespaceOutdatedCount_outdatedCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OutdatedCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterNamespaceOutdatedCount_outdatedCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterNamespaceOutdatedCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _DeletedAPI_ClusterName(ctx context.Context, field graphql.CollectedField, obj *model.DeletedAPI) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DeletedAPI_ClusterName(ctx, field)
@@ -5752,6 +6014,274 @@ func (ec *executionContext) fieldContext_Query_allTrivyMisconfigs(ctx context.Co
 				return ec.fieldContext_TrivyMisconfig_expiryDate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TrivyMisconfig", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_uniqueClusters(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_uniqueClusters(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().UniqueClusters(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_uniqueClusters(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_uniqueNamespaces(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_uniqueNamespaces(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().UniqueNamespaces(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_uniqueNamespaces(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_outdatedImagesByClusterAndNamespace(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_outdatedImagesByClusterAndNamespace(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().OutdatedImagesByClusterAndNamespace(rctx, fc.Args["clusterName"].(string), fc.Args["namespace"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.OutdatedImage)
+	fc.Result = res
+	return ec.marshalNOutdatedImage2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐOutdatedImageᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_outdatedImagesByClusterAndNamespace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "clusterName":
+				return ec.fieldContext_OutdatedImage_clusterName(ctx, field)
+			case "namespace":
+				return ec.fieldContext_OutdatedImage_namespace(ctx, field)
+			case "pod":
+				return ec.fieldContext_OutdatedImage_pod(ctx, field)
+			case "currentImage":
+				return ec.fieldContext_OutdatedImage_currentImage(ctx, field)
+			case "currentTag":
+				return ec.fieldContext_OutdatedImage_currentTag(ctx, field)
+			case "latestVersion":
+				return ec.fieldContext_OutdatedImage_latestVersion(ctx, field)
+			case "versionsBehind":
+				return ec.fieldContext_OutdatedImage_versionsBehind(ctx, field)
+			case "eventTime":
+				return ec.fieldContext_OutdatedImage_eventTime(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OutdatedImage", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_outdatedImagesByClusterAndNamespace_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_outdatedImagesCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_outdatedImagesCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().OutdatedImagesCount(rctx, fc.Args["clusterName"].(string), fc.Args["namespace"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_outdatedImagesCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_outdatedImagesCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_allClusterNamespaceOutdatedCounts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_allClusterNamespaceOutdatedCounts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AllClusterNamespaceOutdatedCounts(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ClusterNamespaceOutdatedCount)
+	fc.Result = res
+	return ec.marshalNClusterNamespaceOutdatedCount2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceOutdatedCountᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_allClusterNamespaceOutdatedCounts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "clusterName":
+				return ec.fieldContext_ClusterNamespaceOutdatedCount_clusterName(ctx, field)
+			case "namespace":
+				return ec.fieldContext_ClusterNamespaceOutdatedCount_namespace(ctx, field)
+			case "outdatedCount":
+				return ec.fieldContext_ClusterNamespaceOutdatedCount_outdatedCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ClusterNamespaceOutdatedCount", field.Name)
 		},
 	}
 	return fc, nil
@@ -10608,6 +11138,55 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** object.gotpl ****************************
 
+var clusterNamespaceOutdatedCountImplementors = []string{"ClusterNamespaceOutdatedCount"}
+
+func (ec *executionContext) _ClusterNamespaceOutdatedCount(ctx context.Context, sel ast.SelectionSet, obj *model.ClusterNamespaceOutdatedCount) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, clusterNamespaceOutdatedCountImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClusterNamespaceOutdatedCount")
+		case "clusterName":
+			out.Values[i] = ec._ClusterNamespaceOutdatedCount_clusterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "namespace":
+			out.Values[i] = ec._ClusterNamespaceOutdatedCount_namespace(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "outdatedCount":
+			out.Values[i] = ec._ClusterNamespaceOutdatedCount_outdatedCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deletedAPIImplementors = []string{"DeletedAPI"}
 
 func (ec *executionContext) _DeletedAPI(ctx context.Context, sel ast.SelectionSet, obj *model.DeletedAPI) graphql.Marshaler {
@@ -11382,6 +11961,116 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "uniqueClusters":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_uniqueClusters(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "uniqueNamespaces":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_uniqueNamespaces(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "outdatedImagesByClusterAndNamespace":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_outdatedImagesByClusterAndNamespace(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "outdatedImagesCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_outdatedImagesCount(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "allClusterNamespaceOutdatedCounts":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_allClusterNamespaceOutdatedCounts(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -12130,6 +12819,60 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNClusterNamespaceOutdatedCount2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceOutdatedCountᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ClusterNamespaceOutdatedCount) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNClusterNamespaceOutdatedCount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceOutdatedCount(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNClusterNamespaceOutdatedCount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceOutdatedCount(ctx context.Context, sel ast.SelectionSet, v *model.ClusterNamespaceOutdatedCount) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ClusterNamespaceOutdatedCount(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNDeletedAPI2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐDeletedAPIᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.DeletedAPI) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -12713,6 +13456,38 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNTrivyImage2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐTrivyImageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TrivyImage) graphql.Marshaler {

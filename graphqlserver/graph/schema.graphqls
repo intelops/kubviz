@@ -10,6 +10,17 @@ type Query {
   allKubeScores: [Kubescore!]!
   allTrivyVuls: [TrivyVul!]!
   allTrivyMisconfigs: [TrivyMisconfig!]!
+  uniqueClusters: [String!]!
+  uniqueNamespaces: [String!]!
+  outdatedImagesByClusterAndNamespace(clusterName: String!, namespace: String!): [OutdatedImage!]!
+  outdatedImagesCount(clusterName: String!, namespace: String!): Int!
+  allClusterNamespaceOutdatedCounts: [ClusterNamespaceOutdatedCount!]!
+}
+
+type ClusterNamespaceOutdatedCount {
+  clusterName: String!
+  namespace: String!
+  outdatedCount: Int!
 }
 
 type TrivyMisconfig {
