@@ -264,11 +264,13 @@ func getK8sPods(clientset *kubernetes.Clientset) string {
 		sb.WriteString(pod.Namespace)
 		sb.WriteString("   ")
 
-		// Iterate over each container in the pod
-		for _, container := range pod.Spec.Containers {
-			sb.WriteString("Container-" + container.Name + ": ")
-			sb.WriteString(container.Image)
-			sb.WriteString("   ")
+		// Check if pod has containers
+		if len(pod.Spec.Containers) > 0 {
+			for _, container := range pod.Spec.Containers {
+				sb.WriteString("Container-" + container.Name + ": ")
+				sb.WriteString(container.Image)
+				sb.WriteString("   ")
+			}
 		}
 	}
 	return sb.String()
