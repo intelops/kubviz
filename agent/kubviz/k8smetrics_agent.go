@@ -181,10 +181,6 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 	log.Println("*****mdata printing", mdata)
 	log.Println("*****images", imageNames)
 
-	if len(imageNames) == 0 {
-		log.Println("imageNames length is 0")
-	}
-
 	// _, imageNames := getK8sPods(clientset)
 	// log.Println("***************Image Names:", imageNames)
 
@@ -204,10 +200,12 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 	log.Println("*****struct printing", metrics.Event)
 
 	metricsJson, _ := json.Marshal(metrics)
+	log.Println("$$$metricsJson", string(metricsJson))
 	_, err := js.Publish(constants.EventSubject, metricsJson)
 	if err != nil {
 		return true, err
 	}
+	log.Println("$$$after publish", metrics.ImageNames)
 	log.Printf("Metrics with ID:%s has been published\n", id)
 
 	log.Println("*****after marshal printing", mdata)
