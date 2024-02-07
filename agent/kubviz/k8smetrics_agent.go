@@ -179,6 +179,11 @@ func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, e
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, clientset *kubernetes.Clientset, imageNames []string) (bool, error) {
 
 	log.Println("*****mdata printing", mdata)
+	log.Println("*****images", imageNames)
+
+	if len(imageNames) == 0 {
+		log.Println("imageNames length is 0")
+	}
 
 	// _, imageNames := getK8sPods(clientset)
 	// log.Println("***************Image Names:", imageNames)
