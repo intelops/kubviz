@@ -176,12 +176,12 @@ func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, e
 	errCh <- nil
 }
 
-func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, clientset *kubernetes.Clientset) (bool, error) {
+func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, clientset *kubernetes.Clientset, imageNames []string) (bool, error) {
 
 	log.Println("*****mdata printing", mdata)
 
-	_, imageNames := getK8sPods(clientset)
-	log.Println("***************Image Names:", imageNames)
+	// _, imageNames := getK8sPods(clientset)
+	// log.Println("***************Image Names:", imageNames)
 
 	ctx := context.Background()
 	tracer := otel.Tracer("kubviz-publish-k8smetrics")
@@ -194,6 +194,7 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 		Type:        mtype,
 		Event:       mdata,
 		ClusterName: ClusterName,
+		ImageNames:  imageNames,
 	}
 	log.Println("*****struct printing", metrics.Event)
 
@@ -275,8 +276,8 @@ func getK8sPods(clientset *kubernetes.Clientset) (string, []string) {
 				sb.WriteString(container.Image)
 				sb.WriteString("   ")
 				imageNames = append(imageNames, container.Image)
-				log.Println("%%%%")
-				log.Println("Pod:", pod.Name, "Container:", container.Name, "Image:", container.Image)
+				//log.Println("%%%%")
+				//log.Println("Pod:", pod.Name, "Container:", container.Name, "Image:", container.Image)
 			}
 		}
 	}
@@ -328,6 +329,8 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 	span.SetAttributes(attribute.String("kubviz-agent", "watch-k8sevents"))
 	defer span.End()
 
+	_, imageNames := getK8sPods(clientset)
+
 	watchlist := cache.NewListWatchFromClient(
 		clientset.CoreV1().RESTClient(),
 		"events",
@@ -341,15 +344,15 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
-				publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, clientset)
+				publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, clientset, imageNames)
 			},
 			DeleteFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
-				publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, clientset)
+				publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, clientset, imageNames)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				event := newObj.(*v1.Event)
-				publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, clientset)
+				publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, clientset, imageNames)
 			},
 		},
 	)
