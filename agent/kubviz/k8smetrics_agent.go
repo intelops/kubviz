@@ -233,6 +233,23 @@ func getK8sClient(config *rest.Config) *kubernetes.Clientset {
 	return clientset
 }
 
+// func getK8sPods(clientset *kubernetes.Clientset) string {
+// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+// 	defer cancel()
+// 	pods, err := clientset.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
+// 	checkErr(err)
+// 	var sb strings.Builder
+// 	for i, pod := range pods.Items {
+// 		sb.WriteString("Name-" + strconv.Itoa(i) + ": ")
+// 		sb.WriteString(pod.Name)
+// 		sb.WriteString("   ")
+// 		sb.WriteString("Namespace-" + strconv.Itoa(i) + ": ")
+// 		sb.WriteString(pod.Namespace)
+// 		sb.WriteString("   ")
+// 	}
+// 	return sb.String()
+// }
+
 func getK8sPods(clientset *kubernetes.Clientset) string {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -246,6 +263,13 @@ func getK8sPods(clientset *kubernetes.Clientset) string {
 		sb.WriteString("Namespace-" + strconv.Itoa(i) + ": ")
 		sb.WriteString(pod.Namespace)
 		sb.WriteString("   ")
+
+		// Iterate over each container in the pod
+		for _, container := range pod.Spec.Containers {
+			sb.WriteString("Container-" + container.Name + ": ")
+			sb.WriteString(container.Image)
+			sb.WriteString("   ")
+		}
 	}
 	return sb.String()
 }
