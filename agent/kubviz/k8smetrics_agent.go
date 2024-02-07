@@ -270,6 +270,8 @@ func getK8sPods(clientset *kubernetes.Clientset) string {
 				sb.WriteString("Container-" + container.Name + ": ")
 				sb.WriteString(container.Image)
 				sb.WriteString("   ")
+				log.Println("%%%%")
+				log.Println("Pod:", pod.Name, "Container:", container.Name, "Image:", container.Image)
 			}
 		}
 	}
