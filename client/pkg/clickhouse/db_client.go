@@ -543,6 +543,7 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 		metrics.Event.Reason,
 		metrics.Event.Source.Host,
 		string(eventJson),
+		metrics.ImageNames,
 		formattedFirstTimestamp,
 		formattedLastTimestamp,
 	); err != nil {

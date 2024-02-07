@@ -7,5 +7,5 @@ type Metrics struct {
 	Type        string
 	Event       *v1.Event
 	ClusterName string
-	ImageNames  []string
+	ImageNames  string
 }

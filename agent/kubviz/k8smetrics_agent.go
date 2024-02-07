@@ -177,13 +177,9 @@ func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, e
 	errCh <- nil
 }
 
-func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, clientset *kubernetes.Clientset, imageNames []string) (bool, error) {
+func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, clientset *kubernetes.Clientset, imageNames string) (bool, error) {
 
-	//log.Println("*****mdata printing", mdata)
 	log.Println("*****images", imageNames)
-
-	// _, imageNames := getK8sPods(clientset)
-	// log.Println("***************Image Names:", imageNames)
 
 	ctx := context.Background()
 	tracer := otel.Tracer("kubviz-publish-k8smetrics")
@@ -198,10 +194,8 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 		ClusterName: ClusterName,
 		ImageNames:  imageNames,
 	}
-	log.Println("*****struct printing", metrics)
 
 	metricsJson, _ := json.Marshal(metrics)
-	log.Println("$$$metricsJson", string(metricsJson))
 	_, err := js.Publish(constants.EventSubject, metricsJson)
 	if err != nil {
 		return true, err
@@ -371,7 +365,7 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 					log.Println("Error retrieving image name:", err)
 					return
 				}
-				publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, clientset, []string{image})
+				publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, clientset, image)
 			},
 			DeleteFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
@@ -380,7 +374,7 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 					log.Println("Error retrieving image name:", err)
 					return
 				}
-				publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, clientset, []string{image})
+				publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, clientset, image)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				event := newObj.(*v1.Event)
@@ -389,7 +383,7 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 					log.Println("Error retrieving image name:", err)
 					return
 				}
-				publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, clientset, []string{image})
+				publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, clientset, image)
 			},
 		},
 	)
