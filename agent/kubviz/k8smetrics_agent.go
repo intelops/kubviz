@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/intelops/go-common/logging"
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
@@ -178,7 +179,7 @@ func publishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, e
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, clientset *kubernetes.Clientset, imageNames []string) (bool, error) {
 
-	log.Println("*****mdata printing", mdata)
+	//log.Println("*****mdata printing", mdata)
 	log.Println("*****images", imageNames)
 
 	// _, imageNames := getK8sPods(clientset)
@@ -197,7 +198,7 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 		ClusterName: ClusterName,
 		ImageNames:  imageNames,
 	}
-	log.Println("*****struct printing", metrics.Event)
+	log.Println("*****struct printing", metrics)
 
 	metricsJson, _ := json.Marshal(metrics)
 	log.Println("$$$metricsJson", string(metricsJson))
@@ -208,7 +209,7 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 	log.Println("$$$after publish", metrics.ImageNames)
 	log.Printf("Metrics with ID:%s has been published\n", id)
 
-	log.Println("*****after marshal printing", mdata)
+	//log.Println("*****after marshal printing", mdata)
 
 	return false, nil
 }
@@ -256,6 +257,24 @@ func getK8sClient(config *rest.Config) *kubernetes.Clientset {
 // 	}
 // 	return sb.String()
 // }
+
+func getK8sPodImage(clientset *kubernetes.Clientset, namespace, podName string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	pod, err := clientset.CoreV1().Pods(namespace).Get(ctx, podName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	// Check if pod has containers
+	if len(pod.Spec.Containers) > 0 {
+		// Assuming only one container in the pod for simplicity
+		return pod.Spec.Containers[0].Image, nil
+	}
+
+	return "", errors.New("no containers found in the pod")
+}
 
 func getK8sPods(clientset *kubernetes.Clientset) (string, []string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -332,7 +351,7 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 	span.SetAttributes(attribute.String("kubviz-agent", "watch-k8sevents"))
 	defer span.End()
 
-	_, imageNames := getK8sPods(clientset)
+	// _, imageNames := getK8sPods(clientset)
 
 	watchlist := cache.NewListWatchFromClient(
 		clientset.CoreV1().RESTClient(),
@@ -347,15 +366,30 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
-				publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, clientset, imageNames)
+				image, err := getK8sPodImage(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
+				if err != nil {
+					log.Println("Error retrieving image name:", err)
+					return
+				}
+				publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, clientset, []string{image})
 			},
 			DeleteFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
-				publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, clientset, imageNames)
+				image, err := getK8sPodImage(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
+				if err != nil {
+					log.Println("Error retrieving image name:", err)
+					return
+				}
+				publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, clientset, []string{image})
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				event := newObj.(*v1.Event)
-				publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, clientset, imageNames)
+				image, err := getK8sPodImage(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
+				if err != nil {
+					log.Println("Error retrieving image name:", err)
+					return
+				}
+				publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, clientset, []string{image})
 			},
 		},
 	)
