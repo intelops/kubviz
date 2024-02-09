@@ -177,3 +177,14 @@ opentelemetry:
   url: "otelcollector.local"
   appName: "kubviz"
  
+consumer:
+  ketallconsumer: "KETALL_EVENTS_CONSUMER"
+  rakeesconsumer: "RAKEES_METRICS_CONSUMER"
+  outdatedconsumer: "OUTDATED_EVENTS_CONSUMER"
+  deprecatedconsumer: "DEPRECATED_API_CONSUMER"
+  deletedconsumer: "DELETED_API_CONSUMER"
+  kubvizconsumer: "KUBVIZ_EVENTS_CONSUMER"
+  kubscoreconsumer: "KUBSCORE_CONSUMER"
+  trivyconsumer: "TRIVY_CONSUMER"
+  trivyimageconsumer: "TRIVY_IMAGE_CONSUMER"
+  trivysbomconsumer: "TRIVY_SBOM_CONSUMER"
