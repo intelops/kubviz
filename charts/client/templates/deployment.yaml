@@ -145,6 +145,26 @@ spec:
             value: {{ .Values.opentelemetry.url }}
           - name : APPLICATION_NAME
             value : {{ .Values.opentelemetry.appName }}
+          - name : KETALL_EVENTS_CONSUMER
+            value : {{ .Values.consumer.ketallconsumer }}
+          - name : RAKEES_METRICS_CONSUMER
+            value : {{ .Values.consumer.rakeesconsumer }}
+          - name : OUTDATED_EVENTS_CONSUMER
+            value : {{ .Values.consumer.outdatedconsumer }}
+          - name : DEPRECATED_API_CONSUMER
+            value : {{ .Values.consumer.deprecatedconsumer }}
+          - name : DELETED_API_CONSUMER
+            value : {{ .Values.consumer.deletedconsumer }}
+          - name : KUBVIZ_EVENTS_CONSUMER
+            value : {{ .Values.consumer.kubvizconsumer }}
+          - name : KUBSCORE_CONSUMER
+            value : {{ .Values.consumer.kubscoreconsumer }}
+          - name : TRIVY_CONSUMER
+            value : {{ .Values.consumer.trivyconsumer }}
+          - name : TRIVY_IMAGE_CONSUMER
+            value : {{ .Values.consumer.trivyimageconsumer }}
+          - name : TRIVY_SBOM_CONSUMER
+            value : {{ .Values.consumer.trivysbomconsumer }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
