@@ -33,5 +33,103 @@ docker tag ubuntu:latest localhost:5001/ubuntu:v1
 docker push localhost:5001/ubuntu:v1
 
 
-# test commit
-# test mr build
+
+tables connected with namespace in common: outdated , kubescore , resources
+
+sample query:
+query {
+    allNamespaceData {
+      namespace
+      outdatedImages {
+        clusterName
+        namespace
+        pod
+        currentImage
+        currentTag
+        latestVersion
+        versionsBehind
+        eventTime
+      }
+      kubeScores {
+        id
+        clusterName
+        objectName
+        kind
+        apiVersion
+        name
+        namespace
+        targetType
+        description
+        path
+        summary
+        fileName
+        fileRow
+        eventTime
+      }
+      resources {
+        clusterName
+        namespace
+        kind
+        resource
+        age
+        eventTime
+      }
+    }
+  }
+
+
+  sample response:
+
+  {
+    "data": {
+      "allNamespaceData": [
+        {
+          "namespace": "namespace1",
+          "outdatedImages": [
+            {
+              "clusterName": "cluster1",
+              "namespace": "namespace1",
+              "pod": "pod1",
+              "currentImage": "image1:v1",
+              "currentTag": "v1",
+              "latestVersion": "v2",
+              "versionsBehind": 1,
+              "eventTime": "2022-01-01T12:00:00Z"
+            },
+            // ... more outdatedImages for namespace1 ...
+          ],
+          "kubeScores": [
+            {
+              "id": "ks1",
+              "clusterName": "cluster1",
+              "objectName": "object1",
+              "kind": "Deployment",
+              "apiVersion": "v1",
+              "name": "deployment1",
+              "namespace": "namespace1",
+              "targetType": "type1",
+              "description": "description1",
+              "path": "path1",
+              "summary": "summary1",
+              "fileName": "file1",
+              "fileRow": 10,
+              "eventTime": "2022-01-01T12:00:00Z"
+            },
+            // ... more kubeScores for namespace1 ...
+          ],
+          "resources": [
+            {
+              "clusterName": "cluster1",
+              "namespace": "namespace1",
+              "kind": "Pod",
+              "resource": "pod1",
+              "age": "10d",
+              "eventTime": "2022-01-01T12:00:00Z"
+            },
+            // ... more resources for namespace1 ...
+          ]
+        },
+        // ... more namespace data objects ...
+      ]
+    }
+  }
