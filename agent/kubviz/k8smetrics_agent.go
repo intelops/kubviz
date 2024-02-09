@@ -23,6 +23,7 @@ import (
 	"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
 
+	"github.com/intelops/kubviz/agent/kubviz/plugins/kuberhealthy"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
@@ -52,8 +53,7 @@ const (
 var (
 	ClusterName string = os.Getenv("CLUSTER_NAME")
 	token       string = os.Getenv("NATS_TOKEN")
-
-	natsurl string = os.Getenv("NATS_ADDRESS")
+	natsurl     string = os.Getenv("NATS_ADDRESS")
 
 	//for local testing provide the location of kubeconfig
 	cluster_conf_loc      string = os.Getenv("CONFIG_LOCATION")
@@ -128,6 +128,9 @@ func main() {
 	}()
 
 	go events.PublishMetrics(clientset, js, clusterMetricsChan)
+	if cfg.KuberHealthyEnable {
+		go kuberhealthy.StartKuberHealthy(js)
+	}
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
 		err := outdated.OutDatedImages(config, js)

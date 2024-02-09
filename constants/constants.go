@@ -1,6 +1,7 @@
 package constants
 
 const (
+	KUBERHEALTHY_SUBJECT         = "METRICS.kuberhealthy"
 	KUBESCORE_SUBJECT            = "METRICS.kubescore"
 	TRIVY_K8S_SUBJECT            = "METRICS.trivyk8s"
 	StreamSubjects               = "METRICS.*"
