@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/intelops/kubviz/agent/container/pkg/config"
+	"github.com/intelops/kubviz/pkg/mtlsnats"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -45,9 +46,34 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 	fmt.Println("Waiting before connecting to NATS at:", conf.NatsAddress)
 	time.Sleep(1 * time.Second)
 
-	conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
-	if err != nil {
-		return nil, err
+	//conn, err := nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
+	var conn *nats.Conn
+	var err error
+	var mtlsConfig mtlsnats.MtlsConfig
+
+	if mtlsConfig.IsEnabled {
+		tlsConfig, err := mtlsnats.GetTlsConfig()
+		if err != nil {
+			log.Println("error while getting tls config ", err)
+			time.Sleep(time.Minute * 30)
+		} else {
+			conn, err = nats.Connect(conf.NatsAddress,
+				nats.Name("Github metrics"),
+				nats.Token(conf.NatsToken),
+				nats.Secure(tlsConfig),
+			)
+			if err != nil {
+				log.Println("error while connecting with mtls ", err)
+			}
+		}
+
+	}
+
+	if conn == nil {
+		conn, err = nats.Connect(conf.NatsAddress, nats.Name("Github metrics"), nats.Token(conf.NatsToken))
+		if err != nil {
+			return nil, fmt.Errorf("error while connecting with token: %w", err)
+		}
 	}
 
 	ctx := &NATSContext{
@@ -117,12 +143,12 @@ func (n *NATSContext) Close() {
 // An error is returned if the publishing process fails, such as if the connection is lost or if there are issues with the JetStream.
 func (n *NATSContext) Publish(event []byte, repo string) error {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("container-nats-client")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "ContainerPublish")
 	span.SetAttributes(attribute.String("repo-name", repo))
 	defer span.End()
-	
+
 	msg := nats.NewMsg(eventSubject)
 	msg.Data = event
 	msg.Header.Set("REPO_NAME", repo)
