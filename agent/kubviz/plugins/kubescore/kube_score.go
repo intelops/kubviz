@@ -1,9 +1,10 @@
-package main
+package kubescore
 
 import (
 	"context"
 	"encoding/json"
 	"log"
+	"os"
 	exec "os/exec"
 
 	"github.com/google/uuid"
@@ -17,6 +18,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
+
+var ClusterName string = os.Getenv("CLUSTER_NAME")
 
 func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext) error {
 	nsList, err := clientset.CoreV1().
@@ -39,7 +42,7 @@ func publish(ns string, js nats.JetStreamContext) error {
 	var report []json_v2.ScoredObject
 	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - -o json"
 	log.Printf("Command:  %#v,", cmd)
-	out, err := executeCommand(cmd)
+	out, err := ExecuteCommand(cmd)
 	if err != nil {
 		log.Println("Error occurred while running kube-score: ", err)
 		return err
@@ -60,13 +63,13 @@ func publish(ns string, js nats.JetStreamContext) error {
 }
 
 func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamContext) error {
-	
-	ctx:=context.Background()
+
+	ctx := context.Background()
 	tracer := otel.Tracer("kubescore")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishKubescoreMetrics")
 	span.SetAttributes(attribute.String("kubescore-plugin-agent", "kubescore-output"))
 	defer span.End()
-	
+
 	metrics := model.KubeScoreRecommendations{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,
@@ -82,9 +85,9 @@ func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamCon
 	return nil
 }
 
-func executeCommand(command string) (string, error) {
+func ExecuteCommand(command string) (string, error) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("kubescore")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommand")
 	span.SetAttributes(attribute.String("kubescore-agent", "kubescore-command-running"))

@@ -1,4 +1,4 @@
-package main
+package kubepreupgrade
 
 import (
 	"context"
@@ -27,6 +27,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
+
+var ClusterName string = os.Getenv("CLUSTER_NAME")
 
 const (
 	baseURL         = "https://raw.githubusercontent.com/kubernetes/kubernetes"
@@ -88,7 +90,7 @@ func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "KubePreUpgradeDetector")
 	span.SetAttributes(attribute.String("kubepug-plugin-agent", "kubepug-output"))
 	defer span.End()
-	
+
 	pvcMountPath := "/mnt/agent/kbz"
 	uniqueDir := fmt.Sprintf("%s/kubepug", pvcMountPath)
 	err := os.MkdirAll(uniqueDir, 0755)

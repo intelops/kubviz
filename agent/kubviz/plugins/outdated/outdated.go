@@ -1,4 +1,4 @@
-package main
+package outdated
 
 import (
 	"context"
@@ -31,6 +31,8 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+var ClusterName string = os.Getenv("CLUSTER_NAME")
+
 const (
 	maxImageLength = 50
 	maxTagLength   = 50
@@ -60,12 +62,12 @@ func truncateTagName(tagName string) string {
 }
 func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext) error {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("outdated-images")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishOutdatedImages")
 	span.SetAttributes(attribute.String("outdated-plugin-agent", "outdated-output"))
 	defer span.End()
-	
+
 	metrics := out
 	metrics.ClusterName = ClusterName
 	metricsJson, _ := json.Marshal(metrics)
@@ -77,7 +79,7 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 	return nil
 }
 
-func outDatedImages(config *rest.Config, js nats.JetStreamContext) error {
+func OutDatedImages(config *rest.Config, js nats.JetStreamContext) error {
 	images, err := ListImages(config)
 	if err != nil {
 		log.Println("unable to list images")
