@@ -80,6 +80,9 @@ tolerations: []
 
 affinity: {}
 
+externalSecrets:
+  create: false
+
 nats:
   enabled: true
   #Authentication setup
@@ -168,3 +171,9 @@ migration:
 ttl:
   ttlInterval: "1"
   ttlUnit: MONTH
+
+opentelemetry:
+  isEnabled: false
+  url: "otelcollector.local"
+  appName: "kubviz"
+ 

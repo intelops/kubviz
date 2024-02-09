@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -12,7 +13,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"k8s.io/client-go/rest"
 )
 
@@ -48,6 +52,13 @@ func publishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) erro
 }
 
 func executeCommandSbom(command string) ([]byte, error) {
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("trivy-sbom")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandSbom")
+	span.SetAttributes(attribute.String("trivy-sbom-agent", "sbom-command-running"))
+	defer span.End()
+	
 	cmd := exec.Command("/bin/sh", "-c", command)
 	var outc, errc bytes.Buffer
 	cmd.Stdout = &outc
@@ -68,6 +79,13 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		log.Printf("Error creating Trivy cache directory: %v\n", err)
 		return err
 	}
+
+	ctx:=context.Background()
+	tracer := otel.Tracer("trivy-sbom")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivySbomScan")
+	span.SetAttributes(attribute.String("sbom", "sbom-creation"))
+	defer span.End()
+	
 	images, err := ListImages(config)
 
 	if err != nil {

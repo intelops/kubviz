@@ -1,11 +1,14 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/intelops/kubviz/agent/container/api"
 	"github.com/intelops/kubviz/agent/container/pkg/clients"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 type APIHandler struct {
@@ -29,6 +32,14 @@ func NewAPIHandler(conn *clients.NATSContext) (*APIHandler, error) {
 }
 
 func (ah *APIHandler) BindRequest(r *gin.Engine) {
+
+	config, err := opentelemetry.GetConfigurations()
+	if err != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+
+	r.Use(otelgin.Middleware(config.ServiceName))
+	
 	apiGroup := r.Group("/")
 	{
 		apiGroup.GET("/api-docs", ah.GetApiDocs)

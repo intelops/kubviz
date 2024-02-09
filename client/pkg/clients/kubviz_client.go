@@ -1,13 +1,19 @@
 package clients
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 
 	"github.com/intelops/kubviz/constants"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
+	"github.com/intelops/kubviz/client/pkg/config"
 	"github.com/intelops/kubviz/model"
 )
 
@@ -18,6 +24,16 @@ type SubscriptionInfo struct {
 }
 
 func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
+
+	ctx := context.Background()
+	tracer := otel.Tracer("kubviz-client")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "SubscribeAllKubvizNats")
+	span.SetAttributes(attribute.String("kubviz-subscribe", "subscribe"))
+	defer span.End()
+	cfg := &config.Config{}
+	if err := envconfig.Process("", cfg); err != nil {
+		log.Fatalf("Could not parse env Config: %v", err)
+	}
 	subscribe := func(sub SubscriptionInfo) {
 		n.stream.Subscribe(sub.Subject, sub.Handler, nats.Durable(sub.Consumer), nats.ManualAck())
 	}
@@ -25,7 +41,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 	subscriptions := []SubscriptionInfo{
 		{
 			Subject:  constants.KetallSubject,
-			Consumer: constants.KetallConsumer,
+			Consumer: cfg.KetallConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.Resource
@@ -40,7 +56,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		},
 		{
 			Subject:  constants.RakeesSubject,
-			Consumer: constants.RakeesConsumer,
+			Consumer: cfg.RakeesConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.RakeesMetrics
@@ -55,7 +71,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		},
 		{
 			Subject:  constants.OutdatedSubject,
-			Consumer: constants.OutdatedConsumer,
+			Consumer: cfg.OutdatedConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.CheckResultfinal
@@ -70,7 +86,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		},
 		{
 			Subject:  constants.DeprecatedSubject,
-			Consumer: constants.DeprecatedConsumer,
+			Consumer: cfg.DeprecatedConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.DeprecatedAPI
@@ -85,7 +101,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		},
 		{
 			Subject:  constants.DeletedSubject,
-			Consumer: constants.DeletedConsumer,
+			Consumer: cfg.DeletedConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.DeletedAPI
@@ -100,7 +116,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		},
 		{
 			Subject:  constants.TRIVY_IMAGE_SUBJECT,
-			Consumer: constants.Trivy_Image_Consumer,
+			Consumer: cfg.TrivyImageConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.TrivyImage
@@ -115,7 +131,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		},
 		{
 			Subject:  constants.TRIVY_SBOM_SUBJECT,
-			Consumer: constants.Trivy_Sbom_Consumer,
+			Consumer: cfg.TrivySbomConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.SbomData
@@ -131,7 +147,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		},
 		{
 			Subject:  constants.KubvizSubject,
-			Consumer: constants.KubvizConsumer,
+			Consumer: cfg.KubvizConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.Metrics
@@ -146,7 +162,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		},
 		{
 			Subject:  constants.KUBESCORE_SUBJECT,
-			Consumer: constants.KubscoreConsumer,
+			Consumer: cfg.KubscoreConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.KubeScoreRecommendations
@@ -161,7 +177,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		},
 		{
 			Subject:  constants.TRIVY_K8S_SUBJECT,
-			Consumer: constants.TrivyConsumer,
+			Consumer: cfg.TrivyConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
 				var metrics model.Trivy
