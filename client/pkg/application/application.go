@@ -105,12 +105,12 @@ func (app *Application) Close() {
 	app.dbClient.Close()
 }
 func exportDataForTables(db *sql.DB) error {
-	pvcMountPath := "/mnt/client/kbz"
+	//pvcMountPath := "/mnt/client/kbz"
 	tables := []string{
 		EventsTable, RakkessTable, DeprecatedAPIsTable, DeletedAPIsTable, JfrogContainerPushTable, GetAllResourcesTable, OutdatedImagesTable, KubeScoreTable, TrivyVulTable, TrivyMisconfigTable, TrivyImageTable, DockerHubBuildTable, AzureContainerPushTable, QuayContainerPushTable, TrivySBOMTable, AzureDevOpsTable, GitHubTable, GitLabTable, BitbucketTable, GiteaTable,
 	}
 	for _, tableName := range tables {
-		err := storage.ExportExpiredData(tableName, db, pvcMountPath)
+		err := storage.ExportExpiredData(tableName, db)
 		if err != nil {
 			log.Printf("Error exporting data for table %s: %v", tableName, err)
 		} else {
