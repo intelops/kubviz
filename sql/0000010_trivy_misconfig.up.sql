@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS trivy_misconfig (
 	misconfig_status   String,
     EventTime          DateTime('UTC'),
 	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
+	ExportedAt DateTime DEFAULT NULL
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
 TTL ExpiryDate;
