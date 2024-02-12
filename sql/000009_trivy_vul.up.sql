@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS trivy_vul (
 	vul_severity          String,
 	vul_published_date    DateTime('UTC'),
 	vul_last_modified_date DateTime('UTC'),
-	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
+	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}},
 	ExportedAt DateTime DEFAULT NULL
 ) ENGINE = MergeTree() 
 ORDER BY ExpiryDate 
