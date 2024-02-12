@@ -15,7 +15,20 @@ type Query {
   outdatedImagesByClusterAndNamespace(clusterName: String!, namespace: String!): [OutdatedImage!]!
   outdatedImagesCount(clusterName: String!, namespace: String!): Int!
   allClusterNamespaceOutdatedCounts: [ClusterNamespaceOutdatedCount!]!
+  allClusterDeprecatedAPIsCounts: [ClusterAPIsCount!]!
+  allClusterDeletedAPIsCounts: [ClusterAPIsCount!]!
+  allClusterNamespaceResourceCounts: [ClusterNamespaceResourceCount!]!
 }
+type ClusterNamespaceResourceCount {
+  clusterName: String!
+  namespace: String!
+  resourceCount: Int!
+}
+type ClusterAPIsCount {
+  clusterName: String!
+  count: Int!
+}
+
 
 type ClusterNamespaceOutdatedCount {
   clusterName: String!
