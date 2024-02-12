@@ -71,7 +71,7 @@ func Start() *Application {
 		log.Fatal("Error establishing connection to NATS:", err)
 	}
 	c := cron.New()
-	_, err = c.AddFunc("@daily", func() {
+	_, err = c.AddFunc("*/5 * * * *", func() {
 		if err := exportDataForTables(conn); err != nil {
 			log.Println("Error exporting data:", err)
 		}
