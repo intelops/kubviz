@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS events (
 	Reason      String,
 	Host        String,
 	Event       String,
+	ImageName   String,
 	FirstTime   String,
 	LastTime    String,
 	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
