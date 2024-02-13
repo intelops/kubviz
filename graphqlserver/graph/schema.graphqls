@@ -10,8 +10,8 @@ type Query {
   allKubeScores: [Kubescore!]!
   allTrivyVuls: [TrivyVul!]!
   allTrivyMisconfigs: [TrivyMisconfig!]!
-  uniqueClusters: [String!]!
-  uniqueNamespaces: [String!]!
+  uniqueNamespaces: [Namespace!]!
+  uniqueClusters: [Cluster!]!
   outdatedImagesByClusterAndNamespace(clusterName: String!, namespace: String!): [OutdatedImage!]!
   outdatedImagesCount(clusterName: String!, namespace: String!): Int!
   allClusterNamespaceOutdatedCounts: [ClusterNamespaceOutdatedCount!]!
@@ -19,6 +19,15 @@ type Query {
   allClusterDeletedAPIsCounts: [ClusterAPIsCount!]!
   allClusterNamespaceResourceCounts: [ClusterNamespaceResourceCount!]!
 }
+
+type Namespace {
+  name: String!
+}
+
+type Cluster {
+  name: String!
+}
+
 type ClusterNamespaceResourceCount {
   clusterName: String!
   namespace: String!
