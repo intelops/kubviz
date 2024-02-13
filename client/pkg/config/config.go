@@ -17,6 +17,7 @@ type Config struct {
 	TrivyConsumer      string `envconfig:"TRIVY_CONSUMER" required:"true"`
 	TrivyImageConsumer string `envconfig:"TRIVY_IMAGE_CONSUMER" required:"true"`
 	TrivySbomConsumer  string `envconfig:"TRIVY_SBOM_CONSUMER" required:"true"`
+	AwsEnable          bool   `envconfig:"AWS_ENABLE" default:"false"`
 	AWSRegion          string `envconfig:"AWS_REGION"`
 	AWSAccessKey       string `envconfig:"AWS_ACCESS_KEY"`
 	AWSSecretKey       string `envconfig:"AWS_SECRET_KEY"`
