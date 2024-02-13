@@ -8,6 +8,34 @@ import (
 	"github.com/intelops/kubviz/graphqlserver/graph/model"
 )
 
+func (r *Resolver) fetchClustersFromDatabase(ctx context.Context) ([]string, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+	query := `SELECT DISTINCT ClusterName FROM events`
+
+	rows, err := r.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var clusters []string
+	for rows.Next() {
+		var cluster string
+		if err := rows.Scan(&cluster); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		clusters = append(clusters, cluster)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return clusters, nil
+}
+
 func (r *Resolver) fetchNamespacesFromDatabase(ctx context.Context) ([]string, error) {
 	if r.DB == nil {
 		return nil, fmt.Errorf("database connection is not initialized")
