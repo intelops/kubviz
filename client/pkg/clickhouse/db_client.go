@@ -27,6 +27,7 @@ type DBClient struct {
 	conf    *config.Config
 }
 type DBInterface interface {
+	InsertKuberhealthyMetrics(model.KuberhealthyCheckDetail)
 	InsertRakeesMetrics(model.RakeesMetrics)
 	InsertKetallEvent(model.Resource)
 	InsertOutdatedEvent(model.CheckResultfinal)
@@ -818,6 +819,43 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 	}
 	stmt.Close()
 }
+
+func (c *DBClient) InsertKuberhealthyMetrics(metrics model.KuberhealthyCheckDetail) {
+	ctx := context.Background()
+	tracer := otel.Tracer("insert-kuberhealthy")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertKuberhealthy")
+	span.SetAttributes(attribute.String("kuberhealthy-client", "insert"))
+	defer span.End()
+
+	tx, err := c.conn.Begin()
+		if err != nil {
+			log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
+		}
+
+		stmt, err := tx.Prepare(InsertKuberhealthy)
+		if err != nil {
+			log.Fatalf("error preparing statement: %v", err)
+		}
+
+		if _, err := stmt.Exec(
+			metrics.CurrentUUID,
+			metrics.CheckName,
+			metrics.OK,
+			metrics.Errors,
+			metrics.RunDuration,
+			metrics.Namespace,
+			metrics.Node,
+			metrics.LastRun,
+			metrics.AuthoritativePod,
+		); err != nil {
+			log.Fatal(err)
+		}
+		if err := tx.Commit(); err != nil {
+			log.Fatal(err)
+		}
+		stmt.Close()
+}
+
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
 }

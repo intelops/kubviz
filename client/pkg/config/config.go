@@ -17,4 +17,5 @@ type Config struct {
 	TrivyConsumer      string `envconfig:"TRIVY_CONSUMER" required:"true"`
 	TrivyImageConsumer string `envconfig:"TRIVY_IMAGE_CONSUMER" required:"true"`
 	TrivySbomConsumer  string `envconfig:"TRIVY_SBOM_CONSUMER" required:"true"`
+	KuberhealthyConsumer string `envconfig:"KUBERHEALTHY_CONSUMER" required:"true"`
 }
