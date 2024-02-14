@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS kuberhealthy (
     RunDuration String,
     Namespace String,
     Node String,
-    LastRun String,
+    LastRun DateTime('UTC'),
     AuthoritativePod String,
     ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}}
 ) ENGINE = MergeTree()
