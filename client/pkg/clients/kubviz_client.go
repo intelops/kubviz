@@ -8,6 +8,7 @@ import (
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/kuberhealthy/kuberhealthy/v2/pkg/health"
 	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -74,7 +75,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			Consumer: cfg.KuberhealthyConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
-				var metrics model.KuberhealthyCheckDetail
+				var metrics health.State
 				err := json.Unmarshal(msg.Data, &metrics)
 				if err != nil {
 					log.Println("failed to unmarshal from nats", err)

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/kuberhealthy/kuberhealthy/v2/pkg/health"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
@@ -27,7 +28,7 @@ type DBClient struct {
 	conf    *config.Config
 }
 type DBInterface interface {
-	InsertKuberhealthyMetrics(model.KuberhealthyCheckDetail)
+	InsertKuberhealthyMetrics(health.State)
 	InsertRakeesMetrics(model.RakeesMetrics)
 	InsertKetallEvent(model.Resource)
 	InsertOutdatedEvent(model.CheckResultfinal)
@@ -381,7 +382,7 @@ func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
 	}
 }
 
-func (c *DBClient) InsertKuberhealthyMetrics(metrics model.KuberhealthyCheckDetail) {
+func (c *DBClient) InsertKuberhealthyMetrics(metrics health.State) {
 	ctx := context.Background()
 	tracer := otel.Tracer("insert-kuberhealthy")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertKuberhealthy")
@@ -399,18 +400,20 @@ func (c *DBClient) InsertKuberhealthyMetrics(metrics model.KuberhealthyCheckDeta
 		log.Fatalf("error preparing statement: %v", err)
 	}
 
-	if _, err := stmt.Exec(
-		metrics.CurrentUUID,
-		metrics.CheckName,
-		metrics.OK,
-		metrics.Errors,
-		metrics.RunDuration,
-		metrics.Namespace,
-		metrics.Node,
-		metrics.LastRun,
-		metrics.AuthoritativePod,
-	); err != nil {
-		log.Fatal(err)
+	for _, checkdata := range metrics.CheckDetails {
+		if _, err := stmt.Exec(
+			checkdata.CurrentUUID,
+			checkdata.CurrentUUID,
+			checkdata.OK,
+			checkdata.Errors,
+			checkdata.RunDuration,
+			checkdata.Namespace,
+			checkdata.Node,
+			checkdata.LastRun,
+			checkdata.AuthoritativePod,
+		); err != nil {
+			log.Fatal(err)
+		}
 	}
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
