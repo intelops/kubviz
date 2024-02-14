@@ -20,14 +20,14 @@ import (
 
 	"github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/events"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
 
 	"github.com/intelops/kubviz/agent/kubviz/plugins/kuberhealthy"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
 	"github.com/intelops/kubviz/agent/kubviz/scheduler"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -135,20 +135,20 @@ func main() {
 	collectAndPublishMetrics := func() {
 		err := outdated.OutDatedImages(config, js)
 		events.LogErr(err)
-		err = kubepreupgrade.KubePreUpgradeDetector(config, js)
-		events.LogErr(err)
-		err = ketall.GetAllResources(config, js)
-		events.LogErr(err)
-		err = rakkess.RakeesOutput(config, js)
-		events.LogErr(err)
-		err = trivy.RunTrivySbomScan(config, js)
-		events.LogErr(err)
-		err = trivy.RunTrivyImageScans(config, js)
-		events.LogErr(err)
-		err = trivy.RunTrivyK8sClusterScan(js)
-		events.LogErr(err)
-		err = kubescore.RunKubeScore(clientset, js)
-		events.LogErr(err)
+		// err = kubepreupgrade.KubePreUpgradeDetector(config, js)
+		// events.LogErr(err)
+		// err = ketall.GetAllResources(config, js)
+		// events.LogErr(err)
+		// err = rakkess.RakeesOutput(config, js)
+		// events.LogErr(err)
+		// err = trivy.RunTrivySbomScan(config, js)
+		// events.LogErr(err)
+		// err = trivy.RunTrivyImageScans(config, js)
+		// events.LogErr(err)
+		// err = trivy.RunTrivyK8sClusterScan(js)
+		// events.LogErr(err)
+		// err = kubescore.RunKubeScore(clientset, js)
+		// events.LogErr(err)
 	}
 
 	collectAndPublishMetrics()
