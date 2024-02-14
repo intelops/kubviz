@@ -70,6 +70,22 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			},
 		},
 		{
+			Subject:  constants.KUBERHEALTHY_SUBJECT,
+			Consumer: cfg.KuberhealthyConsumer,
+			Handler: func(msg *nats.Msg) {
+				msg.Ack()
+				var metrics model.KuberhealthyCheckDetail
+				err := json.Unmarshal(msg.Data, &metrics)
+				if err != nil {
+					log.Println("failed to unmarshal from nats", err)
+					return
+				}
+				log.Printf("Kuberhealthy Metrics Received: %#v,", metrics)
+				conn.InsertKuberhealthyMetrics(metrics)
+				log.Println()
+			},
+		},
+		{
 			Subject:  constants.OutdatedSubject,
 			Consumer: cfg.OutdatedConsumer,
 			Handler: func(msg *nats.Msg) {

@@ -233,3 +233,4 @@ const InsertAzureContainerPushEvent DBStatement = "INSERT INTO azurecontainerpus
 const InsertTrivySbom string = "INSERT INTO trivysbom (id, cluster_name, image_name, package_name, package_url, bom_ref, serial_number, version, bom_format) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertQuayContainerPushEvent DBStatement = "INSERT INTO quaycontainerpush (name, repository, nameSpace, dockerURL, homePage, tag, Event, EventTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertJfrogContainerPushEvent DBStatement = "INSERT INTO jfrogcontainerpush (Domain, EventType, RegistryURL, RepositoryName, SHAID, Size, ImageName, Tag, Event, EventTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const InsertKuberhealthy string = "INSERT INTO kuberhealthy (CurrentUUID, CheckName, OK, Errors, RunDuration, Namespace, Node, LastRun, AuthoritativePod) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
