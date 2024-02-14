@@ -2,10 +2,25 @@
 
 package model
 
+type Cluster struct {
+	Name string `json:"name"`
+}
+
+type ClusterAPIsCount struct {
+	ClusterName string `json:"clusterName"`
+	Count       int    `json:"count"`
+}
+
 type ClusterNamespaceOutdatedCount struct {
 	ClusterName   string `json:"clusterName"`
 	Namespace     string `json:"namespace"`
 	OutdatedCount int    `json:"outdatedCount"`
+}
+
+type ClusterNamespaceResourceCount struct {
+	ClusterName   string `json:"clusterName"`
+	Namespace     string `json:"namespace"`
+	ResourceCount int    `json:"resourceCount"`
 }
 
 type DeletedAPI struct {
@@ -92,6 +107,10 @@ type Kubescore struct {
 	FileRow     *int    `json:"fileRow,omitempty"`
 	EventTime   *string `json:"eventTime,omitempty"`
 	ExpiryDate  *string `json:"expiryDate,omitempty"`
+}
+
+type Namespace struct {
+	Name string `json:"name"`
 }
 
 type NamespaceData struct {

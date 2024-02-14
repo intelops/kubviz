@@ -222,7 +222,7 @@ const InsertKetall DBStatement = "INSERT INTO getall_resources (ClusterName, Nam
 const InsertOutdated DBStatement = "INSERT INTO outdated_images (ClusterName, Namespace, Pod, CurrentImage, CurrentTag, LatestVersion, VersionsBehind, EventTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 const InsertDepricatedApi DBStatement = "INSERT INTO DeprecatedAPIs (ClusterName, ObjectName, Description, Kind, Deprecated, Scope, EventTime) VALUES (?, ?, ?, ?, ?, ?, ?)"
 const InsertDeletedApi DBStatement = "INSERT INTO DeletedAPIs (ClusterName, ObjectName, Group, Kind, Version, Name, Deleted, Scope, EventTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-const InsertKubvizEvent DBStatement = "INSERT INTO events (ClusterName, Id, EventTime, OpType, Name, Namespace, Kind, Message, Reason, Host, Event, FirstTime, LastTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+const InsertKubvizEvent DBStatement = "INSERT INTO events (ClusterName, Id, EventTime, OpType, Name, Namespace, Kind, Message, Reason, Host, Event, ImageName, FirstTime, LastTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 const clickhouseExperimental DBStatement = `SET allow_experimental_object_type=1;`
 const containerGithubTable DBStatement = `CREATE table IF NOT EXISTS container_github(event JSON) ENGINE = MergeTree ORDER BY tuple();`
 const InsertKubeScore string = "INSERT INTO kubescore(id,clustername,object_name,kind,apiVersion,name,namespace,target_type,description,path,summary,file_name,file_row,EventTime) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"

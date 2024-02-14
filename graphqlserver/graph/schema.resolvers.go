@@ -395,38 +395,34 @@ func (r *queryResolver) AllTrivyMisconfigs(ctx context.Context) ([]*model.TrivyM
 	return misconfigs, nil
 }
 
-// UniqueClusters is the resolver for the uniqueClusters field.
-func (r *queryResolver) UniqueClusters(ctx context.Context) ([]string, error) {
-	if r.DB == nil {
-		return nil, fmt.Errorf("database connection is not initialized")
-	}
-	query := `SELECT DISTINCT ClusterName FROM events`
-
-	rows, err := r.DB.QueryContext(ctx, query)
+// UniqueNamespaces is the resolver for the uniqueNamespaces field.
+func (r *queryResolver) UniqueNamespaces(ctx context.Context) ([]*model.Namespace, error) {
+	namespaces, err := r.fetchNamespacesFromDatabase(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error executing query: %v", err)
-	}
-	defer rows.Close()
-
-	var clusters []string
-	for rows.Next() {
-		var cluster string
-		if err := rows.Scan(&cluster); err != nil {
-			return nil, fmt.Errorf("error scanning row: %v", err)
-		}
-		clusters = append(clusters, cluster)
+		return nil, err
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating rows: %v", err)
+	var namespaceObjects []*model.Namespace
+	for _, ns := range namespaces {
+		namespaceObjects = append(namespaceObjects, &model.Namespace{Name: ns})
 	}
 
-	return clusters, nil
+	return namespaceObjects, nil
 }
 
-// UniqueNamespaces is the resolver for the uniqueNamespaces field.
-func (r *queryResolver) UniqueNamespaces(ctx context.Context) ([]string, error) {
-	return r.fetchNamespacesFromDatabase(ctx)
+// UniqueClusters is the resolver for the uniqueClusters field.
+func (r *queryResolver) UniqueClusters(ctx context.Context) ([]*model.Cluster, error) {
+	clusters, err := r.fetchClustersFromDatabase(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var clusterObjects []*model.Cluster
+	for _, cluster := range clusters {
+		clusterObjects = append(clusterObjects, &model.Cluster{Name: cluster})
+	}
+
+	return clusterObjects, nil
 }
 
 // OutdatedImagesByClusterAndNamespace is the resolver for the outdatedImagesByClusterAndNamespace field.
@@ -512,6 +508,106 @@ func (r *queryResolver) AllClusterNamespaceOutdatedCounts(ctx context.Context) (
 	for rows.Next() {
 		var result model.ClusterNamespaceOutdatedCount
 		if err := rows.Scan(&result.ClusterName, &result.Namespace, &result.OutdatedCount); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		results = append(results, &result)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return results, nil
+}
+
+// AllClusterDeprecatedAPIsCounts is the resolver for the allClusterDeprecatedAPIsCounts field.
+func (r *queryResolver) AllClusterDeprecatedAPIsCounts(ctx context.Context) ([]*model.ClusterAPIsCount, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+	query := `
+	SELECT ClusterName, COUNT(*) as count
+	FROM DeprecatedAPIs
+	GROUP BY ClusterName
+`
+
+	rows, err := r.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	var results []*model.ClusterAPIsCount
+	for rows.Next() {
+		var result model.ClusterAPIsCount
+		if err := rows.Scan(&result.ClusterName, &result.Count); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		results = append(results, &result)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return results, nil
+}
+
+// AllClusterDeletedAPIsCounts is the resolver for the allClusterDeletedAPIsCounts field.
+func (r *queryResolver) AllClusterDeletedAPIsCounts(ctx context.Context) ([]*model.ClusterAPIsCount, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	query := `
+        SELECT ClusterName, COUNT(*) as count
+        FROM DeletedAPIs
+        GROUP BY ClusterName
+    `
+
+	rows, err := r.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var results []*model.ClusterAPIsCount
+	for rows.Next() {
+		var result model.ClusterAPIsCount
+		if err := rows.Scan(&result.ClusterName, &result.Count); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		results = append(results, &result)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return results, nil
+}
+
+// AllClusterNamespaceResourceCounts is the resolver for the allClusterNamespaceResourceCounts field.
+func (r *queryResolver) AllClusterNamespaceResourceCounts(ctx context.Context) ([]*model.ClusterNamespaceResourceCount, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	query := `
+        SELECT ClusterName, Namespace, COUNT(*) as resourceCount
+        FROM getall_resources
+        GROUP BY ClusterName, Namespace
+    `
+
+	rows, err := r.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var results []*model.ClusterNamespaceResourceCount
+	for rows.Next() {
+		var result model.ClusterNamespaceResourceCount
+		if err := rows.Scan(&result.ClusterName, &result.Namespace, &result.ResourceCount); err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)
 		}
 		results = append(results, &result)
