@@ -28,7 +28,7 @@ serviceAccount:
 podAnnotations: {}
 
 podSecurityContext:
-  fsGroup: 1001 
+  fsGroup: 1001
   runAsUser: 1001
   runAsGroup: 1001
 
@@ -52,7 +52,7 @@ git_bridge:
     repository: ghcr.io/intelops/kubviz/git-agent
     pullPolicy: Always
     tag: "v1.1.4"
-  resources: 
+  resources:
     limits:
       cpu: 200m
       memory: 256Mi
@@ -96,7 +96,7 @@ container_bridge:
     repository: ghcr.io/intelops/kubviz/container-agent
     pullPolicy: Always
     tag: "v1.1.4"
-  resources: 
+  resources:
     limits:
       cpu: 200m
       memory: 256Mi
@@ -131,7 +131,7 @@ container_bridge:
     #    hosts:
     #      - chart-example.local
 
-    
+
 ingress:
   enabled: false
   annotations: {}
@@ -162,7 +162,7 @@ persistence:
   mountPath: /mnt/agent/kbz
   accessMode: ReadWriteOnce
   size: 5Gi
-    
+
 autoscaling:
   enabled: false
   minReplicas: 1
@@ -186,6 +186,11 @@ schedule:
   kubepreupgradeInterval: "@every 22h"
   trivyInterval: "@every 24h"
 
+kuberhealthy:
+  enabled: true
+  pollInterval: "15m"
+  url: "http://localhost:8080"
+
 opentelemetry:
   isEnabled: false
   url: "otelcollector.local"
@@ -197,7 +202,7 @@ externalSecrets:
   create: false
 
 nats:
-  host: kubviz-client-nats 
+  host: kubviz-client-nats
   auth:
     # Use token if you want to provide the token via Helm Values
     token: ""

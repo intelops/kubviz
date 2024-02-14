@@ -7,13 +7,12 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/constants"
-	"github.com/intelops/kubviz/model"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
+	"github.com/kuberhealthy/kuberhealthy/v2/pkg/health"
 	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel"
 )
@@ -45,52 +44,29 @@ func pollAndPublishKuberhealthy(url string, js nats.JetStreamContext) error {
 		return fmt.Errorf("error reading response body: %w", err)
 	}
 
-	var state model.State
+	var state health.State
 	if err := json.Unmarshal(body, &state); err != nil {
 		return fmt.Errorf("error unmarshaling response: %w", err)
 	}
 
 	return PublishKuberhealthyMetrics(js, state)
 }
-func boolToUInt8(b bool) uint8 {
-	if b {
-		return 1
-	}
-	return 0
-}
 
-func errorsToString(errors []string) string {
-	return strings.Join(errors, ", ")
-}
-func PublishKuberhealthyMetrics(js nats.JetStreamContext, state model.State) error {
+func PublishKuberhealthyMetrics(js nats.JetStreamContext, state health.State) error {
 	ctx := context.Background()
 	tracer := otel.Tracer("kuberhealthy")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishKuberhealthyMetrics")
 	defer span.End()
 
-	for checkName, details := range state.CheckDetails {
-		metrics := model.KuberhealthyCheckDetail{
-			CurrentUUID:      details.CurrentUUID,
-			CheckName:        checkName,
-			OK:               boolToUInt8(details.OK),
-			Errors:           errorsToString(details.Errors),
-			RunDuration:      details.RunDuration,
-			Namespace:        details.Namespace,
-			Node:             details.Node,
-			LastRun:          details.LastRun.Time,
-			AuthoritativePod: details.AuthoritativePod,
-		}
+	metricsJSON, err := json.Marshal(state)
+	if err != nil {
+		log.Printf("Error marshaling metrics of kuberhealthy %v", err)
+		return err
+	}
 
-		metricsJSON, err := json.Marshal(metrics)
-		if err != nil {
-			log.Printf("Error marshaling metrics of kuberhealthy %s: %v", checkName, err)
-			continue
-		}
-
-		if _, err := js.Publish(constants.KUBERHEALTHY_SUBJECT, metricsJSON); err != nil {
-			log.Printf("Error publishing metrics for kuberhealthy %s: %v", checkName, err)
-			continue
-		}
+	if _, err := js.Publish(constants.KUBERHEALTHY_SUBJECT, metricsJSON); err != nil {
+		log.Printf("Error publishing metrics for kuberhealthy %v", err)
+		return err
 	}
 
 	log.Printf("Kuberhealthy metrics have been published")
