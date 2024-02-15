@@ -24,10 +24,11 @@ import (
 	"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
 
 	"github.com/intelops/kubviz/agent/kubviz/plugins/kuberhealthy"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
+
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
 	"github.com/intelops/kubviz/agent/kubviz/scheduler"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -141,14 +142,14 @@ func main() {
 		events.LogErr(err)
 		err = rakkess.RakeesOutput(config, js)
 		events.LogErr(err)
-		err = trivy.RunTrivySbomScan(config, js)
-		events.LogErr(err)
-		err = trivy.RunTrivyImageScans(config, js)
-		events.LogErr(err)
-		err = trivy.RunTrivyK8sClusterScan(js)
-		events.LogErr(err)
-		err = kubescore.RunKubeScore(clientset, js)
-		events.LogErr(err)
+		// err = trivy.RunTrivySbomScan(config, js)
+		// events.LogErr(err)
+		// err = trivy.RunTrivyImageScans(config, js)
+		// events.LogErr(err)
+		// err = trivy.RunTrivyK8sClusterScan(js)
+		// events.LogErr(err)
+		// err = kubescore.RunKubeScore(clientset, js)
+		// events.LogErr(err)
 	}
 
 	collectAndPublishMetrics()

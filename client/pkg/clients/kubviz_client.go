@@ -131,37 +131,37 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 				log.Println()
 			},
 		},
-		{
-			Subject:  constants.TRIVY_IMAGE_SUBJECT,
-			Consumer: cfg.TrivyImageConsumer,
-			Handler: func(msg *nats.Msg) {
-				msg.Ack()
-				var metrics model.TrivyImage
-				err := json.Unmarshal(msg.Data, &metrics)
-				if err != nil {
-					log.Fatal(err)
-				}
-				log.Printf("Trivy Metrics Received: %#v,", metrics)
-				conn.InsertTrivyImageMetrics(metrics)
-				log.Println()
-			},
-		},
-		{
-			Subject:  constants.TRIVY_SBOM_SUBJECT,
-			Consumer: cfg.TrivySbomConsumer,
-			Handler: func(msg *nats.Msg) {
-				msg.Ack()
-				var metrics model.SbomData
-				err := json.Unmarshal(msg.Data, &metrics)
-				if err != nil {
-					log.Println("failed to unmarshal from nats", err)
-					return
-				}
-				log.Printf("Trivy sbom Metrics Received: %#v,", metrics)
-				conn.InsertTrivySbomMetrics(metrics)
-				log.Println()
-			},
-		},
+		// {
+		// 	Subject:  constants.TRIVY_IMAGE_SUBJECT,
+		// 	Consumer: cfg.TrivyImageConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.TrivyImage
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		log.Printf("Trivy Metrics Received: %#v,", metrics)
+		// 		conn.InsertTrivyImageMetrics(metrics)
+		// 		log.Println()
+		// 	},
+		// },
+		// {
+		// 	Subject:  constants.TRIVY_SBOM_SUBJECT,
+		// 	Consumer: cfg.TrivySbomConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.SbomData
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Println("failed to unmarshal from nats", err)
+		// 			return
+		// 		}
+		// 		log.Printf("Trivy sbom Metrics Received: %#v,", metrics)
+		// 		conn.InsertTrivySbomMetrics(metrics)
+		// 		log.Println()
+		// 	},
+		// },
 		{
 			Subject:  constants.KubvizSubject,
 			Consumer: cfg.KubvizConsumer,
@@ -177,36 +177,36 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 				log.Println()
 			},
 		},
-		{
-			Subject:  constants.KUBESCORE_SUBJECT,
-			Consumer: cfg.KubscoreConsumer,
-			Handler: func(msg *nats.Msg) {
-				msg.Ack()
-				var metrics model.KubeScoreRecommendations
-				err := json.Unmarshal(msg.Data, &metrics)
-				if err != nil {
-					log.Fatal(err)
-				}
-				log.Printf("Kubscore Metrics Received: %#v,", metrics)
-				conn.InsertKubeScoreMetrics(metrics)
-				log.Println()
-			},
-		},
-		{
-			Subject:  constants.TRIVY_K8S_SUBJECT,
-			Consumer: cfg.TrivyConsumer,
-			Handler: func(msg *nats.Msg) {
-				msg.Ack()
-				var metrics model.Trivy
-				err := json.Unmarshal(msg.Data, &metrics)
-				if err != nil {
-					log.Fatal(err)
-				}
-				log.Printf("Trivy Metrics Received: %#v,", metrics)
-				conn.InsertTrivyMetrics(metrics)
-				log.Println()
-			},
-		},
+		// {
+		// 	Subject:  constants.KUBESCORE_SUBJECT,
+		// 	Consumer: cfg.KubscoreConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.KubeScoreRecommendations
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		log.Printf("Kubscore Metrics Received: %#v,", metrics)
+		// 		conn.InsertKubeScoreMetrics(metrics)
+		// 		log.Println()
+		// 	},
+		// },
+		// {
+		// 	Subject:  constants.TRIVY_K8S_SUBJECT,
+		// 	Consumer: cfg.TrivyConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.Trivy
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		log.Printf("Trivy Metrics Received: %#v,", metrics)
+		// 		conn.InsertTrivyMetrics(metrics)
+		// 		log.Println()
+		// 	},
+		// },
 	}
 
 	for _, sub := range subscriptions {
