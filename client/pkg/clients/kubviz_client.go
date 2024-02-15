@@ -162,21 +162,21 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 		// 		log.Println()
 		// 	},
 		// },
-		{
-			Subject:  constants.KubvizSubject,
-			Consumer: cfg.KubvizConsumer,
-			Handler: func(msg *nats.Msg) {
-				msg.Ack()
-				var metrics model.Metrics
-				err := json.Unmarshal(msg.Data, &metrics)
-				if err != nil {
-					log.Fatal(err)
-				}
-				log.Printf("Kubviz Metrics Received: %#v,", metrics)
-				conn.InsertKubvizEvent(metrics)
-				log.Println()
-			},
-		},
+		// {
+		// 	Subject:  constants.KubvizSubject,
+		// 	Consumer: cfg.KubvizConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.Metrics
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		log.Printf("Kubviz Metrics Received: %#v,", metrics)
+		// 		conn.InsertKubvizEvent(metrics)
+		// 		log.Println()
+		// 	},
+		// },
 		// {
 		// 	Subject:  constants.KUBESCORE_SUBJECT,
 		// 	Consumer: cfg.KubscoreConsumer,
