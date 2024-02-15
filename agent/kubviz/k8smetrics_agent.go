@@ -21,12 +21,12 @@ import (
 	"github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/events"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
 
 	"github.com/intelops/kubviz/agent/kubviz/plugins/kuberhealthy"
 	//"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
+	//"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
 
 	//"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
 	"github.com/intelops/kubviz/agent/kubviz/scheduler"
@@ -134,14 +134,14 @@ func main() {
 	}
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
-		err := outdated.OutDatedImages(config, js)
-		events.LogErr(err)
-		err = kubepreupgrade.KubePreUpgradeDetector(config, js)
-		events.LogErr(err)
+		// err := outdated.OutDatedImages(config, js)
+		// events.LogErr(err)
+		// err = kubepreupgrade.KubePreUpgradeDetector(config, js)
+		// events.LogErr(err)
 		err = ketall.GetAllResources(config, js)
 		events.LogErr(err)
-		err = rakkess.RakeesOutput(config, js)
-		events.LogErr(err)
+		// err = rakkess.RakeesOutput(config, js)
+		// events.LogErr(err)
 		// err = trivy.RunTrivySbomScan(config, js)
 		// events.LogErr(err)
 		// err = trivy.RunTrivyImageScans(config, js)
@@ -152,7 +152,7 @@ func main() {
 		// events.LogErr(err)
 	}
 
-	collectAndPublishMetrics()
+	//collectAndPublishMetrics()
 
 	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
 		scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)

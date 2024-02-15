@@ -55,21 +55,21 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 				log.Println()
 			},
 		},
-		{
-			Subject:  constants.RakeesSubject,
-			Consumer: cfg.RakeesConsumer,
-			Handler: func(msg *nats.Msg) {
-				msg.Ack()
-				var metrics model.RakeesMetrics
-				err := json.Unmarshal(msg.Data, &metrics)
-				if err != nil {
-					log.Fatal(err)
-				}
-				log.Printf("Rakees Metrics Received: %#v,", metrics)
-				conn.InsertRakeesMetrics(metrics)
-				log.Println()
-			},
-		},
+		// {
+		// 	Subject:  constants.RakeesSubject,
+		// 	Consumer: cfg.RakeesConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.RakeesMetrics
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		log.Printf("Rakees Metrics Received: %#v,", metrics)
+		// 		conn.InsertRakeesMetrics(metrics)
+		// 		log.Println()
+		// 	},
+		// },
 		{
 			Subject:  constants.KUBERHEALTHY_SUBJECT,
 			Consumer: cfg.KuberhealthyConsumer,
@@ -86,51 +86,51 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 				log.Println()
 			},
 		},
-		{
-			Subject:  constants.OutdatedSubject,
-			Consumer: cfg.OutdatedConsumer,
-			Handler: func(msg *nats.Msg) {
-				msg.Ack()
-				var metrics model.CheckResultfinal
-				err := json.Unmarshal(msg.Data, &metrics)
-				if err != nil {
-					log.Fatal(err)
-				}
-				log.Printf("Outdated Metrics Received: %#v,", metrics)
-				conn.InsertOutdatedEvent(metrics)
-				log.Println()
-			},
-		},
-		{
-			Subject:  constants.DeprecatedSubject,
-			Consumer: cfg.DeprecatedConsumer,
-			Handler: func(msg *nats.Msg) {
-				msg.Ack()
-				var metrics model.DeprecatedAPI
-				err := json.Unmarshal(msg.Data, &metrics)
-				if err != nil {
-					log.Fatal(err)
-				}
-				log.Printf("Deprecated API Metrics Received: %#v,", metrics)
-				conn.InsertDeprecatedAPI(metrics)
-				log.Println()
-			},
-		},
-		{
-			Subject:  constants.DeletedSubject,
-			Consumer: cfg.DeletedConsumer,
-			Handler: func(msg *nats.Msg) {
-				msg.Ack()
-				var metrics model.DeletedAPI
-				err := json.Unmarshal(msg.Data, &metrics)
-				if err != nil {
-					log.Fatal(err)
-				}
-				log.Printf("Deleted API Metrics Received: %#v,", metrics)
-				conn.InsertDeletedAPI(metrics)
-				log.Println()
-			},
-		},
+		// {
+		// 	Subject:  constants.OutdatedSubject,
+		// 	Consumer: cfg.OutdatedConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.CheckResultfinal
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		log.Printf("Outdated Metrics Received: %#v,", metrics)
+		// 		conn.InsertOutdatedEvent(metrics)
+		// 		log.Println()
+		// 	},
+		// },
+		// {
+		// 	Subject:  constants.DeprecatedSubject,
+		// 	Consumer: cfg.DeprecatedConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.DeprecatedAPI
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		log.Printf("Deprecated API Metrics Received: %#v,", metrics)
+		// 		conn.InsertDeprecatedAPI(metrics)
+		// 		log.Println()
+		// 	},
+		// },
+		// {
+		// 	Subject:  constants.DeletedSubject,
+		// 	Consumer: cfg.DeletedConsumer,
+		// 	Handler: func(msg *nats.Msg) {
+		// 		msg.Ack()
+		// 		var metrics model.DeletedAPI
+		// 		err := json.Unmarshal(msg.Data, &metrics)
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		log.Printf("Deleted API Metrics Received: %#v,", metrics)
+		// 		conn.InsertDeletedAPI(metrics)
+		// 		log.Println()
+		// 	},
+		// },
 		// {
 		// 	Subject:  constants.TRIVY_IMAGE_SUBJECT,
 		// 	Consumer: cfg.TrivyImageConsumer,
