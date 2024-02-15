@@ -400,17 +400,33 @@ func (c *DBClient) InsertKuberhealthyMetrics(metrics health.State) {
 		log.Fatalf("error preparing statement: %v", err)
 	}
 
-	for _, checkdata := range metrics.CheckDetails {
+	for checkName, checkdata := range metrics.CheckDetails {
+		ok := uint8(0)
+		if checkdata.OK {
+			ok = uint8(1)
+		}
+		errors := strings.Join(checkdata.Errors, ", ")
+		kcd := model.KuberhealthyCheckDetail{
+			CurrentUUID:      checkdata.CurrentUUID,
+			CheckName:        checkName,
+			OK:               ok,
+			Errors:           errors,
+			RunDuration:      checkdata.RunDuration,
+			Namespace:        checkdata.Namespace,
+			Node:             checkdata.Node,
+			LastRun:          checkdata.LastRun.Time.UTC(),
+			AuthoritativePod: checkdata.AuthoritativePod,
+		}
 		if _, err := stmt.Exec(
-			checkdata.CurrentUUID,
-			checkdata.CurrentUUID,
-			checkdata.OK,
-			checkdata.AuthoritativePod,
-			checkdata.RunDuration,
-			checkdata.Namespace,
-			checkdata.Node,
-			checkdata.LastRun,
-			checkdata.AuthoritativePod,
+			kcd.CurrentUUID,
+			kcd.CheckName,
+			kcd.OK,
+			kcd.Errors,
+			kcd.RunDuration,
+			kcd.Namespace,
+			kcd.Node,
+			kcd.LastRun,
+			kcd.AuthoritativePod,
 		); err != nil {
 			log.Fatal(err)
 		}
