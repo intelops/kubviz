@@ -1,7 +1,7 @@
 package kuberhealthy
 
 import (
-	"context"
+	//"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,10 +11,10 @@ import (
 
 	"github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/constants"
-	"github.com/intelops/kubviz/pkg/opentelemetry"
+	//"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/kuberhealthy/kuberhealthy/v2/pkg/health"
 	"github.com/nats-io/nats.go"
-	"go.opentelemetry.io/otel"
+	//"go.opentelemetry.io/otel"
 )
 
 func StartKuberHealthy(js nats.JetStreamContext) {
@@ -53,10 +53,10 @@ func pollAndPublishKuberhealthy(url string, js nats.JetStreamContext) error {
 }
 
 func PublishKuberhealthyMetrics(js nats.JetStreamContext, state health.State) error {
-	ctx := context.Background()
-	tracer := otel.Tracer("kuberhealthy")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishKuberhealthyMetrics")
-	defer span.End()
+	// ctx := context.Background()
+	// tracer := otel.Tracer("kuberhealthy")
+	// _, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishKuberhealthyMetrics")
+	// defer span.End()
 
 	metricsJSON, err := json.Marshal(state)
 	if err != nil {
