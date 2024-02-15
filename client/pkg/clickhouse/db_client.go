@@ -405,7 +405,7 @@ func (c *DBClient) InsertKuberhealthyMetrics(metrics health.State) {
 			checkdata.CurrentUUID,
 			checkdata.CurrentUUID,
 			checkdata.OK,
-			checkdata.Errors,
+			checkdata.AuthoritativePod,
 			checkdata.RunDuration,
 			checkdata.Namespace,
 			checkdata.Node,
