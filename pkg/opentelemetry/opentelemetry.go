@@ -19,6 +19,7 @@ import (
 type Configurations struct {
 	ServiceName  string `envconfig:"APPLICATION_NAME" default:"Kubviz"`
 	CollectorURL string `envconfig:"OPTEL_URL" default:"otelcollector.azureagent.optimizor.app:80"`
+	IsEnabled    bool   `envconfig:"IS_OPTEL_ENABLED" default:"false"`
 }
 
 func GetConfigurations() (opteConfig *Configurations, err error) {
@@ -36,6 +37,10 @@ func InitTracer() (*sdktrace.TracerProvider, error) {
 	if err != nil {
 		log.Println("Unable to read open telemetry configurations")
 		return nil, err
+	}
+
+	if !config.IsEnabled {
+		return nil, nil
 	}
 
     headers := map[string]string{

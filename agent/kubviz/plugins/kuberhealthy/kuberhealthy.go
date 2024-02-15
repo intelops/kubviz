@@ -68,7 +68,6 @@ func PublishKuberhealthyMetrics(js nats.JetStreamContext, state health.State) er
 		log.Printf("Error publishing metrics for kuberhealthy %v", err)
 		return err
 	}
-	log.Println("%%%%after publish", string(metricsJSON))
 
 	log.Printf("Kuberhealthy metrics have been published")
 	return nil
