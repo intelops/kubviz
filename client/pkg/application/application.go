@@ -70,52 +70,52 @@ func Start() *Application {
 	if err != nil {
 		log.Fatal("Error establishing connection to NATS:", err)
 	}
-	c := cron.New()
-	_, err = c.AddFunc("@daily", func() {
-		if err := exportDataForTables(conn); err != nil {
-			log.Println("Error exporting data:", err)
-		}
-	})
-	if err != nil {
-		log.Fatal("Error adding cron job:", err)
-	}
-
-	// Listen for interrupt signals to stop the program
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
-
-	// Start the cron job scheduler
-	c.Start()
-
-	// Wait for an interrupt signal to stop the program
-	<-interrupt
-
-	// Stop the cron scheduler gracefully
-	c.Stop()
-	// if cfg.AwsEnable {
-	// 	c := cron.New()
-	// 	_, err = c.AddFunc("@daily", func() {
-	// 		if err := exportDataForTables(conn); err != nil {
-	// 			log.Println("Error exporting data:", err)
-	// 		}
-	// 	})
-	// 	if err != nil {
-	// 		log.Fatal("Error adding cron job:", err)
+	// c := cron.New()
+	// _, err = c.AddFunc("@daily", func() {
+	// 	if err := exportDataForTables(conn); err != nil {
+	// 		log.Println("Error exporting data:", err)
 	// 	}
-
-	// 	// Listen for interrupt signals to stop the program
-	// 	interrupt := make(chan os.Signal, 1)
-	// 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
-
-	// 	// Start the cron job scheduler
-	// 	c.Start()
-
-	// 	// Wait for an interrupt signal to stop the program
-	// 	<-interrupt
-
-	// 	// Stop the cron scheduler gracefully
-	// 	c.Stop()
+	// })
+	// if err != nil {
+	// 	log.Fatal("Error adding cron job:", err)
 	// }
+
+	// // Listen for interrupt signals to stop the program
+	// interrupt := make(chan os.Signal, 1)
+	// signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+	// // Start the cron job scheduler
+	// c.Start()
+
+	// // Wait for an interrupt signal to stop the program
+	// <-interrupt
+
+	// // Stop the cron scheduler gracefully
+	// c.Stop()
+	if cfg.AwsEnable {
+		c := cron.New()
+		_, err = c.AddFunc("@daily", func() {
+			if err := exportDataForTables(conn); err != nil {
+				log.Println("Error exporting data:", err)
+			}
+		})
+		if err != nil {
+			log.Fatal("Error adding cron job:", err)
+		}
+
+		// Listen for interrupt signals to stop the program
+		interrupt := make(chan os.Signal, 1)
+		signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+		// Start the cron job scheduler
+		c.Start()
+
+		// Wait for an interrupt signal to stop the program
+		<-interrupt
+
+		// Stop the cron scheduler gracefully
+		c.Stop()
+	}
 
 	return &Application{
 		Config:   cfg,
