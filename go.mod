@@ -6,6 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.17.42
 	github.com/ClickHouse/clickhouse-go/v2 v2.10.1
 	github.com/aquasecurity/trivy v0.43.1
+	github.com/aws/aws-sdk-go v1.44.245
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/corneliusweig/tabwriter v0.0.0-20190512204542-5f8a091e83b5
 	github.com/davecgh/go-spew v1.1.1
@@ -97,6 +98,7 @@ require (
 	github.com/imdario/mergo v0.3.15 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
