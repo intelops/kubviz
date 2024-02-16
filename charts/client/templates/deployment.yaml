@@ -165,6 +165,8 @@ spec:
             value : {{ .Values.consumer.trivyimageconsumer }}
           - name : TRIVY_SBOM_CONSUMER
             value : {{ .Values.consumer.trivysbomconsumer }}
+          - name : KUBERHEALTHY_CONSUMER
+            value : {{ .Values.consumer.kuberhealthyconsumer }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
