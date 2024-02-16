@@ -21,14 +21,14 @@ import (
 	"github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/events"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
-	//"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
 
 	"github.com/intelops/kubviz/agent/kubviz/plugins/kuberhealthy"
-	//"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
-	//"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
-	//"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
 
-	//"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
 	"github.com/intelops/kubviz/agent/kubviz/scheduler"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
@@ -64,7 +64,7 @@ var (
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	env := Production
-	//clusterMetricsChan := make(chan error, 1)
+	clusterMetricsChan := make(chan error, 1)
 	cfg, err := config.GetAgentConfigurations()
 	if err != nil {
 		log.Fatal("Failed to retrieve agent configurations", err)
@@ -128,31 +128,31 @@ func main() {
 		}
 	}()
 
-	//go events.PublishMetrics(clientset, js, clusterMetricsChan)
+	go events.PublishMetrics(clientset, js, clusterMetricsChan)
 	if cfg.KuberHealthyEnable {
 		go kuberhealthy.StartKuberHealthy(js)
 	}
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
-		// err := outdated.OutDatedImages(config, js)
-		// events.LogErr(err)
-		// err = kubepreupgrade.KubePreUpgradeDetector(config, js)
-		// events.LogErr(err)
+		err := outdated.OutDatedImages(config, js)
+		events.LogErr(err)
+		err = kubepreupgrade.KubePreUpgradeDetector(config, js)
+		events.LogErr(err)
 		err = ketall.GetAllResources(config, js)
 		events.LogErr(err)
-		// err = rakkess.RakeesOutput(config, js)
-		// events.LogErr(err)
-		// err = trivy.RunTrivySbomScan(config, js)
-		// events.LogErr(err)
-		// err = trivy.RunTrivyImageScans(config, js)
-		// events.LogErr(err)
-		// err = trivy.RunTrivyK8sClusterScan(js)
-		// events.LogErr(err)
-		// err = kubescore.RunKubeScore(clientset, js)
-		// events.LogErr(err)
+		err = rakkess.RakeesOutput(config, js)
+		events.LogErr(err)
+		err = trivy.RunTrivySbomScan(config, js)
+		events.LogErr(err)
+		err = trivy.RunTrivyImageScans(config, js)
+		events.LogErr(err)
+		err = trivy.RunTrivyK8sClusterScan(js)
+		events.LogErr(err)
+		err = kubescore.RunKubeScore(clientset, js)
+		events.LogErr(err)
 	}
 
-	//collectAndPublishMetrics()
+	collectAndPublishMetrics()
 
 	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
 		scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)

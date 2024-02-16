@@ -388,7 +388,6 @@ func (c *DBClient) InsertKuberhealthyMetrics(metrics health.State) {
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertKuberhealthy")
 	span.SetAttributes(attribute.String("kuberhealthy-client", "insert"))
 	defer span.End()
-	log.Println("****metrics", metrics)
 
 	tx, err := c.conn.Begin()
 	if err != nil {
