@@ -188,3 +188,4 @@ consumer:
   trivyconsumer: "TRIVY_CONSUMER"
   trivyimageconsumer: "TRIVY_IMAGE_CONSUMER"
   trivysbomconsumer: "TRIVY_SBOM_CONSUMER"
+  kuberhealthyconsumer: "KUBERHEALTHY_CONSUMER"
