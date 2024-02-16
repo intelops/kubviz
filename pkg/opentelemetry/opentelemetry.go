@@ -19,6 +19,7 @@ import (
 type Configurations struct {
 	ServiceName  string `envconfig:"APPLICATION_NAME" default:"Kubviz"`
 	CollectorURL string `envconfig:"OPTEL_URL" default:"otelcollector.azureagent.optimizor.app:80"`
+	//IsEnabled    bool   `envconfig:"IS_OPTEL_ENABLED" default:"false"`
 }
 
 func GetConfigurations() (opteConfig *Configurations, err error) {
@@ -32,19 +33,23 @@ func GetConfigurations() (opteConfig *Configurations, err error) {
 func InitTracer() (*sdktrace.TracerProvider, error) {
 	ctx := context.Background()
 
-    config, err := GetConfigurations()
+	config, err := GetConfigurations()
 	if err != nil {
 		log.Println("Unable to read open telemetry configurations")
 		return nil, err
 	}
 
-    headers := map[string]string{
+	// if !config.IsEnabled {
+	// 	return nil, nil
+	// }
+
+	headers := map[string]string{
 		"signoz-service-name": config.ServiceName,
 	}
 
 	client := otlptracegrpc.NewClient(
 		otlptracegrpc.WithEndpoint(config.CollectorURL),
-        otlptracegrpc.WithHeaders(headers),
+		otlptracegrpc.WithHeaders(headers),
 		otlptracegrpc.WithInsecure(),
 	)
 
@@ -54,20 +59,19 @@ func InitTracer() (*sdktrace.TracerProvider, error) {
 	}
 
 	res, err := resource.New(
-        ctx,
-        resource.WithAttributes(
-            attribute.String("service.name", config.ServiceName),
+		ctx,
+		resource.WithAttributes(
+			attribute.String("service.name", config.ServiceName),
 			attribute.String("library.language", "go"),
-
-        ),
-    )
+		),
+	)
 	if err != nil {
 		log.Fatalf("failed to initialize resource: %e", err)
 	}
 
 	// Create the trace provider
 	tp := sdktrace.NewTracerProvider(
-        trace.WithSampler(trace.AlwaysSample()),
+		trace.WithSampler(trace.AlwaysSample()),
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(res),
 	)

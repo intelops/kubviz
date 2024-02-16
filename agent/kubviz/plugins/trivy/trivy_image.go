@@ -1,4 +1,4 @@
-package main
+package trivy
 
 import (
 	"context"
@@ -10,6 +10,8 @@ import (
 
 	"github.com/aquasecurity/trivy/pkg/types"
 	"github.com/google/uuid"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
@@ -29,13 +31,13 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 	}
 	// clearCacheCmd := "trivy image --clear-cache"
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("trivy-image")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyImageScans")
 	span.SetAttributes(attribute.String("trivy-image-scan-agent", "image-scan"))
 	defer span.End()
 
-	images, err := ListImages(config)
+	images, err := outdated.ListImages(config)
 	if err != nil {
 		log.Println("error occured while trying to list images, error :", err.Error())
 		return err
@@ -44,7 +46,7 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 	for _, image := range images {
 		var report types.Report
 		scanCmd := fmt.Sprintf("trivy image %s --timeout 60m -f json -q --cache-dir %s", image.PullableImage, trivyImageCacheDir)
-		out, err := executeCommand(scanCmd)
+		out, err := kubescore.ExecuteCommand(scanCmd)
 		if err != nil {
 			log.Printf("Error scanning image %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
@@ -71,7 +73,7 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 		// 	log.Printf("Error executing command: %v\n", err)
 		// 	return err
 		// }
-		err = publishImageScanReports(report, js)
+		err = PublishImageScanReports(report, js)
 		if err != nil {
 			return err
 		}
@@ -79,7 +81,7 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 	return nil
 }
 
-func publishImageScanReports(report types.Report, js nats.JetStreamContext) error {
+func PublishImageScanReports(report types.Report, js nats.JetStreamContext) error {
 	metrics := model.TrivyImage{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,

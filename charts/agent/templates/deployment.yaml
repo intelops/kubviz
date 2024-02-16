@@ -46,6 +46,10 @@ spec:
 #              path: /
 #              port: http
           env:
+          - name: KUBERHEALTHY_URL
+            value: {{ .Values.kuberhealthy.url }}
+          - name: POLL_INTERVAL
+            value: {{ .Values.kuberhealthy.pollInterval }}
           - name: CLUSTER_NAME
             value: {{ .Values.clusterName }}
           - name: NATS_TOKEN
@@ -57,6 +61,8 @@ spec:
                 name: {{ .Values.nats.auth.secret.name }}
                 key: {{ .Values.nats.auth.secret.key }}
             {{- end }}
+          - name: KUBERHEALTHY_ENABLE
+            value: {{ .Values.kuberhealthy.enabled }}
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
           - name: SCHEDULING_INTERVAL
@@ -81,7 +87,7 @@ spec:
             value: {{ .Values.opentelemetry.url }}
           - name : APPLICATION_NAME
             value : {{ .Values.opentelemetry.appName }}
-          {{- if .Values.persistence.enabled }}  
+          {{- if .Values.persistence.enabled }}
           volumeMounts:
           - name: data
             mountPath: {{ .Values.persistence.mountPath }}
@@ -127,7 +133,7 @@ spec:
             value: {{ .Values.opentelemetry.url }}
           - name : APPLICATION_NAME
             value : {{ .Values.opentelemetry.appName }}
-          {{- if .Values.git_bridge.persistence.enabled }}  
+          {{- if .Values.git_bridge.persistence.enabled }}
           volumeMounts:
           - name: data
             mountPath: {{ .Values.git_bridge.persistence.mountPath }}
@@ -174,7 +180,7 @@ spec:
             value: {{ .Values.opentelemetry.url }}
           - name : APPLICATION_NAME
             value : {{ .Values.opentelemetry.appName }}
-          {{- if .Values.container_bridge.persistence.enabled }}  
+          {{- if .Values.container_bridge.persistence.enabled }}
           volumeMounts:
           - name: data
             mountPath: {{ .Values.container_bridge.persistence.mountPath }}

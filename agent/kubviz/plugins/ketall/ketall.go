@@ -1,8 +1,9 @@
-package main
+package ketall
 
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/intelops/kubviz/constants"
@@ -19,6 +20,8 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+var ClusterName string = os.Getenv("CLUSTER_NAME")
+
 func PublishAllResources(result model.Resource, js nats.JetStreamContext) error {
 	metrics := result
 	metrics.ClusterName = ClusterName
@@ -33,12 +36,12 @@ func PublishAllResources(result model.Resource, js nats.JetStreamContext) error 
 
 func GetAllResources(config *rest.Config, js nats.JetStreamContext) error {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("ketall")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "GetAllResources")
 	span.SetAttributes(attribute.String("ketall-plugin-agent", "ketall-output"))
 	defer span.End()
-	
+
 	// TODO: upto this uncomment for production
 	// Create a new discovery client to discover all resources in the cluster
 	dc := discovery.NewDiscoveryClientForConfigOrDie(config)

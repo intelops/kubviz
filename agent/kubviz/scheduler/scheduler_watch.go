@@ -1,9 +1,17 @@
-package main
+package scheduler
 
 import (
+	"github.com/intelops/kubviz/agent/kubviz/plugins/events"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
 	"github.com/nats-io/nats.go"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+
+	"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
+	"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
 )
 
 type OutDatedImagesJob struct {
@@ -51,8 +59,8 @@ func (v *OutDatedImagesJob) CronSpec() string {
 
 func (j *OutDatedImagesJob) Run() {
 	// Call the outDatedImages function with the provided config and js
-	err := outDatedImages(j.config, j.js)
-	LogErr(err)
+	err := outdated.OutDatedImages(j.config, j.js)
+	events.LogErr(err)
 }
 func NewKetallJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*KetallJob, error) {
 	return &KetallJob{
@@ -67,8 +75,8 @@ func (v *KetallJob) CronSpec() string {
 
 func (j *KetallJob) Run() {
 	// Call the Ketall function with the provided config and js
-	err := GetAllResources(j.config, j.js)
-	LogErr(err)
+	err := ketall.GetAllResources(j.config, j.js)
+	events.LogErr(err)
 }
 
 func NewKubePreUpgradeJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*KubePreUpgradeJob, error) {
@@ -84,8 +92,8 @@ func (v *KubePreUpgradeJob) CronSpec() string {
 
 func (j *KubePreUpgradeJob) Run() {
 	// Call the Kubepreupgrade function with the provided config and js
-	err := KubePreUpgradeDetector(j.config, j.js)
-	LogErr(err)
+	err := kubepreupgrade.KubePreUpgradeDetector(j.config, j.js)
+	events.LogErr(err)
 }
 
 func NewKubescoreJob(clientset *kubernetes.Clientset, js nats.JetStreamContext, frequency string) (*KubescoreJob, error) {
@@ -101,8 +109,8 @@ func (v *KubescoreJob) CronSpec() string {
 
 func (j *KubescoreJob) Run() {
 	// Call the Kubescore function with the provided config and js
-	err := RunKubeScore(j.clientset, j.js)
-	LogErr(err)
+	err := kubescore.RunKubeScore(j.clientset, j.js)
+	events.LogErr(err)
 }
 func NewRakkessJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*RakkessJob, error) {
 	return &RakkessJob{
@@ -117,8 +125,8 @@ func (v *RakkessJob) CronSpec() string {
 
 func (j *RakkessJob) Run() {
 	// Call the Rakkes function with the provided config and js
-	err := RakeesOutput(j.config, j.js)
-	LogErr(err)
+	err := rakkess.RakeesOutput(j.config, j.js)
+	events.LogErr(err)
 }
 func NewTrivyJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*TrivyJob, error) {
 	return &TrivyJob{
@@ -133,10 +141,10 @@ func (v *TrivyJob) CronSpec() string {
 
 func (j *TrivyJob) Run() {
 	// Call the Trivy function with the provided config and js
-	err := RunTrivySbomScan(j.config, j.js)
-	LogErr(err)
-	err = RunTrivyImageScans(j.config, j.js)
-	LogErr(err)
-	err = RunTrivyK8sClusterScan(j.js)
-	LogErr(err)
+	err := trivy.RunTrivySbomScan(j.config, j.js)
+	events.LogErr(err)
+	err = trivy.RunTrivyImageScans(j.config, j.js)
+	events.LogErr(err)
+	err = trivy.RunTrivyK8sClusterScan(j.js)
+	events.LogErr(err)
 }

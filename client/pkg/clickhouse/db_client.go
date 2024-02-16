@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/kuberhealthy/kuberhealthy/v2/pkg/health"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
@@ -27,6 +28,7 @@ type DBClient struct {
 	conf    *config.Config
 }
 type DBInterface interface {
+	InsertKuberhealthyMetrics(health.State)
 	InsertRakeesMetrics(model.RakeesMetrics)
 	InsertKetallEvent(model.Resource)
 	InsertOutdatedEvent(model.CheckResultfinal)
@@ -137,7 +139,7 @@ func NewDBClient(conf *config.Config) (DBInterface, *sql.DB, error) {
 
 func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushEventPayload) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("insert-container-azure")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertContainerEventAzure")
 	span.SetAttributes(attribute.String("container-azure-client", "insert"))
@@ -193,7 +195,7 @@ func (c *DBClient) InsertContainerEventAzure(pushEvent model.AzureContainerPushE
 
 func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("insert-container-quay")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertContainerEventQuay")
 	span.SetAttributes(attribute.String("container-quay-client", "insert"))
@@ -251,7 +253,7 @@ func (c *DBClient) InsertContainerEventQuay(pushEvent model.QuayImagePushPayload
 
 func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushEventPayload) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("insert-container-jfrog")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertContainerEventJfrog")
 	span.SetAttributes(attribute.String("container-jfrog-client", "insert"))
@@ -309,7 +311,7 @@ func (c *DBClient) InsertContainerEventJfrog(pushEvent model.JfrogContainerPushE
 
 func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("insert-rakees-metrics")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertRakeesMetrics")
 	span.SetAttributes(attribute.String("rakees-client", "insert"))
@@ -346,7 +348,7 @@ func (c *DBClient) InsertRakeesMetrics(metrics model.RakeesMetrics) {
 
 func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("insert-ketall-event")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertKetallEvent")
 	span.SetAttributes(attribute.String("ketall-client", "insert"))
@@ -380,9 +382,63 @@ func (c *DBClient) InsertKetallEvent(metrics model.Resource) {
 	}
 }
 
+func (c *DBClient) InsertKuberhealthyMetrics(metrics health.State) {
+	ctx := context.Background()
+	tracer := otel.Tracer("insert-kuberhealthy")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertKuberhealthy")
+	span.SetAttributes(attribute.String("kuberhealthy-client", "insert"))
+	defer span.End()
+
+	tx, err := c.conn.Begin()
+	if err != nil {
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
+	}
+
+	stmt, err := tx.Prepare(InsertKuberhealthy)
+	if err != nil {
+		log.Fatalf("error preparing statement: %v", err)
+	}
+
+	for checkName, checkdata := range metrics.CheckDetails {
+		ok := uint8(0)
+		if checkdata.OK {
+			ok = uint8(1)
+		}
+		errors := strings.Join(checkdata.Errors, ", ")
+		kcd := model.KuberhealthyCheckDetail{
+			CurrentUUID:      checkdata.CurrentUUID,
+			CheckName:        checkName,
+			OK:               ok,
+			Errors:           errors,
+			RunDuration:      checkdata.RunDuration,
+			Namespace:        checkdata.Namespace,
+			Node:             checkdata.Node,
+			LastRun:          checkdata.LastRun.Time.UTC(),
+			AuthoritativePod: checkdata.AuthoritativePod,
+		}
+		if _, err := stmt.Exec(
+			kcd.CurrentUUID,
+			kcd.CheckName,
+			kcd.OK,
+			kcd.Errors,
+			kcd.RunDuration,
+			kcd.Namespace,
+			kcd.Node,
+			kcd.LastRun,
+			kcd.AuthoritativePod,
+		); err != nil {
+			log.Fatal(err)
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	stmt.Close()
+}
+
 func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("insert-outdated-event")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertOutdatedEvent")
 	span.SetAttributes(attribute.String("outdated-client", "insert"))
@@ -420,7 +476,7 @@ func (c *DBClient) InsertOutdatedEvent(metrics model.CheckResultfinal) {
 
 func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("insert-depricated-event")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertDeprecatedAPI")
 	span.SetAttributes(attribute.String("depricated-client", "insert"))
@@ -465,7 +521,7 @@ func (c *DBClient) InsertDeprecatedAPI(deprecatedAPI model.DeprecatedAPI) {
 
 func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("insert-deletedapi")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertDeletedAPI")
 	span.SetAttributes(attribute.String("deletedapi-client", "insert"))
@@ -511,7 +567,7 @@ func (c *DBClient) InsertDeletedAPI(deletedAPI model.DeletedAPI) {
 
 func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("insert-kubviz-event")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertKubvizEvent")
 	span.SetAttributes(attribute.String("kubvizevent-client", "insert"))
@@ -792,14 +848,14 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 	span.SetAttributes(attribute.String("trivy-sbom-client", "insert"))
 	defer span.End()
 
-		tx, err := c.conn.Begin()
-		if err != nil {
-			log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
-		}
-		stmt, err := tx.Prepare(InsertTrivySbom)
-		if err != nil {
-			log.Fatalf("error preparing statement: %v", err)
-		}
+	tx, err := c.conn.Begin()
+	if err != nil {
+		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
+	}
+	stmt, err := tx.Prepare(InsertTrivySbom)
+	if err != nil {
+		log.Fatalf("error preparing statement: %v", err)
+	}
 
 	if _, err := stmt.Exec(
 		metrics.ID,

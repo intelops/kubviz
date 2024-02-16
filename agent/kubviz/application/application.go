@@ -1,0 +1,3 @@
+package application
+
+func Start() {}

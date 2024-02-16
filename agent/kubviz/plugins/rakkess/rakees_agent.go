@@ -1,4 +1,4 @@
-package main
+package rakkess
 
 import (
 	"context"
@@ -14,36 +14,37 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/intelops/kubviz/agent/kubviz/rakkess"
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
-func accessToOutcome(access rakkess.Access) (rakkess.Outcome, error) {
+var ClusterName string = os.Getenv("CLUSTER_NAME")
+
+func accessToOutcome(access Access) (Outcome, error) {
 	switch access {
 	case 0:
-		return rakkess.None, nil
+		return None, nil
 	case 1:
-		return rakkess.Up, nil
+		return Up, nil
 	case 2:
-		return rakkess.Down, nil
+		return Down, nil
 	case 3:
-		return rakkess.Err, nil
+		return Err, nil
 	default:
-		return rakkess.None, fmt.Errorf("unknown access code: %d", access)
+		return None, fmt.Errorf("unknown access code: %d", access)
 	}
 }
 
 func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("rakees")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RakeesOutput")
 	span.SetAttributes(attribute.String("rakees-plugin-agent", "rakees-output"))
 	defer span.End()
-	
+
 	// Create a new Kubernetes client
 	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
@@ -55,7 +56,7 @@ func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
 	if err != nil {
 		return err
 	}
-	var opts = rakkess.NewRakkessOptions()
+	var opts = NewRakkessOptions()
 	opts.Verbs = []string{"list", "create", "update", "delete"}
 	opts.OutputFormat = "icon-table"
 	opts.ResourceList = resourceList
@@ -63,7 +64,7 @@ func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	catchCtrlC(cancel)
 
-	res, err := rakkess.Resource(ctx, opts)
+	res, err := Resource(ctx, opts)
 	if err != nil {
 		fmt.Println("Error")
 		return err
@@ -89,10 +90,10 @@ func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
 		metrics := model.RakeesMetrics{
 			ClusterName: ClusterName,
 			Name:        resourceType,
-			Create:      rakkess.HumanreadableAccessCode(createOutcome),
-			Delete:      rakkess.HumanreadableAccessCode(deleteOutcome),
-			List:        rakkess.HumanreadableAccessCode(listOutcome),
-			Update:      rakkess.HumanreadableAccessCode(updateOutcome),
+			Create:      HumanreadableAccessCode(createOutcome),
+			Delete:      HumanreadableAccessCode(deleteOutcome),
+			List:        HumanreadableAccessCode(listOutcome),
+			Update:      HumanreadableAccessCode(updateOutcome),
 		}
 		metricsJson, _ := json.Marshal(metrics)
 		_, err = js.Publish(constants.EventSubject_rakees, metricsJson)
