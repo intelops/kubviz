@@ -99,6 +99,7 @@ type ComplexityRoot struct {
 		FirstTime   func(childComplexity int) int
 		Host        func(childComplexity int) int
 		ID          func(childComplexity int) int
+		ImageName   func(childComplexity int) int
 		Kind        func(childComplexity int) int
 		LastTime    func(childComplexity int) int
 		Message     func(childComplexity int) int
@@ -191,6 +192,7 @@ type ComplexityRoot struct {
 		AllTrivyMisconfigs                  func(childComplexity int) int
 		AllTrivySBOMs                       func(childComplexity int) int
 		AllTrivyVuls                        func(childComplexity int) int
+		EventsByClusterAndNamespace         func(childComplexity int, clusterName string, namespace string) int
 		OutdatedImagesByClusterAndNamespace func(childComplexity int, clusterName string, namespace string) int
 		OutdatedImagesCount                 func(childComplexity int, clusterName string, namespace string) int
 		UniqueClusters                      func(childComplexity int) int
@@ -307,6 +309,7 @@ type QueryResolver interface {
 	AllClusterDeprecatedAPIsCounts(ctx context.Context) ([]*model.ClusterAPIsCount, error)
 	AllClusterDeletedAPIsCounts(ctx context.Context) ([]*model.ClusterAPIsCount, error)
 	AllClusterNamespaceResourceCounts(ctx context.Context) ([]*model.ClusterNamespaceResourceCount, error)
+	EventsByClusterAndNamespace(ctx context.Context, clusterName string, namespace string) ([]*model.Event, error)
 }
 
 type executableSchema struct {
@@ -565,6 +568,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Event.ID(childComplexity), true
+
+	case "Event.ImageName":
+		if e.complexity.Event.ImageName == nil {
+			break
+		}
+
+		return e.complexity.Event.ImageName(childComplexity), true
 
 	case "Event.Kind":
 		if e.complexity.Event.Kind == nil {
@@ -1062,6 +1072,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AllTrivyVuls(childComplexity), true
+
+	case "Query.eventsByClusterAndNamespace":
+		if e.complexity.Query.EventsByClusterAndNamespace == nil {
+			break
+		}
+
+		args, err := ec.field_Query_eventsByClusterAndNamespace_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.EventsByClusterAndNamespace(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
 
 	case "Query.outdatedImagesByClusterAndNamespace":
 		if e.complexity.Query.OutdatedImagesByClusterAndNamespace == nil {
@@ -1718,6 +1740,30 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_eventsByClusterAndNamespace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg1
 	return args, nil
 }
 
@@ -3380,6 +3426,47 @@ func (ec *executionContext) _Event_Event(ctx context.Context, field graphql.Coll
 }
 
 func (ec *executionContext) fieldContext_Event_Event(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Event",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Event_ImageName(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Event_ImageName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Event_ImageName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Event",
 		Field:      field,
@@ -5785,6 +5872,8 @@ func (ec *executionContext) fieldContext_Query_allEvents(ctx context.Context, fi
 				return ec.fieldContext_Event_Host(ctx, field)
 			case "Event":
 				return ec.fieldContext_Event_Event(ctx, field)
+			case "ImageName":
+				return ec.fieldContext_Event_ImageName(ctx, field)
 			case "FirstTime":
 				return ec.fieldContext_Event_FirstTime(ctx, field)
 			case "LastTime":
@@ -6846,6 +6935,93 @@ func (ec *executionContext) fieldContext_Query_allClusterNamespaceResourceCounts
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ClusterNamespaceResourceCount", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_eventsByClusterAndNamespace(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_eventsByClusterAndNamespace(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().EventsByClusterAndNamespace(rctx, fc.Args["clusterName"].(string), fc.Args["namespace"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Event)
+	fc.Result = res
+	return ec.marshalNEvent2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐEventᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_eventsByClusterAndNamespace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ClusterName":
+				return ec.fieldContext_Event_ClusterName(ctx, field)
+			case "Id":
+				return ec.fieldContext_Event_Id(ctx, field)
+			case "EventTime":
+				return ec.fieldContext_Event_EventTime(ctx, field)
+			case "OpType":
+				return ec.fieldContext_Event_OpType(ctx, field)
+			case "Name":
+				return ec.fieldContext_Event_Name(ctx, field)
+			case "Namespace":
+				return ec.fieldContext_Event_Namespace(ctx, field)
+			case "Kind":
+				return ec.fieldContext_Event_Kind(ctx, field)
+			case "Message":
+				return ec.fieldContext_Event_Message(ctx, field)
+			case "Reason":
+				return ec.fieldContext_Event_Reason(ctx, field)
+			case "Host":
+				return ec.fieldContext_Event_Host(ctx, field)
+			case "Event":
+				return ec.fieldContext_Event_Event(ctx, field)
+			case "ImageName":
+				return ec.fieldContext_Event_ImageName(ctx, field)
+			case "FirstTime":
+				return ec.fieldContext_Event_FirstTime(ctx, field)
+			case "LastTime":
+				return ec.fieldContext_Event_LastTime(ctx, field)
+			case "ExpiryDate":
+				return ec.fieldContext_Event_ExpiryDate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Event", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_eventsByClusterAndNamespace_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12019,6 +12195,8 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Event_Host(ctx, field, obj)
 		case "Event":
 			out.Values[i] = ec._Event_Event(ctx, field, obj)
+		case "ImageName":
+			out.Values[i] = ec._Event_ImageName(ctx, field, obj)
 		case "FirstTime":
 			out.Values[i] = ec._Event_FirstTime(ctx, field, obj)
 		case "LastTime":
@@ -12859,6 +13037,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_allClusterNamespaceResourceCounts(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "eventsByClusterAndNamespace":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_eventsByClusterAndNamespace(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

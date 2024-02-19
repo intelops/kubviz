@@ -18,6 +18,24 @@ type Query {
   allClusterDeprecatedAPIsCounts: [ClusterAPIsCount!]!
   allClusterDeletedAPIsCounts: [ClusterAPIsCount!]!
   allClusterNamespaceResourceCounts: [ClusterNamespaceResourceCount!]!
+  eventsByClusterAndNamespace(clusterName: String!, namespace: String!): [Event!]!
+}
+type Event {
+    ClusterName: String
+    Id: String
+    EventTime: String
+    OpType: String
+    Name: String
+    Namespace: String
+    Kind: String
+    Message: String
+    Reason: String
+    Host: String
+    Event: String
+    ImageName: String
+    FirstTime: String
+    LastTime: String
+    ExpiryDate: String
 }
 
 type Namespace {
@@ -210,22 +228,7 @@ type Resource {
   eventTime: String!
 }
 
-type Event {
-    ClusterName: String
-    Id: String
-    EventTime: String
-    OpType: String
-    Name: String
-    Namespace: String
-    Kind: String
-    Message: String
-    Reason: String
-    Host: String
-    Event: String
-    FirstTime: String
-    LastTime: String
-    ExpiryDate: String
-}
+
 
 type Rakkess {
     ClusterName: String
