@@ -62,7 +62,7 @@ spec:
                 key: {{ .Values.nats.auth.secret.key }}
             {{- end }}
           - name: KUBERHEALTHY_ENABLE
-            value: {{ .Values.kuberhealthy.enabled }}
+            value: "{{ .Values.kuberhealthy.enabled }}"
           - name: NATS_ADDRESS
             value: {{ .Values.nats.host }}
           - name: SCHEDULING_INTERVAL

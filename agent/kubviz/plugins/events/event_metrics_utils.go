@@ -3,6 +3,7 @@ package events
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -40,7 +41,7 @@ func PublishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, e
 	errCh <- nil
 }
 
-func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext) (bool, error) {
+func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, imageName string) (bool, error) {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("kubviz-publish-k8smetrics")
@@ -53,6 +54,7 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 		Type:        mtype,
 		Event:       mdata,
 		ClusterName: ClusterName,
+		ImageName:   imageName,
 	}
 	metricsJson, _ := json.Marshal(metrics)
 	_, err := js.Publish(constants.EventSubject, metricsJson)
@@ -61,6 +63,27 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 	}
 	log.Printf("Metrics with ID:%s has been published\n", id)
 	return false, nil
+}
+
+func getK8sPodImages(clientset *kubernetes.Clientset, namespace, podName string) ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	pod, err := clientset.CoreV1().Pods(namespace).Get(ctx, podName, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	var images []string
+	for _, container := range pod.Spec.Containers {
+		images = append(images, container.Image)
+	}
+
+	if len(images) == 0 {
+		return nil, errors.New("no containers found in the pod")
+	}
+
+	return images, nil
 }
 
 // createStream creates a stream by using JetStreamContext
@@ -162,15 +185,36 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
-				publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js)
+				images, err := getK8sPodImages(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
+				if err != nil {
+					log.Println("Error retrieving image names:", err)
+					return
+				}
+				for _, image := range images {
+					publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, image)
+				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				event := obj.(*v1.Event)
-				publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js)
+				images, err := getK8sPodImages(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
+				if err != nil {
+					log.Println("Error retrieving image names:", err)
+					return
+				}
+				for _, image := range images {
+					publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, image)
+				}
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				event := newObj.(*v1.Event)
-				publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js)
+				images, err := getK8sPodImages(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
+				if err != nil {
+					log.Println("Error retrieving image names:", err)
+					return
+				}
+				for _, image := range images {
+					publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, image)
+				}
 			},
 		},
 	)
