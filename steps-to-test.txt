@@ -135,3 +135,30 @@ query {
   }
 
   ...
+
+
+
+  resources - clusterName, namespace
+
+
+  MOM:
+  1. filter by cluster name in the unique namespaces. - Vijesh
+  2.Role id  - is single (it is missed in create group request) - Anila
+  3. Total no of users in group response is missing - get group - Nithu
+  4. Role details missing in get group users response - Nithu
+  5. Update group --> combine both the apis - vijesh (need to discuss with Iyappan)
+
+
+
+  DONE:
+  outdated
+  events
+
+  NOT DONE:
+  trivy_vul -
+  trivy_misconfig
+  trivyimage - only cluster name filter
+  kubescore
+  getall_resources
+  DeletedAPIs - by cluster name
+  depricated - by cluster name

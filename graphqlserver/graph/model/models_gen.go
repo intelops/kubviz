@@ -59,6 +59,7 @@ type Event struct {
 	Reason      *string `json:"Reason,omitempty"`
 	Host        *string `json:"Host,omitempty"`
 	Event       *string `json:"Event,omitempty"`
+	ImageName   *string `json:"ImageName,omitempty"`
 	FirstTime   *string `json:"FirstTime,omitempty"`
 	LastTime    *string `json:"LastTime,omitempty"`
 	ExpiryDate  *string `json:"ExpiryDate,omitempty"`

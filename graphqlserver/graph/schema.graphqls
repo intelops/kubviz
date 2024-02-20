@@ -1,5 +1,4 @@
 type Query {
-  allNamespaceData: [NamespaceData!]!
   allEvents: [Event!]!
   allRakkess: [Rakkess!]!
   allDeprecatedAPIs: [DeprecatedAPI!]!
@@ -10,7 +9,7 @@ type Query {
   allKubeScores: [Kubescore!]!
   allTrivyVuls: [TrivyVul!]!
   allTrivyMisconfigs: [TrivyMisconfig!]!
-  uniqueNamespaces: [Namespace!]!
+  uniqueNamespaces(clusterName: String!): [Namespace!]!
   uniqueClusters: [Cluster!]!
   outdatedImagesByClusterAndNamespace(clusterName: String!, namespace: String!): [OutdatedImage!]!
   outdatedImagesCount(clusterName: String!, namespace: String!): Int!
@@ -18,6 +17,24 @@ type Query {
   allClusterDeprecatedAPIsCounts: [ClusterAPIsCount!]!
   allClusterDeletedAPIsCounts: [ClusterAPIsCount!]!
   allClusterNamespaceResourceCounts: [ClusterNamespaceResourceCount!]!
+  eventsByClusterAndNamespace(clusterName: String!, namespace: String!): [Event!]!
+}
+type Event {
+    ClusterName: String
+    Id: String
+    EventTime: String
+    OpType: String
+    Name: String
+    Namespace: String
+    Kind: String
+    Message: String
+    Reason: String
+    Host: String
+    Event: String
+    ImageName: String
+    FirstTime: String
+    LastTime: String
+    ExpiryDate: String
 }
 
 type Namespace {
@@ -210,22 +227,7 @@ type Resource {
   eventTime: String!
 }
 
-type Event {
-    ClusterName: String
-    Id: String
-    EventTime: String
-    OpType: String
-    Name: String
-    Namespace: String
-    Kind: String
-    Message: String
-    Reason: String
-    Host: String
-    Event: String
-    FirstTime: String
-    LastTime: String
-    ExpiryDate: String
-}
+
 
 type Rakkess {
     ClusterName: String

@@ -36,13 +36,14 @@ func (r *Resolver) fetchClustersFromDatabase(ctx context.Context) ([]string, err
 	return clusters, nil
 }
 
-func (r *Resolver) fetchNamespacesFromDatabase(ctx context.Context) ([]string, error) {
+func (r *Resolver) fetchNamespacesFromDatabase(ctx context.Context, clusterName string) ([]string, error) {
 	if r.DB == nil {
 		return nil, fmt.Errorf("database connection is not initialized")
 	}
-	query := `SELECT DISTINCT Namespace FROM events`
+	// Include the cluster name in the WHERE clause to filter namespaces by cluster
+	query := `SELECT DISTINCT Namespace FROM events WHERE ClusterName = ?`
 
-	rows, err := r.DB.QueryContext(ctx, query)
+	rows, err := r.DB.QueryContext(ctx, query, clusterName)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %v", err)
 	}

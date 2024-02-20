@@ -12,47 +12,6 @@ import (
 	"github.com/intelops/kubviz/graphqlserver/graph/model"
 )
 
-// AllNamespaceData is the resolver for the allNamespaceData field.
-func (r *queryResolver) AllNamespaceData(ctx context.Context) ([]*model.NamespaceData, error) {
-	var namespaceDataList []*model.NamespaceData
-
-	namespaces, err := r.fetchNamespacesFromDatabase(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("error fetching namespaces: %v", err)
-	}
-
-	for _, ns := range namespaces {
-		outdatedImages, err := r.fetchOutdatedImages(ctx, ns)
-		if err != nil {
-			fmt.Printf("error fetching outdated images for namespace %s: %v\n", ns, err)
-			outdatedImages = []*model.OutdatedImage{}
-		}
-
-		kubeScores, err := r.fetchKubeScores(ctx, ns)
-		if err != nil {
-			fmt.Printf("error fetching kube scores for namespace %s: %v\n", ns, err)
-			kubeScores = []*model.KubeScore{}
-		}
-
-		resources, err := r.fetchResources(ctx, ns)
-		if err != nil {
-			fmt.Printf("error fetching resources for namespace %s: %v\n", ns, err)
-			resources = []*model.Resource{}
-		}
-
-		nd := &model.NamespaceData{
-			Namespace:      ns,
-			OutdatedImages: outdatedImages,
-			KubeScores:     kubeScores,
-			Resources:      resources,
-		}
-
-		namespaceDataList = append(namespaceDataList, nd)
-	}
-
-	return namespaceDataList, nil
-}
-
 // AllEvents is the resolver for the allEvents field.
 func (r *queryResolver) AllEvents(ctx context.Context) ([]*model.Event, error) {
 	if r.DB == nil {
@@ -396,8 +355,8 @@ func (r *queryResolver) AllTrivyMisconfigs(ctx context.Context) ([]*model.TrivyM
 }
 
 // UniqueNamespaces is the resolver for the uniqueNamespaces field.
-func (r *queryResolver) UniqueNamespaces(ctx context.Context) ([]*model.Namespace, error) {
-	namespaces, err := r.fetchNamespacesFromDatabase(ctx)
+func (r *queryResolver) UniqueNamespaces(ctx context.Context, clusterName string) ([]*model.Namespace, error) {
+	namespaces, err := r.fetchNamespacesFromDatabase(ctx, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -618,6 +577,43 @@ func (r *queryResolver) AllClusterNamespaceResourceCounts(ctx context.Context) (
 	}
 
 	return results, nil
+}
+
+// EventsByClusterAndNamespace is the resolver for the eventsByClusterAndNamespace field.
+func (r *queryResolver) EventsByClusterAndNamespace(ctx context.Context, clusterName string, namespace string) ([]*model.Event, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" || namespace == "" {
+		return nil, fmt.Errorf("clusterName and namespace cannot be empty")
+	}
+
+	query := `SELECT ClusterName, Id, EventTime, OpType, Name, Namespace, Kind, Message, Reason, Host, Event, ImageName, FirstTime, LastTime FROM events WHERE ClusterName = ? AND Namespace = ?`
+
+	rows, err := r.DB.QueryContext(ctx, query, clusterName, namespace)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return []*model.Event{}, nil
+		}
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var events []*model.Event
+	for rows.Next() {
+		var e model.Event
+		if err := rows.Scan(&e.ClusterName, &e.ID, &e.EventTime, &e.OpType, &e.Name, &e.Namespace, &e.Kind, &e.Message, &e.Reason, &e.Host, &e.Event, &e.ImageName, &e.FirstTime, &e.LastTime); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		events = append(events, &e)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return events, nil
 }
 
 // Query returns QueryResolver implementation.
