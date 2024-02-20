@@ -18,4 +18,10 @@ type Config struct {
 	TrivyImageConsumer   string `envconfig:"TRIVY_IMAGE_CONSUMER" required:"true"`
 	TrivySbomConsumer    string `envconfig:"TRIVY_SBOM_CONSUMER" required:"true"`
 	KuberhealthyConsumer string `envconfig:"KUBERHEALTHY_CONSUMER" required:"true"`
+	AwsEnable            bool   `envconfig:"AWS_ENABLE" default:"false"`
+	AWSRegion            string `envconfig:"AWS_REGION"`
+	AWSAccessKey         string `envconfig:"AWS_ACCESS_KEY"`
+	AWSSecretKey         string `envconfig:"AWS_SECRET_KEY"`
+	S3BucketName         string `envconfig:"S3_BUCKET_NAME"`
+	S3ObjectKey          string `envconfig:"S3_OBJECT_KEY"`
 }
