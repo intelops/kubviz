@@ -186,7 +186,6 @@ type ComplexityRoot struct {
 		AllEvents                           func(childComplexity int) int
 		AllGetAllResources                  func(childComplexity int) int
 		AllKubeScores                       func(childComplexity int) int
-		AllNamespaceData                    func(childComplexity int) int
 		AllRakkess                          func(childComplexity int) int
 		AllTrivyImages                      func(childComplexity int) int
 		AllTrivyMisconfigs                  func(childComplexity int) int
@@ -196,7 +195,7 @@ type ComplexityRoot struct {
 		OutdatedImagesByClusterAndNamespace func(childComplexity int, clusterName string, namespace string) int
 		OutdatedImagesCount                 func(childComplexity int, clusterName string, namespace string) int
 		UniqueClusters                      func(childComplexity int) int
-		UniqueNamespaces                    func(childComplexity int) int
+		UniqueNamespaces                    func(childComplexity int, clusterName string) int
 	}
 
 	Rakkess struct {
@@ -290,7 +289,6 @@ type ComplexityRoot struct {
 }
 
 type QueryResolver interface {
-	AllNamespaceData(ctx context.Context) ([]*model.NamespaceData, error)
 	AllEvents(ctx context.Context) ([]*model.Event, error)
 	AllRakkess(ctx context.Context) ([]*model.Rakkess, error)
 	AllDeprecatedAPIs(ctx context.Context) ([]*model.DeprecatedAPI, error)
@@ -301,7 +299,7 @@ type QueryResolver interface {
 	AllKubeScores(ctx context.Context) ([]*model.Kubescore, error)
 	AllTrivyVuls(ctx context.Context) ([]*model.TrivyVul, error)
 	AllTrivyMisconfigs(ctx context.Context) ([]*model.TrivyMisconfig, error)
-	UniqueNamespaces(ctx context.Context) ([]*model.Namespace, error)
+	UniqueNamespaces(ctx context.Context, clusterName string) ([]*model.Namespace, error)
 	UniqueClusters(ctx context.Context) ([]*model.Cluster, error)
 	OutdatedImagesByClusterAndNamespace(ctx context.Context, clusterName string, namespace string) ([]*model.OutdatedImage, error)
 	OutdatedImagesCount(ctx context.Context, clusterName string, namespace string) (int, error)
@@ -1031,13 +1029,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AllKubeScores(childComplexity), true
 
-	case "Query.allNamespaceData":
-		if e.complexity.Query.AllNamespaceData == nil {
-			break
-		}
-
-		return e.complexity.Query.AllNamespaceData(childComplexity), true
-
 	case "Query.allRakkess":
 		if e.complexity.Query.AllRakkess == nil {
 			break
@@ -1121,7 +1112,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.UniqueNamespaces(childComplexity), true
+		args, err := ec.field_Query_uniqueNamespaces_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UniqueNamespaces(childComplexity, args["clusterName"].(string)), true
 
 	case "Rakkess.ClusterName":
 		if e.complexity.Rakkess.ClusterName == nil {
@@ -1812,6 +1808,21 @@ func (ec *executionContext) field_Query_outdatedImagesCount_args(ctx context.Con
 		}
 	}
 	args["namespace"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_uniqueNamespaces_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
 	return args, nil
 }
 
@@ -5757,60 +5768,6 @@ func (ec *executionContext) fieldContext_OutdatedImage_eventTime(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_allNamespaceData(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_allNamespaceData(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AllNamespaceData(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.NamespaceData)
-	fc.Result = res
-	return ec.marshalNNamespaceData2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐNamespaceDataᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_allNamespaceData(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "namespace":
-				return ec.fieldContext_NamespaceData_namespace(ctx, field)
-			case "outdatedImages":
-				return ec.fieldContext_NamespaceData_outdatedImages(ctx, field)
-			case "kubeScores":
-				return ec.fieldContext_NamespaceData_kubeScores(ctx, field)
-			case "resources":
-				return ec.fieldContext_NamespaceData_resources(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type NamespaceData", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_allEvents(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_allEvents(ctx, field)
 	if err != nil {
@@ -6525,7 +6482,7 @@ func (ec *executionContext) _Query_uniqueNamespaces(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().UniqueNamespaces(rctx)
+		return ec.resolvers.Query().UniqueNamespaces(rctx, fc.Args["clusterName"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6555,6 +6512,17 @@ func (ec *executionContext) fieldContext_Query_uniqueNamespaces(ctx context.Cont
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Namespace", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_uniqueNamespaces_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12631,28 +12599,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "allNamespaceData":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_allNamespaceData(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "allEvents":
 			field := field
 
@@ -14441,60 +14387,6 @@ func (ec *executionContext) marshalNNamespace2ᚖgithubᚗcomᚋintelopsᚋkubvi
 		return graphql.Null
 	}
 	return ec._Namespace(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNNamespaceData2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐNamespaceDataᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.NamespaceData) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNNamespaceData2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐNamespaceData(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNNamespaceData2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐNamespaceData(ctx context.Context, sel ast.SelectionSet, v *model.NamespaceData) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._NamespaceData(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNOutdatedImage2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐOutdatedImageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.OutdatedImage) graphql.Marshaler {

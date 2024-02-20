@@ -1,5 +1,4 @@
 type Query {
-  allNamespaceData: [NamespaceData!]!
   allEvents: [Event!]!
   allRakkess: [Rakkess!]!
   allDeprecatedAPIs: [DeprecatedAPI!]!
@@ -10,7 +9,7 @@ type Query {
   allKubeScores: [Kubescore!]!
   allTrivyVuls: [TrivyVul!]!
   allTrivyMisconfigs: [TrivyMisconfig!]!
-  uniqueNamespaces: [Namespace!]!
+  uniqueNamespaces(clusterName: String!): [Namespace!]!
   uniqueClusters: [Cluster!]!
   outdatedImagesByClusterAndNamespace(clusterName: String!, namespace: String!): [OutdatedImage!]!
   outdatedImagesCount(clusterName: String!, namespace: String!): Int!
