@@ -1,16 +1,17 @@
 package trivy
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	exec "os/exec"
 	"strings"
 
 	"github.com/aquasecurity/trivy/pkg/types"
 	"github.com/google/uuid"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
@@ -46,13 +47,13 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 	for _, image := range images {
 		var report types.Report
 		scanCmd := fmt.Sprintf("trivy image %s --timeout 60m -f json -q --cache-dir %s", image.PullableImage, trivyImageCacheDir)
-		out, err := kubescore.ExecuteCommand(scanCmd)
+		out, err := executeTrivyImage(scanCmd)
 		if err != nil {
 			log.Printf("Error scanning image %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
 
-		parts := strings.SplitN(out, "{", 2)
+		parts := strings.SplitN(string(out), "{", 2)
 		if len(parts) <= 1 {
 			log.Println("No output from image scan command", err)
 			continue // Move on to the next image if there's no output
@@ -94,4 +95,23 @@ func PublishImageScanReports(report types.Report, js nats.JetStreamContext) erro
 	}
 	log.Printf("Trivy image report with ID:%s has been published\n", metrics.ID)
 	return nil
+}
+
+func executeTrivyImage(command string) ([]byte, error) {
+
+	ctx := context.Background()
+	tracer := otel.Tracer("trivy-sbom")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandSbom")
+	span.SetAttributes(attribute.String("trivy-image-agent", "trivyimage-command-running"))
+	defer span.End()
+
+	cmd := exec.Command("/bin/sh", "-c", command)
+	var outc, errc bytes.Buffer
+	cmd.Stdout = &outc
+	cmd.Stderr = &errc
+	err := cmd.Run()
+	if err != nil {
+		log.Println("Execute Trivy Command Error", err.Error())
+	}
+	return outc.Bytes(), err
 }
