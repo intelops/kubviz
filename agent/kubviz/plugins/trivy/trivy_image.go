@@ -101,7 +101,7 @@ func executeTrivyImage(command string) ([]byte, error) {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("trivy-sbom")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandSbom")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandTrivyImage")
 	span.SetAttributes(attribute.String("trivy-image-agent", "trivyimage-command-running"))
 	defer span.End()
 
