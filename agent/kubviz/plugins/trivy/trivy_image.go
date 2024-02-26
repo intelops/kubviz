@@ -100,7 +100,7 @@ func PublishImageScanReports(report types.Report, js nats.JetStreamContext) erro
 func executeTrivyImage(command string) ([]byte, error) {
 
 	ctx := context.Background()
-	tracer := otel.Tracer("trivy-sbom")
+	tracer := otel.Tracer("trivy-image")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandTrivyImage")
 	span.SetAttributes(attribute.String("trivy-image-agent", "trivyimage-command-running"))
 	defer span.End()
@@ -110,6 +110,9 @@ func executeTrivyImage(command string) ([]byte, error) {
 	cmd.Stdout = &outc
 	cmd.Stderr = &errc
 	err := cmd.Run()
+	log.Println("std OUT: ", outc.String())
+	log.Println("std ERROR: ", errc.String())
+
 	if err != nil {
 		log.Println("Execute Trivy Command Error", err.Error())
 	}
