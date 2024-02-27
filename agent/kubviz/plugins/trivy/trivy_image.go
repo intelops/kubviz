@@ -117,7 +117,7 @@ func executeTrivyImage(command string) ([]byte, error) {
 		log.Printf("Command Error: %s\n", errc.String())
 	}
 	if err != nil {
-		return nil, fmt.Errorf("error while executing trivy command: %v", err)
+		return nil, fmt.Errorf("error while executing trivy image command: %v", err)
 	}
 	return outc.Bytes(), err
 }

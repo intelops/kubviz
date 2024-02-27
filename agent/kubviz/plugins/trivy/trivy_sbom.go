@@ -65,8 +65,11 @@ func executeCommandSbom(command string) ([]byte, error) {
 	cmd.Stdout = &outc
 	cmd.Stderr = &errc
 	err := cmd.Run()
+	if errc.Len() > 0 {
+		log.Printf("Command Error: %s\n", errc.String())
+	}
 	if err != nil {
-		log.Println("Execute SBOM Command Error", err.Error())
+		return nil, fmt.Errorf("error while executing trivy sbom command: %v", err)
 	}
 	return outc.Bytes(), err
 }
@@ -94,7 +97,9 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 	}
 	for _, image := range images {
 
-		sbomcmd := fmt.Sprintf("trivy image --format cyclonedx %s --cache-dir %s", image.PullableImage, trivySbomCacheDir)
+		// sbomcmd := fmt.Sprintf("trivy image --format cyclonedx %s --cache-dir %s", image.PullableImage, trivySbomCacheDir)
+		sbomcmd := fmt.Sprintf("trivy image --format cyclonedx %s", image.PullableImage)
+
 		out, err := executeCommandSbom(sbomcmd)
 
 		if err != nil {
