@@ -10,10 +10,10 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
 
-	"context"
+	// "context"
 
 	"github.com/intelops/kubviz/pkg/mtlsnats"
-	"github.com/intelops/kubviz/pkg/opentelemetry"
+	// "github.com/intelops/kubviz/pkg/opentelemetry"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -120,16 +120,16 @@ func main() {
 		clientset = events.GetK8sClient(config)
 	}
 
-	tp, err := opentelemetry.InitTracer()
-	if err != nil {
-		// log.Fatal(err)
-		log.Println(err)
-	}
-	defer func() {
-		if err := tp.Shutdown(context.Background()); err != nil {
-			log.Printf("Error shutting down tracer provider: %v", err)
-		}
-	}()
+	// tp, err := opentelemetry.InitTracer()
+	// if err != nil {
+	// 	// log.Fatal(err)
+	// 	log.Println(err)
+	// }
+	// defer func() {
+	// 	if err := tp.Shutdown(context.Background()); err != nil {
+	// 		log.Printf("Error shutting down tracer provider: %v", err)
+	// 	}
+	// }()
 
 	// go events.PublishMetrics(clientset, js, clusterMetricsChan)
 	// if cfg.KuberHealthyEnable {
