@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
+	// "os/signal"
+	// "syscall"
 	"time"
 
-	"github.com/go-co-op/gocron"
+	// "github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
 
 	// "context"
@@ -15,10 +15,10 @@ import (
 	"github.com/intelops/kubviz/pkg/mtlsnats"
 	// "github.com/intelops/kubviz/pkg/opentelemetry"
 
-	"k8s.io/client-go/kubernetes"
+	// "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/intelops/kubviz/agent/config"
+	// "github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/events"
 
 	// "github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
@@ -30,7 +30,7 @@ import (
 	// "github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
 
 	"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
-	"github.com/intelops/kubviz/agent/kubviz/scheduler"
+	// "github.com/intelops/kubviz/agent/kubviz/scheduler"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -63,17 +63,17 @@ var (
 )
 
 func main() {
-	log.Println("trivy test code")
+	log.Println("trivy image test code")
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	env := Production
 	// clusterMetricsChan := make(chan error, 1)
-	cfg, err := config.GetAgentConfigurations()
-	if err != nil {
-		log.Fatal("Failed to retrieve agent configurations", err)
-	}
+	// cfg, err := config.GetAgentConfigurations()
+	// if err != nil {
+	// 	log.Fatal("Failed to retrieve agent configurations", err)
+	// }
 	var (
-		config    *rest.Config
-		clientset *kubernetes.Clientset
+		config *rest.Config
+		// clientset *kubernetes.Clientset
 	)
 
 	var mtlsConfig mtlsnats.MtlsConfig
@@ -99,8 +99,8 @@ func main() {
 	}
 
 	if nc == nil {
-		nc, err = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
-		events.CheckErr(err)
+		nc, _ = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+		// events.CheckErr(err)
 	}
 	js, err := nc.JetStream()
 	events.CheckErr(err)
@@ -111,13 +111,13 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		clientset = events.GetK8sClient(config)
+		// clientset = events.GetK8sClient(config)
 	} else {
 		config, err = rest.InClusterConfig()
 		if err != nil {
 			log.Fatal(err)
 		}
-		clientset = events.GetK8sClient(config)
+		// clientset = events.GetK8sClient(config)
 	}
 
 	// tp, err := opentelemetry.InitTracer()
@@ -157,28 +157,28 @@ func main() {
 
 	collectAndPublishMetrics()
 
-	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
-		scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)
+	// if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
+	// 	scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)
 
-		// Start the scheduler
-		scheduler.Start()
-		signals := make(chan os.Signal, 1)
-		signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
-		<-signals
+	// 	// Start the scheduler
+	// 	scheduler.Start()
+	// 	signals := make(chan os.Signal, 1)
+	// 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+	// 	<-signals
 
-		scheduler.Stop()
-	} else {
-		if schedulingIntervalStr == "" {
-			schedulingIntervalStr = "20m"
-		}
-		schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
-		if err != nil {
-			log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
-		}
-		s := gocron.NewScheduler(time.UTC)
-		s.Every(schedulingInterval).Do(func() {
-			collectAndPublishMetrics()
-		})
-		s.StartBlocking()
-	}
+	// 	scheduler.Stop()
+	// } else {
+	// 	if schedulingIntervalStr == "" {
+	// 		schedulingIntervalStr = "20m"
+	// 	}
+	// 	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
+	// 	if err != nil {
+	// 		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+	// 	}
+	// 	s := gocron.NewScheduler(time.UTC)
+	// 	s.Every(schedulingInterval).Do(func() {
+	// 		collectAndPublishMetrics()
+	// 	})
+	// 	s.StartBlocking()
+	// }
 }
