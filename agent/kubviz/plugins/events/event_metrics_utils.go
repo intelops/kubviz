@@ -19,27 +19,27 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
+	// "k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/cache"
+	// "k8s.io/client-go/tools/cache"
 )
 
 var ClusterName string = os.Getenv("CLUSTER_NAME")
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
-func PublishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
+// func PublishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
 
-	ctx := context.Background()
-	tracer := otel.Tracer("kubviz-publish-metrics")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishMetrics")
-	span.SetAttributes(attribute.String("kubviz-agent", "publish-metrics"))
-	defer span.End()
+// 	ctx := context.Background()
+// 	tracer := otel.Tracer("kubviz-publish-metrics")
+// 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishMetrics")
+// 	span.SetAttributes(attribute.String("kubviz-agent", "publish-metrics"))
+// 	defer span.End()
 
-	watchK8sEvents(clientset, js)
-	errCh <- nil
-}
+// 	watchK8sEvents(clientset, js)
+// 	errCh <- nil
+// }
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, imageName string) (bool, error) {
 
@@ -164,65 +164,66 @@ func LogErr(err error) {
 		log.Println(err)
 	}
 }
-func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 
-	ctx := context.Background()
-	tracer := otel.Tracer("kubviz-watch-k8sevents")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "watchK8sEvents")
-	span.SetAttributes(attribute.String("kubviz-agent", "watch-k8sevents"))
-	defer span.End()
+// func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 
-	watchlist := cache.NewListWatchFromClient(
-		clientset.CoreV1().RESTClient(),
-		"events",
-		v1.NamespaceAll,
-		fields.Everything(),
-	)
-	_, controller := cache.NewInformer(
-		watchlist,
-		&v1.Event{},
-		0, // Duration is int64
-		cache.ResourceEventHandlerFuncs{
-			AddFunc: func(obj interface{}) {
-				event := obj.(*v1.Event)
-				images, err := getK8sPodImages(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
-				if err != nil {
-					log.Println("Error retrieving image names:", err)
-					return
-				}
-				for _, image := range images {
-					publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, image)
-				}
-			},
-			DeleteFunc: func(obj interface{}) {
-				event := obj.(*v1.Event)
-				images, err := getK8sPodImages(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
-				if err != nil {
-					log.Println("Error retrieving image names:", err)
-					return
-				}
-				for _, image := range images {
-					publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, image)
-				}
-			},
-			UpdateFunc: func(oldObj, newObj interface{}) {
-				event := newObj.(*v1.Event)
-				images, err := getK8sPodImages(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
-				if err != nil {
-					log.Println("Error retrieving image names:", err)
-					return
-				}
-				for _, image := range images {
-					publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, image)
-				}
-			},
-		},
-	)
-	stop := make(chan struct{})
-	defer close(stop)
-	go controller.Run(stop)
+// 	ctx := context.Background()
+// 	tracer := otel.Tracer("kubviz-watch-k8sevents")
+// 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "watchK8sEvents")
+// 	span.SetAttributes(attribute.String("kubviz-agent", "watch-k8sevents"))
+// 	defer span.End()
 
-	for {
-		time.Sleep(time.Second)
-	}
-}
+// 	watchlist := cache.NewListWatchFromClient(
+// 		clientset.CoreV1().RESTClient(),
+// 		"events",
+// 		v1.NamespaceAll,
+// 		fields.Everything(),
+// 	)
+// 	_, controller := cache.NewInformer(
+// 		watchlist,
+// 		&v1.Event{},
+// 		0, // Duration is int64
+// 		cache.ResourceEventHandlerFuncs{
+// 			AddFunc: func(obj interface{}) {
+// 				event := obj.(*v1.Event)
+// 				images, err := getK8sPodImages(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
+// 				if err != nil {
+// 					log.Println("Error retrieving image names:", err)
+// 					return
+// 				}
+// 				for _, image := range images {
+// 					publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, image)
+// 				}
+// 			},
+// 			DeleteFunc: func(obj interface{}) {
+// 				event := obj.(*v1.Event)
+// 				images, err := getK8sPodImages(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
+// 				if err != nil {
+// 					log.Println("Error retrieving image names:", err)
+// 					return
+// 				}
+// 				for _, image := range images {
+// 					publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, image)
+// 				}
+// 			},
+// 			UpdateFunc: func(oldObj, newObj interface{}) {
+// 				event := newObj.(*v1.Event)
+// 				images, err := getK8sPodImages(clientset, event.InvolvedObject.Namespace, event.InvolvedObject.Name)
+// 				if err != nil {
+// 					log.Println("Error retrieving image names:", err)
+// 					return
+// 				}
+// 				for _, image := range images {
+// 					publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, image)
+// 				}
+// 			},
+// 		},
+// 	)
+// 	stop := make(chan struct{})
+// 	defer close(stop)
+// 	go controller.Run(stop)
+
+// 	for {
+// 		time.Sleep(time.Second)
+// 	}
+// }
