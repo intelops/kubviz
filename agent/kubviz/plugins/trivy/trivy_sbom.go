@@ -97,8 +97,8 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 	}
 	for _, image := range images {
 
-		// sbomcmd := fmt.Sprintf("trivy image --format cyclonedx %s --cache-dir %s", image.PullableImage, trivySbomCacheDir)
-		sbomcmd := fmt.Sprintf("trivy image --format cyclonedx %s", image.PullableImage)
+		sbomcmd := fmt.Sprintf("trivy image --format cyclonedx %s --cache-dir %s", image.PullableImage, trivySbomCacheDir)
+		// sbomcmd := fmt.Sprintf("trivy image --format cyclonedx %s", image.PullableImage)
 
 		out, err := executeCommandSbom(sbomcmd)
 
