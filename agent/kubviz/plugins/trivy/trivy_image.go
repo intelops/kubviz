@@ -110,9 +110,9 @@ func executeTrivyImage(command string) ([]byte, error) {
 	cmd.Stdout = &outc
 	cmd.Stderr = &errc
 	err := cmd.Run()
-	if outc.Len() > 0 {
-		log.Printf("Command Output: %s\n", outc.String())
-	}
+	// if outc.Len() > 0 {
+	// 	log.Printf("Command Output: %s\n", outc.String())
+	// }
 	if errc.Len() > 0 {
 		log.Printf("Command Error: %s\n", errc.String())
 	}
