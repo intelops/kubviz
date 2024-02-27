@@ -103,23 +103,23 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		out, err := executeCommandSbom(sbomcmd)
 
 		if err != nil {
-			log.Printf("Error executing Trivy for image sbom %s: %v", image.PullableImage, err)
+			// log.Printf("Error executing Trivy for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
 		if out == nil {
-			log.Printf("Trivy output is nil for image sbom %s", image.PullableImage)
+			// log.Printf("Trivy output is nil for image sbom %s", image.PullableImage)
 			continue
 		}
 		// Check if the output is empty or invalid JSON
 		if len(out) == 0 {
-			log.Printf("Trivy output is empty for image sbom %s", image.PullableImage)
+			// log.Printf("Trivy output is empty for image sbom %s", image.PullableImage)
 			continue // Move on to the next image
 		}
-
+		log.Println(out)
 		var report cyclonedx.BOM
 		err = json.Unmarshal(out, &report)
 		if err != nil {
-			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
+			// log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
 		PublishTrivySbomReport(report, js)
