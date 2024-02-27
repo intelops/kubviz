@@ -2,7 +2,7 @@ package trivy
 
 import (
 	"bytes"
-	"context"
+	// "context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -15,28 +15,28 @@ import (
 	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
-	"github.com/intelops/kubviz/pkg/opentelemetry"
+	// "github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
+	// "go.opentelemetry.io/otel"
+	// "go.opentelemetry.io/otel/attribute"
 	"k8s.io/client-go/rest"
 )
 
 func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 	pvcMountPath := "/mnt/agent/kbz"
 	trivyImageCacheDir := fmt.Sprintf("%s/trivy-imagecache", pvcMountPath)
-	err := os.MkdirAll(trivyImageCacheDir, 0755)
+	err := os.MkdirAll(trivyImageCacheDir, 0777)
 	if err != nil {
 		log.Printf("Error creating Trivy Image cache directory: %v\n", err)
 		return err
 	}
 	// clearCacheCmd := "trivy image --clear-cache"
 
-	ctx := context.Background()
-	tracer := otel.Tracer("trivy-image")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyImageScans")
-	span.SetAttributes(attribute.String("trivy-image-scan-agent", "image-scan"))
-	defer span.End()
+	// ctx := context.Background()
+	// tracer := otel.Tracer("trivy-image")
+	// _, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyImageScans")
+	// span.SetAttributes(attribute.String("trivy-image-scan-agent", "image-scan"))
+	// defer span.End()
 
 	images, err := outdated.ListImages(config)
 	if err != nil {
@@ -44,12 +44,12 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 		return err
 	}
 
-	for _, image := range images {
+	for i, image := range images {
 		var report types.Report
 		scanCmd := fmt.Sprintf("trivy image %s --timeout 60m -f json -q --cache-dir %s", image.PullableImage, trivyImageCacheDir)
 		out, err := executeTrivyImage(scanCmd)
 		if err != nil {
-			log.Printf("Error scanning image %s: %v", image.PullableImage, err)
+			log.Printf("Error scanning image with index %v : %s: %v", i, image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
 
@@ -99,22 +99,25 @@ func PublishImageScanReports(report types.Report, js nats.JetStreamContext) erro
 
 func executeTrivyImage(command string) ([]byte, error) {
 
-	ctx := context.Background()
-	tracer := otel.Tracer("trivy-image")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandTrivyImage")
-	span.SetAttributes(attribute.String("trivy-image-agent", "trivyimage-command-running"))
-	defer span.End()
+	// ctx := context.Background()
+	// tracer := otel.Tracer("trivy-image")
+	// _, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandTrivyImage")
+	// span.SetAttributes(attribute.String("trivy-image-agent", "trivyimage-command-running"))
+	// defer span.End()
 
 	cmd := exec.Command("/bin/sh", "-c", command)
 	var outc, errc bytes.Buffer
 	cmd.Stdout = &outc
 	cmd.Stderr = &errc
 	err := cmd.Run()
-	log.Println("std OUT: ", outc.String())
-	log.Println("std ERROR: ", errc.String())
-
+	if outc.Len() > 0 {
+		log.Printf("Command Output: %s\n", outc.String())
+	}
+	if errc.Len() > 0 {
+		log.Printf("Command Error: %s\n", errc.String())
+	}
 	if err != nil {
-		log.Println("Execute Trivy Command Error", err.Error())
+		return nil, err
 	}
 	return outc.Bytes(), err
 }

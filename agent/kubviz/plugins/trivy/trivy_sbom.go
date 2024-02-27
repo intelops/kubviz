@@ -75,17 +75,17 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 	log.Println("trivy sbom scan started...")
 	pvcMountPath := "/mnt/agent/kbz"
 	trivySbomCacheDir := fmt.Sprintf("%s/trivy-sbomcache", pvcMountPath)
-	err := os.MkdirAll(trivySbomCacheDir, 0755)
+	err := os.MkdirAll(trivySbomCacheDir, 0777)
 	if err != nil {
 		log.Printf("Error creating Trivy cache directory: %v\n", err)
 		return err
 	}
 
-	ctx := context.Background()
-	tracer := otel.Tracer("trivy-sbom")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivySbomScan")
-	span.SetAttributes(attribute.String("sbom", "sbom-creation"))
-	defer span.End()
+	// ctx := context.Background()
+	// tracer := otel.Tracer("trivy-sbom")
+	// _, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivySbomScan")
+	// span.SetAttributes(attribute.String("sbom", "sbom-creation"))
+	// defer span.End()
 
 	images, err := outdated.ListImages(config)
 

@@ -46,18 +46,18 @@ func executeCommandTrivy(command string) ([]byte, error) {
 func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	pvcMountPath := "/mnt/agent/kbz"
 	trivyCacheDir := fmt.Sprintf("%s/trivy-cache", pvcMountPath)
-	err := os.MkdirAll(trivyCacheDir, 0755)
+	err := os.MkdirAll(trivyCacheDir, 0777)
 	if err != nil {
 		log.Printf("Error creating Trivy cache directory: %v\n", err)
 		return err
 	}
 	var report report.ConsolidatedReport
 
-	ctx := context.Background()
-	tracer := otel.Tracer("trivy-cluster")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyK8sClusterScan")
-	span.SetAttributes(attribute.String("cluster-name", report.ClusterName))
-	defer span.End()
+	// ctx := context.Background()
+	// tracer := otel.Tracer("trivy-cluster")
+	// _, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyK8sClusterScan")
+	// span.SetAttributes(attribute.String("cluster-name", report.ClusterName))
+	// defer span.End()
 
 	cmdString := fmt.Sprintf("trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 60m -f json --cache-dir %s --debug", trivyCacheDir)
 	// clearCacheCmd := "trivy k8s --clear-cache"
