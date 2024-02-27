@@ -115,7 +115,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			// log.Printf("Trivy output is empty for image sbom %s", image.PullableImage)
 			continue // Move on to the next image
 		}
-		log.Println(out)
+		log.Println(string(out))
 		var report cyclonedx.BOM
 		err = json.Unmarshal(out, &report)
 		if err != nil {
