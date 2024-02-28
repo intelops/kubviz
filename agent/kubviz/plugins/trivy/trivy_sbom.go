@@ -13,6 +13,8 @@ import (
 	//"github.com/google/uuid"
 	//"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
 	//"github.com/intelops/kubviz/constants"
+	"github.com/google/uuid"
+	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 	"github.com/pkg/errors"
 
@@ -193,7 +195,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
-		log.Println("*****map data", report)
+		//log.Println("*****map data", report)
 
 		// Example: Extract relevant fields from the dynamic JSON data
 		//componentName := report["ComponentName"].(string)
@@ -206,12 +208,36 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		//}
 
 		// Publish the report
-		// err = PublishTrivySbomReport(sbomReport, js)
-		// if err != nil {
-		// 	log.Printf("Error publishing Trivy SBOM report for image %s: %v", image.PullableImage, err)
-		// 	continue
-		// }
+		err = PublishTrivySbomReport(report, js)
+		if err != nil {
+			log.Printf("Error publishing Trivy SBOM report for image %s: %v", image.PullableImage, err)
+			continue
+		}
 	}
+	return nil
+}
+
+func PublishTrivySbomReport(report map[string]interface{}, js nats.JetStreamContext) error {
+	log.Println("trivy PublishTrivySbomReport started...")
+
+	metrics := model.Sbom{
+		ID:          uuid.New().String(),
+		ClusterName: ClusterName,
+		Report:      report,
+	}
+	metricsJson, err := json.Marshal(metrics)
+	if err != nil {
+		log.Println("error occurred while marshalling sbom metrics in agent", err.Error())
+		return err
+	}
+	_, err = js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
+	if err != nil {
+		return err
+	}
+	log.Printf("Trivy sbom report with Id %v has been published\n", metrics.ID)
+	log.Printf("Trivy sbom report with Id %v has been published\n", metrics.ClusterName)
+	log.Printf("Trivy sbom report with Id %v has been published\n", metrics.Report)
+
 	return nil
 }
 
