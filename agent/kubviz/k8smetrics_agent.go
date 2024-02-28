@@ -100,7 +100,7 @@ func main() {
 	}
 
 	if nc == nil {
-		nc, _ = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+		nc, err = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
 		events.CheckErr(err)
 	}
 	js, err := nc.JetStream()
