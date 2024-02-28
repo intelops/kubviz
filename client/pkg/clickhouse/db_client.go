@@ -38,7 +38,7 @@ type DBInterface interface {
 	InsertGitEvent(string)
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
 	InsertTrivyImageMetrics(metrics model.TrivyImage)
-	InsertTrivySbomMetrics(metrics model.SbomData)
+	InsertTrivySbomMetrics(metrics model.Sbom)
 	InsertTrivyMetrics(metrics model.Trivy)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
@@ -841,7 +841,7 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 
 	}
 }
-func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
+func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	ctx := context.Background()
 	tracer := otel.Tracer("insert-trivy-sbom")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertTrivySbomMetrics")
@@ -860,13 +860,13 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 	if _, err := stmt.Exec(
 		metrics.ID,
 		metrics.ClusterName,
-		metrics.ComponentName,
-		metrics.PackageName,
-		metrics.PackageUrl,
-		metrics.BomRef,
-		metrics.SerialNumber,
-		int32(metrics.CycloneDxVersion),
-		metrics.BomFormat,
+		// metrics.ComponentName,
+		// metrics.PackageName,
+		// metrics.PackageUrl,
+		// metrics.BomRef,
+		// metrics.SerialNumber,
+		// int32(metrics.CycloneDxVersion),
+		// metrics.BomFormat,
 	); err != nil {
 		log.Fatal(err)
 	}
