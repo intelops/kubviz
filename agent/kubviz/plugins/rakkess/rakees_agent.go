@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -99,7 +100,7 @@ func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
 		if err != nil {
 			return err
 		}
-		//log.Printf("Metrics with resource %s has been published", resourceType)
+		log.Printf("Metrics with resource %s has been published", resourceType)
 	}
 	return nil
 

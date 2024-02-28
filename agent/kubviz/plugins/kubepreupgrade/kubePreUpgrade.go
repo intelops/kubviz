@@ -79,7 +79,7 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 		}
 	}
 
-	//log.Printf("Metrics with Deletedapi and depricated api has been published")
+	log.Printf("Metrics with Deletedapi and depricated api has been published")
 	return nil
 }
 

@@ -75,7 +75,7 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 	if err != nil {
 		return err
 	}
-	//log.Printf("Metrics with outdated images has been published")
+	log.Printf("Metrics with outdated images has been published")
 	return nil
 }
 
