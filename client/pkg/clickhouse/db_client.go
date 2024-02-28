@@ -857,16 +857,58 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 		log.Fatalf("error preparing statement: %v", err)
 	}
 
+	data := metrics.Report
+
+	bomComponents, ok := data["components"].([]interface{})
+	if !ok {
+		log.Println("error: components not found or not in expected format")
+	}
+	var componentName, bomRef, serialNumber, bomFormat, purl, componentType string
+	var version int32
+
+	// Iterate over the components to find the desired name
+	for _, component := range bomComponents {
+		componentMap, ok := component.(map[string]interface{})
+		if !ok {
+			log.Println("error: component not in expected format")
+			continue
+		}
+		if name, ok := componentMap["name"].(string); ok {
+			componentName = name
+			break
+		}
+	}
+
+	metadata, ok := data["metadata"].(map[string]interface{})
+	if !ok {
+		log.Println("error: metadata not found or not in expected format")
+		return
+	}
+
+	component, ok := metadata["component"].(map[string]interface{})
+	if !ok {
+		log.Println("error: component not found or not in expected format")
+		return
+	}
+
+	bomRef, _ = component["bom-ref"].(string)
+	purl, _ = component["purl"].(string)
+	componentType, _ = component["type"].(string)
+
+	serialNumber, _ = data["serialNumber"].(string)
+	version, _ = data["version"].(int32)
+	bomFormat, _ = data["bomFormat"].(string)
+
 	if _, err := stmt.Exec(
 		metrics.ID,
 		metrics.ClusterName,
-		// metrics.ComponentName,
-		// metrics.PackageName,
-		// metrics.PackageUrl,
-		// metrics.BomRef,
-		// metrics.SerialNumber,
-		// int32(metrics.CycloneDxVersion),
-		// metrics.BomFormat,
+		componentName,
+		componentType,
+		purl,
+		bomRef,
+		serialNumber,
+		version,
+		bomFormat,
 	); err != nil {
 		log.Fatal(err)
 	}

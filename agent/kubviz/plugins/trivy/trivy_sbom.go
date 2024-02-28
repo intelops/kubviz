@@ -236,7 +236,7 @@ func PublishTrivySbomReport(report map[string]interface{}, js nats.JetStreamCont
 	}
 	log.Printf("Trivy sbom report with Id %v has been published\n", metrics.ID)
 	log.Printf("Trivy sbom report with Id %v has been published\n", metrics.ClusterName)
-	log.Printf("Trivy sbom report with Id %v has been published\n", metrics.Report)
+	//log.Printf("Trivy sbom report with Id %v has been published\n", metrics.Report)
 
 	return nil
 }
