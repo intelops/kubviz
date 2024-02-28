@@ -81,7 +81,7 @@ func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamCon
 		return err
 	}
 	//log.Printf("Recommendations with ID:%s has been published\n", id)
-	log.Printf("Recommendations  :%#v", report)
+	//log.Printf("Recommendations  :%#v", report)
 	return nil
 }
 
