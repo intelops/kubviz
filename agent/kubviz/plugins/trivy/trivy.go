@@ -58,7 +58,7 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	// _, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyK8sClusterScan")
 	// span.SetAttributes(attribute.String("cluster-name", report.ClusterName))
 	// defer span.End()
-
+	log.Println("trivy vul and misconfig scan started")
 	cmdString := fmt.Sprintf("trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 60m -f json --cache-dir %s --debug", trivyCacheDir)
 	// clearCacheCmd := "trivy k8s --clear-cache"
 	out, err := executeCommandTrivy(cmdString)
