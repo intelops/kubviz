@@ -3,33 +3,35 @@ package main
 import (
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
+
+	// "os/signal"
+	// "syscall"
 	"time"
 
-	"github.com/go-co-op/gocron"
+	// "github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
 
-	"context"
+	// "context"
 
 	"github.com/intelops/kubviz/pkg/mtlsnats"
-	"github.com/intelops/kubviz/pkg/opentelemetry"
+	// "github.com/intelops/kubviz/pkg/opentelemetry"
 
-	"k8s.io/client-go/kubernetes"
+	// "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/intelops/kubviz/agent/config"
+	// "github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/events"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
 
-	"github.com/intelops/kubviz/agent/kubviz/plugins/kuberhealthy"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
+	// "github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
+	// "github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
+
+	// "github.com/intelops/kubviz/agent/kubviz/plugins/kuberhealthy"
+	// "github.com/intelops/kubviz/agent/kubviz/plugins/kubescore"
+	// "github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
+	// "github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
 
 	"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
-	"github.com/intelops/kubviz/agent/kubviz/scheduler"
+	// "github.com/intelops/kubviz/agent/kubviz/scheduler"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -62,16 +64,17 @@ var (
 )
 
 func main() {
+	log.Println("trivy image test code")
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	env := Production
-	clusterMetricsChan := make(chan error, 1)
-	cfg, err := config.GetAgentConfigurations()
-	if err != nil {
-		log.Fatal("Failed to retrieve agent configurations", err)
-	}
+	// clusterMetricsChan := make(chan error, 1)
+	// cfg, err := config.GetAgentConfigurations()
+	// if err != nil {
+	// 	log.Fatal("Failed to retrieve agent configurations", err)
+	// }
 	var (
-		config    *rest.Config
-		clientset *kubernetes.Clientset
+		config *rest.Config
+		//clientset *kubernetes.Clientset
 	)
 
 	var mtlsConfig mtlsnats.MtlsConfig
@@ -97,8 +100,8 @@ func main() {
 	}
 
 	if nc == nil {
-		nc, err = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
-		events.CheckErr(err)
+		nc, _ = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+		// events.CheckErr(err)
 	}
 	js, err := nc.JetStream()
 	events.CheckErr(err)
@@ -109,73 +112,74 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		clientset = events.GetK8sClient(config)
+		// clientset = events.GetK8sClient(config)
 	} else {
 		config, err = rest.InClusterConfig()
 		if err != nil {
 			log.Fatal(err)
 		}
-		clientset = events.GetK8sClient(config)
+		// clientset = events.GetK8sClient(config)
 	}
 
-	tp, err := opentelemetry.InitTracer()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err := tp.Shutdown(context.Background()); err != nil {
-			log.Printf("Error shutting down tracer provider: %v", err)
-		}
-	}()
+	// tp, err := opentelemetry.InitTracer()
+	// if err != nil {
+	// 	// log.Fatal(err)
+	// 	log.Println(err)
+	// }
+	// defer func() {
+	// 	if err := tp.Shutdown(context.Background()); err != nil {
+	// 		log.Printf("Error shutting down tracer provider: %v", err)
+	// 	}
+	// }()
 
-	go events.PublishMetrics(clientset, js, clusterMetricsChan)
-	if cfg.KuberHealthyEnable {
-		go kuberhealthy.StartKuberHealthy(js)
-	}
+	// go events.PublishMetrics(clientset, js, clusterMetricsChan)
+	// if cfg.KuberHealthyEnable {
+	// 	go kuberhealthy.StartKuberHealthy(js)
+	// }
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
-		err := outdated.OutDatedImages(config, js)
-		events.LogErr(err)
-		err = kubepreupgrade.KubePreUpgradeDetector(config, js)
-		events.LogErr(err)
-		err = ketall.GetAllResources(config, js)
-		events.LogErr(err)
-		err = rakkess.RakeesOutput(config, js)
+		// err := outdated.OutDatedImages(config, js)
+		// events.LogErr(err)
+		// err = kubepreupgrade.KubePreUpgradeDetector(config, js)
+		// events.LogErr(err)
+		// err = ketall.GetAllResources(config, js)
+		// events.LogErr(err)
+		// err = rakkess.RakeesOutput(config, js)
+		// events.LogErr(err)
+		// err = trivy.RunTrivyImageScans(config, js)
+		// events.LogErr(err)
+		err = trivy.RunTrivyK8sClusterScan(js)
 		events.LogErr(err)
 		err = trivy.RunTrivySbomScan(config, js)
 		events.LogErr(err)
-		err = trivy.RunTrivyImageScans(config, js)
-		events.LogErr(err)
-		err = trivy.RunTrivyK8sClusterScan(js)
-		events.LogErr(err)
-		err = kubescore.RunKubeScore(clientset, js)
-		events.LogErr(err)
+		// err = kubescore.RunKubeScore(clientset, js)
+		// events.LogErr(err)
 	}
 
 	collectAndPublishMetrics()
 
-	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
-		scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)
+	// if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
+	// 	scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)
 
-		// Start the scheduler
-		scheduler.Start()
-		signals := make(chan os.Signal, 1)
-		signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
-		<-signals
+	// 	// Start the scheduler
+	// 	scheduler.Start()
+	// 	signals := make(chan os.Signal, 1)
+	// 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+	// 	<-signals
 
-		scheduler.Stop()
-	} else {
-		if schedulingIntervalStr == "" {
-			schedulingIntervalStr = "20m"
-		}
-		schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
-		if err != nil {
-			log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
-		}
-		s := gocron.NewScheduler(time.UTC)
-		s.Every(schedulingInterval).Do(func() {
-			collectAndPublishMetrics()
-		})
-		s.StartBlocking()
-	}
+	// 	scheduler.Stop()
+	// } else {
+	// 	if schedulingIntervalStr == "" {
+	// 		schedulingIntervalStr = "20m"
+	// 	}
+	// 	schedulingInterval, err := time.ParseDuration(schedulingIntervalStr)
+	// 	if err != nil {
+	// 		log.Fatalf("Failed to parse SCHEDULING_INTERVAL: %v", err)
+	// 	}
+	// 	s := gocron.NewScheduler(time.UTC)
+	// 	s.Every(schedulingInterval).Do(func() {
+	// 		collectAndPublishMetrics()
+	// 	})
+	// 	s.StartBlocking()
+	// }
 }
