@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+
 	// "os/signal"
 	// "syscall"
 	"time"
@@ -73,7 +74,7 @@ func main() {
 	// }
 	var (
 		config *rest.Config
-		// clientset *kubernetes.Clientset
+		//clientset *kubernetes.Clientset
 	)
 
 	var mtlsConfig mtlsnats.MtlsConfig
@@ -147,10 +148,10 @@ func main() {
 		// events.LogErr(err)
 		// err = trivy.RunTrivyImageScans(config, js)
 		// events.LogErr(err)
+		err = trivy.RunTrivyK8sClusterScan(js)
+		events.LogErr(err)
 		err = trivy.RunTrivySbomScan(config, js)
 		events.LogErr(err)
-		// err = trivy.RunTrivyK8sClusterScan(js)
-		// events.LogErr(err)
 		// err = kubescore.RunKubeScore(clientset, js)
 		// events.LogErr(err)
 	}
