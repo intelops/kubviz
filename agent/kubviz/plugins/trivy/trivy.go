@@ -36,7 +36,7 @@ func executeCommandTrivy(command string) ([]byte, error) {
 	cmd.Stdout = &outc
 	cmd.Stderr = &errc
 	err := cmd.Run()
-	log.Println("&&&&reason for kill&&&", (errc.String()))
+	log.Println("#####reason for kill", (errc.String()))
 
 	if err != nil {
 		log.Println("Execute Trivy Command Error", err.Error())
