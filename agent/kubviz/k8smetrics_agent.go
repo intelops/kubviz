@@ -20,6 +20,7 @@ import (
 
 	"github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/events"
+
 	//"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
 	//"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
 
@@ -146,8 +147,8 @@ func main() {
 		events.LogErr(err)
 		// err = trivy.RunTrivyImageScans(config, js)
 		// events.LogErr(err)
-		// err = trivy.RunTrivyK8sClusterScan(js)
-		// events.LogErr(err)
+		err = trivy.RunTrivyK8sClusterScan(js)
+		events.LogErr(err)
 		// err = kubescore.RunKubeScore(clientset, js)
 		// events.LogErr(err)
 	}
