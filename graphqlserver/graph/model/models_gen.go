@@ -16,6 +16,11 @@ type ClusterDeletedAPICount struct {
 	DeletedAPICount int    `json:"deletedAPICount"`
 }
 
+type ClusterDeprecatedAPICount struct {
+	ClusterName        string `json:"clusterName"`
+	DeprecatedAPICount int    `json:"deprecatedAPICount"`
+}
+
 type ClusterNamespaceMisconfigCount struct {
 	ClusterName    string `json:"clusterName"`
 	Namespace      string `json:"namespace"`

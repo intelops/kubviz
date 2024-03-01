@@ -626,7 +626,7 @@ func (r *queryResolver) Vulnerabilities(ctx context.Context, clusterName string,
 		return nil, fmt.Errorf("clusterName and namespace cannot be empty")
 	}
 	query := `
-	SELECT id, cluster_name, namespace, kind, name, vul_id, vul_vendor_ids, vul_pkg_id, vul_pkg_name, vul_pkg_path, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date, ExpiryDate, ExportedAt
+	SELECT id, cluster_name, namespace, kind, name, vul_id, vul_vendor_ids, vul_pkg_id, vul_pkg_name, vul_pkg_path, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date, ExpiryDate
 	FROM trivy_vul
 	WHERE cluster_name = ? AND namespace = ?
 	`
@@ -661,7 +661,7 @@ func (r *queryResolver) Misconfigurations(ctx context.Context, clusterName strin
 	}
 
 	query := `
-	SELECT id, cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status, EventTime, ExpiryDate, ExportedAt
+	SELECT id, cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status, EventTime, ExpiryDate
 	FROM trivy_misconfig
 	WHERE cluster_name = ? AND namespace = ?
 	`
@@ -698,7 +698,7 @@ func (r *queryResolver) Kubescores(ctx context.Context, clustername string, name
 	}
 
 	query := `
-	SELECT id, clustername, object_name, kind, apiVersion, name, namespace, target_type, description, path, summary, file_name, file_row, EventTime, ExpiryDate, ExportedAt
+	SELECT id, clustername, object_name, kind, apiVersion, name, namespace, target_type, description, path, summary, file_name, file_row, EventTime, ExpiryDate
 	FROM kubescore
 	WHERE clustername = ? AND namespace = ?
 	`
@@ -735,7 +735,7 @@ func (r *queryResolver) GetAllResources(ctx context.Context, clusterName string,
 	}
 
 	query := `
-	SELECT ClusterName, Namespace, Kind, Resource, Age, EventTime, ExpiryDate, ExportedAt
+	SELECT ClusterName, Namespace, Kind, Resource, Age, EventTime, ExpiryDate
 	FROM getall_resources
 	WHERE ClusterName = ? AND Namespace = ?
 	`
@@ -772,7 +772,7 @@ func (r *queryResolver) TrivyImages(ctx context.Context, clusterName string) ([]
 	}
 
 	query := `
-	SELECT id, cluster_name, artifact_name, vul_id, vul_pkg_id, vul_pkg_name, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date, ExpiryDate, ExportedAt
+	SELECT id, cluster_name, artifact_name, vul_id, vul_pkg_id, vul_pkg_name, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date, ExpiryDate
 	FROM trivyimage
 	WHERE cluster_name = ?
 	`
@@ -809,7 +809,7 @@ func (r *queryResolver) DeprecatedAPIs(ctx context.Context, clusterName string) 
 	}
 
 	query := `
-	SELECT ClusterName, ObjectName, Description, Kind, Deprecated, Scope, EventTime, ExpiryDate, ExportedAt
+	SELECT ClusterName, ObjectName, Description, Kind, Deprecated, Scope, EventTime, ExpiryDate
 	FROM DeprecatedAPIs
 	WHERE ClusterName = ?
 	`
@@ -848,7 +848,7 @@ func (r *queryResolver) DeletedAPIs(ctx context.Context, clusterName string) ([]
 	}
 
 	query := `
-	SELECT ClusterName, ObjectName, Group, Kind, Version, Name, Deleted, Scope, EventTime, ExpiryDate, ExportedAt
+	SELECT ClusterName, ObjectName, Group, Kind, Version, Name, Deleted, Scope, EventTime, ExpiryDate
 	FROM DeletedAPIs
 	WHERE ClusterName = ?
 	`
@@ -886,7 +886,7 @@ func (r *queryResolver) TrivySBOMs(ctx context.Context, clusterName string) ([]*
 	}
 
 	query := `
-	SELECT id, cluster_name, image_name, package_name, package_url, bom_ref, serial_number, version, bom_format, ExpiryDate, ExportedAt
+	SELECT id, cluster_name, image_name, package_name, package_url, bom_ref, serial_number, version, bom_format, ExpiryDate
 	FROM trivysbom
 	WHERE cluster_name = ?
 	`
@@ -1007,6 +1007,30 @@ func (r *queryResolver) TrivyImageCount(ctx context.Context, clusterName string)
 	return &model.TrivyImageCount{
 		ClusterName: clusterName,
 		ImageCount:  count,
+	}, nil
+}
+
+// DeprecatedAPICount is the resolver for the deprecatedAPICount field.
+func (r *queryResolver) DeprecatedAPICount(ctx context.Context, clusterName string) (*model.ClusterDeprecatedAPICount, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" {
+		return nil, fmt.Errorf("ClusterName cannot be empty")
+	}
+
+	query := `SELECT COUNT(*) FROM DeprecatedAPIs WHERE ClusterName = ?`
+
+	var count int
+	err := r.DB.QueryRowContext(ctx, query, clusterName).Scan(&count)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+
+	return &model.ClusterDeprecatedAPICount{
+		ClusterName:        clusterName,
+		DeprecatedAPICount: count,
 	}, nil
 }
 

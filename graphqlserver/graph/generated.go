@@ -60,6 +60,11 @@ type ComplexityRoot struct {
 		DeletedAPICount func(childComplexity int) int
 	}
 
+	ClusterDeprecatedAPICount struct {
+		ClusterName        func(childComplexity int) int
+		DeprecatedAPICount func(childComplexity int) int
+	}
+
 	ClusterNamespaceMisconfigCount struct {
 		ClusterName    func(childComplexity int) int
 		MisconfigCount func(childComplexity int) int
@@ -230,6 +235,7 @@ type ComplexityRoot struct {
 		AllTrivyVuls                        func(childComplexity int) int
 		DeletedAPICount                     func(childComplexity int, clusterName string) int
 		DeletedAPIs                         func(childComplexity int, clusterName string) int
+		DeprecatedAPICount                  func(childComplexity int, clusterName string) int
 		DeprecatedAPIs                      func(childComplexity int, clusterName string) int
 		EventsByClusterAndNamespace         func(childComplexity int, clusterName string, namespace string) int
 		GetAllResources                     func(childComplexity int, clusterName string, namespace string) int
@@ -395,6 +401,7 @@ type QueryResolver interface {
 	TrivyMisconfigCount(ctx context.Context, clusterName string, namespace string) (*model.ClusterNamespaceMisconfigCount, error)
 	DeletedAPICount(ctx context.Context, clusterName string) (*model.ClusterDeletedAPICount, error)
 	TrivyImageCount(ctx context.Context, clusterName string) (*model.TrivyImageCount, error)
+	DeprecatedAPICount(ctx context.Context, clusterName string) (*model.ClusterDeprecatedAPICount, error)
 }
 
 type executableSchema struct {
@@ -450,6 +457,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ClusterDeletedAPICount.DeletedAPICount(childComplexity), true
+
+	case "ClusterDeprecatedAPICount.clusterName":
+		if e.complexity.ClusterDeprecatedAPICount.ClusterName == nil {
+			break
+		}
+
+		return e.complexity.ClusterDeprecatedAPICount.ClusterName(childComplexity), true
+
+	case "ClusterDeprecatedAPICount.deprecatedAPICount":
+		if e.complexity.ClusterDeprecatedAPICount.DeprecatedAPICount == nil {
+			break
+		}
+
+		return e.complexity.ClusterDeprecatedAPICount.DeprecatedAPICount(childComplexity), true
 
 	case "ClusterNamespaceMisconfigCount.clusterName":
 		if e.complexity.ClusterNamespaceMisconfigCount.ClusterName == nil {
@@ -1349,6 +1370,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.DeletedAPIs(childComplexity, args["clusterName"].(string)), true
+
+	case "Query.deprecatedAPICount":
+		if e.complexity.Query.DeprecatedAPICount == nil {
+			break
+		}
+
+		args, err := ec.field_Query_deprecatedAPICount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.DeprecatedAPICount(childComplexity, args["clusterName"].(string)), true
 
 	case "Query.deprecatedAPIs":
 		if e.complexity.Query.DeprecatedAPIs == nil {
@@ -2315,6 +2348,21 @@ func (ec *executionContext) field_Query_deletedAPIs_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_deprecatedAPICount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_deprecatedAPIs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2854,6 +2902,94 @@ func (ec *executionContext) _ClusterDeletedAPICount_deletedAPICount(ctx context.
 func (ec *executionContext) fieldContext_ClusterDeletedAPICount_deletedAPICount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ClusterDeletedAPICount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterDeprecatedAPICount_clusterName(ctx context.Context, field graphql.CollectedField, obj *model.ClusterDeprecatedAPICount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterDeprecatedAPICount_clusterName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterDeprecatedAPICount_clusterName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterDeprecatedAPICount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterDeprecatedAPICount_deprecatedAPICount(ctx context.Context, field graphql.CollectedField, obj *model.ClusterDeprecatedAPICount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterDeprecatedAPICount_deprecatedAPICount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeprecatedAPICount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterDeprecatedAPICount_deprecatedAPICount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterDeprecatedAPICount",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -9739,6 +9875,67 @@ func (ec *executionContext) fieldContext_Query_trivyImageCount(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_deprecatedAPICount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_deprecatedAPICount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().DeprecatedAPICount(rctx, fc.Args["clusterName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ClusterDeprecatedAPICount)
+	fc.Result = res
+	return ec.marshalNClusterDeprecatedAPICount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterDeprecatedAPICount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_deprecatedAPICount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "clusterName":
+				return ec.fieldContext_ClusterDeprecatedAPICount_clusterName(ctx, field)
+			case "deprecatedAPICount":
+				return ec.fieldContext_ClusterDeprecatedAPICount_deprecatedAPICount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ClusterDeprecatedAPICount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_deprecatedAPICount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -15561,6 +15758,50 @@ func (ec *executionContext) _ClusterDeletedAPICount(ctx context.Context, sel ast
 	return out
 }
 
+var clusterDeprecatedAPICountImplementors = []string{"ClusterDeprecatedAPICount"}
+
+func (ec *executionContext) _ClusterDeprecatedAPICount(ctx context.Context, sel ast.SelectionSet, obj *model.ClusterDeprecatedAPICount) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, clusterDeprecatedAPICountImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClusterDeprecatedAPICount")
+		case "clusterName":
+			out.Values[i] = ec._ClusterDeprecatedAPICount_clusterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deprecatedAPICount":
+			out.Values[i] = ec._ClusterDeprecatedAPICount_deprecatedAPICount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var clusterNamespaceMisconfigCountImplementors = []string{"ClusterNamespaceMisconfigCount"}
 
 func (ec *executionContext) _ClusterNamespaceMisconfigCount(ctx context.Context, sel ast.SelectionSet, obj *model.ClusterNamespaceMisconfigCount) graphql.Marshaler {
@@ -17098,6 +17339,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "deprecatedAPICount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_deprecatedAPICount(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -18098,6 +18361,20 @@ func (ec *executionContext) marshalNClusterDeletedAPICount2ᚖgithubᚗcomᚋint
 		return graphql.Null
 	}
 	return ec._ClusterDeletedAPICount(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNClusterDeprecatedAPICount2githubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterDeprecatedAPICount(ctx context.Context, sel ast.SelectionSet, v model.ClusterDeprecatedAPICount) graphql.Marshaler {
+	return ec._ClusterDeprecatedAPICount(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNClusterDeprecatedAPICount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterDeprecatedAPICount(ctx context.Context, sel ast.SelectionSet, v *model.ClusterDeprecatedAPICount) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ClusterDeprecatedAPICount(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNClusterNamespaceMisconfigCount2githubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceMisconfigCount(ctx context.Context, sel ast.SelectionSet, v model.ClusterNamespaceMisconfigCount) graphql.Marshaler {
