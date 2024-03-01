@@ -14,16 +14,25 @@ import (
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	tp, err := opentelemetry.InitTracer()
+	//opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Unable to read open telemetry configurations")
 	}
-	defer func() {
-		if err := tp.Shutdown(context.Background()); err != nil {
-			log.Printf("Error shutting down tracer provider: %v", err)
+	if opentelconfig.IsEnabled {
+		tp, err := opentelemetry.InitTracer()
+		if err != nil {
+			log.Fatal(err)
 		}
-	}()
-	
+		defer func() {
+			if err := tp.Shutdown(context.Background()); err != nil {
+				log.Printf("Error shutting down tracer provider: %v", err)
+			}
+		}()
+	} else {
+		log.Println("OpenTelemetry is disabled. Tracing will not be enabled.")
+	}
+
 	app := application.New()
 	go app.GithubContainerWatch()
 	go app.Start()

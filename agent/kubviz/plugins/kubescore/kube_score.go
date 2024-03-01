@@ -64,11 +64,17 @@ func publish(ns string, js nats.JetStreamContext) error {
 
 func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamContext) error {
 
-	ctx := context.Background()
-	tracer := otel.Tracer("kubescore")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishKubescoreMetrics")
-	span.SetAttributes(attribute.String("kubescore-plugin-agent", "kubescore-output"))
-	defer span.End()
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("kubescore")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishKubescoreMetrics")
+		defer span.End()
+	}
 
 	metrics := model.KubeScoreRecommendations{
 		ID:          uuid.New().String(),

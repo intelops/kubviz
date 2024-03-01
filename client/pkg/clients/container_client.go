@@ -1,7 +1,6 @@
 package clients
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"log"
@@ -9,10 +8,7 @@ import (
 
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
 	"github.com/intelops/kubviz/model"
-	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 )
 
 var (
@@ -31,12 +27,6 @@ const (
 
 func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
 
-	ctx:=context.Background()
-	tracer := otel.Tracer("container-client")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "SubscribeContainerNats")
-	span.SetAttributes(attribute.String("container-subscribe", "Subscribe"))
-	defer span.End()
-	
 	n.stream.Subscribe(string(containerSubject), func(msg *nats.Msg) {
 		msg.Ack()
 		repoName := msg.Header.Get("REPO_NAME")

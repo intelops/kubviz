@@ -33,13 +33,15 @@ func NewAPIHandler(conn *clients.NATSContext) (*APIHandler, error) {
 
 func (ah *APIHandler) BindRequest(r *gin.Engine) {
 
-	config, err := opentelemetry.GetConfigurations()
+	//opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
 	if err != nil {
 		log.Println("Unable to read open telemetry configurations")
 	}
+	if opentelconfig.IsEnabled {
+		r.Use(otelgin.Middleware(opentelconfig.ServiceName))
+	}
 
-	r.Use(otelgin.Middleware(config.ServiceName))
-	
 	apiGroup := r.Group("/")
 	{
 		apiGroup.GET("/api-docs", ah.GetApiDocs)

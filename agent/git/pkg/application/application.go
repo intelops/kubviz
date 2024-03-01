@@ -44,13 +44,15 @@ func New(conf *config.Config, conn *clients.NATSContext) *Application {
 func (app *Application) Routes() *gin.Engine {
 	router := gin.New()
 
-	config, err := opentelemetry.GetConfigurations()
+	//opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
 	if err != nil {
 		log.Println("Unable to read open telemetry configurations")
 	}
+	if opentelconfig.IsEnabled {
+		router.Use(otelgin.Middleware(opentelconfig.ServiceName))
+	}
 
-	router.Use(otelgin.Middleware(config.ServiceName))
-	
 	api.RegisterHandlers(router, app)
 	return router
 }

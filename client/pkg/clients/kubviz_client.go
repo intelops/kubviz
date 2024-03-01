@@ -1,17 +1,13 @@
 package clients
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 
 	"github.com/intelops/kubviz/constants"
-	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/kuberhealthy/kuberhealthy/v2/pkg/health"
 	"github.com/nats-io/nats.go"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/client/pkg/clickhouse"
 	"github.com/intelops/kubviz/client/pkg/config"
@@ -26,11 +22,6 @@ type SubscriptionInfo struct {
 
 func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 
-	ctx := context.Background()
-	tracer := otel.Tracer("kubviz-client")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "SubscribeAllKubvizNats")
-	span.SetAttributes(attribute.String("kubviz-subscribe", "subscribe"))
-	defer span.End()
 	cfg := &config.Config{}
 	if err := envconfig.Process("", cfg); err != nil {
 		log.Fatalf("Could not parse env Config: %v", err)

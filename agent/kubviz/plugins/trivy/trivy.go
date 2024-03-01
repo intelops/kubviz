@@ -24,12 +24,6 @@ var ClusterName string = os.Getenv("CLUSTER_NAME")
 
 func executeCommandTrivy(command string) ([]byte, error) {
 
-	ctx := context.Background()
-	tracer := otel.Tracer("trivy-cluster")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandTrivy")
-	span.SetAttributes(attribute.String("trivy-k8s-agent", "command-running"))
-	defer span.End()
-
 	cmd := exec.Command("/bin/sh", "-c", command)
 	var outc, errc bytes.Buffer
 	cmd.Stdout = &outc
@@ -53,11 +47,18 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	}
 	var report report.ConsolidatedReport
 
-	ctx := context.Background()
-	tracer := otel.Tracer("trivy-cluster")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyK8sClusterScan")
-	span.SetAttributes(attribute.String("cluster-name", report.ClusterName))
-	defer span.End()
+	// opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
+	if err != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("trivy-cluster-agent")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyK8sClusterScan")
+		span.SetAttributes(attribute.String("cluster-name", report.ClusterName))
+		defer span.End()
+	}
 
 	cmdString := fmt.Sprintf("trivy k8s --report summary cluster --exclude-nodes kubernetes.io/arch:amd64 --timeout 60m -f json --cache-dir %s --debug", trivyCacheDir)
 	// clearCacheCmd := "trivy k8s --clear-cache"
@@ -95,6 +96,20 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 }
 
 func PublishTrivyK8sReport(report report.ConsolidatedReport, js nats.JetStreamContext) error {
+
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("trivy-cluster-agent")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishTrivyK8sReport")
+		span.SetAttributes(attribute.String("cluster-name", report.ClusterName))
+		defer span.End()
+	}
+
 	metrics := model.Trivy{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,

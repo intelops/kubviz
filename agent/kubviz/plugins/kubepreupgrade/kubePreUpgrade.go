@@ -12,7 +12,6 @@ import (
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -60,6 +59,19 @@ var (
 var result *model.Result
 
 func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamContext) error {
+
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("kubepreupgrade")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishK8sDepricated_Deleted_Api")
+		defer span.End()
+	}
+
 	for _, deprecatedAPI := range result.DeprecatedAPIs {
 		deprecatedAPI.ClusterName = ClusterName
 		deprecatedAPIJson, _ := json.Marshal(deprecatedAPI)
@@ -84,12 +96,6 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 }
 
 func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error {
-
-	ctx := context.Background()
-	tracer := otel.Tracer("kubepreupgrade")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "KubePreUpgradeDetector")
-	span.SetAttributes(attribute.String("kubepug-plugin-agent", "kubepug-output"))
-	defer span.End()
 
 	pvcMountPath := "/mnt/agent/kbz"
 	uniqueDir := fmt.Sprintf("%s/kubepug", pvcMountPath)

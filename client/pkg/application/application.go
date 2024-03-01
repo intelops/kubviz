@@ -1,7 +1,6 @@
 package application
 
 import (
-	"context"
 	"database/sql"
 	"log"
 	"os"
@@ -12,11 +11,8 @@ import (
 	"github.com/intelops/kubviz/client/pkg/clients"
 	"github.com/intelops/kubviz/client/pkg/config"
 	"github.com/intelops/kubviz/client/pkg/storage"
-	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/robfig/cron/v3"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 )
 
 type Application struct {
@@ -51,12 +47,6 @@ const (
 
 func Start() *Application {
 	log.Println("Client Application started...")
-
-	ctx := context.Background()
-	tracer := otel.Tracer("kubviz-client")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "Start")
-	span.SetAttributes(attribute.String("start-app-client", "application"))
-	defer span.End()
 
 	cfg := &config.Config{}
 	if err := envconfig.Process("", cfg); err != nil {

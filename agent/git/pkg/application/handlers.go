@@ -9,6 +9,7 @@ import (
 	"github.com/intelops/kubviz/agent/git/api"
 	"github.com/intelops/kubviz/gitmodels/azuremodel"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 )
@@ -16,11 +17,18 @@ import (
 func (app *Application) PostGitea(c *gin.Context) {
 	log.Println("gitea handler called...")
 
-	tracer := otel.Tracer("gitea-git")
-	_, span := tracer.Start(c.Request.Context(), "PostGitea")
-	span.SetAttributes(attribute.String("http.method", "POST"))
-	defer span.End()
-	
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		tracer := otel.Tracer("gitea-git")
+		_, span := tracer.Start(c.Request.Context(), "PostGitea")
+		span.SetAttributes(attribute.String("http.method", "POST"))
+		defer span.End()
+	}
+
 	defer log.Println("gitea handler exited...")
 
 	event := c.Request.Header.Get(string(model.GiteaHeader))
@@ -39,10 +47,17 @@ func (app *Application) PostGitea(c *gin.Context) {
 func (app *Application) PostAzure(c *gin.Context) {
 	log.Println("azure handler called...")
 
-	tracer := otel.Tracer("azure-git")
-	_, span := tracer.Start(c.Request.Context(), "PostAzure")
-	span.SetAttributes(attribute.String("http.method", "POST"))
-	defer span.End()
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		tracer := otel.Tracer("azure-git")
+		_, span := tracer.Start(c.Request.Context(), "PostAzure")
+		span.SetAttributes(attribute.String("http.method", "POST"))
+		defer span.End()
+	}
 
 	defer log.Println("azure handler exited...")
 
@@ -73,13 +88,20 @@ func (app *Application) PostAzure(c *gin.Context) {
 func (app *Application) PostGithub(c *gin.Context) {
 	log.Println("github handler called...")
 
-	tracer := otel.Tracer("github-git")
-	_, span := tracer.Start(c.Request.Context(), "PostGithub")
-	span.SetAttributes(attribute.String("http.method", "POST"))
-	defer span.End()
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		tracer := otel.Tracer("github-git")
+		_, span := tracer.Start(c.Request.Context(), "PostGithub")
+		span.SetAttributes(attribute.String("http.method", "POST"))
+		defer span.End()
+	}
 
 	defer log.Println("github handler exited...")
-	
+
 	event := c.Request.Header.Get(string(model.GithubHeader))
 	if len(event) == 0 {
 		log.Println("error getting the github event from header")
@@ -100,10 +122,17 @@ func (app *Application) PostGithub(c *gin.Context) {
 func (app *Application) PostGitlab(c *gin.Context) {
 	log.Println("gitlab handler called...")
 
-	tracer := otel.Tracer("gitlab-git")
-	_, span := tracer.Start(c.Request.Context(), "PostGitlab")
-	span.SetAttributes(attribute.String("http.method", "POST"))
-	defer span.End()
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		tracer := otel.Tracer("gitlab-git")
+		_, span := tracer.Start(c.Request.Context(), "PostGitlab")
+		span.SetAttributes(attribute.String("http.method", "POST"))
+		defer span.End()
+	}
 
 	defer log.Println("gitlab handler exited...")
 
@@ -127,11 +156,18 @@ func (app *Application) PostGitlab(c *gin.Context) {
 func (app *Application) PostBitbucket(c *gin.Context) {
 	log.Println("bitbucket handler called...")
 
-	tracer := otel.Tracer("bitbucket-git")
-	_, span := tracer.Start(c.Request.Context(), "PostBitbucket")
-	span.SetAttributes(attribute.String("http.method", "POST"))
-	defer span.End()
-	
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		tracer := otel.Tracer("bitbucket-git")
+		_, span := tracer.Start(c.Request.Context(), "PostBitbucket")
+		span.SetAttributes(attribute.String("http.method", "POST"))
+		defer span.End()
+	}
+
 	defer log.Println("bitbucket handler exited...")
 
 	event := c.Request.Header.Get(string(model.BitBucketHeader))

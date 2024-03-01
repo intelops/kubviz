@@ -17,11 +17,22 @@ import (
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"k8s.io/client-go/rest"
 )
 
 func PublishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) error {
+
+	// opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
+	if err != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("trivy-sbom")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishTrivySbomReport")
+		defer span.End()
+	}
 
 	for _, packageinfo := range report.Packages {
 		for _, pkg := range packageinfo.Packages {
@@ -54,12 +65,6 @@ func PublishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) erro
 
 func executeCommandSbom(command string) ([]byte, error) {
 
-	ctx := context.Background()
-	tracer := otel.Tracer("trivy-sbom")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandSbom")
-	span.SetAttributes(attribute.String("trivy-sbom-agent", "sbom-command-running"))
-	defer span.End()
-
 	cmd := exec.Command("/bin/sh", "-c", command)
 	var outc, errc bytes.Buffer
 	cmd.Stdout = &outc
@@ -81,11 +86,17 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		return err
 	}
 
-	ctx := context.Background()
-	tracer := otel.Tracer("trivy-sbom")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivySbomScan")
-	span.SetAttributes(attribute.String("sbom", "sbom-creation"))
-	defer span.End()
+	// opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
+	if err != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("trivy-sbom")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivySbomScan")
+		defer span.End()
+	}
 
 	images, err := outdated.ListImages(config)
 
