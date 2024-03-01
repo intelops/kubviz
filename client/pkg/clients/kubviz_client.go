@@ -142,7 +142,7 @@ func (n *NATSContext) SubscribeAllKubvizNats(conn clickhouse.DBInterface) {
 			Consumer: cfg.TrivySbomConsumer,
 			Handler: func(msg *nats.Msg) {
 				msg.Ack()
-				var metrics model.SbomData
+				var metrics model.Sbom
 				err := json.Unmarshal(msg.Data, &metrics)
 				if err != nil {
 					log.Println("failed to unmarshal from nats", err)

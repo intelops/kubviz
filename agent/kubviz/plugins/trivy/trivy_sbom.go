@@ -8,19 +8,21 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 
-	"github.com/aquasecurity/trivy/pkg/sbom/cyclonedx"
 	"github.com/google/uuid"
-	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
-func PublishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) error {
+func PublishTrivySbomReport(report map[string]interface{}, js nats.JetStreamContext) error {
 
 	// opentelemetry
 	opentelconfig, err := opentelemetry.GetConfigurations()
@@ -34,32 +36,23 @@ func PublishTrivySbomReport(report cyclonedx.BOM, js nats.JetStreamContext) erro
 		defer span.End()
 	}
 
-	for _, packageinfo := range report.Packages {
-		for _, pkg := range packageinfo.Packages {
-
-			metrics := model.SbomData{
-				ID:               uuid.New().String(),
-				ClusterName:      ClusterName,
-				ComponentName:    report.CycloneDX.Metadata.Component.Name,
-				PackageName:      pkg.Name,
-				PackageUrl:       report.CycloneDX.Metadata.Component.PackageURL,
-				BomRef:           report.CycloneDX.Metadata.Component.BOMRef,
-				SerialNumber:     report.CycloneDX.SerialNumber,
-				CycloneDxVersion: report.CycloneDX.Version,
-				BomFormat:        report.CycloneDX.BOMFormat,
-			}
-			metricsJson, err := json.Marshal(metrics)
-			if err != nil {
-				log.Println("error occurred while marshalling sbom metrics in agent", err.Error())
-				return err
-			}
-			_, err = js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
-			if err != nil {
-				return err
-			}
-			log.Printf("Trivy sbom report with Id %v has been published\n", metrics.ID)
-		}
+	metrics := model.Sbom{
+		ID:          uuid.New().String(),
+		ClusterName: ClusterName,
+		Report:      report,
 	}
+	metricsJson, err := json.Marshal(metrics)
+	if err != nil {
+		log.Println("error occurred while marshalling sbom metrics in agent", err.Error())
+		return err
+	}
+	_, err = js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
+	if err != nil {
+		return err
+	}
+	log.Printf("Trivy sbom report with Id %v has been published\n", metrics.ID)
+	log.Printf("Trivy sbom report with Id %v has been published\n", metrics)
+
 	return nil
 }
 
@@ -98,13 +91,12 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		defer span.End()
 	}
 
-	images, err := outdated.ListImages(config)
-
+	images, err := ListImagesForSbom(config)
 	if err != nil {
 		log.Printf("failed to list images: %v", err)
 	}
-	for _, image := range images {
 
+	for _, image := range images {
 		sbomcmd := fmt.Sprintf("trivy image --format cyclonedx %s --cache-dir %s", image.PullableImage, trivySbomCacheDir)
 		out, err := executeCommandSbom(sbomcmd)
 
@@ -122,13 +114,79 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			continue // Move on to the next image
 		}
 
-		var report cyclonedx.BOM
+		var report map[string]interface{}
 		err = json.Unmarshal(out, &report)
 		if err != nil {
 			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
-		PublishTrivySbomReport(report, js)
+		err = PublishTrivySbomReport(report, js)
+		if err != nil {
+			log.Printf("Error publishing Trivy SBOM report for image %s: %v", image.PullableImage, err)
+			continue
+		}
 	}
 	return nil
+}
+
+func ListImagesForSbom(config *rest.Config) ([]model.RunningImage, error) {
+	var err error
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create clientset")
+	}
+	ctx := context.Background()
+	namespaces, err := clientset.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list namespaces")
+	}
+
+	runningImages := []model.RunningImage{}
+	for _, namespace := range namespaces.Items {
+		pods, err := clientset.CoreV1().Pods(namespace.Name).List(ctx, metav1.ListOptions{})
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to list pods")
+		}
+
+		for _, pod := range pods.Items {
+			for _, initContainerStatus := range pod.Status.InitContainerStatuses {
+				pullable := initContainerStatus.ImageID
+				pullable = strings.TrimPrefix(pullable, "docker-pullable://")
+				runningImage := model.RunningImage{
+					Pod:           pod.Name,
+					Namespace:     pod.Namespace,
+					InitContainer: &initContainerStatus.Name,
+					Image:         initContainerStatus.Image,
+					PullableImage: pullable,
+				}
+				runningImages = append(runningImages, runningImage)
+			}
+
+			for _, containerStatus := range pod.Status.ContainerStatuses {
+				pullable := containerStatus.ImageID
+				pullable = strings.TrimPrefix(pullable, "docker-pullable://")
+
+				runningImage := model.RunningImage{
+					Pod:           pod.Name,
+					Namespace:     pod.Namespace,
+					Container:     &containerStatus.Name,
+					Image:         containerStatus.Image,
+					PullableImage: pullable,
+				}
+				runningImages = append(runningImages, runningImage)
+			}
+		}
+	}
+
+	// Remove exact duplicates
+	cleanedImages := []model.RunningImage{}
+	seenImages := make(map[string]bool)
+	for _, runningImage := range runningImages {
+		if !seenImages[runningImage.PullableImage] {
+			cleanedImages = append(cleanedImages, runningImage)
+			seenImages[runningImage.PullableImage] = true
+		}
+	}
+
+	return cleanedImages, nil
 }
