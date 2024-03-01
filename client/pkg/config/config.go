@@ -25,3 +25,10 @@ type Config struct {
 	S3BucketName         string `envconfig:"S3_BUCKET_NAME"`
 	S3ObjectKey          string `envconfig:"S3_OBJECT_KEY"`
 }
+
+type GraphQlConfig struct {
+	DbPort             int    `envconfig:"DB_PORT"`
+	DBAddress          string `envconfig:"DB_ADDRESS"`
+	ClickHouseUsername string `envconfig:"CLICKHOUSE_USERNAME"`
+	ClickHousePassword string `envconfig:"CLICKHOUSE_PASSWORD"`
+}

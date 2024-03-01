@@ -23,7 +23,7 @@ const (
 
 func main() {
 	log.Println("Graph ql server starting ... Iteration one")
-	cfg := &config.Config{}
+	cfg := &config.GraphQlConfig{}
 	if err := envconfig.Process("", cfg); err != nil {
 		log.Fatalf("Could not parse env Config: %v", err)
 	}
@@ -46,12 +46,17 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-func initializeDatabase(cfg *config.Config) (*sql.DB, error) {
+func initializeDatabase(cfg *config.GraphQlConfig) (*sql.DB, error) {
 	var db *sql.DB
 	var err error
-
+	var config = &config.Config{
+		DbPort:             cfg.DbPort,
+		DBAddress:          cfg.DBAddress,
+		ClickHouseUsername: cfg.ClickHouseUsername,
+		ClickHousePassword: cfg.ClickHousePassword,
+	}
 	for i := 0; i < maxRetries; i++ {
-		_, db, err = clickhouse.NewDBClient(cfg)
+		_, db, err = clickhouse.NewDBClient(config)
 		if err == nil {
 			log.Println("Successfully connected to the database")
 			return db, nil

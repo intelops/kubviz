@@ -18,7 +18,105 @@ type Query {
   allClusterDeletedAPIsCounts: [ClusterAPIsCount!]!
   allClusterNamespaceResourceCounts: [ClusterNamespaceResourceCount!]!
   eventsByClusterAndNamespace(clusterName: String!, namespace: String!): [Event!]!
+  vulnerabilities(clusterName: String!, namespace: String!): [Vulnerability!]!
+  misconfigurations(clusterName: String!, namespace: String!): [Misconfiguration!]!
+  kubescores(clustername: String!, namespace: String!): [KubeScore!]!
+  getAllResources(clusterName: String!, namespace: String!): [GetAllResource!]!
+  trivyImages(clusterName: String!): [TrivyImage!]!
+  deprecatedAPIs(clusterName: String!): [DeprecatedAPI!]!
+  deletedAPIs(clusterName: String!): [DeletedAPI!]!
+  trivySBOMs(clusterName: String!): [TrivySBOM!]!
+  trivyVulCount(clusterName: String!, namespace: String!): ClusterNamespaceVulCount!
+  trivyMisconfigCount(clusterName: String!, namespace: String!): ClusterNamespaceMisconfigCount!
+  deletedAPICount(clusterName: String!): ClusterDeletedAPICount!
+  trivyImageCount(clusterName: String!): TrivyImageCount!
 }
+
+type TrivyImageCount {
+  clusterName: String!
+  ImageCount: Int!
+}
+
+
+type ClusterDeletedAPICount {
+  clusterName: String!
+  deletedAPICount: Int!
+}
+
+
+type ClusterNamespaceMisconfigCount {
+  clusterName: String!
+  namespace: String!
+  misconfigCount: Int!
+}
+
+
+type ClusterNamespaceVulCount {
+  clusterName: String!
+  namespace: String!
+  vulCount: Int!
+}
+
+type Kubescore {
+    id: ID!
+    clusterName: String
+    objectName: String
+    kind: String
+    apiVersion: String
+    name: String
+    namespace: String
+    targetType: String
+    description: String
+    path: String
+    summary: String
+    fileName: String
+    fileRow: Int
+    eventTime: String
+}
+
+
+type Misconfiguration {
+  id: ID!
+  clusterName: String!
+  namespace: String!
+  kind: String!
+  name: String!
+  misconfigId: String!
+  misconfigAvdid: String
+  misconfigType: String
+  misconfigTitle: String
+  misconfigDesc: String
+  misconfigMsg: String
+  misconfigQuery: String
+  misconfigResolution: String
+  misconfigSeverity: String
+  misconfigStatus: String
+  eventTime: String
+  expiryDate: String
+  exportedAt: String
+}
+
+type Vulnerability {
+  id: ID!
+  clusterName: String!
+  namespace: String!
+  kind: String!
+  name: String!
+  vulId: String!
+  vulVendorIds: String
+  vulPkgId: String
+  vulPkgName: String
+  vulPkgPath: String
+  vulInstalledVersion: String
+  vulFixedVersion: String
+  vulTitle: String
+  vulSeverity: String
+  vulPublishedDate: String
+  vulLastModifiedDate: String
+  expiryDate: String
+  exportedAt: String
+}
+
 type Event {
     ClusterName: String
     Id: String
@@ -99,24 +197,6 @@ type TrivyVul {
     vulSeverity: String
     vulPublishedDate: String
     vulLastModifiedDate: String
-    expiryDate: String
-}
-
-type Kubescore {
-    id: ID!
-    clusterName: String
-    objectName: String
-    kind: String
-    apiVersion: String
-    name: String
-    namespace: String
-    targetType: String
-    description: String
-    path: String
-    summary: String
-    fileName: String
-    fileRow: Int
-    eventTime: String
     expiryDate: String
 }
 

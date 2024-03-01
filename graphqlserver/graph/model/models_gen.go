@@ -11,6 +11,17 @@ type ClusterAPIsCount struct {
 	Count       int    `json:"count"`
 }
 
+type ClusterDeletedAPICount struct {
+	ClusterName     string `json:"clusterName"`
+	DeletedAPICount int    `json:"deletedAPICount"`
+}
+
+type ClusterNamespaceMisconfigCount struct {
+	ClusterName    string `json:"clusterName"`
+	Namespace      string `json:"namespace"`
+	MisconfigCount int    `json:"misconfigCount"`
+}
+
 type ClusterNamespaceOutdatedCount struct {
 	ClusterName   string `json:"clusterName"`
 	Namespace     string `json:"namespace"`
@@ -21,6 +32,12 @@ type ClusterNamespaceResourceCount struct {
 	ClusterName   string `json:"clusterName"`
 	Namespace     string `json:"namespace"`
 	ResourceCount int    `json:"resourceCount"`
+}
+
+type ClusterNamespaceVulCount struct {
+	ClusterName string `json:"clusterName"`
+	Namespace   string `json:"namespace"`
+	VulCount    int    `json:"vulCount"`
 }
 
 type DeletedAPI struct {
@@ -107,7 +124,27 @@ type Kubescore struct {
 	FileName    *string `json:"fileName,omitempty"`
 	FileRow     *int    `json:"fileRow,omitempty"`
 	EventTime   *string `json:"eventTime,omitempty"`
-	ExpiryDate  *string `json:"expiryDate,omitempty"`
+}
+
+type Misconfiguration struct {
+	ID                  string  `json:"id"`
+	ClusterName         string  `json:"clusterName"`
+	Namespace           string  `json:"namespace"`
+	Kind                string  `json:"kind"`
+	Name                string  `json:"name"`
+	MisconfigID         string  `json:"misconfigId"`
+	MisconfigAvdid      *string `json:"misconfigAvdid,omitempty"`
+	MisconfigType       *string `json:"misconfigType,omitempty"`
+	MisconfigTitle      *string `json:"misconfigTitle,omitempty"`
+	MisconfigDesc       *string `json:"misconfigDesc,omitempty"`
+	MisconfigMsg        *string `json:"misconfigMsg,omitempty"`
+	MisconfigQuery      *string `json:"misconfigQuery,omitempty"`
+	MisconfigResolution *string `json:"misconfigResolution,omitempty"`
+	MisconfigSeverity   *string `json:"misconfigSeverity,omitempty"`
+	MisconfigStatus     *string `json:"misconfigStatus,omitempty"`
+	EventTime           *string `json:"eventTime,omitempty"`
+	ExpiryDate          *string `json:"expiryDate,omitempty"`
+	ExportedAt          *string `json:"exportedAt,omitempty"`
 }
 
 type Namespace struct {
@@ -171,6 +208,11 @@ type TrivyImage struct {
 	ExpiryDate          *string `json:"expiryDate,omitempty"`
 }
 
+type TrivyImageCount struct {
+	ClusterName string `json:"clusterName"`
+	ImageCount  int    `json:"ImageCount"`
+}
+
 type TrivyMisconfig struct {
 	ID                  string  `json:"id"`
 	ClusterName         *string `json:"clusterName,omitempty"`
@@ -222,4 +264,25 @@ type TrivyVul struct {
 	VulPublishedDate    *string `json:"vulPublishedDate,omitempty"`
 	VulLastModifiedDate *string `json:"vulLastModifiedDate,omitempty"`
 	ExpiryDate          *string `json:"expiryDate,omitempty"`
+}
+
+type Vulnerability struct {
+	ID                  string  `json:"id"`
+	ClusterName         string  `json:"clusterName"`
+	Namespace           string  `json:"namespace"`
+	Kind                string  `json:"kind"`
+	Name                string  `json:"name"`
+	VulID               string  `json:"vulId"`
+	VulVendorIds        *string `json:"vulVendorIds,omitempty"`
+	VulPkgID            *string `json:"vulPkgId,omitempty"`
+	VulPkgName          *string `json:"vulPkgName,omitempty"`
+	VulPkgPath          *string `json:"vulPkgPath,omitempty"`
+	VulInstalledVersion *string `json:"vulInstalledVersion,omitempty"`
+	VulFixedVersion     *string `json:"vulFixedVersion,omitempty"`
+	VulTitle            *string `json:"vulTitle,omitempty"`
+	VulSeverity         *string `json:"vulSeverity,omitempty"`
+	VulPublishedDate    *string `json:"vulPublishedDate,omitempty"`
+	VulLastModifiedDate *string `json:"vulLastModifiedDate,omitempty"`
+	ExpiryDate          *string `json:"expiryDate,omitempty"`
+	ExportedAt          *string `json:"exportedAt,omitempty"`
 }

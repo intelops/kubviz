@@ -275,7 +275,7 @@ func (r *queryResolver) AllKubeScores(ctx context.Context) ([]*model.Kubescore, 
 	var kubeScores []*model.Kubescore
 	for rows.Next() {
 		var ks model.Kubescore
-		if err := rows.Scan(&ks.ID, &ks.ClusterName, &ks.ObjectName, &ks.Kind, &ks.APIVersion, &ks.Name, &ks.Namespace, &ks.TargetType, &ks.Description, &ks.Path, &ks.Summary, &ks.FileName, &ks.FileRow, &ks.EventTime, &ks.ExpiryDate); err != nil {
+		if err := rows.Scan(&ks.ID, &ks.ClusterName, &ks.ObjectName, &ks.Kind, &ks.APIVersion, &ks.Name, &ks.Namespace, &ks.TargetType, &ks.Description, &ks.Path, &ks.Summary, &ks.FileName, &ks.FileRow, &ks.EventTime); err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)
 		}
 		kubeScores = append(kubeScores, &ks)
@@ -614,6 +614,400 @@ func (r *queryResolver) EventsByClusterAndNamespace(ctx context.Context, cluster
 	}
 
 	return events, nil
+}
+
+// Vulnerabilities is the resolver for the vulnerabilities field.
+func (r *queryResolver) Vulnerabilities(ctx context.Context, clusterName string, namespace string) ([]*model.Vulnerability, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" || namespace == "" {
+		return nil, fmt.Errorf("clusterName and namespace cannot be empty")
+	}
+	query := `
+	SELECT id, cluster_name, namespace, kind, name, vul_id, vul_vendor_ids, vul_pkg_id, vul_pkg_name, vul_pkg_path, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date, ExpiryDate, ExportedAt
+	FROM trivy_vul
+	WHERE cluster_name = ? AND namespace = ?
+	`
+	rows, err := r.DB.QueryContext(ctx, query, clusterName, namespace)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	var vulnerabilities []*model.Vulnerability
+	for rows.Next() {
+		var v model.Vulnerability
+		if err := rows.Scan(&v.ID, &v.ClusterName, &v.Namespace, &v.Kind, &v.Name, &v.VulID, &v.VulVendorIds, &v.VulPkgID, &v.VulPkgName, &v.VulPkgPath, &v.VulInstalledVersion, &v.VulFixedVersion, &v.VulTitle, &v.VulSeverity, &v.VulPublishedDate, &v.VulLastModifiedDate, &v.ExpiryDate, &v.ExportedAt); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		vulnerabilities = append(vulnerabilities, &v)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return vulnerabilities, nil
+}
+
+// Misconfigurations is the resolver for the misconfigurations field.
+func (r *queryResolver) Misconfigurations(ctx context.Context, clusterName string, namespace string) ([]*model.Misconfiguration, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" || namespace == "" {
+		return nil, fmt.Errorf("clusterName and namespace cannot be empty")
+	}
+
+	query := `
+	SELECT id, cluster_name, namespace, kind, name, misconfig_id, misconfig_avdid, misconfig_type, misconfig_title, misconfig_desc, misconfig_msg, misconfig_query, misconfig_resolution, misconfig_severity, misconfig_status, EventTime, ExpiryDate, ExportedAt
+	FROM trivy_misconfig
+	WHERE cluster_name = ? AND namespace = ?
+	`
+
+	rows, err := r.DB.QueryContext(ctx, query, clusterName, namespace)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var misconfigurations []*model.Misconfiguration
+	for rows.Next() {
+		var m model.Misconfiguration
+		if err := rows.Scan(&m.ID, &m.ClusterName, &m.Namespace, &m.Kind, &m.Name, &m.MisconfigID, &m.MisconfigAvdid, &m.MisconfigType, &m.MisconfigTitle, &m.MisconfigDesc, &m.MisconfigMsg, &m.MisconfigQuery, &m.MisconfigResolution, &m.MisconfigSeverity, &m.MisconfigStatus, &m.EventTime, &m.ExpiryDate, &m.ExportedAt); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		misconfigurations = append(misconfigurations, &m)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return misconfigurations, nil
+}
+
+// Kubescores is the resolver for the kubescores field.
+func (r *queryResolver) Kubescores(ctx context.Context, clustername string, namespace string) ([]*model.KubeScore, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clustername == "" || namespace == "" {
+		return nil, fmt.Errorf("clustername and namespace cannot be empty")
+	}
+
+	query := `
+	SELECT id, clustername, object_name, kind, apiVersion, name, namespace, target_type, description, path, summary, file_name, file_row, EventTime, ExpiryDate, ExportedAt
+	FROM kubescore
+	WHERE clustername = ? AND namespace = ?
+	`
+
+	rows, err := r.DB.QueryContext(ctx, query, clustername, namespace)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var scores []*model.KubeScore
+	for rows.Next() {
+		var s model.KubeScore
+		if err := rows.Scan(&s.ID, &s.ClusterName, &s.ObjectName, &s.Kind, &s.APIVersion, &s.Name, &s.Namespace, &s.TargetType, &s.Description, &s.Path, &s.Summary, &s.FileName, &s.FileRow, &s.EventTime); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		scores = append(scores, &s)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return scores, nil
+}
+
+// GetAllResources is the resolver for the getAllResources field.
+func (r *queryResolver) GetAllResources(ctx context.Context, clusterName string, namespace string) ([]*model.GetAllResource, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" || namespace == "" {
+		return nil, fmt.Errorf("clusterName and namespace cannot be empty")
+	}
+
+	query := `
+	SELECT ClusterName, Namespace, Kind, Resource, Age, EventTime, ExpiryDate, ExportedAt
+	FROM getall_resources
+	WHERE ClusterName = ? AND Namespace = ?
+	`
+
+	rows, err := r.DB.QueryContext(ctx, query, clusterName, namespace)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var resources []*model.GetAllResource
+	for rows.Next() {
+		var r model.GetAllResource
+		if err := rows.Scan(&r.ClusterName, &r.Namespace, &r.Kind, &r.Resource, &r.Age, &r.EventTime, &r.ExpiryDate); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		resources = append(resources, &r)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return resources, nil
+}
+
+// TrivyImages is the resolver for the trivyImages field.
+func (r *queryResolver) TrivyImages(ctx context.Context, clusterName string) ([]*model.TrivyImage, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" {
+		return nil, fmt.Errorf("clusterName cannot be empty")
+	}
+
+	query := `
+	SELECT id, cluster_name, artifact_name, vul_id, vul_pkg_id, vul_pkg_name, vul_installed_version, vul_fixed_version, vul_title, vul_severity, vul_published_date, vul_last_modified_date, ExpiryDate, ExportedAt
+	FROM trivyimage
+	WHERE cluster_name = ?
+	`
+
+	rows, err := r.DB.QueryContext(ctx, query, clusterName)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var images []*model.TrivyImage
+	for rows.Next() {
+		var img model.TrivyImage
+		if err := rows.Scan(&img.ID, &img.ClusterName, &img.ArtifactName, &img.VulID, &img.VulPkgID, &img.VulPkgName, &img.VulInstalledVersion, &img.VulFixedVersion, &img.VulTitle, &img.VulSeverity, &img.VulPublishedDate, &img.VulLastModifiedDate, &img.ExpiryDate); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		images = append(images, &img)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return images, nil
+}
+
+// DeprecatedAPIs is the resolver for the deprecatedAPIs field.
+func (r *queryResolver) DeprecatedAPIs(ctx context.Context, clusterName string) ([]*model.DeprecatedAPI, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" {
+		return nil, fmt.Errorf("ClusterName cannot be empty")
+	}
+
+	query := `
+	SELECT ClusterName, ObjectName, Description, Kind, Deprecated, Scope, EventTime, ExpiryDate, ExportedAt
+	FROM DeprecatedAPIs
+	WHERE ClusterName = ?
+	`
+
+	rows, err := r.DB.QueryContext(ctx, query, clusterName)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	var apis []*model.DeprecatedAPI
+	for rows.Next() {
+		var api model.DeprecatedAPI
+		var deprecated uint8
+		if err := rows.Scan(&api.ClusterName, &api.ObjectName, &api.Description, &api.Kind, &deprecated, &api.Scope, &api.EventTime, &api.ExpiryDate); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		deprecatedBool := deprecated != 0
+		api.Deprecated = &deprecatedBool
+		apis = append(apis, &api)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return apis, nil
+}
+
+// DeletedAPIs is the resolver for the deletedAPIs field.
+func (r *queryResolver) DeletedAPIs(ctx context.Context, clusterName string) ([]*model.DeletedAPI, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" {
+		return nil, fmt.Errorf("ClusterName cannot be empty")
+	}
+
+	query := `
+	SELECT ClusterName, ObjectName, Group, Kind, Version, Name, Deleted, Scope, EventTime, ExpiryDate, ExportedAt
+	FROM DeletedAPIs
+	WHERE ClusterName = ?
+	`
+	rows, err := r.DB.QueryContext(ctx, query, clusterName)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	var apis []*model.DeletedAPI
+	for rows.Next() {
+		var api model.DeletedAPI
+		var deleted uint8
+		if err := rows.Scan(&api.ClusterName, &api.ObjectName, &api.Group, &api.Kind, &api.Version, &api.Name, &deleted, &api.Scope, &api.EventTime, &api.ExpiryDate); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		deletedBool := deleted != 0
+		api.Deleted = &deletedBool
+		apis = append(apis, &api)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return apis, nil
+}
+
+// TrivySBOMs is the resolver for the trivySBOMs field.
+func (r *queryResolver) TrivySBOMs(ctx context.Context, clusterName string) ([]*model.TrivySbom, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" {
+		return nil, fmt.Errorf("clusterName cannot be empty")
+	}
+
+	query := `
+	SELECT id, cluster_name, image_name, package_name, package_url, bom_ref, serial_number, version, bom_format, ExpiryDate, ExportedAt
+	FROM trivysbom
+	WHERE cluster_name = ?
+	`
+
+	rows, err := r.DB.QueryContext(ctx, query, clusterName)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var sboms []*model.TrivySbom
+	for rows.Next() {
+		var sbom model.TrivySbom
+		if err := rows.Scan(&sbom.ID, &sbom.ClusterName, &sbom.ImageName, &sbom.PackageName, &sbom.PackageURL, &sbom.BomRef, &sbom.SerialNumber, &sbom.Version, &sbom.BomFormat, &sbom.ExpiryDate); err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		sboms = append(sboms, &sbom)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %v", err)
+	}
+
+	return sboms, nil
+}
+
+// TrivyVulCount is the resolver for the trivyVulCount field.
+func (r *queryResolver) TrivyVulCount(ctx context.Context, clusterName string, namespace string) (*model.ClusterNamespaceVulCount, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" || namespace == "" {
+		return nil, fmt.Errorf("clusterName and namespace cannot be empty")
+	}
+
+	query := `SELECT COUNT(*) FROM trivy_vul WHERE cluster_name = ? AND namespace = ?`
+
+	var count int
+	err := r.DB.QueryRowContext(ctx, query, clusterName, namespace).Scan(&count)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+
+	return &model.ClusterNamespaceVulCount{
+		ClusterName: clusterName,
+		Namespace:   namespace,
+		VulCount:    count,
+	}, nil
+}
+
+// TrivyMisconfigCount is the resolver for the trivyMisconfigCount field.
+func (r *queryResolver) TrivyMisconfigCount(ctx context.Context, clusterName string, namespace string) (*model.ClusterNamespaceMisconfigCount, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" || namespace == "" {
+		return nil, fmt.Errorf("clusterName and namespace cannot be empty")
+	}
+
+	query := `SELECT COUNT(*) FROM trivy_misconfig WHERE cluster_name = ? AND namespace = ?`
+
+	var count int
+	err := r.DB.QueryRowContext(ctx, query, clusterName, namespace).Scan(&count)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+
+	return &model.ClusterNamespaceMisconfigCount{
+		ClusterName:    clusterName,
+		Namespace:      namespace,
+		MisconfigCount: count,
+	}, nil
+}
+
+// DeletedAPICount is the resolver for the deletedAPICount field.
+func (r *queryResolver) DeletedAPICount(ctx context.Context, clusterName string) (*model.ClusterDeletedAPICount, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" {
+		return nil, fmt.Errorf("ClusterName cannot be empty")
+	}
+
+	query := `SELECT COUNT(*) FROM DeletedAPIs WHERE ClusterName = ?`
+
+	var count int
+	err := r.DB.QueryRowContext(ctx, query, clusterName).Scan(&count)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+
+	return &model.ClusterDeletedAPICount{
+		ClusterName:     clusterName,
+		DeletedAPICount: count,
+	}, nil
+}
+
+// TrivyImageVulCount is the resolver for the trivyImageVulCount field.
+func (r *queryResolver) TrivyImageCount(ctx context.Context, clusterName string) (*model.TrivyImageCount, error) {
+	if r.DB == nil {
+		return nil, fmt.Errorf("database connection is not initialized")
+	}
+
+	if clusterName == "" {
+		return nil, fmt.Errorf("clusterName cannot be empty")
+	}
+
+	query := `SELECT COUNT(*) FROM trivyimage WHERE cluster_name = ?`
+
+	var count int
+	err := r.DB.QueryRowContext(ctx, query, clusterName).Scan(&count)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+
+	return &model.TrivyImageCount{
+		ClusterName: clusterName,
+		ImageCount:  count,
+	}, nil
 }
 
 // Query returns QueryResolver implementation.

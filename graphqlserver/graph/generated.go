@@ -55,6 +55,17 @@ type ComplexityRoot struct {
 		Count       func(childComplexity int) int
 	}
 
+	ClusterDeletedAPICount struct {
+		ClusterName     func(childComplexity int) int
+		DeletedAPICount func(childComplexity int) int
+	}
+
+	ClusterNamespaceMisconfigCount struct {
+		ClusterName    func(childComplexity int) int
+		MisconfigCount func(childComplexity int) int
+		Namespace      func(childComplexity int) int
+	}
+
 	ClusterNamespaceOutdatedCount struct {
 		ClusterName   func(childComplexity int) int
 		Namespace     func(childComplexity int) int
@@ -65,6 +76,12 @@ type ComplexityRoot struct {
 		ClusterName   func(childComplexity int) int
 		Namespace     func(childComplexity int) int
 		ResourceCount func(childComplexity int) int
+	}
+
+	ClusterNamespaceVulCount struct {
+		ClusterName func(childComplexity int) int
+		Namespace   func(childComplexity int) int
+		VulCount    func(childComplexity int) int
 	}
 
 	DeletedAPI struct {
@@ -141,7 +158,6 @@ type ComplexityRoot struct {
 		ClusterName func(childComplexity int) int
 		Description func(childComplexity int) int
 		EventTime   func(childComplexity int) int
-		ExpiryDate  func(childComplexity int) int
 		FileName    func(childComplexity int) int
 		FileRow     func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -152,6 +168,27 @@ type ComplexityRoot struct {
 		Path        func(childComplexity int) int
 		Summary     func(childComplexity int) int
 		TargetType  func(childComplexity int) int
+	}
+
+	Misconfiguration struct {
+		ClusterName         func(childComplexity int) int
+		EventTime           func(childComplexity int) int
+		ExpiryDate          func(childComplexity int) int
+		ExportedAt          func(childComplexity int) int
+		ID                  func(childComplexity int) int
+		Kind                func(childComplexity int) int
+		MisconfigAvdid      func(childComplexity int) int
+		MisconfigDesc       func(childComplexity int) int
+		MisconfigID         func(childComplexity int) int
+		MisconfigMsg        func(childComplexity int) int
+		MisconfigQuery      func(childComplexity int) int
+		MisconfigResolution func(childComplexity int) int
+		MisconfigSeverity   func(childComplexity int) int
+		MisconfigStatus     func(childComplexity int) int
+		MisconfigTitle      func(childComplexity int) int
+		MisconfigType       func(childComplexity int) int
+		Name                func(childComplexity int) int
+		Namespace           func(childComplexity int) int
 	}
 
 	Namespace struct {
@@ -191,11 +228,23 @@ type ComplexityRoot struct {
 		AllTrivyMisconfigs                  func(childComplexity int) int
 		AllTrivySBOMs                       func(childComplexity int) int
 		AllTrivyVuls                        func(childComplexity int) int
+		DeletedAPICount                     func(childComplexity int, clusterName string) int
+		DeletedAPIs                         func(childComplexity int, clusterName string) int
+		DeprecatedAPIs                      func(childComplexity int, clusterName string) int
 		EventsByClusterAndNamespace         func(childComplexity int, clusterName string, namespace string) int
+		GetAllResources                     func(childComplexity int, clusterName string, namespace string) int
+		Kubescores                          func(childComplexity int, clustername string, namespace string) int
+		Misconfigurations                   func(childComplexity int, clusterName string, namespace string) int
 		OutdatedImagesByClusterAndNamespace func(childComplexity int, clusterName string, namespace string) int
 		OutdatedImagesCount                 func(childComplexity int, clusterName string, namespace string) int
+		TrivyImageCount                     func(childComplexity int, clusterName string) int
+		TrivyImages                         func(childComplexity int, clusterName string) int
+		TrivyMisconfigCount                 func(childComplexity int, clusterName string, namespace string) int
+		TrivySBOMs                          func(childComplexity int, clusterName string) int
+		TrivyVulCount                       func(childComplexity int, clusterName string, namespace string) int
 		UniqueClusters                      func(childComplexity int) int
 		UniqueNamespaces                    func(childComplexity int, clusterName string) int
+		Vulnerabilities                     func(childComplexity int, clusterName string, namespace string) int
 	}
 
 	Rakkess struct {
@@ -232,6 +281,11 @@ type ComplexityRoot struct {
 		VulPublishedDate    func(childComplexity int) int
 		VulSeverity         func(childComplexity int) int
 		VulTitle            func(childComplexity int) int
+	}
+
+	TrivyImageCount struct {
+		ClusterName func(childComplexity int) int
+		ImageCount  func(childComplexity int) int
 	}
 
 	TrivyMisconfig struct {
@@ -286,6 +340,27 @@ type ComplexityRoot struct {
 		VulTitle            func(childComplexity int) int
 		VulVendorIds        func(childComplexity int) int
 	}
+
+	Vulnerability struct {
+		ClusterName         func(childComplexity int) int
+		ExpiryDate          func(childComplexity int) int
+		ExportedAt          func(childComplexity int) int
+		ID                  func(childComplexity int) int
+		Kind                func(childComplexity int) int
+		Name                func(childComplexity int) int
+		Namespace           func(childComplexity int) int
+		VulFixedVersion     func(childComplexity int) int
+		VulID               func(childComplexity int) int
+		VulInstalledVersion func(childComplexity int) int
+		VulLastModifiedDate func(childComplexity int) int
+		VulPkgID            func(childComplexity int) int
+		VulPkgName          func(childComplexity int) int
+		VulPkgPath          func(childComplexity int) int
+		VulPublishedDate    func(childComplexity int) int
+		VulSeverity         func(childComplexity int) int
+		VulTitle            func(childComplexity int) int
+		VulVendorIds        func(childComplexity int) int
+	}
 }
 
 type QueryResolver interface {
@@ -308,6 +383,18 @@ type QueryResolver interface {
 	AllClusterDeletedAPIsCounts(ctx context.Context) ([]*model.ClusterAPIsCount, error)
 	AllClusterNamespaceResourceCounts(ctx context.Context) ([]*model.ClusterNamespaceResourceCount, error)
 	EventsByClusterAndNamespace(ctx context.Context, clusterName string, namespace string) ([]*model.Event, error)
+	Vulnerabilities(ctx context.Context, clusterName string, namespace string) ([]*model.Vulnerability, error)
+	Misconfigurations(ctx context.Context, clusterName string, namespace string) ([]*model.Misconfiguration, error)
+	Kubescores(ctx context.Context, clustername string, namespace string) ([]*model.KubeScore, error)
+	GetAllResources(ctx context.Context, clusterName string, namespace string) ([]*model.GetAllResource, error)
+	TrivyImages(ctx context.Context, clusterName string) ([]*model.TrivyImage, error)
+	DeprecatedAPIs(ctx context.Context, clusterName string) ([]*model.DeprecatedAPI, error)
+	DeletedAPIs(ctx context.Context, clusterName string) ([]*model.DeletedAPI, error)
+	TrivySBOMs(ctx context.Context, clusterName string) ([]*model.TrivySbom, error)
+	TrivyVulCount(ctx context.Context, clusterName string, namespace string) (*model.ClusterNamespaceVulCount, error)
+	TrivyMisconfigCount(ctx context.Context, clusterName string, namespace string) (*model.ClusterNamespaceMisconfigCount, error)
+	DeletedAPICount(ctx context.Context, clusterName string) (*model.ClusterDeletedAPICount, error)
+	TrivyImageCount(ctx context.Context, clusterName string) (*model.TrivyImageCount, error)
 }
 
 type executableSchema struct {
@@ -350,6 +437,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ClusterAPIsCount.Count(childComplexity), true
 
+	case "ClusterDeletedAPICount.clusterName":
+		if e.complexity.ClusterDeletedAPICount.ClusterName == nil {
+			break
+		}
+
+		return e.complexity.ClusterDeletedAPICount.ClusterName(childComplexity), true
+
+	case "ClusterDeletedAPICount.deletedAPICount":
+		if e.complexity.ClusterDeletedAPICount.DeletedAPICount == nil {
+			break
+		}
+
+		return e.complexity.ClusterDeletedAPICount.DeletedAPICount(childComplexity), true
+
+	case "ClusterNamespaceMisconfigCount.clusterName":
+		if e.complexity.ClusterNamespaceMisconfigCount.ClusterName == nil {
+			break
+		}
+
+		return e.complexity.ClusterNamespaceMisconfigCount.ClusterName(childComplexity), true
+
+	case "ClusterNamespaceMisconfigCount.misconfigCount":
+		if e.complexity.ClusterNamespaceMisconfigCount.MisconfigCount == nil {
+			break
+		}
+
+		return e.complexity.ClusterNamespaceMisconfigCount.MisconfigCount(childComplexity), true
+
+	case "ClusterNamespaceMisconfigCount.namespace":
+		if e.complexity.ClusterNamespaceMisconfigCount.Namespace == nil {
+			break
+		}
+
+		return e.complexity.ClusterNamespaceMisconfigCount.Namespace(childComplexity), true
+
 	case "ClusterNamespaceOutdatedCount.clusterName":
 		if e.complexity.ClusterNamespaceOutdatedCount.ClusterName == nil {
 			break
@@ -391,6 +513,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ClusterNamespaceResourceCount.ResourceCount(childComplexity), true
+
+	case "ClusterNamespaceVulCount.clusterName":
+		if e.complexity.ClusterNamespaceVulCount.ClusterName == nil {
+			break
+		}
+
+		return e.complexity.ClusterNamespaceVulCount.ClusterName(childComplexity), true
+
+	case "ClusterNamespaceVulCount.namespace":
+		if e.complexity.ClusterNamespaceVulCount.Namespace == nil {
+			break
+		}
+
+		return e.complexity.ClusterNamespaceVulCount.Namespace(childComplexity), true
+
+	case "ClusterNamespaceVulCount.vulCount":
+		if e.complexity.ClusterNamespaceVulCount.VulCount == nil {
+			break
+		}
+
+		return e.complexity.ClusterNamespaceVulCount.VulCount(childComplexity), true
 
 	case "DeletedAPI.ClusterName":
 		if e.complexity.DeletedAPI.ClusterName == nil {
@@ -798,13 +941,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Kubescore.EventTime(childComplexity), true
 
-	case "Kubescore.expiryDate":
-		if e.complexity.Kubescore.ExpiryDate == nil {
-			break
-		}
-
-		return e.complexity.Kubescore.ExpiryDate(childComplexity), true
-
 	case "Kubescore.fileName":
 		if e.complexity.Kubescore.FileName == nil {
 			break
@@ -874,6 +1010,132 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Kubescore.TargetType(childComplexity), true
+
+	case "Misconfiguration.clusterName":
+		if e.complexity.Misconfiguration.ClusterName == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.ClusterName(childComplexity), true
+
+	case "Misconfiguration.eventTime":
+		if e.complexity.Misconfiguration.EventTime == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.EventTime(childComplexity), true
+
+	case "Misconfiguration.expiryDate":
+		if e.complexity.Misconfiguration.ExpiryDate == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.ExpiryDate(childComplexity), true
+
+	case "Misconfiguration.exportedAt":
+		if e.complexity.Misconfiguration.ExportedAt == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.ExportedAt(childComplexity), true
+
+	case "Misconfiguration.id":
+		if e.complexity.Misconfiguration.ID == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.ID(childComplexity), true
+
+	case "Misconfiguration.kind":
+		if e.complexity.Misconfiguration.Kind == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.Kind(childComplexity), true
+
+	case "Misconfiguration.misconfigAvdid":
+		if e.complexity.Misconfiguration.MisconfigAvdid == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigAvdid(childComplexity), true
+
+	case "Misconfiguration.misconfigDesc":
+		if e.complexity.Misconfiguration.MisconfigDesc == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigDesc(childComplexity), true
+
+	case "Misconfiguration.misconfigId":
+		if e.complexity.Misconfiguration.MisconfigID == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigID(childComplexity), true
+
+	case "Misconfiguration.misconfigMsg":
+		if e.complexity.Misconfiguration.MisconfigMsg == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigMsg(childComplexity), true
+
+	case "Misconfiguration.misconfigQuery":
+		if e.complexity.Misconfiguration.MisconfigQuery == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigQuery(childComplexity), true
+
+	case "Misconfiguration.misconfigResolution":
+		if e.complexity.Misconfiguration.MisconfigResolution == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigResolution(childComplexity), true
+
+	case "Misconfiguration.misconfigSeverity":
+		if e.complexity.Misconfiguration.MisconfigSeverity == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigSeverity(childComplexity), true
+
+	case "Misconfiguration.misconfigStatus":
+		if e.complexity.Misconfiguration.MisconfigStatus == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigStatus(childComplexity), true
+
+	case "Misconfiguration.misconfigTitle":
+		if e.complexity.Misconfiguration.MisconfigTitle == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigTitle(childComplexity), true
+
+	case "Misconfiguration.misconfigType":
+		if e.complexity.Misconfiguration.MisconfigType == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.MisconfigType(childComplexity), true
+
+	case "Misconfiguration.name":
+		if e.complexity.Misconfiguration.Name == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.Name(childComplexity), true
+
+	case "Misconfiguration.namespace":
+		if e.complexity.Misconfiguration.Namespace == nil {
+			break
+		}
+
+		return e.complexity.Misconfiguration.Namespace(childComplexity), true
 
 	case "Namespace.name":
 		if e.complexity.Namespace.Name == nil {
@@ -1064,6 +1326,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AllTrivyVuls(childComplexity), true
 
+	case "Query.deletedAPICount":
+		if e.complexity.Query.DeletedAPICount == nil {
+			break
+		}
+
+		args, err := ec.field_Query_deletedAPICount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.DeletedAPICount(childComplexity, args["clusterName"].(string)), true
+
+	case "Query.deletedAPIs":
+		if e.complexity.Query.DeletedAPIs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_deletedAPIs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.DeletedAPIs(childComplexity, args["clusterName"].(string)), true
+
+	case "Query.deprecatedAPIs":
+		if e.complexity.Query.DeprecatedAPIs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_deprecatedAPIs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.DeprecatedAPIs(childComplexity, args["clusterName"].(string)), true
+
 	case "Query.eventsByClusterAndNamespace":
 		if e.complexity.Query.EventsByClusterAndNamespace == nil {
 			break
@@ -1075,6 +1373,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.EventsByClusterAndNamespace(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
+
+	case "Query.getAllResources":
+		if e.complexity.Query.GetAllResources == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getAllResources_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetAllResources(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
+
+	case "Query.kubescores":
+		if e.complexity.Query.Kubescores == nil {
+			break
+		}
+
+		args, err := ec.field_Query_kubescores_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Kubescores(childComplexity, args["clustername"].(string), args["namespace"].(string)), true
+
+	case "Query.misconfigurations":
+		if e.complexity.Query.Misconfigurations == nil {
+			break
+		}
+
+		args, err := ec.field_Query_misconfigurations_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Misconfigurations(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
 
 	case "Query.outdatedImagesByClusterAndNamespace":
 		if e.complexity.Query.OutdatedImagesByClusterAndNamespace == nil {
@@ -1100,6 +1434,66 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.OutdatedImagesCount(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
 
+	case "Query.trivyImageCount":
+		if e.complexity.Query.TrivyImageCount == nil {
+			break
+		}
+
+		args, err := ec.field_Query_trivyImageCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TrivyImageCount(childComplexity, args["clusterName"].(string)), true
+
+	case "Query.trivyImages":
+		if e.complexity.Query.TrivyImages == nil {
+			break
+		}
+
+		args, err := ec.field_Query_trivyImages_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TrivyImages(childComplexity, args["clusterName"].(string)), true
+
+	case "Query.trivyMisconfigCount":
+		if e.complexity.Query.TrivyMisconfigCount == nil {
+			break
+		}
+
+		args, err := ec.field_Query_trivyMisconfigCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TrivyMisconfigCount(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
+
+	case "Query.trivySBOMs":
+		if e.complexity.Query.TrivySBOMs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_trivySBOMs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TrivySBOMs(childComplexity, args["clusterName"].(string)), true
+
+	case "Query.trivyVulCount":
+		if e.complexity.Query.TrivyVulCount == nil {
+			break
+		}
+
+		args, err := ec.field_Query_trivyVulCount_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TrivyVulCount(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
+
 	case "Query.uniqueClusters":
 		if e.complexity.Query.UniqueClusters == nil {
 			break
@@ -1118,6 +1512,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.UniqueNamespaces(childComplexity, args["clusterName"].(string)), true
+
+	case "Query.vulnerabilities":
+		if e.complexity.Query.Vulnerabilities == nil {
+			break
+		}
+
+		args, err := ec.field_Query_vulnerabilities_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Vulnerabilities(childComplexity, args["clusterName"].(string), args["namespace"].(string)), true
 
 	case "Rakkess.ClusterName":
 		if e.complexity.Rakkess.ClusterName == nil {
@@ -1307,6 +1713,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TrivyImage.VulTitle(childComplexity), true
+
+	case "TrivyImageCount.clusterName":
+		if e.complexity.TrivyImageCount.ClusterName == nil {
+			break
+		}
+
+		return e.complexity.TrivyImageCount.ClusterName(childComplexity), true
+
+	case "TrivyImageCount.ImageCount":
+		if e.complexity.TrivyImageCount.ImageCount == nil {
+			break
+		}
+
+		return e.complexity.TrivyImageCount.ImageCount(childComplexity), true
 
 	case "TrivyMisconfig.clusterName":
 		if e.complexity.TrivyMisconfig.ClusterName == nil {
@@ -1616,6 +2036,132 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TrivyVul.VulVendorIds(childComplexity), true
 
+	case "Vulnerability.clusterName":
+		if e.complexity.Vulnerability.ClusterName == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.ClusterName(childComplexity), true
+
+	case "Vulnerability.expiryDate":
+		if e.complexity.Vulnerability.ExpiryDate == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.ExpiryDate(childComplexity), true
+
+	case "Vulnerability.exportedAt":
+		if e.complexity.Vulnerability.ExportedAt == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.ExportedAt(childComplexity), true
+
+	case "Vulnerability.id":
+		if e.complexity.Vulnerability.ID == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.ID(childComplexity), true
+
+	case "Vulnerability.kind":
+		if e.complexity.Vulnerability.Kind == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.Kind(childComplexity), true
+
+	case "Vulnerability.name":
+		if e.complexity.Vulnerability.Name == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.Name(childComplexity), true
+
+	case "Vulnerability.namespace":
+		if e.complexity.Vulnerability.Namespace == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.Namespace(childComplexity), true
+
+	case "Vulnerability.vulFixedVersion":
+		if e.complexity.Vulnerability.VulFixedVersion == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulFixedVersion(childComplexity), true
+
+	case "Vulnerability.vulId":
+		if e.complexity.Vulnerability.VulID == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulID(childComplexity), true
+
+	case "Vulnerability.vulInstalledVersion":
+		if e.complexity.Vulnerability.VulInstalledVersion == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulInstalledVersion(childComplexity), true
+
+	case "Vulnerability.vulLastModifiedDate":
+		if e.complexity.Vulnerability.VulLastModifiedDate == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulLastModifiedDate(childComplexity), true
+
+	case "Vulnerability.vulPkgId":
+		if e.complexity.Vulnerability.VulPkgID == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulPkgID(childComplexity), true
+
+	case "Vulnerability.vulPkgName":
+		if e.complexity.Vulnerability.VulPkgName == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulPkgName(childComplexity), true
+
+	case "Vulnerability.vulPkgPath":
+		if e.complexity.Vulnerability.VulPkgPath == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulPkgPath(childComplexity), true
+
+	case "Vulnerability.vulPublishedDate":
+		if e.complexity.Vulnerability.VulPublishedDate == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulPublishedDate(childComplexity), true
+
+	case "Vulnerability.vulSeverity":
+		if e.complexity.Vulnerability.VulSeverity == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulSeverity(childComplexity), true
+
+	case "Vulnerability.vulTitle":
+		if e.complexity.Vulnerability.VulTitle == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulTitle(childComplexity), true
+
+	case "Vulnerability.vulVendorIds":
+		if e.complexity.Vulnerability.VulVendorIds == nil {
+			break
+		}
+
+		return e.complexity.Vulnerability.VulVendorIds(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -1739,7 +2285,124 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_deletedAPICount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_deletedAPIs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_deprecatedAPIs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_eventsByClusterAndNamespace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getAllResources_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_kubescores_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clustername"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clustername"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clustername"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_misconfigurations_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1811,6 +2474,99 @@ func (ec *executionContext) field_Query_outdatedImagesCount_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_trivyImageCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_trivyImages_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_trivyMisconfigCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_trivySBOMs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_trivyVulCount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_uniqueNamespaces_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1823,6 +2579,30 @@ func (ec *executionContext) field_Query_uniqueNamespaces_args(ctx context.Contex
 		}
 	}
 	args["clusterName"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_vulnerabilities_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["clusterName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clusterName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["clusterName"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg1
 	return args, nil
 }
 
@@ -1986,6 +2766,226 @@ func (ec *executionContext) _ClusterAPIsCount_count(ctx context.Context, field g
 func (ec *executionContext) fieldContext_ClusterAPIsCount_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ClusterAPIsCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterDeletedAPICount_clusterName(ctx context.Context, field graphql.CollectedField, obj *model.ClusterDeletedAPICount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterDeletedAPICount_clusterName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterDeletedAPICount_clusterName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterDeletedAPICount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterDeletedAPICount_deletedAPICount(ctx context.Context, field graphql.CollectedField, obj *model.ClusterDeletedAPICount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterDeletedAPICount_deletedAPICount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAPICount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterDeletedAPICount_deletedAPICount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterDeletedAPICount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterNamespaceMisconfigCount_clusterName(ctx context.Context, field graphql.CollectedField, obj *model.ClusterNamespaceMisconfigCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterNamespaceMisconfigCount_clusterName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterNamespaceMisconfigCount_clusterName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterNamespaceMisconfigCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterNamespaceMisconfigCount_namespace(ctx context.Context, field graphql.CollectedField, obj *model.ClusterNamespaceMisconfigCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterNamespaceMisconfigCount_namespace(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Namespace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterNamespaceMisconfigCount_namespace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterNamespaceMisconfigCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterNamespaceMisconfigCount_misconfigCount(ctx context.Context, field graphql.CollectedField, obj *model.ClusterNamespaceMisconfigCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterNamespaceMisconfigCount_misconfigCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterNamespaceMisconfigCount_misconfigCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterNamespaceMisconfigCount",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -2250,6 +3250,138 @@ func (ec *executionContext) _ClusterNamespaceResourceCount_resourceCount(ctx con
 func (ec *executionContext) fieldContext_ClusterNamespaceResourceCount_resourceCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ClusterNamespaceResourceCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterNamespaceVulCount_clusterName(ctx context.Context, field graphql.CollectedField, obj *model.ClusterNamespaceVulCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterNamespaceVulCount_clusterName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterNamespaceVulCount_clusterName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterNamespaceVulCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterNamespaceVulCount_namespace(ctx context.Context, field graphql.CollectedField, obj *model.ClusterNamespaceVulCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterNamespaceVulCount_namespace(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Namespace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterNamespaceVulCount_namespace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterNamespaceVulCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterNamespaceVulCount_vulCount(ctx context.Context, field graphql.CollectedField, obj *model.ClusterNamespaceVulCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterNamespaceVulCount_vulCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterNamespaceVulCount_vulCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterNamespaceVulCount",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -5093,8 +6225,682 @@ func (ec *executionContext) fieldContext_Kubescore_eventTime(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Kubescore_expiryDate(ctx context.Context, field graphql.CollectedField, obj *model.Kubescore) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Kubescore_expiryDate(ctx, field)
+func (ec *executionContext) _Misconfiguration_id(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_clusterName(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_clusterName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_clusterName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_namespace(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_namespace(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Namespace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_namespace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_kind(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_kind(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kind, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_kind(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_name(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigId(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigAvdid(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigAvdid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigAvdid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigAvdid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigType(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigType(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigTitle(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigTitle(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigTitle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigTitle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigDesc(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigDesc(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigDesc, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigDesc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigMsg(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigMsg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigMsg, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigMsg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigQuery(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigQuery(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigQuery, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigQuery(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigResolution(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigResolution(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigResolution, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigResolution(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigSeverity(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigSeverity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigSeverity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigSeverity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_misconfigStatus(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_misconfigStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MisconfigStatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_misconfigStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_eventTime(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_eventTime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EventTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_eventTime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_expiryDate(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_expiryDate(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5121,9 +6927,50 @@ func (ec *executionContext) _Kubescore_expiryDate(ctx context.Context, field gra
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Kubescore_expiryDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Misconfiguration_expiryDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Kubescore",
+		Object:     "Misconfiguration",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Misconfiguration_exportedAt(ctx context.Context, field graphql.CollectedField, obj *model.Misconfiguration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Misconfiguration_exportedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExportedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Misconfiguration_exportedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Misconfiguration",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -6299,8 +8146,6 @@ func (ec *executionContext) fieldContext_Query_allKubeScores(ctx context.Context
 				return ec.fieldContext_Kubescore_fileRow(ctx, field)
 			case "eventTime":
 				return ec.fieldContext_Kubescore_eventTime(ctx, field)
-			case "expiryDate":
-				return ec.fieldContext_Kubescore_expiryDate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Kubescore", field.Name)
 		},
@@ -6988,6 +8833,906 @@ func (ec *executionContext) fieldContext_Query_eventsByClusterAndNamespace(ctx c
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_eventsByClusterAndNamespace_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_vulnerabilities(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_vulnerabilities(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Vulnerabilities(rctx, fc.Args["clusterName"].(string), fc.Args["namespace"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Vulnerability)
+	fc.Result = res
+	return ec.marshalNVulnerability2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐVulnerabilityᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_vulnerabilities(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Vulnerability_id(ctx, field)
+			case "clusterName":
+				return ec.fieldContext_Vulnerability_clusterName(ctx, field)
+			case "namespace":
+				return ec.fieldContext_Vulnerability_namespace(ctx, field)
+			case "kind":
+				return ec.fieldContext_Vulnerability_kind(ctx, field)
+			case "name":
+				return ec.fieldContext_Vulnerability_name(ctx, field)
+			case "vulId":
+				return ec.fieldContext_Vulnerability_vulId(ctx, field)
+			case "vulVendorIds":
+				return ec.fieldContext_Vulnerability_vulVendorIds(ctx, field)
+			case "vulPkgId":
+				return ec.fieldContext_Vulnerability_vulPkgId(ctx, field)
+			case "vulPkgName":
+				return ec.fieldContext_Vulnerability_vulPkgName(ctx, field)
+			case "vulPkgPath":
+				return ec.fieldContext_Vulnerability_vulPkgPath(ctx, field)
+			case "vulInstalledVersion":
+				return ec.fieldContext_Vulnerability_vulInstalledVersion(ctx, field)
+			case "vulFixedVersion":
+				return ec.fieldContext_Vulnerability_vulFixedVersion(ctx, field)
+			case "vulTitle":
+				return ec.fieldContext_Vulnerability_vulTitle(ctx, field)
+			case "vulSeverity":
+				return ec.fieldContext_Vulnerability_vulSeverity(ctx, field)
+			case "vulPublishedDate":
+				return ec.fieldContext_Vulnerability_vulPublishedDate(ctx, field)
+			case "vulLastModifiedDate":
+				return ec.fieldContext_Vulnerability_vulLastModifiedDate(ctx, field)
+			case "expiryDate":
+				return ec.fieldContext_Vulnerability_expiryDate(ctx, field)
+			case "exportedAt":
+				return ec.fieldContext_Vulnerability_exportedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Vulnerability", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_vulnerabilities_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_misconfigurations(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_misconfigurations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Misconfigurations(rctx, fc.Args["clusterName"].(string), fc.Args["namespace"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Misconfiguration)
+	fc.Result = res
+	return ec.marshalNMisconfiguration2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐMisconfigurationᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_misconfigurations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Misconfiguration_id(ctx, field)
+			case "clusterName":
+				return ec.fieldContext_Misconfiguration_clusterName(ctx, field)
+			case "namespace":
+				return ec.fieldContext_Misconfiguration_namespace(ctx, field)
+			case "kind":
+				return ec.fieldContext_Misconfiguration_kind(ctx, field)
+			case "name":
+				return ec.fieldContext_Misconfiguration_name(ctx, field)
+			case "misconfigId":
+				return ec.fieldContext_Misconfiguration_misconfigId(ctx, field)
+			case "misconfigAvdid":
+				return ec.fieldContext_Misconfiguration_misconfigAvdid(ctx, field)
+			case "misconfigType":
+				return ec.fieldContext_Misconfiguration_misconfigType(ctx, field)
+			case "misconfigTitle":
+				return ec.fieldContext_Misconfiguration_misconfigTitle(ctx, field)
+			case "misconfigDesc":
+				return ec.fieldContext_Misconfiguration_misconfigDesc(ctx, field)
+			case "misconfigMsg":
+				return ec.fieldContext_Misconfiguration_misconfigMsg(ctx, field)
+			case "misconfigQuery":
+				return ec.fieldContext_Misconfiguration_misconfigQuery(ctx, field)
+			case "misconfigResolution":
+				return ec.fieldContext_Misconfiguration_misconfigResolution(ctx, field)
+			case "misconfigSeverity":
+				return ec.fieldContext_Misconfiguration_misconfigSeverity(ctx, field)
+			case "misconfigStatus":
+				return ec.fieldContext_Misconfiguration_misconfigStatus(ctx, field)
+			case "eventTime":
+				return ec.fieldContext_Misconfiguration_eventTime(ctx, field)
+			case "expiryDate":
+				return ec.fieldContext_Misconfiguration_expiryDate(ctx, field)
+			case "exportedAt":
+				return ec.fieldContext_Misconfiguration_exportedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Misconfiguration", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_misconfigurations_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_kubescores(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_kubescores(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Kubescores(rctx, fc.Args["clustername"].(string), fc.Args["namespace"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.KubeScore)
+	fc.Result = res
+	return ec.marshalNKubeScore2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐKubeScoreᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_kubescores(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_KubeScore_id(ctx, field)
+			case "clusterName":
+				return ec.fieldContext_KubeScore_clusterName(ctx, field)
+			case "objectName":
+				return ec.fieldContext_KubeScore_objectName(ctx, field)
+			case "kind":
+				return ec.fieldContext_KubeScore_kind(ctx, field)
+			case "apiVersion":
+				return ec.fieldContext_KubeScore_apiVersion(ctx, field)
+			case "name":
+				return ec.fieldContext_KubeScore_name(ctx, field)
+			case "namespace":
+				return ec.fieldContext_KubeScore_namespace(ctx, field)
+			case "targetType":
+				return ec.fieldContext_KubeScore_targetType(ctx, field)
+			case "description":
+				return ec.fieldContext_KubeScore_description(ctx, field)
+			case "path":
+				return ec.fieldContext_KubeScore_path(ctx, field)
+			case "summary":
+				return ec.fieldContext_KubeScore_summary(ctx, field)
+			case "fileName":
+				return ec.fieldContext_KubeScore_fileName(ctx, field)
+			case "fileRow":
+				return ec.fieldContext_KubeScore_fileRow(ctx, field)
+			case "eventTime":
+				return ec.fieldContext_KubeScore_eventTime(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type KubeScore", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_kubescores_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getAllResources(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getAllResources(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetAllResources(rctx, fc.Args["clusterName"].(string), fc.Args["namespace"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.GetAllResource)
+	fc.Result = res
+	return ec.marshalNGetAllResource2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐGetAllResourceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getAllResources(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ClusterName":
+				return ec.fieldContext_GetAllResource_ClusterName(ctx, field)
+			case "Namespace":
+				return ec.fieldContext_GetAllResource_Namespace(ctx, field)
+			case "Kind":
+				return ec.fieldContext_GetAllResource_Kind(ctx, field)
+			case "Resource":
+				return ec.fieldContext_GetAllResource_Resource(ctx, field)
+			case "Age":
+				return ec.fieldContext_GetAllResource_Age(ctx, field)
+			case "EventTime":
+				return ec.fieldContext_GetAllResource_EventTime(ctx, field)
+			case "ExpiryDate":
+				return ec.fieldContext_GetAllResource_ExpiryDate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GetAllResource", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getAllResources_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_trivyImages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_trivyImages(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TrivyImages(rctx, fc.Args["clusterName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TrivyImage)
+	fc.Result = res
+	return ec.marshalNTrivyImage2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐTrivyImageᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_trivyImages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TrivyImage_id(ctx, field)
+			case "clusterName":
+				return ec.fieldContext_TrivyImage_clusterName(ctx, field)
+			case "artifactName":
+				return ec.fieldContext_TrivyImage_artifactName(ctx, field)
+			case "vulId":
+				return ec.fieldContext_TrivyImage_vulId(ctx, field)
+			case "vulPkgId":
+				return ec.fieldContext_TrivyImage_vulPkgId(ctx, field)
+			case "vulPkgName":
+				return ec.fieldContext_TrivyImage_vulPkgName(ctx, field)
+			case "vulInstalledVersion":
+				return ec.fieldContext_TrivyImage_vulInstalledVersion(ctx, field)
+			case "vulFixedVersion":
+				return ec.fieldContext_TrivyImage_vulFixedVersion(ctx, field)
+			case "vulTitle":
+				return ec.fieldContext_TrivyImage_vulTitle(ctx, field)
+			case "vulSeverity":
+				return ec.fieldContext_TrivyImage_vulSeverity(ctx, field)
+			case "vulPublishedDate":
+				return ec.fieldContext_TrivyImage_vulPublishedDate(ctx, field)
+			case "vulLastModifiedDate":
+				return ec.fieldContext_TrivyImage_vulLastModifiedDate(ctx, field)
+			case "expiryDate":
+				return ec.fieldContext_TrivyImage_expiryDate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrivyImage", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_trivyImages_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_deprecatedAPIs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_deprecatedAPIs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().DeprecatedAPIs(rctx, fc.Args["clusterName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.DeprecatedAPI)
+	fc.Result = res
+	return ec.marshalNDeprecatedAPI2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐDeprecatedAPIᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_deprecatedAPIs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ClusterName":
+				return ec.fieldContext_DeprecatedAPI_ClusterName(ctx, field)
+			case "ObjectName":
+				return ec.fieldContext_DeprecatedAPI_ObjectName(ctx, field)
+			case "Description":
+				return ec.fieldContext_DeprecatedAPI_Description(ctx, field)
+			case "Kind":
+				return ec.fieldContext_DeprecatedAPI_Kind(ctx, field)
+			case "Deprecated":
+				return ec.fieldContext_DeprecatedAPI_Deprecated(ctx, field)
+			case "Scope":
+				return ec.fieldContext_DeprecatedAPI_Scope(ctx, field)
+			case "EventTime":
+				return ec.fieldContext_DeprecatedAPI_EventTime(ctx, field)
+			case "ExpiryDate":
+				return ec.fieldContext_DeprecatedAPI_ExpiryDate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeprecatedAPI", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_deprecatedAPIs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_deletedAPIs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_deletedAPIs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().DeletedAPIs(rctx, fc.Args["clusterName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.DeletedAPI)
+	fc.Result = res
+	return ec.marshalNDeletedAPI2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐDeletedAPIᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_deletedAPIs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ClusterName":
+				return ec.fieldContext_DeletedAPI_ClusterName(ctx, field)
+			case "ObjectName":
+				return ec.fieldContext_DeletedAPI_ObjectName(ctx, field)
+			case "Group":
+				return ec.fieldContext_DeletedAPI_Group(ctx, field)
+			case "Kind":
+				return ec.fieldContext_DeletedAPI_Kind(ctx, field)
+			case "Version":
+				return ec.fieldContext_DeletedAPI_Version(ctx, field)
+			case "Name":
+				return ec.fieldContext_DeletedAPI_Name(ctx, field)
+			case "Deleted":
+				return ec.fieldContext_DeletedAPI_Deleted(ctx, field)
+			case "Scope":
+				return ec.fieldContext_DeletedAPI_Scope(ctx, field)
+			case "EventTime":
+				return ec.fieldContext_DeletedAPI_EventTime(ctx, field)
+			case "ExpiryDate":
+				return ec.fieldContext_DeletedAPI_ExpiryDate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeletedAPI", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_deletedAPIs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_trivySBOMs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_trivySBOMs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TrivySBOMs(rctx, fc.Args["clusterName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TrivySbom)
+	fc.Result = res
+	return ec.marshalNTrivySBOM2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐTrivySbomᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_trivySBOMs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TrivySBOM_id(ctx, field)
+			case "clusterName":
+				return ec.fieldContext_TrivySBOM_clusterName(ctx, field)
+			case "imageName":
+				return ec.fieldContext_TrivySBOM_imageName(ctx, field)
+			case "packageName":
+				return ec.fieldContext_TrivySBOM_packageName(ctx, field)
+			case "packageUrl":
+				return ec.fieldContext_TrivySBOM_packageUrl(ctx, field)
+			case "bomRef":
+				return ec.fieldContext_TrivySBOM_bomRef(ctx, field)
+			case "serialNumber":
+				return ec.fieldContext_TrivySBOM_serialNumber(ctx, field)
+			case "version":
+				return ec.fieldContext_TrivySBOM_version(ctx, field)
+			case "bomFormat":
+				return ec.fieldContext_TrivySBOM_bomFormat(ctx, field)
+			case "expiryDate":
+				return ec.fieldContext_TrivySBOM_expiryDate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrivySBOM", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_trivySBOMs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_trivyVulCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_trivyVulCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TrivyVulCount(rctx, fc.Args["clusterName"].(string), fc.Args["namespace"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ClusterNamespaceVulCount)
+	fc.Result = res
+	return ec.marshalNClusterNamespaceVulCount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceVulCount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_trivyVulCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "clusterName":
+				return ec.fieldContext_ClusterNamespaceVulCount_clusterName(ctx, field)
+			case "namespace":
+				return ec.fieldContext_ClusterNamespaceVulCount_namespace(ctx, field)
+			case "vulCount":
+				return ec.fieldContext_ClusterNamespaceVulCount_vulCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ClusterNamespaceVulCount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_trivyVulCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_trivyMisconfigCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_trivyMisconfigCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TrivyMisconfigCount(rctx, fc.Args["clusterName"].(string), fc.Args["namespace"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ClusterNamespaceMisconfigCount)
+	fc.Result = res
+	return ec.marshalNClusterNamespaceMisconfigCount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceMisconfigCount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_trivyMisconfigCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "clusterName":
+				return ec.fieldContext_ClusterNamespaceMisconfigCount_clusterName(ctx, field)
+			case "namespace":
+				return ec.fieldContext_ClusterNamespaceMisconfigCount_namespace(ctx, field)
+			case "misconfigCount":
+				return ec.fieldContext_ClusterNamespaceMisconfigCount_misconfigCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ClusterNamespaceMisconfigCount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_trivyMisconfigCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_deletedAPICount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_deletedAPICount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().DeletedAPICount(rctx, fc.Args["clusterName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ClusterDeletedAPICount)
+	fc.Result = res
+	return ec.marshalNClusterDeletedAPICount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterDeletedAPICount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_deletedAPICount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "clusterName":
+				return ec.fieldContext_ClusterDeletedAPICount_clusterName(ctx, field)
+			case "deletedAPICount":
+				return ec.fieldContext_ClusterDeletedAPICount_deletedAPICount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ClusterDeletedAPICount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_deletedAPICount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_trivyImageCount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_trivyImageCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TrivyImageCount(rctx, fc.Args["clusterName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TrivyImageCount)
+	fc.Result = res
+	return ec.marshalNTrivyImageCount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐTrivyImageCount(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_trivyImageCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "clusterName":
+				return ec.fieldContext_TrivyImageCount_clusterName(ctx, field)
+			case "ImageCount":
+				return ec.fieldContext_TrivyImageCount_ImageCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrivyImageCount", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_trivyImageCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8246,6 +10991,94 @@ func (ec *executionContext) fieldContext_TrivyImage_expiryDate(ctx context.Conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrivyImageCount_clusterName(ctx context.Context, field graphql.CollectedField, obj *model.TrivyImageCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrivyImageCount_clusterName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrivyImageCount_clusterName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrivyImageCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrivyImageCount_ImageCount(ctx context.Context, field graphql.CollectedField, obj *model.TrivyImageCount) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TrivyImageCount_ImageCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TrivyImageCount_ImageCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrivyImageCount",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -10054,6 +12887,762 @@ func (ec *executionContext) _TrivyVul_expiryDate(ctx context.Context, field grap
 func (ec *executionContext) fieldContext_TrivyVul_expiryDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TrivyVul",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_id(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_clusterName(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_clusterName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_clusterName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_namespace(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_namespace(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Namespace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_namespace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_kind(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_kind(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kind, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_kind(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_name(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulId(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulVendorIds(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulVendorIds(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulVendorIds, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulVendorIds(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulPkgId(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulPkgId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulPkgID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulPkgId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulPkgName(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulPkgName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulPkgName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulPkgName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulPkgPath(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulPkgPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulPkgPath, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulPkgPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulInstalledVersion(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulInstalledVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulInstalledVersion, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulInstalledVersion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulFixedVersion(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulFixedVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulFixedVersion, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulFixedVersion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulTitle(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulTitle(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulTitle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulTitle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulSeverity(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulSeverity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulSeverity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulSeverity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulPublishedDate(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulPublishedDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulPublishedDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulPublishedDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_vulLastModifiedDate(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_vulLastModifiedDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VulLastModifiedDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_vulLastModifiedDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_expiryDate(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_expiryDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExpiryDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_expiryDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vulnerability_exportedAt(ctx context.Context, field graphql.CollectedField, obj *model.Vulnerability) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vulnerability_exportedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExportedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vulnerability_exportedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vulnerability",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -11928,6 +15517,99 @@ func (ec *executionContext) _ClusterAPIsCount(ctx context.Context, sel ast.Selec
 	return out
 }
 
+var clusterDeletedAPICountImplementors = []string{"ClusterDeletedAPICount"}
+
+func (ec *executionContext) _ClusterDeletedAPICount(ctx context.Context, sel ast.SelectionSet, obj *model.ClusterDeletedAPICount) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, clusterDeletedAPICountImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClusterDeletedAPICount")
+		case "clusterName":
+			out.Values[i] = ec._ClusterDeletedAPICount_clusterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletedAPICount":
+			out.Values[i] = ec._ClusterDeletedAPICount_deletedAPICount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var clusterNamespaceMisconfigCountImplementors = []string{"ClusterNamespaceMisconfigCount"}
+
+func (ec *executionContext) _ClusterNamespaceMisconfigCount(ctx context.Context, sel ast.SelectionSet, obj *model.ClusterNamespaceMisconfigCount) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, clusterNamespaceMisconfigCountImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClusterNamespaceMisconfigCount")
+		case "clusterName":
+			out.Values[i] = ec._ClusterNamespaceMisconfigCount_clusterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "namespace":
+			out.Values[i] = ec._ClusterNamespaceMisconfigCount_namespace(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "misconfigCount":
+			out.Values[i] = ec._ClusterNamespaceMisconfigCount_misconfigCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var clusterNamespaceOutdatedCountImplementors = []string{"ClusterNamespaceOutdatedCount"}
 
 func (ec *executionContext) _ClusterNamespaceOutdatedCount(ctx context.Context, sel ast.SelectionSet, obj *model.ClusterNamespaceOutdatedCount) graphql.Marshaler {
@@ -12000,6 +15682,55 @@ func (ec *executionContext) _ClusterNamespaceResourceCount(ctx context.Context, 
 			}
 		case "resourceCount":
 			out.Values[i] = ec._ClusterNamespaceResourceCount_resourceCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var clusterNamespaceVulCountImplementors = []string{"ClusterNamespaceVulCount"}
+
+func (ec *executionContext) _ClusterNamespaceVulCount(ctx context.Context, sel ast.SelectionSet, obj *model.ClusterNamespaceVulCount) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, clusterNamespaceVulCountImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClusterNamespaceVulCount")
+		case "clusterName":
+			out.Values[i] = ec._ClusterNamespaceVulCount_clusterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "namespace":
+			out.Values[i] = ec._ClusterNamespaceVulCount_namespace(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "vulCount":
+			out.Values[i] = ec._ClusterNamespaceVulCount_vulCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -12388,8 +16119,94 @@ func (ec *executionContext) _Kubescore(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._Kubescore_fileRow(ctx, field, obj)
 		case "eventTime":
 			out.Values[i] = ec._Kubescore_eventTime(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var misconfigurationImplementors = []string{"Misconfiguration"}
+
+func (ec *executionContext) _Misconfiguration(ctx context.Context, sel ast.SelectionSet, obj *model.Misconfiguration) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, misconfigurationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Misconfiguration")
+		case "id":
+			out.Values[i] = ec._Misconfiguration_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "clusterName":
+			out.Values[i] = ec._Misconfiguration_clusterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "namespace":
+			out.Values[i] = ec._Misconfiguration_namespace(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "kind":
+			out.Values[i] = ec._Misconfiguration_kind(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Misconfiguration_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "misconfigId":
+			out.Values[i] = ec._Misconfiguration_misconfigId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "misconfigAvdid":
+			out.Values[i] = ec._Misconfiguration_misconfigAvdid(ctx, field, obj)
+		case "misconfigType":
+			out.Values[i] = ec._Misconfiguration_misconfigType(ctx, field, obj)
+		case "misconfigTitle":
+			out.Values[i] = ec._Misconfiguration_misconfigTitle(ctx, field, obj)
+		case "misconfigDesc":
+			out.Values[i] = ec._Misconfiguration_misconfigDesc(ctx, field, obj)
+		case "misconfigMsg":
+			out.Values[i] = ec._Misconfiguration_misconfigMsg(ctx, field, obj)
+		case "misconfigQuery":
+			out.Values[i] = ec._Misconfiguration_misconfigQuery(ctx, field, obj)
+		case "misconfigResolution":
+			out.Values[i] = ec._Misconfiguration_misconfigResolution(ctx, field, obj)
+		case "misconfigSeverity":
+			out.Values[i] = ec._Misconfiguration_misconfigSeverity(ctx, field, obj)
+		case "misconfigStatus":
+			out.Values[i] = ec._Misconfiguration_misconfigStatus(ctx, field, obj)
+		case "eventTime":
+			out.Values[i] = ec._Misconfiguration_eventTime(ctx, field, obj)
 		case "expiryDate":
-			out.Values[i] = ec._Kubescore_expiryDate(ctx, field, obj)
+			out.Values[i] = ec._Misconfiguration_expiryDate(ctx, field, obj)
+		case "exportedAt":
+			out.Values[i] = ec._Misconfiguration_exportedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13017,6 +16834,270 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "vulnerabilities":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_vulnerabilities(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "misconfigurations":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_misconfigurations(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "kubescores":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_kubescores(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getAllResources":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getAllResources(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "trivyImages":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_trivyImages(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "deprecatedAPIs":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_deprecatedAPIs(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "deletedAPIs":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_deletedAPIs(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "trivySBOMs":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_trivySBOMs(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "trivyVulCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_trivyVulCount(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "trivyMisconfigCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_trivyMisconfigCount(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "deletedAPICount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_deletedAPICount(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "trivyImageCount":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_trivyImageCount(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -13225,6 +17306,50 @@ func (ec *executionContext) _TrivyImage(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var trivyImageCountImplementors = []string{"TrivyImageCount"}
+
+func (ec *executionContext) _TrivyImageCount(ctx context.Context, sel ast.SelectionSet, obj *model.TrivyImageCount) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trivyImageCountImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrivyImageCount")
+		case "clusterName":
+			out.Values[i] = ec._TrivyImageCount_clusterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "ImageCount":
+			out.Values[i] = ec._TrivyImageCount_ImageCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var trivyMisconfigImplementors = []string{"TrivyMisconfig"}
 
 func (ec *executionContext) _TrivyMisconfig(ctx context.Context, sel ast.SelectionSet, obj *model.TrivyMisconfig) graphql.Marshaler {
@@ -13401,6 +17526,94 @@ func (ec *executionContext) _TrivyVul(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._TrivyVul_vulLastModifiedDate(ctx, field, obj)
 		case "expiryDate":
 			out.Values[i] = ec._TrivyVul_expiryDate(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var vulnerabilityImplementors = []string{"Vulnerability"}
+
+func (ec *executionContext) _Vulnerability(ctx context.Context, sel ast.SelectionSet, obj *model.Vulnerability) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, vulnerabilityImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Vulnerability")
+		case "id":
+			out.Values[i] = ec._Vulnerability_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "clusterName":
+			out.Values[i] = ec._Vulnerability_clusterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "namespace":
+			out.Values[i] = ec._Vulnerability_namespace(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "kind":
+			out.Values[i] = ec._Vulnerability_kind(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Vulnerability_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "vulId":
+			out.Values[i] = ec._Vulnerability_vulId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "vulVendorIds":
+			out.Values[i] = ec._Vulnerability_vulVendorIds(ctx, field, obj)
+		case "vulPkgId":
+			out.Values[i] = ec._Vulnerability_vulPkgId(ctx, field, obj)
+		case "vulPkgName":
+			out.Values[i] = ec._Vulnerability_vulPkgName(ctx, field, obj)
+		case "vulPkgPath":
+			out.Values[i] = ec._Vulnerability_vulPkgPath(ctx, field, obj)
+		case "vulInstalledVersion":
+			out.Values[i] = ec._Vulnerability_vulInstalledVersion(ctx, field, obj)
+		case "vulFixedVersion":
+			out.Values[i] = ec._Vulnerability_vulFixedVersion(ctx, field, obj)
+		case "vulTitle":
+			out.Values[i] = ec._Vulnerability_vulTitle(ctx, field, obj)
+		case "vulSeverity":
+			out.Values[i] = ec._Vulnerability_vulSeverity(ctx, field, obj)
+		case "vulPublishedDate":
+			out.Values[i] = ec._Vulnerability_vulPublishedDate(ctx, field, obj)
+		case "vulLastModifiedDate":
+			out.Values[i] = ec._Vulnerability_vulLastModifiedDate(ctx, field, obj)
+		case "expiryDate":
+			out.Values[i] = ec._Vulnerability_expiryDate(ctx, field, obj)
+		case "exportedAt":
+			out.Values[i] = ec._Vulnerability_exportedAt(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13873,6 +18086,34 @@ func (ec *executionContext) marshalNClusterAPIsCount2ᚖgithubᚗcomᚋintelops�
 	return ec._ClusterAPIsCount(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNClusterDeletedAPICount2githubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterDeletedAPICount(ctx context.Context, sel ast.SelectionSet, v model.ClusterDeletedAPICount) graphql.Marshaler {
+	return ec._ClusterDeletedAPICount(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNClusterDeletedAPICount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterDeletedAPICount(ctx context.Context, sel ast.SelectionSet, v *model.ClusterDeletedAPICount) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ClusterDeletedAPICount(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNClusterNamespaceMisconfigCount2githubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceMisconfigCount(ctx context.Context, sel ast.SelectionSet, v model.ClusterNamespaceMisconfigCount) graphql.Marshaler {
+	return ec._ClusterNamespaceMisconfigCount(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNClusterNamespaceMisconfigCount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceMisconfigCount(ctx context.Context, sel ast.SelectionSet, v *model.ClusterNamespaceMisconfigCount) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ClusterNamespaceMisconfigCount(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNClusterNamespaceOutdatedCount2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceOutdatedCountᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ClusterNamespaceOutdatedCount) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -13979,6 +18220,20 @@ func (ec *executionContext) marshalNClusterNamespaceResourceCount2ᚖgithubᚗco
 		return graphql.Null
 	}
 	return ec._ClusterNamespaceResourceCount(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNClusterNamespaceVulCount2githubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceVulCount(ctx context.Context, sel ast.SelectionSet, v model.ClusterNamespaceVulCount) graphql.Marshaler {
+	return ec._ClusterNamespaceVulCount(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNClusterNamespaceVulCount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐClusterNamespaceVulCount(ctx context.Context, sel ast.SelectionSet, v *model.ClusterNamespaceVulCount) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ClusterNamespaceVulCount(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDeletedAPI2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐDeletedAPIᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.DeletedAPI) graphql.Marshaler {
@@ -14335,6 +18590,60 @@ func (ec *executionContext) marshalNKubescore2ᚖgithubᚗcomᚋintelopsᚋkubvi
 	return ec._Kubescore(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNMisconfiguration2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐMisconfigurationᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Misconfiguration) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMisconfiguration2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐMisconfiguration(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMisconfiguration2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐMisconfiguration(ctx context.Context, sel ast.SelectionSet, v *model.Misconfiguration) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Misconfiguration(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNNamespace2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐNamespaceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Namespace) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -14620,6 +18929,20 @@ func (ec *executionContext) marshalNTrivyImage2ᚖgithubᚗcomᚋintelopsᚋkubv
 	return ec._TrivyImage(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNTrivyImageCount2githubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐTrivyImageCount(ctx context.Context, sel ast.SelectionSet, v model.TrivyImageCount) graphql.Marshaler {
+	return ec._TrivyImageCount(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTrivyImageCount2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐTrivyImageCount(ctx context.Context, sel ast.SelectionSet, v *model.TrivyImageCount) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrivyImageCount(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNTrivyMisconfig2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐTrivyMisconfigᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TrivyMisconfig) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -14780,6 +19103,60 @@ func (ec *executionContext) marshalNTrivyVul2ᚖgithubᚗcomᚋintelopsᚋkubviz
 		return graphql.Null
 	}
 	return ec._TrivyVul(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNVulnerability2ᚕᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐVulnerabilityᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Vulnerability) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNVulnerability2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐVulnerability(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNVulnerability2ᚖgithubᚗcomᚋintelopsᚋkubvizᚋgraphqlserverᚋgraphᚋmodelᚐVulnerability(ctx context.Context, sel ast.SelectionSet, v *model.Vulnerability) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Vulnerability(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
