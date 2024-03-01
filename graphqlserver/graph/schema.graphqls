@@ -30,6 +30,12 @@ type Query {
   trivyMisconfigCount(clusterName: String!, namespace: String!): ClusterNamespaceMisconfigCount!
   deletedAPICount(clusterName: String!): ClusterDeletedAPICount!
   trivyImageCount(clusterName: String!): TrivyImageCount!
+  deprecatedAPICount(clusterName: String!): ClusterDeprecatedAPICount!
+}
+
+type ClusterDeprecatedAPICount {
+  clusterName: String!
+  deprecatedAPICount: Int!
 }
 
 type TrivyImageCount {
