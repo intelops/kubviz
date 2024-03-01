@@ -3,10 +3,12 @@ package main
 import (
 	"log"
 	"os"
+
 	"os/signal"
 	"syscall"
 	"time"
 
+	//"github.com/go-co-op/gocron"
 	"github.com/go-co-op/gocron"
 	"github.com/nats-io/nats.go"
 
@@ -20,6 +22,7 @@ import (
 
 	"github.com/intelops/kubviz/agent/config"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/events"
+
 	"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
 
@@ -35,8 +38,8 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 
-	//  _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 	"github.com/intelops/kubviz/agent/server"
+	//_ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
