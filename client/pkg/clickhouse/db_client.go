@@ -945,54 +945,76 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	}
 
 	data := metrics.Report
-	bomComponents, ok := data["components"].([]interface{})
-	if !ok {
-		log.Println("error: components not found or not in expected format")
-	}
-	var componentName, bomRef, serialNumber, bomFormat, purl, componentType string
-	var version int32
-	// Iterate over the components to find the desired name
-	for _, component := range bomComponents {
-		componentMap, ok := component.(map[string]interface{})
-		if !ok {
-			log.Println("error: component not in expected format")
-			continue
-		}
-		if name, ok := componentMap["name"].(string); ok {
-			componentName = name
-			break
-		}
-	}
+	bomFormat, _ := data["bomFormat"].(string)       //CycloneDX
+	serialNumber, _ := data["serialNumber"].(string) // exmplvalue:urn:uuid:146625a5-531a-40fa-a205-174448c6c569
+
+	// fetching metadata
 	metadata, ok := data["metadata"].(map[string]interface{})
 	if !ok {
 		log.Println("error: metadata not found or not in expected format")
 		return
 	}
-
+	// inside metadata
+	// taking component
 	component, ok := metadata["component"].(map[string]interface{})
 	if !ok {
 		log.Println("error: component not found or not in expected format")
 		return
 	}
+	timestamp, _ := metadata["timestamp"].(time.Time)
 
-	bomRef, _ = component["bom-ref"].(string)
-	purl, _ = component["purl"].(string)
-	componentType, _ = component["type"].(string)
-
-	serialNumber, _ = data["serialNumber"].(string)
-	version, _ = data["version"].(int32)
-	bomFormat, _ = data["bomFormat"].(string)
+	// inside metadata
+	// taking component
+	// inside component taking bomRef, componentType, componentName, packageURL
+	bomRef, _ := component["bom-ref"].(string)     //pkg:oci/redis@sha256:873c49204b64258778a1f34d23a962de526021e9a63b09236d6d7c86e2dd13e9?repository_url=public.ecr.aws%2Fdocker%2Flibrary%2Fredis\u0026arch=amd64
+	componentType, _ := component["type"].(string) //container
+	componentName, _ := component["name"].(string) //public.ecr.aws/docker/library/redis@sha256:873c49204b64258778a1f34d23a962de526021e9a63b09236d6d7c86e2dd13e9
+	packageURL, _ := component["purl"].(string)    //pkg:oci/redis@sha256:873c49204b64258778a1f34d23a962de526021e9a63b09236d6d7c86e2dd13e9?repository_url=public.ecr.aws%2Fdocker%2Flibrary%2Fredis\u0026arch=amd64
+	// fetching other componets
+	Components, ok := data["components"].([]interface{})
+	if !ok {
+		log.Println("error: components not found or not in expected format")
+	}
+	var otherComponentName, otherComponentbomref, otherComponenttype, otherComponentVersion string
+	// Iterate over the components to find the desired name
+	for _, otherComponent := range Components {
+		componentsMap, ok := otherComponent.(map[string]interface{})
+		if !ok {
+			log.Println("error: component not in expected format")
+			continue
+		}
+		if name, ok := componentsMap["name"].(string); ok {
+			otherComponentName = name // alpine
+			break
+		}
+		if bomref, ok := componentsMap["bom-ref"].(string); ok {
+			otherComponentbomref = bomref // 92fc3e51-41d6-48da-831e-a1f5f9b6444d
+			break
+		}
+		if types, ok := componentsMap["type"].(string); ok {
+			otherComponenttype = types // operating-system
+			break
+		}
+		if version, ok := componentsMap["version"].(string); ok {
+			otherComponentVersion = version // 3.18.4
+			break
+		}
+	}
 
 	if _, err := stmt.Exec(
 		metrics.ID,
 		metrics.ClusterName,
+		bomFormat,
+		serialNumber,
+		bomRef,
 		componentName,
 		componentType,
-		purl,
-		bomRef,
-		serialNumber,
-		int32(version),
-		bomFormat,
+		packageURL,
+		timestamp,
+		otherComponentName,
+		otherComponentbomref,
+		otherComponenttype,
+		otherComponentVersion,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -1001,6 +1023,86 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	}
 	stmt.Close()
 }
+
+// func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
+// 	//opentelemetry
+// 	opentelconfig, err := opentelemetry.GetConfigurations()
+// 	if err != nil {
+// 		log.Println("Unable to read open telemetry configurations")
+// 	}
+// 	if opentelconfig.IsEnabled {
+// 		ctx := context.Background()
+// 		tracer := otel.Tracer("insert-trivy-sbom")
+// 		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertTrivySbomMetrics")
+// 		defer span.End()
+// 	}
+
+// 	tx, err := c.conn.Begin()
+// 	if err != nil {
+// 		log.Fatalf("error beginning transaction, clickhouse connection not available: %v", err)
+// 	}
+// 	stmt, err := tx.Prepare(InsertTrivySbom)
+// 	if err != nil {
+// 		log.Fatalf("error preparing statement: %v", err)
+// 	}
+
+// 	data := metrics.Report
+// 	bomComponents, ok := data["components"].([]interface{})
+// 	if !ok {
+// 		log.Println("error: components not found or not in expected format")
+// 	}
+// 	var componentName, bomRef, serialNumber, bomFormat, purl, componentType string
+// 	var version int32
+// 	// Iterate over the components to find the desired name
+// 	for _, component := range bomComponents {
+// 		componentMap, ok := component.(map[string]interface{})
+// 		if !ok {
+// 			log.Println("error: component not in expected format")
+// 			continue
+// 		}
+// 		if name, ok := componentMap["name"].(string); ok {
+// 			componentName = name
+// 			break
+// 		}
+// 	}
+// 	metadata, ok := data["metadata"].(map[string]interface{})
+// 	if !ok {
+// 		log.Println("error: metadata not found or not in expected format")
+// 		return
+// 	}
+
+// 	component, ok := metadata["component"].(map[string]interface{})
+// 	if !ok {
+// 		log.Println("error: component not found or not in expected format")
+// 		return
+// 	}
+
+// 	bomRef, _ = component["bom-ref"].(string)
+// 	purl, _ = component["purl"].(string)
+// 	componentType, _ = component["type"].(string)
+
+// 	serialNumber, _ = data["serialNumber"].(string)
+// 	version, _ = data["version"].(int32)
+// 	bomFormat, _ = data["bomFormat"].(string)
+
+//		if _, err := stmt.Exec(
+//			metrics.ID,
+//			metrics.ClusterName,
+//			componentName,
+//			componentType,
+//			purl,
+//			bomRef,
+//			serialNumber,
+//			int32(version),
+//			bomFormat,
+//		); err != nil {
+//			log.Fatal(err)
+//		}
+//		if err := tx.Commit(); err != nil {
+//			log.Fatal(err)
+//		}
+//		stmt.Close()
+//	}
 func (c *DBClient) Close() {
 	_ = c.conn.Close()
 }
