@@ -51,8 +51,6 @@ func PublishTrivySbomReport(report map[string]interface{}, js nats.JetStreamCont
 		return err
 	}
 	log.Printf("Trivy sbom report with Id %v has been published\n", metrics.ID)
-	log.Printf("Trivy sbom report with Id %v has been published\n", metrics)
-
 	return nil
 }
 
