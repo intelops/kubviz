@@ -961,7 +961,18 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 		log.Println("error: component not found or not in expected format")
 		return
 	}
-	timestamp, _ := metadata["timestamp"].(time.Time)
+	//timestamp, _ := metadata["timestamp"].(time.Time)
+	var timestamp time.Time
+	rawTimestamp, ok := metadata["timestamp"].(string)
+	if !ok {
+		log.Println("error: timestamp not found or not in expected format")
+		return
+	}
+	timestamp, err = time.Parse(time.RFC3339, rawTimestamp)
+	if err != nil {
+		log.Println("error parsing timestamp:", err)
+		return
+	}
 
 	// inside metadata
 	// taking component
