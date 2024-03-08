@@ -154,9 +154,14 @@ func main() {
 		// err = kubescore.RunKubeScore(clientset, js)
 		// events.LogErr(err)
 	}
+	collectAndPublishMetrics()
+	collectAndPublishMetrics()
+	collectAndPublishMetrics()
+	collectAndPublishMetrics()
+	collectAndPublishMetrics()
 	ticker := time.NewTicker(3 * time.Minute)
 	defer ticker.Stop()
-	collectAndPublishMetrics()
+
 	for range ticker.C {
 		collectAndPublishMetrics()
 	}
