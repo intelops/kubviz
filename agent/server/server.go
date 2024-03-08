@@ -6,8 +6,8 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/gin-gonic/gin"
-	"github.com/intelops/kubviz/pkg/opentelemetry"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	// "github.com/intelops/kubviz/pkg/opentelemetry"
+	// "go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 func EnableProfile(r *gin.Engine) {
@@ -35,13 +35,13 @@ func EnableProfile(r *gin.Engine) {
 func StartServer() {
 	r := gin.Default()
 
-	config, err := opentelemetry.GetConfigurations()
-	if err != nil {
-		log.Println("Unable to read open telemetry configurations")
-	}
+	// config, err := opentelemetry.GetConfigurations()
+	// if err != nil {
+	// 	log.Println("Unable to read open telemetry configurations")
+	// }
 
-	r.Use(otelgin.Middleware(config.ServiceName))
-	
+	// r.Use(otelgin.Middleware(config.ServiceName))
+
 	EnableProfile(r)
 	log.Fatal(r.Run(":8080"))
 }
