@@ -188,7 +188,7 @@ schedule:
 
 kuberhealthy:
   enabled: true
-  pollInterval: "15m"
+  pollInterval: "60m"
   url: "http://localhost:8080"
 
 opentelemetry:

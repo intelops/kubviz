@@ -30,7 +30,7 @@ func GetAgentConfigurations() (serviceConf *AgentConfigurations, err error) {
 
 type KHConfig struct {
 	KuberhealthyURL string        `envconfig:"KUBERHEALTHY_URL" required:"true"`
-	PollInterval    time.Duration `envconfig:"POLL_INTERVAL" default:"15m"`
+	PollInterval    time.Duration `envconfig:"POLL_INTERVAL" default:"60m"`
 }
 
 func GetKuberHealthyConfig() (khconfig *KHConfig, err error) {
