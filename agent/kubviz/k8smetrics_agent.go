@@ -67,7 +67,7 @@ var (
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	env := Production
-	clusterMetricsChan := make(chan error, 1)
+	//clusterMetricsChan := make(chan error, 1)
 	cfg, err := config.GetAgentConfigurations()
 	if err != nil {
 		log.Fatal("Failed to retrieve agent configurations", err)
@@ -131,7 +131,7 @@ func main() {
 		}
 	}()
 
-	go events.PublishMetrics(clientset, js, clusterMetricsChan)
+	//go events.PublishMetrics(clientset, js, clusterMetricsChan)
 	if cfg.KuberHealthyEnable {
 		go kuberhealthy.StartKuberHealthy(js)
 	}
