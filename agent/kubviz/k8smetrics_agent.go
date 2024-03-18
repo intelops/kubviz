@@ -154,7 +154,7 @@ func main() {
 		err = kubescore.RunKubeScore(clientset, js)
 		events.LogErr(err)
 	}
-
+	// collectAndPublishMetrics()
 	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
 		scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)
 
