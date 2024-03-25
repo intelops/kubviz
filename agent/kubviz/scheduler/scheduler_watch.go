@@ -187,24 +187,3 @@ func (j *RakkessJob) Run() {
 	err := rakkess.RakeesOutput(j.config, j.js)
 	events.LogErr(err)
 }
-
-// func NewTrivyJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*TrivyJob, error) {
-// 	return &TrivyJob{
-// 		config:    config,
-// 		js:        js,
-// 		frequency: frequency,
-// 	}, nil
-// }
-// func (v *TrivyJob) CronSpec() string {
-// 	return v.frequency
-// }
-
-// func (j *TrivyJob) Run() {
-// 	// Call the Trivy function with the provided config and js
-// 	err := trivy.RunTrivySbomScan(j.config, j.js)
-// 	events.LogErr(err)
-// 	err = trivy.RunTrivyImageScans(j.config, j.js)
-// 	events.LogErr(err)
-// 	err = trivy.RunTrivyK8sClusterScan(j.js)
-// 	events.LogErr(err)
-// }

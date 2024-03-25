@@ -154,7 +154,7 @@ func main() {
 		err = kubescore.RunKubeScore(clientset, js)
 		events.LogErr(err)
 	}
-	// collectAndPublishMetrics()
+	collectAndPublishMetrics()
 	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
 		scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)
 
@@ -180,22 +180,3 @@ func main() {
 		s.StartBlocking()
 	}
 }
-
-// func collectAndPublishMetrics(config *rest.Config, js nats.JetStreamContext, clientset *kubernetes.Clientset) {
-// 	err := outdated.OutDatedImages(config, js)
-// 	events.LogErr(err)
-// 	err = kubepreupgrade.KubePreUpgradeDetector(config, js)
-// 	events.LogErr(err)
-// 	err = ketall.GetAllResources(config, js)
-// 	events.LogErr(err)
-// 	err = rakkess.RakeesOutput(config, js)
-// 	events.LogErr(err)
-// 	err = trivy.RunTrivySbomScan(config, js)
-// 	events.LogErr(err)
-// 	err = trivy.RunTrivyImageScans(config, js)
-// 	events.LogErr(err)
-// 	err = trivy.RunTrivyK8sClusterScan(js)
-// 	events.LogErr(err)
-// 	err = kubescore.RunKubeScore(clientset, js)
-// 	events.LogErr(err)
-// }
