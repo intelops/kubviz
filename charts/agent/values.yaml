@@ -184,7 +184,9 @@ schedule:
   kubescoreInterval: "@every 20h"
   rakkessInterval: "@every 21h"
   kubepreupgradeInterval: "@every 22h"
-  trivyInterval: "@every 24h"
+  trivyimageInterval: "@every 24h"
+  trivysbomInterval: "@every 16h"
+  trivyclusterscanInterval: "@every 17h"
 
 kuberhealthy:
   enabled: true
