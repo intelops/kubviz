@@ -1,13 +1,14 @@
 CREATE TABLE IF NOT EXISTS trivysbom (
 	id                    UUID,
-	cluster_name String,
-	image_name            String,
-	package_name String,
-	package_url           String,
-	bom_ref 			  String,
-	serial_number         String,
-	version 			  INTEGER,
+	cluster_name          String,
 	bom_format 			  String,
+	serial_number         String,
+	bom_ref 			  String,
+	image_name            String,
+	componet_type 		  String,
+	package_url           String,
+	event_time			  DateTime('UTC'),
+	other_component_name  String,
 	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}},
 	ExportedAt DateTime DEFAULT NULL
 ) ENGINE = MergeTree() 
