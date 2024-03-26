@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 )
@@ -22,11 +23,18 @@ var ErrInvalidPayload = errors.New("invalid or malformed Azure Container Registr
 // If the payload is invalid or the publishing process fails, an error response is returned.
 func (ah *APIHandler) PostEventAzureContainer(c *gin.Context) {
 
-	tracer := otel.Tracer("azure-container")
-	_, span := tracer.Start(c.Request.Context(), "PostEventAzureContainer")
-	span.SetAttributes(attribute.String("http.method", "POST"))
-	defer span.End()
-	
+	//opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
+	if err != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		tracer := otel.Tracer("azure-container")
+		_, span := tracer.Start(c.Request.Context(), "PostEventAzureContainer")
+		span.SetAttributes(attribute.String("http.method", "POST"))
+		defer span.End()
+	}
+
 	defer func() {
 		_, _ = io.Copy(io.Discard, c.Request.Body)
 		_ = c.Request.Body.Close()

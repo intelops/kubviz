@@ -1,15 +1,11 @@
 package clients
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/intelops/kubviz/agent/git/pkg/config"
 	"github.com/intelops/kubviz/model"
 	"github.com/intelops/kubviz/pkg/mtlsnats"
-	"github.com/intelops/kubviz/pkg/opentelemetry"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 
 	"log"
 	"time"
@@ -122,12 +118,6 @@ func (n *NATSContext) Close() {
 }
 
 func (n *NATSContext) Publish(metric []byte, repo string, eventkey model.EventKey, eventvalue model.EventValue) error {
-
-	ctx := context.Background()
-	tracer := otel.Tracer("git-nats-client")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "GitPublish")
-	span.SetAttributes(attribute.String("repo-name", repo))
-	defer span.End()
 
 	msg := nats.NewMsg(eventSubject)
 	msg.Data = metric

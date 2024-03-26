@@ -53,10 +53,17 @@ func pollAndPublishKuberhealthy(url string, js nats.JetStreamContext) error {
 }
 
 func PublishKuberhealthyMetrics(js nats.JetStreamContext, state health.State) error {
-	ctx := context.Background()
-	tracer := otel.Tracer("kuberhealthy")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishKuberhealthyMetrics")
-	defer span.End()
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("kuberhealthy")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishKuberhealthyMetrics")
+		defer span.End()
+	}
 
 	metricsJSON, err := json.Marshal(state)
 	if err != nil {

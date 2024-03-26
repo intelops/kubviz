@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 )
@@ -18,12 +19,18 @@ var (
 )
 
 func (ah *APIHandler) PostEventDockerHub(c *gin.Context) {
+	//opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
+	if err != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		tracer := otel.Tracer("dockerhub-container")
+		_, span := tracer.Start(c.Request.Context(), "PostEventDockerHub")
+		span.SetAttributes(attribute.String("http.method", "POST"))
+		defer span.End()
+	}
 
-	tracer := otel.Tracer("dockerhub-container")
-	_, span := tracer.Start(c.Request.Context(), "PostEventDockerHub")
-	span.SetAttributes(attribute.String("http.method", "POST"))
-	defer span.End()
-	
 	defer func() {
 		_, _ = io.Copy(io.Discard, c.Request.Body)
 		_ = c.Request.Body.Close()

@@ -16,7 +16,6 @@ import (
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -31,23 +30,23 @@ var ClusterName string = os.Getenv("CLUSTER_NAME")
 // with subject "METRICS.created"
 func PublishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
 
-	ctx := context.Background()
-	tracer := otel.Tracer("kubviz-publish-metrics")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishMetrics")
-	span.SetAttributes(attribute.String("kubviz-agent", "publish-metrics"))
-	defer span.End()
-
 	watchK8sEvents(clientset, js)
 	errCh <- nil
 }
 
 func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, imageName string) (bool, error) {
 
-	ctx := context.Background()
-	tracer := otel.Tracer("kubviz-publish-k8smetrics")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishK8sMetrics")
-	span.SetAttributes(attribute.String("kubviz-agent", "publish-k8smetrics"))
-	defer span.End()
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("kubviz-publish-k8smetrics")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "publishK8sMetrics")
+		defer span.End()
+	}
 
 	metrics := model.Metrics{
 		ID:          id,
@@ -165,12 +164,6 @@ func LogErr(err error) {
 	}
 }
 func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
-
-	ctx := context.Background()
-	tracer := otel.Tracer("kubviz-watch-k8sevents")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "watchK8sEvents")
-	span.SetAttributes(attribute.String("kubviz-agent", "watch-k8sevents"))
-	defer span.End()
 
 	watchlist := cache.NewListWatchFromClient(
 		clientset.CoreV1().RESTClient(),

@@ -9,7 +9,6 @@ import (
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/model"
 	"github.com/nats-io/nats.go"
@@ -23,6 +22,20 @@ import (
 var ClusterName string = os.Getenv("CLUSTER_NAME")
 
 func PublishAllResources(result model.Resource, js nats.JetStreamContext) error {
+
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+
+		ctx := context.Background()
+		tracer := otel.Tracer("ketall")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishAllResources")
+		defer span.End()
+	}
+
 	metrics := result
 	metrics.ClusterName = ClusterName
 	metricsJson, _ := json.Marshal(metrics)
@@ -35,12 +48,6 @@ func PublishAllResources(result model.Resource, js nats.JetStreamContext) error 
 }
 
 func GetAllResources(config *rest.Config, js nats.JetStreamContext) error {
-
-	ctx := context.Background()
-	tracer := otel.Tracer("ketall")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "GetAllResources")
-	span.SetAttributes(attribute.String("ketall-plugin-agent", "ketall-output"))
-	defer span.End()
 
 	// TODO: upto this uncomment for production
 	// Create a new discovery client to discover all resources in the cluster

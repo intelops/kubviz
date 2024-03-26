@@ -35,13 +35,14 @@ func EnableProfile(r *gin.Engine) {
 func StartServer() {
 	r := gin.Default()
 
-	config, err := opentelemetry.GetConfigurations()
+	opentelconfig, err := opentelemetry.GetConfigurations()
 	if err != nil {
 		log.Println("Unable to read open telemetry configurations")
 	}
+	if opentelconfig.IsEnabled {
+		r.Use(otelgin.Middleware(opentelconfig.ServiceName))
+	}
 
-	r.Use(otelgin.Middleware(config.ServiceName))
-	
 	EnableProfile(r)
 	log.Fatal(r.Run(":8080"))
 }

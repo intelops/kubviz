@@ -46,13 +46,15 @@ func New() *Application {
 
 	r := gin.Default()
 
-	config, err := opentelemetry.GetConfigurations()
+	//opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
 	if err != nil {
 		log.Println("Unable to read open telemetry configurations")
 	}
+	if opentelconfig.IsEnabled {
+		r.Use(otelgin.Middleware(opentelconfig.ServiceName))
+	}
 
-	r.Use(otelgin.Middleware(config.ServiceName))
-	
 	apiServer.BindRequest(r)
 
 	httpServer := &http.Server{

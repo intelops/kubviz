@@ -18,7 +18,6 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -34,11 +33,17 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 	}
 	// clearCacheCmd := "trivy image --clear-cache"
 
-	ctx := context.Background()
-	tracer := otel.Tracer("trivy-image")
-	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyImageScans")
-	span.SetAttributes(attribute.String("trivy-image-scan-agent", "image-scan"))
-	defer span.End()
+	// opentelemetry
+	opentelconfig, err := opentelemetry.GetConfigurations()
+	if err != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("trivy-image")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivyImageScans")
+		defer span.End()
+	}
 
 	images, err := ListImages(config)
 	if err != nil {
@@ -85,6 +90,19 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 }
 
 func PublishImageScanReports(report types.Report, js nats.JetStreamContext) error {
+
+	// opentelemetry
+	opentelconfig, errs := opentelemetry.GetConfigurations()
+	if errs != nil {
+		log.Println("Unable to read open telemetry configurations")
+	}
+	if opentelconfig.IsEnabled {
+		ctx := context.Background()
+		tracer := otel.Tracer("trivy-image")
+		_, span := tracer.Start(opentelemetry.BuildContext(ctx), "PublishImageScanReports")
+		defer span.End()
+	}
+
 	metrics := model.TrivyImage{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,
@@ -99,12 +117,6 @@ func PublishImageScanReports(report types.Report, js nats.JetStreamContext) erro
 	return nil
 }
 func executeTrivyImage(command string) ([]byte, error) {
-
-	// ctx := context.Background()
-	// tracer := otel.Tracer("trivy-image")
-	// _, span := tracer.Start(opentelemetry.BuildContext(ctx), "executeCommandTrivyImage")
-	// span.SetAttributes(attribute.String("trivy-image-agent", "trivyimage-command-running"))
-	// defer span.End()
 
 	cmd := exec.Command("/bin/sh", "-c", command)
 	var outc, errc bytes.Buffer

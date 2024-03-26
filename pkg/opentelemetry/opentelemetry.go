@@ -19,7 +19,7 @@ import (
 type Configurations struct {
 	ServiceName  string `envconfig:"APPLICATION_NAME" default:"Kubviz"`
 	CollectorURL string `envconfig:"OPTEL_URL" default:"otelcollector.azureagent.optimizor.app:80"`
-	//IsEnabled    bool   `envconfig:"IS_OPTEL_ENABLED" default:"false"`
+	IsEnabled    bool   `envconfig:"IS_OPTEL_ENABLED" default:"false"`
 }
 
 func GetConfigurations() (opteConfig *Configurations, err error) {
@@ -39,9 +39,10 @@ func InitTracer() (*sdktrace.TracerProvider, error) {
 		return nil, err
 	}
 
-	// if !config.IsEnabled {
-	// 	return nil, nil
-	// }
+	if !config.IsEnabled {
+		log.Println("OpenTelemetry is disabled. Skipping initialization.")
+		return nil, nil
+	}
 
 	headers := map[string]string{
 		"signoz-service-name": config.ServiceName,
