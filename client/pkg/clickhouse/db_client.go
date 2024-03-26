@@ -38,7 +38,7 @@ type DBInterface interface {
 	InsertGitEvent(string)
 	InsertKubeScoreMetrics(model.KubeScoreRecommendations)
 	InsertTrivyImageMetrics(metrics model.TrivyImage)
-	InsertTrivySbomMetrics(metrics model.SbomData)
+	InsertTrivySbomMetrics(metrics model.Sbom)
 	InsertTrivyMetrics(metrics model.Trivy)
 	RetriveKetallEvent() ([]model.Resource, error)
 	RetriveOutdatedEvent() ([]model.CheckResultfinal, error)
@@ -841,11 +841,10 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 
 	}
 }
-func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
+func (c *DBClient) InsertTrivySbomMetrics(metrics model.Sbom) {
 	ctx := context.Background()
 	tracer := otel.Tracer("insert-trivy-sbom")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertTrivySbomMetrics")
-	span.SetAttributes(attribute.String("trivy-sbom-client", "insert"))
 	defer span.End()
 
 	tx, err := c.conn.Begin()
@@ -857,16 +856,73 @@ func (c *DBClient) InsertTrivySbomMetrics(metrics model.SbomData) {
 		log.Fatalf("error preparing statement: %v", err)
 	}
 
+	data := metrics.Report
+	bomFormat, _ := data["bomFormat"].(string)       //CycloneDX
+	serialNumber, _ := data["serialNumber"].(string) // exmplvalue:urn:uuid:146625a5-531a-40fa-a205-174448c6c569
+
+	// fetching metadata
+	metadata, ok := data["metadata"].(map[string]interface{})
+	if !ok {
+		log.Println("error: metadata not found or not in expected format")
+		return
+	}
+
+	// inside metadata
+	// taking component
+	component, ok := metadata["component"].(map[string]interface{})
+	if !ok {
+		log.Println("error: component not found or not in expected format")
+		return
+	}
+	//timestamp, _ := metadata["timestamp"].(time.Time)
+	var eventTime time.Time
+	rawTimestamp, ok := metadata["timestamp"].(string)
+	if !ok {
+		log.Println("error: timestamp not found or not in expected format")
+		return
+	}
+	eventTime, err = time.Parse(time.RFC3339, rawTimestamp)
+	if err != nil {
+		log.Println("error parsing timestamp:", err)
+		return
+	}
+	// inside metadata
+	// taking component
+	// inside component taking bomRef, componentType, componentName, packageURL
+	bomRef, _ := component["bom-ref"].(string)     //pkg:oci/redis@sha256:873c49204b64258778a1f34d23a962de526021e9a63b09236d6d7c86e2dd13e9?repository_url=public.ecr.aws%2Fdocker%2Flibrary%2Fredis\u0026arch=amd64
+	componentType, _ := component["type"].(string) //container
+	componentName, _ := component["name"].(string) //public.ecr.aws/docker/library/redis@sha256:873c49204b64258778a1f34d23a962de526021e9a63b09236d6d7c86e2dd13e9
+	packageURL, _ := component["purl"].(string)    //pkg:oci/redis@sha256:873c49204b64258778a1f34d23a962de526021e9a63b09236d6d7c86e2dd13e9?repository_url=public.ecr.aws%2Fdocker%2Flibrary%2Fredis\u0026arch=amd64
+	// fetching other componets
+	Components, ok := data["components"].([]interface{})
+	if !ok {
+		log.Println("error: components not found or not in expected format")
+	}
+	var otherComponentName string
+	// Iterate over the components to find the desired name
+	for _, otherComponent := range Components {
+		componentsMap, ok := otherComponent.(map[string]interface{})
+		if !ok {
+			log.Println("error: component not in expected format")
+			continue
+		}
+		if name, ok := componentsMap["name"].(string); ok {
+			otherComponentName = name // alpine
+			break
+		}
+	}
+
 	if _, err := stmt.Exec(
 		metrics.ID,
 		metrics.ClusterName,
-		metrics.ComponentName,
-		metrics.PackageName,
-		metrics.PackageUrl,
-		metrics.BomRef,
-		metrics.SerialNumber,
-		int32(metrics.CycloneDxVersion),
-		metrics.BomFormat,
+		bomFormat,
+		serialNumber,
+		bomRef,
+		componentName,
+		componentType,
+		packageURL,
+		eventTime,
+		otherComponentName,
 	); err != nil {
 		log.Fatal(err)
 	}
