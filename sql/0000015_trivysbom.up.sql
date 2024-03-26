@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS trivysbom (
 	serial_number         String,
 	bom_ref 			  String,
 	image_name            String,
-	componet_type 		  String,
+	component_type 		  String,
 	package_url           String,
 	event_time			  DateTime('UTC'),
 	other_component_name  String,
