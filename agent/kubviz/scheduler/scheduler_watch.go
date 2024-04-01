@@ -25,8 +25,18 @@ type KetallJob struct {
 	js        nats.JetStreamContext
 	frequency string
 }
-type TrivyJob struct {
+type TrivyImageJob struct {
 	config    *rest.Config
+	js        nats.JetStreamContext
+	frequency string
+}
+type TrivySbomJob struct {
+	config    *rest.Config
+	js        nats.JetStreamContext
+	frequency string
+}
+type TrivyClusterScanJob struct {
+	//config    *rest.Config
 	js        nats.JetStreamContext
 	frequency string
 }
@@ -46,6 +56,55 @@ type KubescoreJob struct {
 	frequency string
 }
 
+func NewTrivySbomJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*TrivySbomJob, error) {
+	return &TrivySbomJob{
+		config:    config,
+		js:        js,
+		frequency: frequency,
+	}, nil
+}
+func (v *TrivySbomJob) CronSpec() string {
+	return v.frequency
+}
+
+func (j *TrivySbomJob) Run() {
+	// Call the outDatedImages function with the provided config and js
+	err := trivy.RunTrivySbomScan(j.config, j.js)
+	events.LogErr(err)
+}
+
+func NewTrivyClusterScanJob(js nats.JetStreamContext, frequency string) (*TrivyClusterScanJob, error) {
+	return &TrivyClusterScanJob{
+		// config:    config,
+		js:        js,
+		frequency: frequency,
+	}, nil
+}
+func (v *TrivyClusterScanJob) CronSpec() string {
+	return v.frequency
+}
+
+func (j *TrivyClusterScanJob) Run() {
+	// Call the outDatedImages function with the provided config and js
+	err := trivy.RunTrivyK8sClusterScan(j.js)
+	events.LogErr(err)
+}
+func NewTrivyImagesJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*TrivyImageJob, error) {
+	return &TrivyImageJob{
+		config:    config,
+		js:        js,
+		frequency: frequency,
+	}, nil
+}
+func (v *TrivyImageJob) CronSpec() string {
+	return v.frequency
+}
+
+func (j *TrivyImageJob) Run() {
+	// Call the outDatedImages function with the provided config and js
+	err := trivy.RunTrivyImageScans(j.config, j.js)
+	events.LogErr(err)
+}
 func NewOutDatedImagesJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*OutDatedImagesJob, error) {
 	return &OutDatedImagesJob{
 		config:    config,
@@ -126,25 +185,5 @@ func (v *RakkessJob) CronSpec() string {
 func (j *RakkessJob) Run() {
 	// Call the Rakkes function with the provided config and js
 	err := rakkess.RakeesOutput(j.config, j.js)
-	events.LogErr(err)
-}
-func NewTrivyJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*TrivyJob, error) {
-	return &TrivyJob{
-		config:    config,
-		js:        js,
-		frequency: frequency,
-	}, nil
-}
-func (v *TrivyJob) CronSpec() string {
-	return v.frequency
-}
-
-func (j *TrivyJob) Run() {
-	// Call the Trivy function with the provided config and js
-	err := trivy.RunTrivySbomScan(j.config, j.js)
-	events.LogErr(err)
-	err = trivy.RunTrivyImageScans(j.config, j.js)
-	events.LogErr(err)
-	err = trivy.RunTrivyK8sClusterScan(j.js)
 	events.LogErr(err)
 }

@@ -144,12 +144,32 @@ func InitScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.Age
 			log.Fatal("failed to do job", err)
 		}
 	}
-	if cfg.TrivyInterval != "" && cfg.TrivyInterval != "0" {
-		sj, err := NewTrivyJob(config, js, cfg.TrivyInterval)
+	if cfg.TrivyImageInterval != "" && cfg.TrivyImageInterval != "0" {
+		sj, err := NewTrivyImagesJob(config, js, cfg.TrivyImageInterval)
 		if err != nil {
 			log.Fatal("no time interval", err)
 		}
-		err = s.AddJob("Trivy", sj)
+		err = s.AddJob("Trivyimage", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.TrivySbomInterval != "" && cfg.TrivySbomInterval != "0" {
+		sj, err := NewTrivySbomJob(config, js, cfg.TrivySbomInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("Trivysbom", sj)
+		if err != nil {
+			log.Fatal("failed to do job", err)
+		}
+	}
+	if cfg.TrivyClusterScanInterval != "" && cfg.TrivyClusterScanInterval != "0" {
+		sj, err := NewTrivyClusterScanJob(js, cfg.TrivyClusterScanInterval)
+		if err != nil {
+			log.Fatal("no time interval", err)
+		}
+		err = s.AddJob("Trivycluster", sj)
 		if err != nil {
 			log.Fatal("failed to do job", err)
 		}

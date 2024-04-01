@@ -79,8 +79,12 @@ spec:
             value: "{{ .Values.schedule.rakkessInterval }}"
           - name: KUBEPREUPGRADE_INTERVAL
             value: "{{ .Values.schedule.kubepreupgradeInterval }}"
-          - name: TRIVY_INTERVAL
-            value: "{{ .Values.schedule.trivyInterval }}"
+          - name: TRIVY_IMAGE_INTERVAL
+            value: "{{ .Values.schedule.trivyimageInterval }}"
+          - name: TRIVY_SBOM_INTERVAL
+            value: "{{ .Values.schedule.trivysbomInterval }}"
+          - name: TRIVY_CLUSTERSCAN_INTERVAL
+            value: "{{ .Values.schedule.trivyclusterscanInterval }}"
           - name: IS_OPTEL_ENABLED
             value: "{{ .Values.opentelemetry.isEnabled }}"
           - name : OPTEL_URL
