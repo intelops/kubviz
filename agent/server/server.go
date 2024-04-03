@@ -41,7 +41,7 @@ func StartServer() {
 	}
 
 	r.Use(otelgin.Middleware(config.ServiceName))
-	
+
 	EnableProfile(r)
 	log.Fatal(r.Run(":8080"))
 }

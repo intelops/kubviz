@@ -26,7 +26,7 @@ func (ah *APIHandler) PostEventAzureContainer(c *gin.Context) {
 	_, span := tracer.Start(c.Request.Context(), "PostEventAzureContainer")
 	span.SetAttributes(attribute.String("http.method", "POST"))
 	defer span.End()
-	
+
 	defer func() {
 		_, _ = io.Copy(io.Discard, c.Request.Body)
 		_ = c.Request.Body.Close()

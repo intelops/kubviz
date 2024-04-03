@@ -39,7 +39,7 @@ func (ah *APIHandler) BindRequest(r *gin.Engine) {
 	}
 
 	r.Use(otelgin.Middleware(config.ServiceName))
-	
+
 	apiGroup := r.Group("/")
 	{
 		apiGroup.GET("/api-docs", ah.GetApiDocs)

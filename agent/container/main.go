@@ -23,7 +23,7 @@ func main() {
 			log.Printf("Error shutting down tracer provider: %v", err)
 		}
 	}()
-	
+
 	app := application.New()
 	go app.GithubContainerWatch()
 	go app.Start()

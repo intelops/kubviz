@@ -50,7 +50,7 @@ func (app *Application) Routes() *gin.Engine {
 	}
 
 	router.Use(otelgin.Middleware(config.ServiceName))
-	
+
 	api.RegisterHandlers(router, app)
 	return router
 }

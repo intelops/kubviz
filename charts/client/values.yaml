@@ -127,7 +127,7 @@ grafana:
         allowUiUpdates: true
   postgresql:
     enabled: false
-  database: 
+  database:
     type: postgres
     host: kubviz-client-postgresql:5432
     name: postgres
@@ -176,7 +176,7 @@ opentelemetry:
   isEnabled: false
   url: "otelcollector.local"
   appName: "kubviz"
- 
+
 consumer:
   ketallconsumer: "KETALL_EVENTS_CONSUMER"
   rakeesconsumer: "RAKEES_METRICS_CONSUMER"

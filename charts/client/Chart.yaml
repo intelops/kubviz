@@ -35,4 +35,4 @@ dependencies:
     condition: grafana.enabled
     version: 1.0.5
     repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
-    
+

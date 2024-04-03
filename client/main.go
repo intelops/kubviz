@@ -24,7 +24,7 @@ func main() {
 			log.Printf("Error shutting down tracer provider: %v", err)
 		}
 	}()
-	
+
 	app := application.Start()
 
 	signals := make(chan os.Signal, 1)

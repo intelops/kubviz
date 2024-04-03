@@ -52,7 +52,7 @@ func New() *Application {
 	}
 
 	r.Use(otelgin.Middleware(config.ServiceName))
-	
+
 	apiServer.BindRequest(r)
 
 	httpServer := &http.Server{

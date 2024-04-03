@@ -14,11 +14,11 @@ Please replace the <INGRESS HOSTNAME> section with the specific ingress host nam
 Possible values are:
 
 Values | Platform |
------- | -------- | 
+------ | -------- |
 `/github` | GitHub |
 `/gitlab` | GitLab |
 `/gitea` | Gitea |
-`/bitbucket` | BitBucket | 
+`/bitbucket` | BitBucket |
 `/azure` | Azure |
 
 2. The URL for a Container Registry will appear in the following format:
@@ -32,7 +32,7 @@ Please replace the <INGRESS HOSTNAME> section with the specific ingress host nam
 Possible values are:
 
 Values | Platform |
------- | -------- | 
+------ | -------- |
 `/event/docker/hub` | DockerHub |
 `/event/azure/container` | Azure |
 `/event/jfrog/container` | JFrog |

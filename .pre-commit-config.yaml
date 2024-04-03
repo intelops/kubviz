@@ -1,0 +1,87 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.5.0
+  hooks:
+  # Checks for files that contain merge conflict strings.
+  - id: check-merge-conflict
+  # Detects aws credentials from the aws cli credentials file.
+  - id: detect-aws-credentials
+    args: [--allow-missing-credentials]
+  # detects the presence of private keys.
+  - id: detect-private-key
+  # Trims trailing whitespace in codebase.
+  - id: trailing-whitespace
+  # Protect commit to main branch
+  - id: no-commit-to-branch
+    args: [--branch,main]
+
+
+# Check is the Commit is Signed off using `--signoff/-s`
+- repo: https://github.com/KAUTH/pre-commit-git-checks
+  rev: v0.0.1 # Use the SHA or tag you want to point to
+  hooks:
+    - id: git-signoff
+      stages: [commit-msg]
+
+# Checks your git commit messages for style.
+- repo: https://github.com/jorisroovers/gitlint
+  rev:  v0.19.1
+  hooks:
+  - id: gitlint
+    name: Scan Commit messages
+
+# Detects hardcoded secrets, security vulnerabilities and policy breaks using GGShield
+- repo: https://github.com/zricethezav/gitleaks
+  rev: v8.18.1
+  hooks:
+  - id: gitleaks
+    name: Detect hardcoded secrets
+    description: Detect hardcoded secrets using Gitleaks
+    entry: gitleaks protect --verbose --redact --staged
+    language: golang
+    pass_filenames: false
+
+- repo: https://github.com/Bahjat/pre-commit-golang
+  rev: v1.0.3
+  hooks:
+  # Formats Go code
+  # - id: gofumpt # requires gofumpt to be installed from github.com/mvdan/gofumpt
+  #   name: Go formatter
+  #   description: Runs a strict Go formatter
+  - id: go-fmt-import
+    name: Go formatter
+    description: Go formatter with fmt and imports
+  # Runs Unit tests
+  - id: go-unit-tests
+    name: Run Unit tests
+    desription: Runs all the unit tests in the repo
+    # Runs static analysis of the Go code
+  - id: go-static-check
+    name: Go Static Check
+    description: Finds bugs and performance issues
+
+# Local hooks
+
+- repo: https://github.com/intelops/gitrepos-templates-policies
+  rev: v0.0.1
+  hooks:
+  - id: check-devcontainer
+    name: Check devcontainer
+    description: Checks for existance of .devcontainer.json in the project
+  - id: check-dockerfile
+    name: Check Dockerfile
+    description: Enforce use of Chainguard base images in Dockefiles
+  - id: check-gitsign
+    name: Check gitsign
+    description: Check if the last commit is signed with Sigstore gitsign
+  - id: check-multistage-dockerfile
+    name: Check multi-stage Dockerfile
+    description: Check the existance of Dockerfile in the project and verify that its a multi-stage Dockerfile
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.5.0
+  hooks:
+  - id: check-yaml
+    name: Verify YAML syntax
+    args:
+    - --allow-multiple-documents

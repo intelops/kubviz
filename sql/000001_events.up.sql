@@ -15,6 +15,6 @@ CREATE TABLE IF NOT EXISTS events (
 	LastTime    String,
 	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}},
 	ExportedAt DateTime DEFAULT NULL
-) ENGINE = MergeTree() 
-ORDER BY ExpiryDate 
+) ENGINE = MergeTree()
+ORDER BY ExpiryDate
 TTL ExpiryDate;

@@ -17,11 +17,11 @@ jobs:
         uses: actions/checkout@v3
         with:
             fetch-depth: 0
-          
+
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-        
+
       - uses: docker/setup-buildx-action@v1
         name: Set up Docker Buildx
 
@@ -32,8 +32,8 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-    
-            
+
+
       -
         name: Build and push on PR
         uses: docker/build-push-action@v4
@@ -45,4 +45,4 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ github.repository }}/container-agent:pr-${{ github.event.pull_request.number }}
           build-args: |
             "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
- 
+
