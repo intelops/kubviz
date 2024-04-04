@@ -3,6 +3,21 @@ entries:
   agent:
   - apiVersion: v2
     appVersion: v1.1.5
+    created: "2024-04-04T18:02:11.810762626Z"
+    dependencies:
+    - condition: kuberhealthy.enabled
+      name: kuberhealthy
+      repository: https://kube-tarian.github.io/helmrepo-supporting-tools/
+      version: 1.x.x
+    description: A Helm chart for kubeviz agent
+    digest: 19e1a26c8480fcf8f87403950bd847b1e3ec9a79352d794904355217e73b29f2
+    name: agent
+    type: application
+    urls:
+    - https://github.com/intelops/kubviz/releases/download/agent-1.1.17/agent-1.1.17.tgz
+    version: 1.1.17
+  - apiVersion: v2
+    appVersion: v1.1.5
     created: "2024-04-01T08:02:07.582850117Z"
     description: A Helm chart for kubeviz agent
     digest: 9fe70314db6f0a3aa7c95fa3e5482fa97cbaf88a50d692bf7a22662700c2ce9a
