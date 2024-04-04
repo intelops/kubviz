@@ -68,9 +68,6 @@ repos:
   - id: check-devcontainer
     name: Check devcontainer
     description: Checks for existance of .devcontainer.json in the project
-  - id: check-dockerfile
-    name: Check Dockerfile
-    description: Enforce use of Chainguard base images in Dockefiles
   - id: check-gitsign
     name: Check gitsign
     description: Check if the last commit is signed with Sigstore gitsign
@@ -85,3 +82,42 @@ repos:
     name: Verify YAML syntax
     args:
     - --allow-multiple-documents
+- repo: https://github.com/hadolint/hadolint
+  rev: v2.12.0
+  hooks:
+  - id: hadolint
+  # Rules you want to ignore may be found here: https://github.com/hadolint/hadolint?tab=readme-ov-file#rules
+    name: Dockerfile linter
+    description: Dockerfile linter following best-practices
+    args: [--ignore, DL3051]
+
+- repo: local
+  hooks:
+  - name: Check Dockerfile
+    id: check-dockerfile-sh
+    entry: bash
+    args:
+    - -c
+    - |
+        check_dockerfile() {
+        if [[ $1 == *"Dockerfile"* ]]; then
+              base_image=$(grep '^FROM' "$1" | awk '{print $2}')
+            if [[ $base_image != golang:* ]]; then
+                echo "Error: Base image in $1 is not from cgr.dev/chianguard"
+                return 1
+            fi
+        fi
+        return 0
+        }
+
+        export -f check_dockerfile
+
+        if find . -type f -exec bash -c 'check_dockerfile "$0"' {} \; | grep -q 'Error'; then
+          echo "Commit failed due to non-compliant Dockerfile(s)."
+          exit 1
+        fi
+
+        echo "All Dockerfiles are compliant."
+        exit 0
+    language: system
+    pass_filenames: false
