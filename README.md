@@ -233,6 +233,37 @@ The TTL value is customizable, empowering you to define the specific duration af
 
 To guide you through the process of setting up a TTL, [please follow these steps](docs/CONFIGURATION_TTL.md)
 
+#### Customizing Security Scanning
+
+KubViz enables you to perform cluster scans, image scans, and SBOM creation in CycloneDX format. Utilizing this scan, vulnerabilities can be identified.
+
+You can customize the security scans by changing the chart values.
+
+- To [Disable](https://github.com/intelops/kubviz/blob/main/charts/agent/values.yaml#L186) the cluster scan you can pass 0 or empty string
+
+```yaml
+schedule:
+  enabled: true
+  trivyclusterscanInterval: 0
+...
+```
+- For changing the interval, pass the interval time
+
+```yaml
+schedule:
+  enabled: true
+  trivyclusterscanInterval: "@every 24h"
+...
+```
+
+Same you can change for [image-scan](https://github.com/intelops/kubviz/blob/main/charts/agent/values.yaml#L184) and [sbom](https://github.com/intelops/kubviz/blob/main/charts/agent/values.yaml#L185)
+
+## Health Check
+
+You can run different types of checks against your Kubernetes cluster to detect any issues or potential problems before they cause any downtime or service disruptions. Check will run in the background and sends data to kubviz. After analysing the data from dashboard you can take corrective action quickly, if any issues are detected.
+
+Please check the [configuration](docs/CONFIGURATION_HEALTHCHECK.md) for health checks
+
 ## Use Cases
 
 ### Cluster Event Tracking
