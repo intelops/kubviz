@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/intelops/kubviz/kubviz-agent
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.1.5"
+  tag: "v1.1.6"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -45,13 +45,12 @@ service:
   port: 80
 
 
-
 git_bridge:
   enabled: false
   image:
     repository: ghcr.io/intelops/kubviz/git-agent
     pullPolicy: Always
-    tag: "v1.1.5"
+    tag: "v1.1.6"
   resources:
     limits:
       cpu: 200m
@@ -88,14 +87,12 @@ git_bridge:
     #      - chart-example.local
 
 
-
-
 container_bridge:
   enabled: false
   image:
     repository: ghcr.io/intelops/kubviz/container-agent
     pullPolicy: Always
-    tag: "v1.1.5"
+    tag: "v1.1.6"
   resources:
     limits:
       cpu: 200m
@@ -192,6 +189,78 @@ kuberhealthy:
   enabled: true
   pollInterval: "60m"
   url: "http://kuberhealthy:8080"
+  check:
+    podRestarts:
+      enabled: true
+      runInterval: 5m
+      timeout: 10m
+      image:
+        registry: docker.io
+        repository: kuberhealthy/pod-restarts-check
+        tag: v2.5.0
+      allNamespaces: true
+      extraEnvs:
+        MAX_FAILURES_ALLOWED: "10"
+      nodeSelector: {}
+      tolerations: []
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    podStatus:
+      enabled: true
+      runInterval: 5m
+      timeout: 15m
+      image:
+        registry: docker.io
+        repository: kuberhealthy/pod-status-check
+        tag: v1.3.0
+      allNamespaces: true
+      extraEnvs: {}
+      nodeSelector: {}
+      tolerations: []
+      #- key: "key"
+      #  operator: "Equal"
+      #  value: "value"
+      #  effect: "NoSchedule"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    imagePullCheck:
+      enabled: true
+      runInterval: 60m
+      timeout: 1m
+      image:
+        repository: kuberhealthy/test-check
+        tag: v1.4.0
+      extraEnvs:
+        REPORT_FAILURE: "false"
+        REPORT_DELAY: "1s"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+    resourceQuota:
+      enabled: true
+      runInterval: 1h
+      timeout: 2m
+      image:
+        repository: kuberhealthy/resource-quota-check
+        tag: v1.3.0
+      extraEnvs:
+        BLACKLIST: "default"
+        WHITELIST: "kube-system,kubviz"
+      resources:
+        requests:
+          cpu: 15m
+          memory: 15Mi
+        limits:
+          cpu: 30m
 
 opentelemetry:
   isEnabled: false
