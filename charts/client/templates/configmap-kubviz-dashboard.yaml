@@ -32,7 +32,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 32,
+      "id": 64,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -205,11 +205,12 @@ data:
               "format": "auto",
               "height": 600
             },
+            "editorMode": "code",
             "gaode": {
               "key": "",
               "plugin": "AMap.Scale,AMap.ToolBar"
             },
-            "getOption": "// Check if data.series exists\nif (data.series && data.series.length > 0) {\n  const reasons = data.series[0].fields[0].values;\n  const kinds = data.series[0].fields[1].values;\n  const eventTimes = data.series[0].fields[2].values;\n\n  // Create nodes and links\n  const nodes = [];\n  const links = [];\n\n  reasons.forEach((reason, index) => {\n    const sourceNode = {\n      name: reason,\n      category: 0, // Category for source nodes\n      symbolSize: 60, // Size for source nodes\n    };\n\n    const kindNode = {\n      name: kinds[index],\n      category: 1, // Category for kind nodes\n      symbolSize: 40, // Size for kind nodes\n    };\n\n    const eventTimeNode = {\n      name: eventTimes[index],\n      category: 2, // Category for eventTime nodes\n      symbolSize: 20, // Size for eventTime nodes\n    };\n\n    // Ensure source, kind, and eventTime nodes are unique before adding them\n    if (!nodes.some((node) => node.name === sourceNode.name)) {\n      nodes.push(sourceNode);\n    }\n\n    if (!nodes.some((node) => node.name === kindNode.name)) {\n      nodes.push(kindNode);\n    }\n\n    if (!nodes.some((node) => node.name === eventTimeNode.name)) {\n      nodes.push(eventTimeNode);\n    }\n\n    // Create links between reason, kind, and eventTime nodes\n    links.push({\n      source: reason,\n      target: kinds[index],\n    });\n\n    links.push({\n      source: kinds[index],\n      target: eventTimes[index],\n    });\n  });\n\n  // Create categories for nodes\n  const categories = [\n    {\n      name: 'Reasons',\n    },\n    {\n      name: 'Nodes',\n    },\n    {\n      name: 'Event Times',\n    },\n  ];\n\n  // Create ECharts option\n  const option = {\n    tooltip: {\n      trigger: 'item',\n      formatter: '{b}',\n    },\n    legend: {\n      x: 'left',\n      data: ['Reasons', 'Nodes', 'Event Times'],\n    },\n    series: [\n      {\n        type: 'graph',\n        layout: 'circular',\n        roam: true,\n        label: {\n          show: true,\n          textStyle: {\n            color: '#000',\n          },\n        },\n        force: {\n          repulsion: 100,\n          gravity: 0.1,\n          edgeLength: 150,\n        },\n        data: nodes,\n        links: links,\n        draggable: true,\n        categories: categories,\n        edgeSymbol: [\"none\", \"arrow\"],\n        edgeSymbolSize: [12, 12],\n        lineStyle: {\n          color: \"#000000\",\n          curveness: 0,\n          opacity: 0.3,\n        },\n      },\n    ],\n  };\n\n  // Return the ECharts option\n  return option;\n} else {\n  // Handle the case when data.series does not exist\n  return {};\n}",
+            "getOption": "// Check if context.panel.data.series exists\nif (context.panel.data.series && context.panel.data.series.length > 0) {\n  const reasons = context.panel.data.series[0].fields[0].values;\n  const kinds = context.panel.data.series[0].fields[1].values;\n  const eventTimes = context.panel.data.series[0].fields[2].values;\n\n  // Create nodes and links\n  const nodes = [];\n  const links = [];\n\n  reasons.forEach((reason, index) => {\n    const sourceNode = {\n      name: reason,\n      category: 0, // Category for source nodes\n      symbolSize: 60, // Size for source nodes\n    };\n\n    const kindNode = {\n      name: kinds[index],\n      category: 1, // Category for kind nodes\n      symbolSize: 40, // Size for kind nodes\n    };\n\n    const eventTimeNode = {\n      name: eventTimes[index],\n      category: 2, // Category for eventTime nodes\n      symbolSize: 20, // Size for eventTime nodes\n    };\n\n    // Ensure source, kind, and eventTime nodes are unique before adding them\n    if (!nodes.some((node) => node.name === sourceNode.name)) {\n      nodes.push(sourceNode);\n    }\n\n    if (!nodes.some((node) => node.name === kindNode.name)) {\n      nodes.push(kindNode);\n    }\n\n    if (!nodes.some((node) => node.name === eventTimeNode.name)) {\n      nodes.push(eventTimeNode);\n    }\n\n    // Create links between reason, kind, and eventTime nodes\n    links.push({\n      source: reason,\n      target: kinds[index],\n    });\n\n    links.push({\n      source: kinds[index],\n      target: eventTimes[index],\n    });\n  });\n\n  // Create categories for nodes\n  const categories = [\n    {\n      name: 'Reasons',\n    },\n    {\n      name: 'Nodes',\n    },\n    {\n      name: 'Event Times',\n    },\n  ];\n\n  // Create ECharts option\n  const option = {\n    tooltip: {\n      trigger: 'item',\n      formatter: '{b}',\n    },\n    legend: {\n      x: 'left',\n      data: ['Reasons', 'Nodes', 'Event Times'],\n    },\n    series: [\n      {\n        type: 'graph',\n        layout: 'circular',\n        roam: true,\n        label: {\n          show: true,\n          textStyle: {\n            color: '#000',\n          },\n        },\n        force: {\n          repulsion: 100,\n          gravity: 0.1,\n          edgeLength: 150,\n        },\n        data: nodes,\n        links: links,\n        draggable: true,\n        categories: categories,\n        edgeSymbol: [\"none\", \"arrow\"],\n        edgeSymbolSize: [12, 12],\n        lineStyle: {\n          color: \"#000000\",\n          curveness: 0,\n          opacity: 0.3,\n        },\n      },\n    ],\n  };\n\n  // Return the ECharts option\n  return option;\n} else {\n  // Display \"Data not available\" in the panel\n  return {\n    title: {\n      text: 'Data not available',\n      textStyle: {\n        fontSize: 24,\n        fontWeight: 'bold',\n      },\n      left: 'center',\n      top: 'middle',\n    },\n  };\n}\n",
             "google": {
               "callback": "gmapReady",
               "key": ""
@@ -220,8 +221,14 @@ data:
               "config": "{}",
               "height": 400,
               "name": "default"
+            },
+            "visualEditor": {
+              "code": "return {\n  dataset: context.editor.dataset,\n  series: context.editor.series,\n  xAxis: {\n    type: 'time',\n  },\n  yAxis: {\n    type: 'value',\n    min: 'dataMin',\n  },\n}\n",
+              "dataset": [],
+              "series": []
             }
           },
+          "pluginVersion": "6.0.0",
           "targets": [
             {
               "datasource": {
@@ -264,11 +271,12 @@ data:
               "format": "auto",
               "height": 600
             },
+            "editorMode": "code",
             "gaode": {
               "key": "",
               "plugin": "AMap.Scale,AMap.ToolBar"
             },
-            "getOption": "let kind = [];\nlet resources = [];\n\ndata.series.map((s) => {\n  kind = s.fields.find((f) => f.name === 'Kind').values;\n  resources = s.fields.find((f) => f.name === 'Resources').values;\n});\n\n// Create an empty array to store doughnut chart data\nconst doughnutChartData = [];\n\n// Define colors for doughnut slices\nconst doughnutSliceColors = ['#235894', '#FFFF00', '#FF0000', '#00FF00', '#FFA500'];\n\n// Map severity and counts to doughnut chart data\nkind.forEach((kinddata, index) => {\n  doughnutChartData.push({\n    value: resources[index],\n    name: kinddata,\n    itemStyle: {\n      borderRadius: [10, 10, 10, 10], // Add rounded corners\n      color: doughnutSliceColors[index % doughnutSliceColors.length],\n      borderWidth: 2,\n      borderColor: '#fff',\n    },\n  });\n});\n\nreturn {\n  backgroundColor: '#FFFFFF', // Set the background color to white\n  tooltip: {\n    trigger: 'item',\n  },\n  legend: {\n    top: '5%',\n    left: 'center',\n  },\n  series: [\n    {\n      name: 'Access From',\n      type: 'pie',\n      radius: ['40%', '70%'],\n      avoidLabelOverlap: false,\n      label: {\n        show: false,\n        position: 'center',\n      },\n      emphasis: {\n        label: {\n          show: true,\n          fontSize: 40,\n          fontWeight: 'bold',\n        },\n      },\n      labelLine: {\n        show: false,\n      },\n      data: doughnutChartData, // Use the modified doughnut chart data\n    },\n  ],\n};",
+            "getOption": "let kind = [];\nlet resources = [];\n\ncontext.panel.data.series.forEach((s) => {\n  const kindField = s.fields.find((f) => f.name === 'Kind');\n  const resourcesField = s.fields.find((f) => f.name === 'Resources');\n  if (kindField && resourcesField) {\n    kind = kindField.values;\n    resources = resourcesField.values;\n  }\n});\n\n// Create an empty array to store doughnut chart data\nconst doughnutChartData = [];\n\n// Define colors for doughnut slices\nconst doughnutSliceColors = ['#235894', '#FFFF00', '#FF0000', '#00FF00', '#FFA500'];\n\n// Map kind and resources counts to doughnut chart data\nkind.forEach((kinddata, index) => {\n  doughnutChartData.push({\n    value: resources[index],\n    name: kinddata,\n    clusterName: context.panel.data.series[0].fields[0].values[index], // Extract cluster name\n    itemStyle: {\n      borderRadius: [10, 10, 10, 10], // Add rounded corners\n      color: doughnutSliceColors[index % doughnutSliceColors.length],\n      borderWidth: 2,\n      borderColor: '#fff',\n    },\n  });\n});\n\nreturn {\n  backgroundColor: '#FFFFFF', // Set the background color to white\n  tooltip: {\n    trigger: 'item',\n    formatter: function (params) {\n      return `Resource From <br/>  ${params.data.clusterName} ${params.value}`;\n    },\n  },\n  legend: {\n    top: '5%',\n    left: 'center',\n  },\n  series: [\n    {\n      name: '',\n      type: 'pie',\n      radius: ['40%', '70%'],\n      avoidLabelOverlap: false,\n      label: {\n        show: false,\n        position: 'center',\n      },\n      emphasis: {\n        label: {\n          show: true,\n          fontSize: 40,\n          fontWeight: 'bold',\n        },\n      },\n      labelLine: {\n        show: false,\n      },\n      data: doughnutChartData, // Use the modified doughnut chart data\n    },\n  ],\n};\n",
             "google": {
               "callback": "gmapReady",
               "key": ""
@@ -279,8 +287,14 @@ data:
               "config": "{}",
               "height": 400,
               "name": "default"
+            },
+            "visualEditor": {
+              "code": "return {\n  dataset: context.editor.dataset,\n  series: context.editor.series,\n  xAxis: {\n    type: 'time',\n  },\n  yAxis: {\n    type: 'value',\n    min: 'dataMin',\n  },\n}\n",
+              "dataset": [],
+              "series": []
             }
           },
+          "pluginVersion": "6.0.0",
           "targets": [
             {
               "datasource": {
@@ -576,8 +590,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -646,8 +659,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -716,8 +728,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -786,8 +797,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -856,8 +866,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -959,8 +968,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1060,8 +1068,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3112,7 +3119,8 @@ data:
       "timezone": "",
       "title": "Kubviz Dashboard",
       "uid": "eT4fox94z",
-      "version": 1,
+      "version": 4,
       "weekStart": ""
     }
+
 {{- end }}
