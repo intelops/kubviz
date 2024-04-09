@@ -2,6 +2,9 @@ name: Client Docker Image CI
 
 on:
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'charts/**'
     branches:
       - 'main'
 
