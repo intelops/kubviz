@@ -46,7 +46,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "SubscribeGitBridgeNats")
 	span.SetAttributes(attribute.String("git-subscribe", "Subscribe"))
 	defer span.End()
-	
+
 	n.stream.Subscribe(string(bridgeSubject), func(msg *nats.Msg) {
 		msg.Ack()
 		gitprovider := msg.Header.Get("GitProvider")

@@ -17,11 +17,11 @@ data:
         basicAuth: true
         basicAuthUser: {{ .Values.clickhouse.user }}
         secureJsonData:
-          basicAuthPassword: {{ .Values.clickhouse.password }} 
+          basicAuthPassword: {{ .Values.clickhouse.password }}
  {{- else }}
         url: {{ .Values.existingClickhouse.host }}:8123
         access: proxy
-        basicAuth: true  
+        basicAuth: true
     {{- if not .Values.existingClickhouse.secret }}
         basicAuthUser: {{ .Values.existingClickhouse.username }}
     {{- else }}

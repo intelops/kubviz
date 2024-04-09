@@ -28,7 +28,7 @@ You are more than welcome to open issues in this project to [suggest new feature
 
 This project is written in Golang.
 
-You need 
+You need
 
 <a href="https://go.dev/doc/install" target="_blank">`Go 1.16+`</a>
 

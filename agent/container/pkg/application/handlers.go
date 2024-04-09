@@ -20,7 +20,7 @@ func (app *Application) localRegistryHandler(w http.ResponseWriter, r *http.Requ
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "localRegistryHandler")
 	span.SetAttributes(attribute.String("http.method", "POST"))
 	defer span.End()
-	
+
 	event, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Event body read failed: %v", err)

@@ -40,7 +40,7 @@ Visualize Kubernetes & DevSecOps Workflows. Tracks changes/events real-time acro
 
 ## How KubViz works
 
-KubViz client can be installed on any Kubernetes cluster. KubViz agent runs in a kubernetes cluster where the changes/events need to be tracked. The agent detects the changes in real time and send those events via NATS JetStream and the same is received in the KubViz client. 
+KubViz client can be installed on any Kubernetes cluster. KubViz agent runs in a kubernetes cluster where the changes/events need to be tracked. The agent detects the changes in real time and send those events via NATS JetStream and the same is received in the KubViz client.
 
 KubViz client receives the events and passes it to Clickhouse database. The events present in the Clickhouse database can be visualized through Grafana.
 
@@ -59,7 +59,7 @@ It comprehensively scans Kubernetes containers for security flaws, such as vulne
 ## How to install and run Kubviz
 
 #### Prerequisites
-* A Kubernetes cluster 
+* A Kubernetes cluster
 * Helm binary
 
 #### Prepare Namespace
@@ -87,10 +87,10 @@ token=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token"
 ```
 
-**NOTE:** 
+**NOTE:**
 - If you want to get a token from a secret, use a secret reference with the secret's name and key.
 
-**NOTE:** 
+**NOTE:**
 - If you want to enable Grafana with the client deployment, add `--set grafana.enabled=true` to the helm upgrade command.
 
 - Kubviz provides a setup for Grafana with Postgres data persistence, ensuring that even if the grafana pod/service goes down, the data will persist, safeguarding crucial information for visualization and analysis.
@@ -99,7 +99,7 @@ helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$to
 helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token" --set grafana.enabled=true --set grafana.postgresql=true
 ```
 
-- If grafana already exist use the same upgrade command without --set grafana.enabled=true flag. 
+- If grafana already exist use the same upgrade command without --set grafana.enabled=true flag.
 
 ```bash
 helm upgrade -i kubviz-client kubviz/client -n kubviz --set "nats.auth.token=$token" --set grafana.enabled=true
@@ -130,12 +130,12 @@ kubectl get services kubviz-client-nats-external -n kubviz --output jsonpath='{.
 helm upgrade -i kubviz-agent kubviz/agent -n kubviz \
   --set "nats.auth.token=$token" \
   --set git_bridge.enabled=true \
-  --set "git_bridge.ingress.hosts[0].host=<INGRESS HOSTNAME>",git_bridge.ingress.hosts[0].paths[0].path=/,git_bridge.ingress.hosts[0].paths[0].pathType=Prefix,git_bridge.ingress.tls[0].secretName=<SECRET-NAME>,git_bridge.ingress.tls[0].hosts[0]=<INGRESS HOSTNAME> \ 
+  --set "git_bridge.ingress.hosts[0].host=<INGRESS HOSTNAME>",git_bridge.ingress.hosts[0].paths[0].path=/,git_bridge.ingress.hosts[0].paths[0].pathType=Prefix,git_bridge.ingress.tls[0].secretName=<SECRET-NAME>,git_bridge.ingress.tls[0].hosts[0]=<INGRESS HOSTNAME> \
   --set container_bridge.enabled=true \
   --set "container_bridge.ingress.hosts[0].host=<INGRESS HOSTNAME>",container_bridge.ingress.hosts[0].paths[0].path=/,container_bridge.ingress.hosts[0].paths[0].pathType=Prefix,container_bridge.ingress.tls[0].secretName=<SECRET-NAME>,container_bridge.ingress.tls[0].hosts[0]=<INGRESS HOSTNAME>
 ```
 
-**NOTE:** 
+**NOTE:**
 If you want to get a token from a secret, use a secret reference with the secret's name and key.
 
 3. Replace "INGRESS HOSTNAME" with the desired hostname for the Git Bridge and Container Bridge Ingress configurations.
@@ -155,7 +155,7 @@ Parameter | Description | Default
 `git_bridge.ingress.tls` | git_bridge ingress tls configuration | []
 `container_bridge.ingress.tls` | container_bridge ingress tls configuration | []
 
-**NOTE:** 
+**NOTE:**
 
 - Default Annotations for Ingress
 
@@ -180,11 +180,11 @@ helm upgrade -i kubviz-agent kubviz/agent -f values.yaml -n kubviz
 1. Run the following command to deploy the KubViz agent:
 
 ```bash
-helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token"   
+helm upgrade -i kubviz-agent kubviz/agent -n kubviz --set nats.host=<NATS IP Address> --set "nats.auth.token=$token"
 ```
 2. Replace "<NATS IP Address>" with the IP address of your NATS service **kubviz-client-nats-external**.
 
-**NOTE:** 
+**NOTE:**
 
 The time-based job scheduler is added for each plugin, allowing you to schedule and automate the execution of plugins at specific times or intervals. To activate this scheduler, set 'enabled' to 'true.' Once enabled, each plugin's execution can be configured to run at a precise time or at regular intervals, based on the provided settings. Additionally, if you set the 'schedulingInterval' to '0', it will disable the plugins.
 
@@ -217,7 +217,7 @@ kubectl get secret --namespace kubviz kubviz-client-grafana -o jsonpath="{.data.
 ```bash
 export POD_NAME=$(kubectl get pods --namespace kubviz -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=kubviz-client" -o jsonpath="{.items[0].metadata.name}")
 ```
-```bash     
+```bash
 kubectl --namespace kubviz port-forward $POD_NAME 3000
 ```
 
@@ -274,7 +274,7 @@ Please check the [configuration](docs/CONFIGURATION_HEALTHCHECK.md) for health c
 
 Use KubViz to monitor your cluster events, including:
 
-- State changes 
+- State changes
 - Errors
 - Other messages that occur in the cluster
 

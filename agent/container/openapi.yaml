@@ -59,6 +59,6 @@ paths:
       summary: Post Jfrog Container Registry webhook events
       responses:
         '200':
-          description: OK 
+          description: OK
 
 # oapi-codegen -config ./cfg.yaml ./openapi.yaml

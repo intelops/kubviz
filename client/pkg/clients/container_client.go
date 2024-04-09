@@ -36,7 +36,7 @@ func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "SubscribeContainerNats")
 	span.SetAttributes(attribute.String("container-subscribe", "Subscribe"))
 	defer span.End()
-	
+
 	n.stream.Subscribe(string(containerSubject), func(msg *nats.Msg) {
 		msg.Ack()
 		repoName := msg.Header.Get("REPO_NAME")

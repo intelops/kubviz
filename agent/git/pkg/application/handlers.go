@@ -20,7 +20,7 @@ func (app *Application) PostGitea(c *gin.Context) {
 	_, span := tracer.Start(c.Request.Context(), "PostGitea")
 	span.SetAttributes(attribute.String("http.method", "POST"))
 	defer span.End()
-	
+
 	defer log.Println("gitea handler exited...")
 
 	event := c.Request.Header.Get(string(model.GiteaHeader))
@@ -79,7 +79,7 @@ func (app *Application) PostGithub(c *gin.Context) {
 	defer span.End()
 
 	defer log.Println("github handler exited...")
-	
+
 	event := c.Request.Header.Get(string(model.GithubHeader))
 	if len(event) == 0 {
 		log.Println("error getting the github event from header")
@@ -131,7 +131,7 @@ func (app *Application) PostBitbucket(c *gin.Context) {
 	_, span := tracer.Start(c.Request.Context(), "PostBitbucket")
 	span.SetAttributes(attribute.String("http.method", "POST"))
 	defer span.End()
-	
+
 	defer log.Println("bitbucket handler exited...")
 
 	event := c.Request.Header.Get(string(model.BitBucketHeader))
