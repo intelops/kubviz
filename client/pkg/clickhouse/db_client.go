@@ -60,7 +60,7 @@ func NewDBClient(conf *config.Config) (DBInterface, *sql.DB, error) {
 	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
 		fmt.Println("Using provided username and password")
 		connOptions = clickhouse.Options{
-			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DBPort)},
 			Debug: true,
 			Auth: clickhouse.Auth{
 				Username: conf.ClickHouseUsername,
@@ -77,7 +77,7 @@ func NewDBClient(conf *config.Config) (DBInterface, *sql.DB, error) {
 	} else {
 		fmt.Println("Using connection without username and password")
 		connOptions = clickhouse.Options{
-			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DBPort)},
 			Debug: true,
 			Debugf: func(format string, v ...interface{}) {
 				fmt.Printf(format, v...)
@@ -109,7 +109,7 @@ func NewDBClient(conf *config.Config) (DBInterface, *sql.DB, error) {
 	if conf.ClickHouseUsername != "" && conf.ClickHousePassword != "" {
 		fmt.Println("Using provided username and password")
 		connOption = clickhouse.Options{
-			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Addr:  []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DBPort)},
 			Debug: true,
 			Auth: clickhouse.Auth{
 				Username: conf.ClickHouseUsername,
@@ -119,7 +119,7 @@ func NewDBClient(conf *config.Config) (DBInterface, *sql.DB, error) {
 	} else {
 		fmt.Println("Using connection without username and password")
 		connOption = clickhouse.Options{
-			Addr: []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DbPort)},
+			Addr: []string{fmt.Sprintf("%s:%d", conf.DBAddress, conf.DBPort)},
 		}
 	}
 
@@ -936,7 +936,7 @@ func (c *DBClient) Close() {
 }
 
 func DbUrl(conf *config.Config) string {
-	return fmt.Sprintf("tcp://%s:%d?debug=true", conf.DBAddress, conf.DbPort)
+	return fmt.Sprintf("tcp://%s:%d?debug=true", conf.DBAddress, conf.DBPort)
 }
 func (c *DBClient) RetriveKetallEvent() ([]model.Resource, error) {
 	rows, err := c.conn.Query("SELECT ClusterName, Namespace, Kind, Resource, Age FROM getall_resources")

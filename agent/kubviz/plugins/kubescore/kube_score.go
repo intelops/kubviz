@@ -26,7 +26,7 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext) err
 		Namespaces().
 		List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Println("Error occurred while getting client set for kube-score: ", err)
+		log.Println("Error occured while getting client set for kube-score: ", err)
 		return err
 	}
 
@@ -44,21 +44,18 @@ func publish(ns string, js nats.JetStreamContext) error {
 	log.Printf("Command:  %#v,", cmd)
 	out, err := ExecuteCommand(cmd)
 	if err != nil {
-		log.Println("Error occurred while running kube-score: ", err)
+		log.Println("Error occured while running kube-score: ", err)
 		return err
 	}
 	// 	// Continue with the rest of the code...
 	err = json.Unmarshal([]byte(out), &report)
 	if err != nil {
-		log.Printf("Error occurred while Unmarshalling json: %v", err)
+		log.Printf("Error occured while Unmarshalling json: %v", err)
 		return err
 	}
 
 	publishKubescoreMetrics(report, js)
 	//err = publishKubescoreMetrics(uuid.New().String(), ns, out, js)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -75,8 +72,8 @@ func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamCon
 		ClusterName: ClusterName,
 		Report:      report,
 	}
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.KUBESCORE_SUBJECT, metricsJson)
+	metricsJSON, _ := json.Marshal(metrics)
+	_, err := js.Publish(constants.KUBESCORE_SUBJECT, metricsJSON)
 	if err != nil {
 		return err
 	}

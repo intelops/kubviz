@@ -95,8 +95,8 @@ func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
 			List:        HumanreadableAccessCode(listOutcome),
 			Update:      HumanreadableAccessCode(updateOutcome),
 		}
-		metricsJson, _ := json.Marshal(metrics)
-		_, err = js.Publish(constants.EventSubject_rakees, metricsJson)
+		metricsJSON, _ := json.Marshal(metrics)
+		_, err = js.Publish(constants.EventSubject_rakees, metricsJSON)
 		if err != nil {
 			return err
 		}

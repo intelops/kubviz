@@ -31,7 +31,7 @@ const (
 
 func (n *NATSContext) SubscribeContainerNats(conn clickhouse.DBInterface) {
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("container-client")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "SubscribeContainerNats")
 	span.SetAttributes(attribute.String("container-subscribe", "Subscribe"))

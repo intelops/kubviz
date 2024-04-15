@@ -79,7 +79,7 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	// log.Println("Last 200 k8s cluster scan lines output", jsonPart[len(jsonPart)-200:])
 	err = json.Unmarshal([]byte(jsonPart), &report)
 	if err != nil {
-		log.Printf("Error occurred while Unmarshalling json for k8s cluster scan: %v", err)
+		log.Printf("Error occured while Unmarshalling json for k8s cluster scan: %v", err)
 		return err
 	}
 	// _, err = executeCommandTrivy(clearCacheCmd)
@@ -100,8 +100,8 @@ func PublishTrivyK8sReport(report report.ConsolidatedReport, js nats.JetStreamCo
 		ClusterName: ClusterName,
 		Report:      report,
 	}
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.TRIVY_K8S_SUBJECT, metricsJson)
+	metricsJSON, _ := json.Marshal(metrics)
+	_, err := js.Publish(constants.TRIVY_K8S_SUBJECT, metricsJSON)
 	if err != nil {
 		return err
 	}

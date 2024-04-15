@@ -25,8 +25,8 @@ var ClusterName string = os.Getenv("CLUSTER_NAME")
 func PublishAllResources(result model.Resource, js nats.JetStreamContext) error {
 	metrics := result
 	metrics.ClusterName = ClusterName
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.EventSubject_getall_resource, metricsJson)
+	metricsJSON, _ := json.Marshal(metrics)
+	_, err := js.Publish(constants.EventSubject_getall_resource, metricsJSON)
 	if err != nil {
 		return err
 	}

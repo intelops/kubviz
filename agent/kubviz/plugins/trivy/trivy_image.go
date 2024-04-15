@@ -68,7 +68,7 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 
 		err = json.Unmarshal([]byte(jsonPart), &report)
 		if err != nil {
-			log.Printf("Error occurred while Unmarshalling json for image: %v", err)
+			log.Printf("Error occured while Unmarshalling json for image: %v", err)
 			continue // Move on to the next image in case of an error
 		}
 		// _, err = executeCommandTrivy(clearCacheCmd)
@@ -90,8 +90,8 @@ func PublishImageScanReports(report types.Report, js nats.JetStreamContext) erro
 		ClusterName: ClusterName,
 		Report:      report,
 	}
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.TRIVY_IMAGE_SUBJECT, metricsJson)
+	metricsJSON, _ := json.Marshal(metrics)
+	_, err := js.Publish(constants.TRIVY_IMAGE_SUBJECT, metricsJSON)
 	if err != nil {
 		return err
 	}

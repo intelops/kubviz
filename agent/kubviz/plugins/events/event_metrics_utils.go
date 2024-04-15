@@ -56,8 +56,8 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 		ClusterName: ClusterName,
 		ImageName:   imageName,
 	}
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.EventSubject, metricsJson)
+	metricsJSON, _ := json.Marshal(metrics)
+	_, err := js.Publish(constants.EventSubject, metricsJSON)
 	if err != nil {
 		return true, err
 	}

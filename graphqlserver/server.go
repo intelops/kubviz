@@ -50,7 +50,7 @@ func initializeDatabase(cfg *config.GraphQlConfig) (*sql.DB, error) {
 	var db *sql.DB
 	var err error
 	var config = &config.Config{
-		DbPort:             cfg.DbPort,
+		DBPort:             cfg.DBPort,
 		DBAddress:          cfg.DBAddress,
 		ClickHouseUsername: cfg.ClickHouseUsername,
 		ClickHousePassword: cfg.ClickHousePassword,

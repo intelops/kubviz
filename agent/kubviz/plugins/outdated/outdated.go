@@ -70,8 +70,8 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 
 	metrics := out
 	metrics.ClusterName = ClusterName
-	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.EventSubject_outdated_images, metricsJson)
+	metricsJSON, _ := json.Marshal(metrics)
+	_, err := js.Publish(constants.EventSubject_outdated_images, metricsJSON)
 	if err != nil {
 		return err
 	}

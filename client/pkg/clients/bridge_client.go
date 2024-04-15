@@ -41,7 +41,7 @@ const (
 func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 	log.Printf("Creating nats consumer %s with subject: %s \n", bridgeConsumer, bridgeSubject)
 
-	ctx:=context.Background()
+	ctx := context.Background()
 	tracer := otel.Tracer("git-client")
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "SubscribeGitBridgeNats")
 	span.SetAttributes(attribute.String("git-subscribe", "Subscribe"))

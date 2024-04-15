@@ -29,12 +29,12 @@ func PublishTrivySbomReport(report map[string]interface{}, js nats.JetStreamCont
 		ClusterName: ClusterName,
 		Report:      report,
 	}
-	metricsJson, err := json.Marshal(metrics)
+	metricsJSON, err := json.Marshal(metrics)
 	if err != nil {
-		log.Println("error occurred while marshalling sbom metrics in agent", err.Error())
+		log.Println("error occured while marshalling sbom metrics in agent", err.Error())
 		return err
 	}
-	_, err = js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
+	_, err = js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJSON)
 	if err != nil {
 		return err
 	}
