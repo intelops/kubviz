@@ -43,7 +43,7 @@ func ReadMtlsCerts(certificateFilePath, keyFilePath, CAFilePath string) (certPEM
 func OpenMtlsCertFile(filepath string) (f *os.File, err error) {
 	f, err = os.Open(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to open mtls certificate file: %w", err)
+		return nil, fmt.Errorf("failed to open mtls certificate file: %w", err)
 	}
 	return f, nil
 }
@@ -58,7 +58,7 @@ func ReadMtlsFileContents(filePath string) ([]byte, error) {
 
 	contents, err := io.ReadAll(file)
 	if err != nil {
-		return nil, fmt.Errorf("Error while reading file %s:%w", filePath, err)
+		return nil, fmt.Errorf("error while reading file %s:%w", filePath, err)
 	}
 
 	return contents, nil
@@ -70,19 +70,19 @@ func GetTlsConfig() (*tls.Config, error) {
 	err := envconfig.Process("", &cfg)
 
 	if err != nil {
-		return nil, fmt.Errorf("Unable to read mtls config %w", err)
+		return nil, fmt.Errorf("unable to read mtls config %w", err)
 
 	}
 
 	certPEM, keyPEM, CACertPEM, err := ReadMtlsCerts(cfg.CertificateFilePath, cfg.KeyFilePath, cfg.CAFilePath)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to read mtls certificates %w", err)
+		return nil, fmt.Errorf("unable to read mtls certificates %w", err)
 
 	}
 
 	cert, err := tls.X509KeyPair(certPEM, keyPEM)
 	if err != nil {
-		return nil, fmt.Errorf("Error loading X509 key pair from PEM: %w", err)
+		return nil, fmt.Errorf("error loading X509 key pair from PEM: %w", err)
 	}
 
 	caCertPool := x509.NewCertPool()
