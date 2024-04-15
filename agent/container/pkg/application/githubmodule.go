@@ -123,7 +123,7 @@ func (c *GithubApiClient) FetchVersions(packageName string) ([]Version, error) {
 	var versions []Version
 	err = json.Unmarshal(body, &versions)
 	if err != nil {
-		return nil, fmt.Errorf("error occured while unmarshalling the version %w", err)
+		return nil, fmt.Errorf("error occurred while unmarshalling the version %w", err)
 	}
 
 	return versions, nil

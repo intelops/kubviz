@@ -583,7 +583,7 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 	}
 
 	defer stmt.Close()
-	eventJson, _ := json.Marshal(metrics.Event)
+	eventJSON, _ := json.Marshal(metrics.Event)
 	formattedFirstTimestamp := metrics.Event.FirstTimestamp.Time.UTC().Format("2006-01-02 15:04:05")
 	formattedLastTimestamp := metrics.Event.LastTimestamp.Time.UTC().Format("2006-01-02 15:04:05")
 
@@ -598,7 +598,7 @@ func (c *DBClient) InsertKubvizEvent(metrics model.Metrics) {
 		metrics.Event.Message,
 		metrics.Event.Reason,
 		metrics.Event.Source.Host,
-		string(eventJson),
+		string(eventJSON),
 		metrics.ImageName,
 		formattedFirstTimestamp,
 		formattedLastTimestamp,
@@ -1018,8 +1018,8 @@ func (c *DBClient) RetrieveKubvizEvent() ([]model.DbEvent, error) {
 			log.Printf("Error: %s", err)
 			return nil, err
 		}
-		eventJson, _ := json.Marshal(dbEvent)
-		log.Printf("DB Event: %s", string(eventJson))
+		eventJSON, _ := json.Marshal(dbEvent)
+		log.Printf("DB Event: %s", string(eventJSON))
 		events = append(events, dbEvent)
 	}
 

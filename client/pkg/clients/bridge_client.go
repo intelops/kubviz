@@ -82,7 +82,7 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				var pl azuremodel.GitPushEvent
 				err := json.Unmarshal([]byte(msg.Data), &pl)
 				if err != nil {
-					log.Println("error occured while unmarshal the payload Error:", err.Error())
+					log.Println("error occurred while unmarshal the payload Error:", err.Error())
 					return
 				}
 				var gca model.GitCommonAttribute

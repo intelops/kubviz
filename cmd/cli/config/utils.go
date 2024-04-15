@@ -100,7 +100,7 @@ func (cfg *Config) Migrate() error {
 
 	conn, err := cfg.openClickHouseConn()
 	if err != nil {
-		return fmt.Errorf("unable to create a clickhouse conection %w", err)
+		return fmt.Errorf("unable to create a clickhouse connection %w", err)
 	}
 
 	driver, err := ch.WithInstance(conn, &ch.Config{})
