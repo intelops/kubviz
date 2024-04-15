@@ -42,7 +42,7 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 
 	images, err := ListImages(config)
 	if err != nil {
-		log.Println("error occured while trying to list images, error :", err.Error())
+		log.Println("error occurred while trying to list images, error :", err.Error())
 		return err
 	}
 
@@ -68,7 +68,7 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 
 		err = json.Unmarshal([]byte(jsonPart), &report)
 		if err != nil {
-			log.Printf("Error occured while Unmarshalling json for image: %v", err)
+			log.Printf("Error occurred while Unmarshalling json for image: %v", err)
 			continue // Move on to the next image in case of an error
 		}
 		// _, err = executeCommandTrivy(clearCacheCmd)
