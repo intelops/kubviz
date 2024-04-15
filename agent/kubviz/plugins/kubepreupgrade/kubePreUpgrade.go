@@ -53,13 +53,13 @@ type PreferredResource map[string]ResourceStruct
 
 var (
 	k8sVersion             = "master"
-	deletedApiReplacements = map[string]groupResourceKind{
+	deletedAPIReplacements = map[string]groupResourceKind{
 		"extensions/v1beta1/Ingress": {"networking.k8s.io/v1", "ingresses", "Ingress"},
 	}
 )
 var result *model.Result
 
-func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamContext) error {
+func publishK8sDepricatedDeletedApi(result *model.Result, js nats.JetStreamContext) error {
 	for _, deprecatedAPI := range result.DeprecatedAPIs {
 		deprecatedAPI.ClusterName = ClusterName
 		deprecatedAPIJson, _ := json.Marshal(deprecatedAPI)
@@ -109,7 +109,7 @@ func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error
 		return err
 	}
 	result = getResults(config, kubernetesAPIs)
-	err = publishK8sDepricated_Deleted_Api(result, js)
+	err = publishK8sDepricatedDeletedApi(result, js)
 	return err
 }
 
@@ -371,7 +371,7 @@ func getResults(configRest *rest.Config, kubeAPIs model.KubernetesAPIs) *model.R
 
 				gvr, list := getResources(client, groupResourceKind{resourceGroupVersion.GroupVersion, resource.Name, resource.Kind})
 
-				if newApi, ok := deletedApiReplacements[keyAPI]; ok {
+				if newApi, ok := deletedAPIReplacements[keyAPI]; ok {
 					list.Items = fixDeletedItemsList(client, list.Items, newApi)
 				}
 
