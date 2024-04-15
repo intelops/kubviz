@@ -59,7 +59,7 @@ var (
 )
 var result *model.Result
 
-func publishK8sDepricatedDeletedApi(result *model.Result, js nats.JetStreamContext) error {
+func publishK8sDepricatedDeletedAPI(result *model.Result, js nats.JetStreamContext) error {
 	for _, deprecatedAPI := range result.DeprecatedAPIs {
 		deprecatedAPI.ClusterName = ClusterName
 		deprecatedAPIJson, _ := json.Marshal(deprecatedAPI)
@@ -109,7 +109,7 @@ func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error
 		return err
 	}
 	result = getResults(config, kubernetesAPIs)
-	err = publishK8sDepricatedDeletedApi(result, js)
+	err = publishK8sDepricatedDeletedAPI(result, js)
 	return err
 }
 

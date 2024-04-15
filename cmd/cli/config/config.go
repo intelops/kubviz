@@ -5,7 +5,7 @@ import (
 )
 
 type Config struct {
-	DbPort             int    `envconfig:"DB_PORT" required:"true"`
+	DBPort             int    `envconfig:"DB_PORT" required:"true"`
 	DBAddress          string `envconfig:"DB_ADDRESS" required:"true"`
 	ClickHouseUsername string `envconfig:"CLICKHOUSE_USERNAME"`
 	ClickHousePassword string `envconfig:"CLICKHOUSE_PASSWORD"`
