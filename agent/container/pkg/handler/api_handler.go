@@ -42,7 +42,7 @@ func (ah *APIHandler) BindRequest(r *gin.Engine) {
 
 	apiGroup := r.Group("/")
 	{
-		apiGroup.GET("/api-docs", ah.GetApiDocs)
+		apiGroup.GET("/api-docs", ah.GetAPIDocs)
 		apiGroup.GET("/status", ah.GetStatus)
 		apiGroup.POST("/event/docker/hub", ah.PostEventDockerHub)
 		apiGroup.POST("/event/azure/container", ah.PostEventAzureContainer)
@@ -54,7 +54,7 @@ func (ah *APIHandler) BindRequest(r *gin.Engine) {
 // GetApiDocs serves the Swagger API documentation generated from the OpenAPI YAML file.
 // It responds with a JSON representation of the API's endpoints, parameters, responses, and other details.
 // This endpoint can be used by tools like Swagger UI to provide interactive documentation for the API.
-func (ah *APIHandler) GetApiDocs(c *gin.Context) {
+func (ah *APIHandler) GetAPIDocs(c *gin.Context) {
 	swagger, err := api.GetSwagger()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
