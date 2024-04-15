@@ -102,7 +102,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.RepoName = pl.Resource.Repository.Name
 				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertAzureDevops)
+				err = conn.InsertGitCommon(gca, dbstatement.InsertAzureDevops)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted AzureDevops metrics:", string(msg.Data))
 				log.Println()
 			case string(azuremodel.GitPullRequestMergedEventType):
@@ -121,7 +125,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.RepoName = pl.Resource.Repository.Name
 				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertAzureDevops)
+				err = conn.InsertGitCommon(gca, dbstatement.InsertAzureDevops)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted AzureDevops metrics:", string(msg.Data))
 				log.Println()
 			default:
@@ -134,7 +142,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.EventType = event
 				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertAzureDevops)
+				err := conn.InsertGitCommon(gca, dbstatement.InsertAzureDevops)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted GitHub metrics:", string(msg.Data))
 				log.Println()
 			}
@@ -168,7 +180,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.RepoName = pl.Repository.Name
 				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertGithub)
+				err = conn.InsertGitCommon(gca, dbstatement.InsertGithub)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted GitHub metrics:", string(msg.Data))
 				log.Println()
 			case string(github.PullRequestEvent):
@@ -192,7 +208,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					gca.RepoName = pl.Repository.Name
 					gca.TimeStamp = time.Now().UTC()
 					gca.Event = string(msg.Data)
-					conn.InsertGitCommon(gca, dbstatement.InsertGithub)
+					err := conn.InsertGitCommon(gca, dbstatement.InsertGithub)
+					if err != nil {
+						log.Println("error occurred while connecting the payload Error:")
+
+					}
 					log.Println("Inserted GitHub metrics:", string(msg.Data))
 					log.Println()
 				}
@@ -206,7 +226,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.EventType = event
 				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertGithub)
+				err := conn.InsertGitCommon(gca, dbstatement.InsertGithub)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted GitHub metrics:", string(msg.Data))
 				log.Println()
 			}
@@ -232,7 +256,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.RepoName = pl.Repo.Name
 				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertGitea)
+				err = conn.InsertGitCommon(gca, dbstatement.InsertGitea)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted Gitea metrics:", string(msg.Data))
 				log.Println()
 			case string(gitea.PullRequestEvent):
@@ -266,7 +294,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					}
 					gca.TimeStamp = time.Now().UTC()
 					gca.Event = string(msg.Data)
-					conn.InsertGitCommon(gca, dbstatement.InsertGitea)
+					err := conn.InsertGitCommon(gca, dbstatement.InsertGitea)
+					if err != nil {
+						log.Println("error occurred while connecting the payload Error:")
+
+					}
 					log.Println("Inserted Gitea metrics:", string(msg.Data))
 					log.Println()
 				}
@@ -279,7 +311,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.TimeStamp = time.Now().UTC()
 				gca.RepoName = ""
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertGitea)
+				err := conn.InsertGitCommon(gca, dbstatement.InsertGitea)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted Gitea metrics:", string(msg.Data))
 				log.Println()
 			}
@@ -305,7 +341,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.RepoName = pl.Project.Name
 				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
+				err = conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted Gitlab metrics:", string(msg.Data))
 				log.Println()
 			case string(gitlab.MergeRequestEvents):
@@ -325,7 +365,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 					gca.RepoName = pl.Project.Name
 					gca.TimeStamp = time.Now().UTC()
 					gca.Event = string(msg.Data)
-					conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
+					err = conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
+					if err != nil {
+						log.Println("error occurred while connecting the payload Error:")
+
+					}
 					log.Println("Inserted Gitlab metrics:", string(msg.Data))
 					log.Println()
 				}
@@ -339,7 +383,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.TimeStamp = time.Now().UTC()
 				gca.RepoName = ""
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
+				err := conn.InsertGitCommon(gca, dbstatement.InsertGitlab)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted Gitlab metrics:", string(msg.Data))
 				log.Println()
 			}
@@ -366,7 +414,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.RepoName = pl.Repository.Name
 				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
+				err = conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted BitBucket metrics:", string(msg.Data))
 				log.Println()
 			case string(bitbucket.PullRequestMergedEvent):
@@ -385,7 +437,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.RepoName = pl.Repository.Name
 				gca.TimeStamp = time.Now().UTC()
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
+				err = conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted BitBucket metrics:", string(msg.Data))
 				log.Println()
 			default:
@@ -398,7 +454,11 @@ func (n *NATSContext) SubscribeGitBridgeNats(conn clickhouse.DBInterface) {
 				gca.TimeStamp = time.Now().UTC()
 				gca.RepoName = ""
 				gca.Event = string(msg.Data)
-				conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
+				err := conn.InsertGitCommon(gca, dbstatement.InsertBitbucket)
+				if err != nil {
+					log.Println("error occurred while connecting the payload Error:")
+
+				}
 				log.Println("Inserted BitBucket metrics:", string(msg.Data))
 				log.Println()
 			}
