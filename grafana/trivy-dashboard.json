@@ -1054,8 +1054,8 @@
           "format": "table",
           "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
           "intervalFactor": 1,
-          "query": "SELECT \"cluster_name\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE $timeFilterByColumn(vul_last_modified_date)\nORDER BY vul_last_modified_date DESC",
-          "rawQuery": "SELECT \"cluster_name\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE vul_last_modified_date >= toDateTime(1693581675) AND vul_last_modified_date <= toDateTime(1694186475)\nORDER BY vul_last_modified_date DESC",
+          "query": "SELECT \"cluster_name\", \"EventTime\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
+          "rawQuery": "SELECT \"cluster_name\", \"EventTime\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE EventTime >= toDateTime(1693581675) AND EventTime <= toDateTime(1694186475)\nORDER BY EventTime DESC",
           "refId": "A",
           "round": "0s",
           "skip_comments": true
