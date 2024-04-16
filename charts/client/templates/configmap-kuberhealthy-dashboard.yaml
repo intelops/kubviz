@@ -26,7 +26,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 2,
+      "id": 41,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -75,7 +75,7 @@ data:
               "series": []
             }
           },
-          "pluginVersion": "5.3.0",
+          "pluginVersion": "6.0.0",
           "targets": [
             {
               "datasource": {
@@ -143,7 +143,7 @@ data:
               "series": []
             }
           },
-          "pluginVersion": "5.3.0",
+          "pluginVersion": "6.0.0",
           "targets": [
             {
               "datasource": {
@@ -446,8 +446,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -574,8 +573,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -677,8 +675,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -755,8 +752,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -834,8 +830,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -909,8 +904,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -984,8 +978,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1056,8 +1049,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -1131,8 +1123,7 @@ data:
                 "mode": "percentage",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "orange",
@@ -1210,7 +1201,7 @@ data:
       "timezone": "",
       "title": "KuberHealth",
       "uid": "d946c53c-8b1d-4e3c-9154-4219165342",
-      "version": 3,
+      "version": 2,
       "weekStart": ""
     }
 
