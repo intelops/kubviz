@@ -188,7 +188,7 @@ schedule:
 kuberhealthy:
   enabled: true
   pollInterval: "60m"
-  url: "http://kuberhealthy:8080"
+  url: "http://kuberhealthy:80"
   check:
     podRestarts:
       enabled: true
