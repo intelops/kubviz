@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS trivyimage (
 	vul_severity        String,
 	vul_published_date  DateTime('UTC'),
 	vul_last_modified_date DateTime('UTC'),
+	EventTime			  DateTime('UTC'),
 	ExpiryDate DateTime DEFAULT now() + INTERVAL {{.TTLValue}} {{.TTLUnit}},
 	ExportedAt DateTime DEFAULT NULL
 ) ENGINE = MergeTree()

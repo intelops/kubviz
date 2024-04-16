@@ -799,7 +799,7 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "InsertTrivyImageMetrics")
 	span.SetAttributes(attribute.String("trivy-image-client", "insert"))
 	defer span.End()
-
+	currentTime := time.Now().UTC()
 	for _, result := range metrics.Report.Results {
 		for _, vulnerability := range result.Vulnerabilities {
 			tx, err := c.conn.Begin()
@@ -830,6 +830,7 @@ func (c *DBClient) InsertTrivyImageMetrics(metrics model.TrivyImage) {
 				vulnerability.Severity,
 				vulnerability.PublishedDate,
 				vulnerability.LastModifiedDate,
+				currentTime,
 			); err != nil {
 				log.Fatal(err)
 			}
