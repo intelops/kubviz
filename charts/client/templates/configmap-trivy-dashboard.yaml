@@ -32,7 +32,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 58,
+      "id": 71,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -145,8 +145,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'LOW'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
-              "rawQuery": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE vul_last_modified_date >= toDateTime(1712241666) AND vul_last_modified_date <= toDateTime(1712328066) AND vul_severity = 'LOW'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
+              "query": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE $timeFilterByColumn(EventTime) AND vul_severity = 'LOW'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
+              "rawQuery": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE EventTime >= toDateTime(1713162544) AND EventTime <= toDateTime(1713248944) AND vul_severity = 'LOW'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -253,8 +253,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'HIGH'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
-              "rawQuery": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE vul_last_modified_date >= toDateTime(1712241678) AND vul_last_modified_date <= toDateTime(1712328078) AND vul_severity = 'HIGH'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
+              "query": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE $timeFilterByColumn(EventTime) AND vul_severity = 'HIGH'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
+              "rawQuery": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE EventTime >= toDateTime(1713162563) AND EventTime <= toDateTime(1713248963) AND vul_severity = 'HIGH'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -361,8 +361,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE $timeFilterByColumn(vul_last_modified_date) AND  vul_severity = 'MEDIUM'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
-              "rawQuery": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE vul_last_modified_date >= toDateTime(1712241603) AND vul_last_modified_date <= toDateTime(1712328003) AND  vul_severity = 'MEDIUM'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
+              "query": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE $timeFilterByColumn(EventTime) AND  vul_severity = 'MEDIUM'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
+              "rawQuery": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE EventTime >= toDateTime(1713162505) AND EventTime <= toDateTime(1713248905) AND  vul_severity = 'MEDIUM'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -469,8 +469,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'CRITICAL'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
-              "rawQuery": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE vul_last_modified_date >= toDateTime(1712241618) AND vul_last_modified_date <= toDateTime(1712328018) AND vul_severity = 'CRITICAL'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
+              "query": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE $timeFilterByColumn(EventTime) AND vul_severity = 'CRITICAL'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
+              "rawQuery": "SELECT cluster_name, artifact_name, vul_pkg_name, count(vul_severity) AS Counts\nFROM default.trivyimage\nWHERE EventTime >= toDateTime(1713162524) AND EventTime <= toDateTime(1713248924) AND vul_severity = 'CRITICAL'\nGROUP BY cluster_name, artifact_name, vul_pkg_name\nHAVING count(vul_severity) > 1\nORDER BY count(vul_severity) DESC",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -502,7 +502,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-blue"
+                    "color": "light-blue",
+                    "value": null
                   }
                 ]
               }
@@ -557,8 +558,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'LOW'",
-              "rawQuery": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE vul_last_modified_date >= toDateTime(1712241558) AND vul_last_modified_date <= toDateTime(1712327958) AND vul_severity = 'LOW'",
+              "query": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE $timeFilterByColumn(EventTime) AND vul_severity = 'LOW'",
+              "rawQuery": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE EventTime >= toDateTime(1713162449) AND EventTime <= toDateTime(1713248849) AND vul_severity = 'LOW'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -590,7 +591,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   }
                 ]
               }
@@ -645,8 +647,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'MEDIUM'",
-              "rawQuery": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE vul_last_modified_date >= toDateTime(1712241583) AND vul_last_modified_date <= toDateTime(1712327983) AND vul_severity = 'MEDIUM'",
+              "query": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE $timeFilterByColumn(EventTime) AND vul_severity = 'MEDIUM'",
+              "rawQuery": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE EventTime >= toDateTime(1713162478) AND EventTime <= toDateTime(1713248878) AND vul_severity = 'MEDIUM'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -678,7 +680,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "super-light-orange"
+                    "color": "super-light-orange",
+                    "value": null
                   }
                 ]
               }
@@ -733,8 +736,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'HIGH'",
-              "rawQuery": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE vul_last_modified_date >= toDateTime(1712241526) AND vul_last_modified_date <= toDateTime(1712327926) AND vul_severity = 'HIGH'",
+              "query": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE $timeFilterByColumn(EventTime) AND vul_severity = 'HIGH'",
+              "rawQuery": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE EventTime >= toDateTime(1713162400) AND EventTime <= toDateTime(1713248800) AND vul_severity = 'HIGH'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -766,7 +769,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red"
+                    "color": "red",
+                    "value": null
                   }
                 ]
               }
@@ -821,8 +825,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE $timeFilterByColumn(vul_last_modified_date) AND vul_severity = 'CRITICAL'",
-              "rawQuery": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE vul_last_modified_date >= toDateTime(1712241543) AND vul_last_modified_date <= toDateTime(1712327943) AND vul_severity = 'CRITICAL'",
+              "query": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE $timeFilterByColumn(EventTime) AND vul_severity = 'CRITICAL'",
+              "rawQuery": "SELECT cluster_name, artifact_name AS image_name, vul_id, vul_pkg_name, vul_severity\nFROM default.trivyimage\nWHERE EventTime >= toDateTime(1713162429) AND EventTime <= toDateTime(1713248829) AND vul_severity = 'CRITICAL'",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -854,7 +858,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -892,12 +897,13 @@ data:
                 "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
+              "editorMode": "builder",
               "extrapolate": true,
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT image_name, package_name, count(*) AS duplicates\nFROM default.trivysbom\nGROUP BY image_name,package_name\nHAVING count(*) > 1",
-              "rawQuery": "SELECT image_name, package_name, count(*) AS duplicates\nFROM default.trivysbom\nGROUP BY image_name,package_name\nHAVING count(*) > 1",
+              "query": "SELECT image_name, package_url, count(*) AS duplicates\nFROM default.trivysbom\nWHERE $timeFilterByColumn(event_time)\nGROUP BY image_name,package_url\nHAVING count(*) > 1\n",
+              "rawQuery": "SELECT image_name, package_url, count(*) AS duplicates\nFROM default.trivysbom\nWHERE event_time >= toDateTime(1713162318) AND event_time <= toDateTime(1713248718)\nGROUP BY image_name,package_url\nHAVING count(*) > 1",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -926,7 +932,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -985,8 +992,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT vul_id, count(artifact_name) AS images\nFROM default.trivyimage\nWHERE $timeFilterByColumn(vul_last_modified_date)\nGROUP BY vul_id",
-              "rawQuery": "SELECT vul_id, count(artifact_name) AS images\nFROM default.trivyimage\nWHERE vul_last_modified_date >= toDateTime(1712241498) AND vul_last_modified_date <= toDateTime(1712327898)\nGROUP BY vul_id",
+              "query": "SELECT vul_id, count(artifact_name) AS images\nFROM default.trivyimage\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY vul_id",
+              "rawQuery": "SELECT vul_id, count(artifact_name) AS images\nFROM default.trivyimage\nWHERE EventTime >= toDateTime(1713162358) AND EventTime <= toDateTime(1713248758)\nGROUP BY vul_id",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
@@ -1019,7 +1026,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   }
                 ]
               }
@@ -1057,9 +1065,8 @@ data:
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT \"cluster_name\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE $timeFilterByColumn(vul_last_modified_date)\nORDER BY vul_last_modified_date DESC",
-              "rawQuery": "SELECT \"cluster_name\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE vul_last_modified_date >= toDateTime(1693581675) AND vul_last_modified_date <= toDateTime(1694186475)\nORDER BY vul_last_modified_date DESC",
-              "refId": "A",
+              "query": "SELECT \"cluster_name\", \"EventTime\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
+          "rawQuery": "SELECT \"cluster_name\", \"EventTime\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE EventTime >= toDateTime(1693581675) AND EventTime <= toDateTime(1694186475)\nORDER BY EventTime DESC",
               "round": "0s",
               "skip_comments": true
             }
@@ -1091,7 +1098,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   }
                 ]
               }
@@ -1125,12 +1133,13 @@ data:
                 "uid": "{{ .Values.datasources.uid }}"
               },
               "dateTimeType": "DATETIME",
+              "editorMode": "builder",
               "extrapolate": true,
               "format": "table",
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
-              "query": "SELECT * FROM default.trivysbom",
-              "rawQuery": "SELECT * FROM default.trivysbom",
+              "query": "SELECT * FROM default.trivysbom\nWHERE $timeFilterByColumn(event_time)",
+              "rawQuery": "SELECT * FROM default.trivysbom\nWHERE event_time >= toDateTime(1713162248) AND event_time <= toDateTime(1713248648)",
               "refId": "A",
               "round": "0s",
               "skip_comments": true
