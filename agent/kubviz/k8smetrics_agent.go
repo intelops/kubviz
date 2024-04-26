@@ -77,30 +77,30 @@ func main() {
 		clientset *kubernetes.Clientset
 	)
 
-	var mtlsConfig mtlsnats.MtlsConfig
+	//var mtlsConfig mtlsnats.MtlsConfig
 	var nc *nats.Conn
 
-	if mtlsConfig.IsEnabled {
-		tlsConfig, err := mtlsnats.GetTlsConfig()
-		if err != nil {
-			log.Println("Error while getting TLS config:", err)
-			//return nil, err
-		}
-
-		nc, err = nats.Connect(natsurl,
-			nats.Name("Github metrics"),
+	//if mtlsConfig.IsEnabled {
+	tlsConfig, err := mtlsnats.GetTlsConfig()
+	if err != nil {
+		log.Println("error while getting tls config ", err)
+		time.Sleep(time.Minute * 30)
+	} else {
+		nc, err = nats.Connect(
+			natsurl,
+			nats.Name("K8s Metrics"),
+			//nats.Token(token),
 			nats.Secure(tlsConfig),
 		)
 		if err != nil {
-			log.Fatal("Error while connecting with mTLS:", err)
-		}
-	} else {
-		nc, err = nats.Connect(natsurl, nats.Name("Github metrics"), nats.Token(token))
-		if err != nil {
-			log.Println("Error while connecting with token:", err)
-			//return nil, err
+			log.Fatal("error while connecting with mtls ", err)
 		}
 	}
+
+	// if nc == nil {
+	// 	nc, err = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
+	// 	events.CheckErr(err)
+	// }
 	js, err := nc.JetStream()
 	events.CheckErr(err)
 	err = events.CreateStream(js)
