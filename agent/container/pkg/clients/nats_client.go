@@ -59,11 +59,11 @@ func NewNATSContext(conf *config.Config) (*NATSContext, error) {
 		} else {
 			conn, err = nats.Connect(conf.NatsAddress,
 				nats.Name("Github metrics"),
-				nats.Token(conf.NatsToken),
+				//nats.Token(conf.NatsToken),
 				nats.Secure(tlsConfig),
 			)
 			if err != nil {
-				log.Println("error while connecting with mtls ", err)
+				log.Fatal("error while connecting with mtls ", err)
 			}
 		}
 

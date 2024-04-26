@@ -89,11 +89,11 @@ func main() {
 			nc, err = nats.Connect(
 				natsurl,
 				nats.Name("K8s Metrics"),
-				nats.Token(token),
+				//nats.Token(token),
 				nats.Secure(tlsConfig),
 			)
 			if err != nil {
-				log.Println("error while connecting with mtls ", err)
+				log.Fatal("error while connecting with mtls ", err)
 			}
 		}
 
