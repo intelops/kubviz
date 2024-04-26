@@ -83,25 +83,23 @@ func main() {
 	if mtlsConfig.IsEnabled {
 		tlsConfig, err := mtlsnats.GetTlsConfig()
 		if err != nil {
-			log.Println("error while getting tls config ", err)
-			time.Sleep(time.Minute * 30)
-		} else {
-			nc, err = nats.Connect(
-				natsurl,
-				nats.Name("K8s Metrics"),
-				//nats.Token(token),
-				nats.Secure(tlsConfig),
-			)
-			if err != nil {
-				log.Fatal("error while connecting with mtls ", err)
-			}
+			log.Println("Error while getting TLS config:", err)
+			//return nil, err
 		}
 
-	}
-
-	if nc == nil {
-		nc, err = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
-		events.CheckErr(err)
+		nc, err = nats.Connect(natsurl,
+			nats.Name("Github metrics"),
+			nats.Secure(tlsConfig),
+		)
+		if err != nil {
+			log.Fatal("Error while connecting with mTLS:", err)
+		}
+	} else {
+		nc, err = nats.Connect(natsurl, nats.Name("Github metrics"), nats.Token(token))
+		if err != nil {
+			log.Println("Error while connecting with token:", err)
+			//return nil, err
+		}
 	}
 	js, err := nc.JetStream()
 	events.CheckErr(err)
