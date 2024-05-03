@@ -32,7 +32,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 71,
+      "id": 66,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -50,7 +50,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -62,6 +62,7 @@ data:
                 "cellOptions": {
                   "type": "auto"
                 },
+                "filterable": true,
                 "inspect": false
               },
               "mappings": [],
@@ -137,7 +138,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -158,7 +159,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -170,6 +171,7 @@ data:
                 "cellOptions": {
                   "type": "auto"
                 },
+                "filterable": true,
                 "inspect": false
               },
               "mappings": [],
@@ -245,7 +247,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -266,7 +268,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -278,6 +280,7 @@ data:
                 "cellOptions": {
                   "type": "auto"
                 },
+                "filterable": true,
                 "inspect": false
               },
               "mappings": [],
@@ -353,7 +356,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -374,7 +377,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -386,6 +389,7 @@ data:
                 "cellOptions": {
                   "type": "auto"
                 },
+                "filterable": true,
                 "inspect": false
               },
               "mappings": [],
@@ -461,7 +465,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -482,7 +486,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -550,7 +554,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -571,7 +575,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -639,7 +643,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -660,7 +664,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -728,7 +732,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -749,7 +753,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -817,7 +821,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -838,7 +842,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -858,8 +862,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -894,7 +897,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -915,7 +918,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -932,8 +935,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -984,7 +986,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -1005,7 +1007,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -1026,8 +1028,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               }
@@ -1058,7 +1059,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "extrapolate": true,
@@ -1066,7 +1067,8 @@ data:
               "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
               "intervalFactor": 1,
               "query": "SELECT \"cluster_name\", \"EventTime\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE $timeFilterByColumn(EventTime)\nORDER BY EventTime DESC",
-          "rawQuery": "SELECT \"cluster_name\", \"EventTime\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE EventTime >= toDateTime(1693581675) AND EventTime <= toDateTime(1694186475)\nORDER BY EventTime DESC",
+              "rawQuery": "SELECT \"cluster_name\", \"EventTime\", \"artifact_name\", \"vul_id\", \"vul_pkg_id\", \"vul_pkg_name\", \"vul_installed_version\", \"vul_fixed_version\", \"vul_title\", \"vul_severity\", \"vul_published_date\", \"vul_last_modified_date\" \nFROM \"default\".\"trivyimage\"\nWHERE EventTime >= toDateTime(1693581675) AND EventTime <= toDateTime(1694186475)\nORDER BY EventTime DESC",
+              "refId": "A",
               "round": "0s",
               "skip_comments": true
             }
@@ -1077,7 +1079,7 @@ data:
         {
           "datasource": {
             "type": "vertamedia-clickhouse-datasource",
-            "uid": "{{ .Values.datasources.uid }}"
+            "uid": "vertamedia-clickhouse-datasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -1098,8 +1100,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               }
@@ -1130,7 +1131,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "dateTimeType": "DATETIME",
               "editorMode": "builder",
@@ -1161,13 +1162,13 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "gridPos": {
                 "h": 8,
                 "w": 12,
                 "x": 0,
-                "y": 97
+                "y": 58
               },
               "id": 36,
               "options": {
@@ -1179,11 +1180,12 @@ data:
                   "format": "auto",
                   "height": 600
                 },
+                "editorMode": "code",
                 "gaode": {
                   "key": "",
                   "plugin": "AMap.Scale,AMap.ToolBar"
                 },
-                "getOption": "let severity = [];\nlet counts = [];\n\ndata.series.map((s) => {\n  severity = s.fields.find((f) => f.name === 'vul_severity').values;\n  counts = s.fields.find((f) => f.name === 'total_count').values;\n});\n\n// Create an empty array to store pie chart data\nconst pieChartData = [];\n\n// Define colors for pie slices\nconst pieSliceColors = ['#235894', '#FF0000', '#00FF00', '#FFFF00', '#FFA500'];\n\n// Map severity and counts to pie chart data\nseverity.forEach((sev, index) => {\n  pieChartData.push({\n    value: counts[index],\n    name: sev,\n    itemStyle: {\n      opacity: 0.7,\n      color: pieSliceColors[index % pieSliceColors.length],\n      borderWidth: 3,\n      borderColor: '#FFFFFF', // Set the border color to white\n    },\n  });\n});\n\nreturn {\n  backgroundColor: '#FFFFFF', // Set the background color to white\n  tooltip: {},\n  series: [\n    {\n      name: 'pie',\n      type: 'pie',\n      selectedMode: 'single',\n      selectedOffset: 30,\n      clockwise: true,\n      label: {\n        fontSize: 18,\n        color: '#235894',\n      },\n      labelLine: {\n        lineStyle: {\n          color: '#235894',\n        },\n      },\n      data: pieChartData, // Use the modified pie chart data\n      itemStyle: {\n        opacity: 0.7,\n        borderWidth: 3,\n        borderColor: '#FFFFFF', // Set the border color to white\n      },\n    },\n  ],\n};",
+                "getOption": "let severity = [];\nlet counts = [];\nlet clusterNames = [];\n\n// Extract severity, counts, and cluster names from each series\ncontext.panel.data.series.forEach((s) => {\n  const severityField = s.fields.find((f) => f.name === 'vul_severity');\n  const countsField = s.fields.find((f) => f.name === 'total_count');\n  const clusterNameField = s.fields.find((f) => f.name === 'cluster_name');\n\n  if (severityField && countsField && clusterNameField) {\n    severity.push(...severityField.values);\n    counts.push(...countsField.values);\n    clusterNames.push(...clusterNameField.values);\n  }\n});\n\n// Create an empty array to store pie chart data\nconst pieChartData = [];\n\n// Define colors for pie slices\nconst pieSliceColors = ['#235894', '#FF0000', '#00FF00', '#FFFF00', '#FFA500'];\n\n// Map severity, counts, and cluster names to pie chart data\nseverity.forEach((sev, index) => {\n  pieChartData.push({\n    value: counts[index],\n    name: sev,\n    clusterName: clusterNames[index], // Add cluster name\n    itemStyle: {\n      opacity: 0.7,\n      color: pieSliceColors[index % pieSliceColors.length],\n      borderWidth: 3,\n      borderColor: '#FFFFFF', // Set the border color to white\n    },\n  });\n});\n\n// Return the ECharts options object\nreturn {\n  backgroundColor: '#FFFFFF', // Set the background color to white\n  tooltip: {\n    trigger: 'item',\n    formatter: function (params) {\n      return `Severity: ${params.data.name}<br/>Cluster Name: ${params.data.clusterName}<br/>Count: ${params.data.value}`;\n    },\n  },\n  series: [\n    {\n      name: 'pie',\n      type: 'pie',\n      selectedMode: 'single',\n      selectedOffset: 30,\n      clockwise: true,\n      label: {\n        fontSize: 18,\n        color: '#235894',\n      },\n      labelLine: {\n        lineStyle: {\n          color: '#235894',\n        },\n      },\n      data: pieChartData, // Use the modified pie chart data\n      itemStyle: {\n        opacity: 0.7,\n        borderWidth: 3,\n        borderColor: '#FFFFFF', // Set the border color to white\n      },\n    },\n  ],\n};\n",
                 "google": {
                   "callback": "gmapReady",
                   "key": ""
@@ -1194,21 +1196,28 @@ data:
                   "config": "{}",
                   "height": 400,
                   "name": "default"
+                },
+                "visualEditor": {
+                  "code": "return {\n  dataset: context.editor.dataset,\n  series: context.editor.series,\n  xAxis: {\n    type: 'time',\n  },\n  yAxis: {\n    type: 'value',\n    min: 'dataMin',\n  },\n}\n",
+                  "dataset": [],
+                  "series": []
                 }
               },
+              "pluginVersion": "6.0.0",
               "targets": [
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
+                  "editorMode": "builder",
                   "extrapolate": true,
                   "format": "table",
                   "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
                   "intervalFactor": 1,
-                  "query": "SELECT vul_severity, count(*) AS total_count\nFROM default.trivy_vul\nWHERE $timeFilterByColumn(vul_last_modified_date)\nGROUP BY vul_severity",
-                  "rawQuery": "SELECT vul_severity, count(*) AS total_count\nFROM default.trivy_vul\nWHERE vul_last_modified_date >= toDateTime(1694438766) AND vul_last_modified_date <= toDateTime(1694611566)\nGROUP BY vul_severity",
+                  "query": "SELECT cluster_name, vul_severity, count(*) AS total_count\nFROM default.trivy_vul\nWHERE $timeFilterByColumn(vul_last_modified_date)\nGROUP BY cluster_name, vul_severity",
+                  "rawQuery": "SELECT cluster_name, vul_severity, count(*) AS total_count\nFROM default.trivy_vul\nWHERE vul_last_modified_date >= toDateTime(1714632860) AND vul_last_modified_date <= toDateTime(1714719260)\nGROUP BY cluster_name, vul_severity",
                   "refId": "A",
                   "round": "0s",
                   "skip_comments": true
@@ -1220,13 +1229,13 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "gridPos": {
                 "h": 8,
                 "w": 12,
                 "x": 12,
-                "y": 97
+                "y": 58
               },
               "id": 37,
               "options": {
@@ -1238,11 +1247,12 @@ data:
                   "format": "auto",
                   "height": 600
                 },
+                "editorMode": "code",
                 "gaode": {
                   "key": "",
                   "plugin": "AMap.Scale,AMap.ToolBar"
                 },
-                "getOption": "let severity = [];\nlet counts = [];\n\ndata.series.map((s) => {\n  severity = s.fields.find((f) => f.name === 'misconfig_severity').values;\n  counts = s.fields.find((f) => f.name === 'total_count').values;\n});\n\n// Create an empty array to store pie chart data\nconst pieChartData = [];\n\n// Define colors for pie slices\nconst pieSliceColors = ['#235894', '#FF0000', '#00FF00', '#FFFF00', '#FFA500'];\n\n// Map severity and counts to pie chart data\nseverity.forEach((sev, index) => {\n  pieChartData.push({\n    value: counts[index],\n    name: sev,\n    itemStyle: {\n      opacity: 0.7,\n      color: pieSliceColors[index % pieSliceColors.length],\n      borderWidth: 3,\n      borderColor: '#FFFFFF', // Set the border color to white\n    },\n  });\n});\n\nreturn {\n  backgroundColor: '#FFFFFF', // Set the background color to white\n  tooltip: {},\n  series: [\n    {\n      name: 'pie',\n      type: 'pie',\n      selectedMode: 'single',\n      selectedOffset: 30,\n      clockwise: true,\n      label: {\n        fontSize: 18,\n        color: '#235894',\n      },\n      labelLine: {\n        lineStyle: {\n          color: '#235894',\n        },\n      },\n      data: pieChartData, // Use the modified pie chart data\n      itemStyle: {\n        opacity: 0.7,\n        borderWidth: 3,\n        borderColor: '#FFFFFF', // Set the border color to white\n      },\n    },\n  ],\n};",
+                "getOption": "let severity = [];\nlet counts = [];\nlet clusterNames = [];\n\n// Extract severity, counts, and cluster names from each series\ncontext.panel.data.series.forEach((s) => {\n  const severityField = s.fields.find((f) => f.name === 'misconfig_severity');\n  const countsField = s.fields.find((f) => f.name === 'total_count');\n  const clusterNameField = s.fields.find((f) => f.name === 'cluster_name');\n\n  if (severityField && countsField && clusterNameField) {\n    severity.push(...severityField.values);\n    counts.push(...countsField.values);\n    clusterNames.push(...clusterNameField.values);\n  }\n});\n\n// Create an empty array to store pie chart data\nconst pieChartData = [];\n\n// Define colors for pie slices\nconst pieSliceColors = ['#235894', '#FF0000', '#00FF00', '#FFFF00', '#FFA500'];\n\n// Map severity, counts, and cluster names to pie chart data\nseverity.forEach((sev, index) => {\n  pieChartData.push({\n    value: counts[index],\n    name: sev,\n    clusterName: clusterNames[index], // Add cluster name\n    itemStyle: {\n      opacity: 0.7,\n      color: pieSliceColors[index % pieSliceColors.length],\n      borderWidth: 3,\n      borderColor: '#FFFFFF', // Set the border color to white\n    },\n  });\n});\n\n// Return the ECharts options object\nreturn {\n  backgroundColor: '#FFFFFF', // Set the background color to white\n  tooltip: {\n    trigger: 'item',\n    formatter: function (params) {\n      return `Severity: ${params.data.name}<br/>Cluster Name: ${params.data.clusterName}<br/>Count: ${params.data.value}`;\n    },\n  },\n  series: [\n    {\n      name: 'pie',\n      type: 'pie',\n      selectedMode: 'single',\n      selectedOffset: 30,\n      clockwise: true,\n      label: {\n        fontSize: 18,\n        color: '#235894',\n      },\n      labelLine: {\n        lineStyle: {\n          color: '#235894',\n        },\n      },\n      data: pieChartData, // Use the modified pie chart data\n      itemStyle: {\n        opacity: 0.7,\n        borderWidth: 3,\n        borderColor: '#FFFFFF', // Set the border color to white\n      },\n    },\n  ],\n};\n",
                 "google": {
                   "callback": "gmapReady",
                   "key": ""
@@ -1253,21 +1263,28 @@ data:
                   "config": "{}",
                   "height": 400,
                   "name": "default"
+                },
+                "visualEditor": {
+                  "code": "return {\n  dataset: context.editor.dataset,\n  series: context.editor.series,\n  xAxis: {\n    type: 'time',\n  },\n  yAxis: {\n    type: 'value',\n    min: 'dataMin',\n  },\n}\n",
+                  "dataset": [],
+                  "series": []
                 }
               },
+              "pluginVersion": "6.0.0",
               "targets": [
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
+                  "editorMode": "builder",
                   "extrapolate": true,
                   "format": "table",
                   "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
                   "intervalFactor": 1,
-                  "query": "SELECT misconfig_severity, count(*) AS total_count\nFROM default.trivy_misconfig\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY misconfig_severity",
-                  "rawQuery": "SELECT misconfig_severity, count(*) AS total_count\nFROM default.trivy_misconfig\nWHERE EventTime >= toDateTime(1694438912) AND EventTime <= toDateTime(1694611712)\nGROUP BY misconfig_severity",
+                  "query": "SELECT cluster_name, misconfig_severity, count(*) AS total_count\nFROM default.trivy_misconfig\nWHERE $timeFilterByColumn(EventTime)\nGROUP BY cluster_name, misconfig_severity",
+                  "rawQuery": "SELECT cluster_name, misconfig_severity, count(*) AS total_count\nFROM default.trivy_misconfig\nWHERE EventTime >= toDateTime(1714632780) AND EventTime <= toDateTime(1714719180)\nGROUP BY cluster_name, misconfig_severity",
                   "refId": "A",
                   "round": "0s",
                   "skip_comments": true
@@ -1279,7 +1296,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel illustrates the distribution of vulnerability severities across different clusters. It provides an overview of the count of vulnerabilities categorized by severity levels within each cluster.",
               "fieldConfig": {
@@ -1308,7 +1325,7 @@ data:
                 "h": 8,
                 "w": 12,
                 "x": 0,
-                "y": 105
+                "y": 66
               },
               "id": 20,
               "options": {
@@ -1329,7 +1346,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1349,7 +1366,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel illustrates the distribution of misconfiguration severities across different clusters. It provides an overview of the count of misconfigurations categorized by severity levels within each cluster. ",
               "fieldConfig": {
@@ -1378,7 +1395,7 @@ data:
                 "h": 8,
                 "w": 12,
                 "x": 12,
-                "y": 105
+                "y": 66
               },
               "id": 22,
               "options": {
@@ -1399,7 +1416,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1419,7 +1436,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel displays the total number Vulnerabilities under each namespace",
               "fieldConfig": {
@@ -1449,7 +1466,7 @@ data:
                 "h": 5,
                 "w": 12,
                 "x": 0,
-                "y": 113
+                "y": 74
               },
               "id": 18,
               "options": {
@@ -1467,7 +1484,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1487,7 +1504,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel displays the total of misconfigurations from each clusters.",
               "fieldConfig": {
@@ -1517,7 +1534,7 @@ data:
                 "h": 5,
                 "w": 12,
                 "x": 12,
-                "y": 113
+                "y": 74
               },
               "id": 16,
               "options": {
@@ -1535,7 +1552,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1555,7 +1572,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel provides a count of high vulnerabilities categorized by namespace. It helps to monitor and prioritize high security issues across different namespaces.",
               "fieldConfig": {
@@ -1584,7 +1601,7 @@ data:
                 "h": 7,
                 "w": 12,
                 "x": 0,
-                "y": 118
+                "y": 79
               },
               "id": 29,
               "options": {
@@ -1605,7 +1622,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1625,7 +1642,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel provides a count of high misconfigurations categorized by namespace. It helps to monitor and prioritize high security issues across different namespaces.",
               "fieldConfig": {
@@ -1654,7 +1671,7 @@ data:
                 "h": 7,
                 "w": 12,
                 "x": 12,
-                "y": 118
+                "y": 79
               },
               "id": 30,
               "options": {
@@ -1675,7 +1692,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1695,7 +1712,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel provides a count of Low vulnerabilities categorized by namespace. It helps to monitor and prioritize Low security issues across different namespaces.",
               "fieldConfig": {
@@ -1724,7 +1741,7 @@ data:
                 "h": 7,
                 "w": 12,
                 "x": 0,
-                "y": 125
+                "y": 86
               },
               "id": 27,
               "options": {
@@ -1745,7 +1762,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1765,7 +1782,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel provides a count of low misconfigurations categorized by namespace. It helps to monitor and prioritize low security issues across different namespaces.",
               "fieldConfig": {
@@ -1794,7 +1811,7 @@ data:
                 "h": 7,
                 "w": 12,
                 "x": 12,
-                "y": 125
+                "y": 86
               },
               "id": 28,
               "options": {
@@ -1815,7 +1832,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1835,7 +1852,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel provides a count of Medium vulnerabilities categorized by namespace. It helps to monitor and prioritize Medium security issues across different namespaces.",
               "fieldConfig": {
@@ -1864,7 +1881,7 @@ data:
                 "h": 7,
                 "w": 12,
                 "x": 0,
-                "y": 132
+                "y": 93
               },
               "id": 25,
               "options": {
@@ -1885,7 +1902,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1905,7 +1922,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel provides a count of medium misconfigurations categorized by namespace. It helps to monitor and prioritize medium security issues across different namespaces.",
               "fieldConfig": {
@@ -1934,7 +1951,7 @@ data:
                 "h": 7,
                 "w": 12,
                 "x": 12,
-                "y": 132
+                "y": 93
               },
               "id": 26,
               "options": {
@@ -1955,7 +1972,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -1975,7 +1992,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel provides a count of critical vulnerabilities categorized by namespace. It helps to monitor and prioritize critical security issues across different namespaces.",
               "fieldConfig": {
@@ -2004,7 +2021,7 @@ data:
                 "h": 7,
                 "w": 12,
                 "x": 0,
-                "y": 139
+                "y": 100
               },
               "id": 12,
               "options": {
@@ -2025,7 +2042,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -2045,7 +2062,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel provides a count of critical misconfigurations categorized by namespace. It helps to monitor and prioritize critical security issues across different namespaces.",
               "fieldConfig": {
@@ -2074,7 +2091,7 @@ data:
                 "h": 7,
                 "w": 12,
                 "x": 12,
-                "y": 139
+                "y": 100
               },
               "id": 14,
               "options": {
@@ -2095,7 +2112,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -2116,7 +2133,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel displays the count of vulnerabilities in different clusters and namespaces.",
               "fieldConfig": {
@@ -2145,7 +2162,7 @@ data:
                 "h": 8,
                 "w": 12,
                 "x": 0,
-                "y": 146
+                "y": 107
               },
               "id": 6,
               "options": {
@@ -2166,7 +2183,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -2186,7 +2203,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "description": "This panel displays the count of Misconfigurations in different clusters and namespaces.",
               "fieldConfig": {
@@ -2215,7 +2232,7 @@ data:
                 "h": 8,
                 "w": 12,
                 "x": 12,
-                "y": 146
+                "y": 107
               },
               "id": 4,
               "options": {
@@ -2236,7 +2253,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -2256,7 +2273,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2288,7 +2305,7 @@ data:
                 "h": 8,
                 "w": 24,
                 "x": 0,
-                "y": 154
+                "y": 115
               },
               "id": 32,
               "options": {
@@ -2308,7 +2325,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -2328,7 +2345,7 @@ data:
             {
               "datasource": {
                 "type": "vertamedia-clickhouse-datasource",
-                "uid": "{{ .Values.datasources.uid }}"
+                "uid": "vertamedia-clickhouse-datasource"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2360,7 +2377,7 @@ data:
                 "h": 8,
                 "w": 24,
                 "x": 0,
-                "y": 162
+                "y": 123
               },
               "id": 33,
               "options": {
@@ -2380,7 +2397,7 @@ data:
                 {
                   "datasource": {
                     "type": "vertamedia-clickhouse-datasource",
-                    "uid": "{{ .Values.datasources.uid }}"
+                    "uid": "vertamedia-clickhouse-datasource"
                   },
                   "dateTimeType": "DATETIME",
                   "extrapolate": true,
@@ -2417,7 +2434,7 @@ data:
       "timezone": "",
       "title": "Trivy",
       "uid": "f9b0a865-f419-410a-b7d9-9a3f79a70d48",
-      "version": 2,
+      "version": 5,
       "weekStart": ""
     }
 
