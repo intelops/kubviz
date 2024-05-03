@@ -162,3 +162,5 @@ query {
   getall_resources
   DeletedAPIs - by cluster name
   depricated - by cluster name
+
+graphql and other docker files included data
