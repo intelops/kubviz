@@ -94,14 +94,14 @@ nats:
     # secret:
     #   name: ""
     #   key: ""
-  tls:
-    secret:
-      name: 
-    ca: ""
-    cert: ""
-    key: ""
-    verify: true
-    verify_and_map: true
+  tls: {}
+    # secret:
+    #   name: 
+    # ca: ""
+    # cert: ""
+    # key: ""
+    # verify: true
+    # verify_and_map: true
 
   nats:
     jetstream:
