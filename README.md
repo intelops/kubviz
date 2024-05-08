@@ -336,7 +336,7 @@ Use KubViz to monitor your cluster events, including:
 <br clear="all">
 
 ### SBOM
-
+###############
 <img src=".readme_assets/sbom.jpeg" alt="sbom" width="525" align="right">
 
 <br>
