@@ -29,6 +29,175 @@ type Resource struct {
 	ClusterName string `json:"clusterName"`
 }
 
+func TestPublishAllResources(t *testing.T) {
+	mockResource := model.Resource{
+		Resource:    "test-resource",
+		Kind:        "test-kind",
+		Namespace:   "test-namespace",
+		Age:         "test-age",
+		ClusterName: "test-cluster",
+	}
+	tests := []struct {
+		name     string
+		resource model.Resource
+	}{
+		{"success", mockResource},
+		{"error", model.Resource{}},
+	}
+	for _, tt := range tests {
+		mockJS := &MockJetStreamContext{}
+
+		mockPublish := gomonkey.ApplyMethod(
+			reflect.TypeOf(mockJS),
+			"Publish",
+			func(*MockJetStreamContext, string, []byte, ...nats.PubOpt) (*nats.PubAck, error) {
+				if tt.name == "error" {
+					return nil, errors.New("Error in publish")
+				}
+				return nil, nil
+			},
+		)
+		defer mockPublish.Reset()
+
+		t.Run(tt.name, func(t *testing.T) {
+
+			err := PublishAllResources(tt.resource, mockJS)
+			if tt.name == "error" {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestGetAllResources(t *testing.T) {
+	cases := []struct {
+		name                   string
+		isNameSpaceEmpty       bool
+		wantErr                bool
+		PublishAllResourcesErr bool
+	}{
+		{"success with namespace", false, false, false},
+		{"success without namespace", true, false, false},
+		{"error in NewForConfig", false, true, false},
+	}
+
+	for _, tt := range cases {
+		mockConfig := &rest.Config{}
+		mockJS := &MockJetStreamContext{}
+		mockDC := &discovery.DiscoveryClient{}
+		mockGroupVersionResource := schema.GroupVersionResource{
+			Group:    "group",
+			Version:  "version",
+			Resource: "resource",
+		}
+		mockgvrs := make(map[schema.GroupVersionResource]struct{})
+		mockgvrs[mockGroupVersionResource] = struct{}{}
+		mockList := &unstructured.UnstructuredList{
+			Items: []unstructured.Unstructured{
+				{
+					Object: map[string]interface{}{
+						"apiVersion": "group/version",
+						"kind":       "resource",
+					},
+				},
+			},
+		}
+		mockDyC := &dynamic.DynamicClient{}
+		mockNamespace := &MockNamespaceableResourceInterface{}
+		mockResourceInterface := &MockResourceInterface{}
+
+		patchNewDiscovery := gomonkey.ApplyFunc(
+			discovery.NewDiscoveryClientForConfigOrDie,
+			func(*rest.Config) *discovery.DiscoveryClient {
+				return mockDC
+			},
+		)
+		defer patchNewDiscovery.Reset()
+
+		if tt.wantErr {
+			patchNewDynamic := gomonkey.ApplyFunc(
+				dynamic.NewForConfig,
+				func(*rest.Config) (*dynamic.DynamicClient, error) {
+					return nil, errors.New("new dynamic client error")
+				},
+			)
+			defer patchNewDynamic.Reset()
+		}
+
+		patchResourceLists := gomonkey.ApplyMethod(
+			reflect.TypeOf(mockDC),
+			"ServerPreferredResources",
+			func(*discovery.DiscoveryClient) ([]*metav1.APIResourceList, error) {
+				return []*metav1.APIResourceList{}, nil
+			},
+		)
+		defer patchResourceLists.Reset()
+
+		patchgvrs := gomonkey.ApplyFunc(
+			discovery.GroupVersionResources,
+			func([]*metav1.APIResourceList) (map[schema.GroupVersionResource]struct{}, error) {
+				return mockgvrs, nil
+			},
+		)
+		defer patchgvrs.Reset()
+
+		mockDynamicResourceInterface := &MockNamespaceableResourceInterface{}
+		patchResource := gomonkey.ApplyMethod(
+			reflect.TypeOf(mockDyC),
+			"Resource",
+			func(*dynamic.DynamicClient, schema.GroupVersionResource) dynamic.NamespaceableResourceInterface {
+				return mockDynamicResourceInterface
+			},
+		)
+		defer patchResource.Reset()
+
+		patchNamespace := gomonkey.ApplyMethod(
+			reflect.TypeOf(mockNamespace),
+			"Namespace",
+			func(*MockNamespaceableResourceInterface, string) dynamic.ResourceInterface {
+				return mockResourceInterface
+			},
+		)
+		defer patchNamespace.Reset()
+
+		patchList := gomonkey.ApplyMethod(
+			reflect.TypeOf(mockResourceInterface),
+			"List",
+			func(*MockResourceInterface, context.Context, metav1.ListOptions) (*unstructured.UnstructuredList, error) {
+				return mockList, nil
+			},
+		)
+		defer patchList.Reset()
+
+		mockItem := &unstructured.Unstructured{}
+		patchGetNamespace := gomonkey.ApplyMethod(
+			reflect.TypeOf(mockItem),
+			"GetNamespace",
+			func(*unstructured.Unstructured) string {
+				if tt.isNameSpaceEmpty {
+					return ""
+				}
+				return "default"
+			},
+		)
+		defer patchGetNamespace.Reset()
+
+		t.Run(tt.name, func(t *testing.T) {
+			err := GetAllResources(mockConfig, mockJS)
+			fmt.Println("Error in GetAllResources: ", err)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else if tt.isNameSpaceEmpty {
+				require.NoError(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
 type MockJetStreamContext struct{}
 
 func (m *MockJetStreamContext) AccountInfo(opts ...nats.JSOpt) (*nats.AccountInfo, error) {
@@ -262,48 +431,6 @@ func (m *MockNamespaceableResourceInterface) Namespace(s string) dynamic.Resourc
 	return &MockResourceInterface{}
 }
 
-func TestPublishAllResources(t *testing.T) {
-	mockResource := model.Resource{
-		Resource:    "test-resource",
-		Kind:        "test-kind",
-		Namespace:   "test-namespace",
-		Age:         "test-age",
-		ClusterName: "test-cluster",
-	}
-	tests := []struct {
-		name     string
-		resource model.Resource
-	}{
-		{"success", mockResource},
-		{"error", model.Resource{}},
-	}
-	for _, tt := range tests {
-		mockJS := &MockJetStreamContext{}
-
-		mockPublish := gomonkey.ApplyMethod(
-			reflect.TypeOf(mockJS),
-			"Publish",
-			func(*MockJetStreamContext, string, []byte, ...nats.PubOpt) (*nats.PubAck, error) {
-				if tt.name == "error" {
-					return nil, errors.New("Error in publish")
-				}
-				return nil, nil
-			},
-		)
-		defer mockPublish.Reset()
-
-		t.Run(tt.name, func(t *testing.T) {
-
-			err := PublishAllResources(tt.resource, mockJS)
-			if tt.name == "error" {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
 type MockDynamicResource struct {
 	FnList      func(ctx context.Context, options metav1.ListOptions) (runtime.Object, error)
 	FnApply     func(ctx context.Context, namespace string, obj *unstructured.Unstructured, options metav1.ApplyOptions, subresources ...string) (*unstructured.Unstructured, error)
@@ -375,131 +502,4 @@ func LegacyAPIPathResolverFunc(kind schema.GroupVersionKind) string {
 		return "/api"
 	}
 	return "/apis"
-}
-
-func TestGetAllResources2(t *testing.T) {
-	cases := []struct {
-		name                   string
-		isNameSpaceEmpty       bool
-		wantErr                bool
-		PublishAllResourcesErr bool
-	}{
-		{"success with namespace", false, false, false},
-		{"success without namespace", true, false, false},
-		{"error in NewForConfig", false, true, false},
-	}
-
-	for _, tt := range cases {
-		mockConfig := &rest.Config{}
-		mockJS := &MockJetStreamContext{}
-		mockDC := &discovery.DiscoveryClient{}
-		mockGroupVersionResource := schema.GroupVersionResource{
-			Group:    "group",
-			Version:  "version",
-			Resource: "resource",
-		}
-		mockgvrs := make(map[schema.GroupVersionResource]struct{})
-		mockgvrs[mockGroupVersionResource] = struct{}{}
-		mockList := &unstructured.UnstructuredList{
-			Items: []unstructured.Unstructured{
-				{
-					Object: map[string]interface{}{
-						"apiVersion": "group/version",
-						"kind":       "resource",
-					},
-				},
-			},
-		}
-		mockDyC := &dynamic.DynamicClient{}
-		mockNamespace := &MockNamespaceableResourceInterface{}
-		mockResourceInterface := &MockResourceInterface{}
-
-		patchNewDiscovery := gomonkey.ApplyFunc(
-			discovery.NewDiscoveryClientForConfigOrDie,
-			func(*rest.Config) *discovery.DiscoveryClient {
-				return mockDC
-			},
-		)
-		defer patchNewDiscovery.Reset()
-
-		if tt.wantErr {
-			patchNewDynamic := gomonkey.ApplyFunc(
-				dynamic.NewForConfig,
-				func(*rest.Config) (*dynamic.DynamicClient, error) {
-					return nil, errors.New("new dynamic client error")
-				},
-			)
-			defer patchNewDynamic.Reset()
-		}
-
-		patchResourceLists := gomonkey.ApplyMethod(
-			reflect.TypeOf(mockDC),
-			"ServerPreferredResources",
-			func(*discovery.DiscoveryClient) ([]*metav1.APIResourceList, error) {
-				return []*metav1.APIResourceList{}, nil
-			},
-		)
-		defer patchResourceLists.Reset()
-
-		patchgvrs := gomonkey.ApplyFunc(
-			discovery.GroupVersionResources,
-			func([]*metav1.APIResourceList) (map[schema.GroupVersionResource]struct{}, error) {
-				return mockgvrs, nil
-			},
-		)
-		defer patchgvrs.Reset()
-
-		mockDynamicResourceInterface := &MockNamespaceableResourceInterface{}
-		patchResource := gomonkey.ApplyMethod(
-			reflect.TypeOf(mockDyC),
-			"Resource",
-			func(*dynamic.DynamicClient, schema.GroupVersionResource) dynamic.NamespaceableResourceInterface {
-				return mockDynamicResourceInterface
-			},
-		)
-		defer patchResource.Reset()
-
-		patchNamespace := gomonkey.ApplyMethod(
-			reflect.TypeOf(mockNamespace),
-			"Namespace",
-			func(*MockNamespaceableResourceInterface, string) dynamic.ResourceInterface {
-				return mockResourceInterface
-			},
-		)
-		defer patchNamespace.Reset()
-
-		patchList := gomonkey.ApplyMethod(
-			reflect.TypeOf(mockResourceInterface),
-			"List",
-			func(*MockResourceInterface, context.Context, metav1.ListOptions) (*unstructured.UnstructuredList, error) {
-				return mockList, nil
-			},
-		)
-		defer patchList.Reset()
-
-		mockItem := &unstructured.Unstructured{}
-		patchGetNamespace := gomonkey.ApplyMethod(
-			reflect.TypeOf(mockItem),
-			"GetNamespace",
-			func(*unstructured.Unstructured) string {
-				if tt.isNameSpaceEmpty {
-					return ""
-				}
-				return "default"
-			},
-		)
-		defer patchGetNamespace.Reset()
-
-		t.Run(tt.name, func(t *testing.T) {
-			err := GetAllResources(mockConfig, mockJS)
-			fmt.Println("Error in GetAllResources: ", err)
-			if tt.wantErr {
-				require.Error(t, err)
-			} else if tt.isNameSpaceEmpty {
-				require.NoError(t, err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
 }
