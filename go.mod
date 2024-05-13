@@ -2,8 +2,6 @@ module github.com/intelops/kubviz
 
 go 1.22.0
 
-toolchain go1.22.1
-
 require (
 	bou.ke/monkey v1.0.2
 	github.com/ClickHouse/clickhouse-go/v2 v2.24.0
