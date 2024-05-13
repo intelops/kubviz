@@ -1,6 +1,6 @@
 module github.com/intelops/kubviz
 
-go 1.20
+go 1.22
 
 require (
 	bou.ke/monkey v1.0.2
@@ -11,6 +11,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/corneliusweig/tabwriter v0.0.0-20190512204542-5f8a091e83b5
 	github.com/davecgh/go-spew v1.1.1
+	github.com/docker/distribution v2.8.2+incompatible
 	github.com/docker/docker v24.0.4+incompatible
 	github.com/genuinetools/reg v0.16.1
 	github.com/getkin/kin-openapi v0.118.0
@@ -60,7 +61,6 @@ require (
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
-	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
