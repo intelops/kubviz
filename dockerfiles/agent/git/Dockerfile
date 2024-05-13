@@ -1,5 +1,5 @@
-FROM cgr.dev/chainguard/wolfi-base AS builder
-RUN apk update && apk add go-1.21
+FROM cgr.dev/chainguard/go:latest AS builder
+
 WORKDIR /
 COPY ./ ./
 
