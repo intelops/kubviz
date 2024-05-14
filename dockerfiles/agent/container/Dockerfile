@@ -6,7 +6,7 @@ COPY ./ ./
 RUN go mod download
 RUN CGO_ENABLED=0 go build -o ./build/agent agent/container/main.go
 
-FROM cgr.dev/chainguard/static:latest
+FROM scratch
 COPY --from=builder ./build/agent agent
 
 USER 65532:65532
