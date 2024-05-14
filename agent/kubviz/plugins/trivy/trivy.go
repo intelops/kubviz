@@ -14,8 +14,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
-	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 )
@@ -43,7 +43,7 @@ func executeCommandTrivy(command string) ([]byte, error) {
 
 	return outc.Bytes(), err
 }
-func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
+func RunTrivyK8sClusterScan(natsCli *sdk.NATSClient) error {
 	pvcMountPath := "/mnt/agent/kbz"
 	trivyCacheDir := fmt.Sprintf("%s/trivy-cache", pvcMountPath)
 	err := os.MkdirAll(trivyCacheDir, 0755)
@@ -87,21 +87,21 @@ func RunTrivyK8sClusterScan(js nats.JetStreamContext) error {
 	// 	log.Printf("Error executing command: %v\n", err)
 	// 	return err
 	// }
-	err = PublishTrivyK8sReport(report, js)
+	err = PublishTrivyK8sReport(report, natsCli)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func PublishTrivyK8sReport(report report.ConsolidatedReport, js nats.JetStreamContext) error {
+func PublishTrivyK8sReport(report report.ConsolidatedReport, natsCli *sdk.NATSClient) error {
 	metrics := model.Trivy{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,
 		Report:      report,
 	}
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.TRIVY_K8S_SUBJECT, metricsJson)
+	err := natsCli.Publish(constants.TRIVY_K8S_SUBJECT, metricsJson)
 	if err != nil {
 		return err
 	}

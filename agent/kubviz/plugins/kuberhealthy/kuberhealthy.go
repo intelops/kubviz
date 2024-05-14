@@ -14,7 +14,8 @@ import (
 	"github.com/intelops/kubviz/pkg/nats/sdk"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/kuberhealthy/kuberhealthy/v2/pkg/health"
-	"github.com/nats-io/nats.go"
+
+	//"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel"
 )
 
