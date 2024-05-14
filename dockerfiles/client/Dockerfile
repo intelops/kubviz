@@ -1,6 +1,6 @@
 # Build the manager binary
 FROM cgr.dev/chainguard/go:latest AS builder
-RUN apk update && apk add go-1.21
+
 WORKDIR /workspace
 # Copy the Go Modules manifests
 COPY ./ ./
