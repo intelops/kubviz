@@ -112,13 +112,13 @@ func main() {
 	}
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
-		err := outdated.OutDatedImages(config, js)
+		err := outdated.OutDatedImages(config, natsCli)
 		events.LogErr(err)
-		err = kubepreupgrade.KubePreUpgradeDetector(config, js)
+		err = kubepreupgrade.KubePreUpgradeDetector(config, natsCli)
 		events.LogErr(err)
-		err = ketall.GetAllResources(config, js)
+		err = ketall.GetAllResources(config, natsCli)
 		events.LogErr(err)
-		err = rakkess.RakeesOutput(config, js)
+		err = rakkess.RakeesOutput(config, natsCli)
 		events.LogErr(err)
 		err = trivy.RunTrivySbomScan(config, natsCli)
 		events.LogErr(err)
