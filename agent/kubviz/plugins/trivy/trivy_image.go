@@ -24,6 +24,14 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+type JetStreamContextInterface interface {
+	nats.JetStream
+	nats.JetStreamManager
+	nats.KeyValueManager
+	nats.ObjectStoreManager
+	AccountInfo(opts ...nats.JSOpt) (*nats.AccountInfo, error)
+}
+
 func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 	pvcMountPath := "/mnt/agent/kbz"
 	trivyImageCacheDir := fmt.Sprintf("%s/trivy-imagecache", pvcMountPath)

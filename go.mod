@@ -1,15 +1,17 @@
 module github.com/intelops/kubviz
 
-go 1.20
+go 1.22
 
 require (
-	github.com/99designs/gqlgen v0.17.42
+	bou.ke/monkey v1.0.2
 	github.com/ClickHouse/clickhouse-go/v2 v2.10.1
+	github.com/agiledragon/gomonkey v2.0.2+incompatible
 	github.com/aquasecurity/trivy v0.43.1
 	github.com/aws/aws-sdk-go v1.44.245
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/corneliusweig/tabwriter v0.0.0-20190512204542-5f8a091e83b5
 	github.com/davecgh/go-spew v1.1.1
+	github.com/docker/distribution v2.8.2+incompatible
 	github.com/docker/docker v24.0.4+incompatible
 	github.com/genuinetools/reg v0.16.1
 	github.com/getkin/kin-openapi v0.118.0
@@ -17,6 +19,7 @@ require (
 	github.com/go-co-op/gocron v1.30.1
 	github.com/go-playground/webhooks/v6 v6.2.0
 	github.com/golang-migrate/migrate/v4 v4.16.2
+	github.com/golang/mock v1.5.0
 	github.com/google/uuid v1.3.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/intelops/go-common v1.0.19
@@ -27,7 +30,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
-	github.com/vektah/gqlparser/v2 v2.5.10
+	github.com/stretchr/testify v1.8.4
 	github.com/zegl/kube-score v1.17.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.46.1
 	go.opentelemetry.io/otel v1.21.0
@@ -48,7 +51,6 @@ require (
 	cloud.google.com/go/storage v1.30.1 // indirect
 	github.com/ClickHouse/ch-go v0.52.1 // indirect
 	github.com/CycloneDX/cyclonedx-go v0.7.2-0.20230625092137-07e2f29defc3 // indirect
-	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/aquasecurity/go-dep-parser v0.0.0-20230626110909-e7ea5097483b // indirect
@@ -59,7 +61,6 @@ require (
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
-	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
@@ -89,12 +90,10 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/googleapis/gax-go/v2 v2.11.0 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/golang-lru/v2 v2.0.3 // indirect
 	github.com/imdario/mergo v0.3.15 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect
@@ -111,7 +110,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
@@ -133,13 +131,12 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/samber/lo v1.38.1 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/showa-93/go-mask v0.6.0 // indirect
-	github.com/sosodev/duration v1.1.0 // indirect
 	github.com/spdx/tools-golang v0.5.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
@@ -159,6 +156,7 @@ require (
 	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
+	golang.org/x/tools v0.9.3 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.126.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
