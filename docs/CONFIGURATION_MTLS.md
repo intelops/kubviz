@@ -10,11 +10,11 @@ req_extensions      = req_ext
 x509_extensions     = v3_ca
 [ req_distinguished_name ]
 countryName                 = Country Name (2 letter code)
-countryName_default         = IN
+countryName_default         = US
 stateOrProvinceName         = State or Province Name (full name)
-stateOrProvinceName_default = Tamil Nadu
+stateOrProvinceName_default = New York
 localityName                = Locality Name (eg, city)
-localityName_default        = Chennai
+localityName_default        = Albany
 organizationName            = Organization Name (eg, company)
 organizationName_default    = Kubviz
 commonName                  = Common Name (e.g. server FQDN or YOUR name)
@@ -36,7 +36,7 @@ openssl genrsa -out ca-key.pem 4096
 ```
 
 ```bash
-openssl req -new -x509 -days 365 -key ca-key.pem -out ca-cert.pem -subj "/C=IN/ST=Tamil Nadu/L=Chennai/O=Kubviz/CN=KubvizCA"
+openssl req -new -x509 -days 365 -key ca-key.pem -out ca-cert.pem -subj "/C=US/ST=New York/L=Albany/O=Kubviz/CN=KubvizCA"
 ```
 
 **Step-3: Create the Server Certificate**
@@ -46,7 +46,7 @@ openssl genrsa -out server-key.pem 4096
 ```
 
 ```bash
-openssl req -new -key server-key.pem -out server-csr.pem -subj "/C=IN/ST=Tamil Nadu/L=Chennai/O=Kubviz/CN=kubviz-client-nats" -config ca-config.cnf -extensions req_ext
+openssl req -new -key server-key.pem -out server-csr.pem -subj "/C=US/ST=New York/L=Albany/O=Kubviz/CN=kubviz-client-nats" -config ca-config.cnf -extensions req_ext
 ```
 
 ```bash
@@ -60,7 +60,7 @@ openssl genrsa -out client-key.pem 4096
 ```
 
 ```bash
-openssl req -new -key client-key.pem -out client-csr.pem -subj "/C=IN/ST=Tamil Nadu/L=Chennai/O=Kubviz/CN=kubviz-client" -config ca-congig.cnf -extensions req_ext
+openssl req -new -key client-key.pem -out client-csr.pem -subj "/C=US/ST=New York/L=Albany/O=Kubviz/CN=kubviz-client" -config ca-congig.cnf -extensions req_ext
 ```
 
 ```bash
@@ -74,7 +74,7 @@ openssl genrsa -out agent-key.pem 4096
 ```
 
 ```bash
-openssl req -new -key agent-key.pem -out agent-csr.pem -subj "/C=IN/ST=Tamil Nadu/L=Chennai/O=Kubviz/CN=kubviz-agent" -config ca-config.cnf -extensions req_ext
+openssl req -new -key agent-key.pem -out agent-csr.pem -subj "/C=US/ST=New York/L=Albany/O=Kubviz/CN=kubviz-agent" -config ca-config.cnf -extensions req_ext
 ```
 
 ```bash

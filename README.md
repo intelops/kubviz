@@ -239,7 +239,7 @@ In our kubviz setup, we use mTLS for secure communication with the NATS server. 
 
 #### Configuring mTLS
 
-To enable mTLS in your application, [follow these steps:](docs/CONFIGURATION_MTLS.md)
+To enable mTLS in your application for agent-to-NATS communication, [follow these steps:](docs/CONFIGURATION_MTLS.md)
 
 #### TTL - Time-To-Live Feature
 
