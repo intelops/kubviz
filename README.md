@@ -223,6 +223,24 @@ kubectl --namespace kubviz port-forward $POD_NAME 3000
 
 3. Access "localhost:3000" in your web browser, where you'll be prompted to enter your credentials. Utilize the username "admin" and the password obtained from step 1 to proceed.
 
+#### mTLS - mutual TLS Feature
+
+Mutual TLS (mTLS) is an extension of standard Transport Layer Security (TLS) that enhances security by requiring both the client and server to authenticate and verify each other's identities during the SSL/TLS handshake process. This mutual authentication helps ensure that both parties are who they claim to be, providing a higher level of security for sensitive data exchanges.
+
+In our kubviz setup, we use mTLS for secure communication with the NATS server. Both the agent and the client connect to the NATS server using mTLS. The agent sends data to the NATS server securely, and the client also uses mTLS to receive data from the NATS server.
+
+#### Why Use mTLS?
+
+- **Enhanced Security:** mTLS ensures that both the client and server are authenticated, mitigating the risk of man-in-the-middle attacks.
+
+- **Data Integrity:** By verifying identities, mTLS ensures that data is exchanged between trusted entities only.
+
+- **Regulatory Compliance:** For many industries, mTLS is a requirement for compliance with regulations that mandate secure communication.
+
+#### Configuring mTLS
+
+To enable mTLS in your application, [follow these steps:](docs/CONFIGURATION_MTLS.md)
+
 #### TTL - Time-To-Live Feature
 
 We've implemented a Time-To-Live (TTL) feature to streamline the management of data within your ClickHouse tables. With TTL, historical data can be automatically relocated to alternative storage or purged to optimize storage space. This feature is particularly valuable for scenarios like time-series data or logs where older data gradually loses its relevance over time.
