@@ -281,3 +281,9 @@ nats:
     # secret:
     #   name: ""
     #   key: ""
+
+
+mtls:
+  enabled: false
+  secret:
+    name: 

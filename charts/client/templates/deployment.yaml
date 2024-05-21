@@ -84,6 +84,12 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+        
+          volumeMounts:
+          {{- if .Values.mtls.enabled }}
+          - name: mtls
+            mountPath: /etc/mtls
+          {{- end }}    
 #          livenessProbe:
 #            httpGet:
 #              path: /
@@ -93,6 +99,16 @@ spec:
 #              path: /
 #              port: http
           env:
+          {{- if .Values.mtls.enabled }}
+          - name: CERT_FILE
+            value: /etc/mtls/client-cert.pem
+          - name: KEY_FILE
+            value: /etc/mtls/client-key.pem
+          - name: CA_FILE
+            value: /etc/mtls/ca-cert.pem
+          - name: ENABLE_MTLS_NATS
+            value: "true"
+          {{- end }}
           - name: NATS_TOKEN
             {{- if and .Values.nats.enabled .Values.nats.auth.enabled .Values.nats.auth.token }}
             value: {{ .Values.nats.auth.token }}
@@ -169,6 +185,12 @@ spec:
             value : {{ .Values.consumer.kuberhealthyconsumer }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.mtls.enabled }}
+      volumes:
+        - name: mtls
+          secret:
+            secretName: {{ .Values.mtls.secret.name }}
+      {{- end }}      
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
