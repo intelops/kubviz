@@ -131,7 +131,7 @@ func main() {
 	}
 	collectAndPublishMetrics()
 	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
-		scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)
+		scheduler := scheduler.InitScheduler(config, natsCli, *cfg, clientset)
 
 		// Start the scheduler
 		scheduler.Start()
