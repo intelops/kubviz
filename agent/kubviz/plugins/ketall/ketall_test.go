@@ -187,10 +187,9 @@ func TestGetAllResources(t *testing.T) {
 		patchPublish := gomonkey.ApplyMethod(
 			reflect.TypeOf(natsCli),
 			"Publish",
-			func(*sdk.NATSClient,string, []byte) error {
+			func(*sdk.NATSClient, string, []byte) error {
 				return nil
 			},
-
 		)
 		defer patchPublish.Reset()
 

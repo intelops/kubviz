@@ -8,6 +8,11 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
+type NATSClientInterface interface {
+	CreateStream(streamName string) error
+	Publish(subject string, data []byte) error
+}
+
 type NATSClient struct {
 	conn   *nats.Conn
 	js     nats.JetStreamContext

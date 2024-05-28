@@ -21,7 +21,7 @@ import (
 
 var ClusterName string = os.Getenv("CLUSTER_NAME")
 
-func RunKubeScore(clientset *kubernetes.Clientset, natsCli *sdk.NATSClient) error {
+func RunKubeScore(clientset *kubernetes.Clientset, natsCli sdk.NATSClientInterface) error {
 	nsList, err := clientset.CoreV1().
 		Namespaces().
 		List(context.Background(), metav1.ListOptions{})
@@ -38,7 +38,7 @@ func RunKubeScore(clientset *kubernetes.Clientset, natsCli *sdk.NATSClient) erro
 	return nil
 }
 
-func publish(ns string, natsCli *sdk.NATSClient) error {
+func publish(ns string, natsCli sdk.NATSClientInterface) error {
 	var report []json_v2.ScoredObject
 	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - -o json"
 	log.Printf("Command:  %#v,", cmd)
@@ -62,7 +62,7 @@ func publish(ns string, natsCli *sdk.NATSClient) error {
 	return nil
 }
 
-func publishKubescoreMetrics(report []json_v2.ScoredObject, natsCli *sdk.NATSClient) error {
+func publishKubescoreMetrics(report []json_v2.ScoredObject, natsCli sdk.NATSClientInterface) error {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("kubescore")

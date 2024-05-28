@@ -32,6 +32,10 @@ type JetStreamContextInterface interface {
 	nats.ObjectStoreManager
 	AccountInfo(opts ...nats.JSOpt) (*nats.AccountInfo, error)
 }
+type NATSClientInterface interface {
+	CreateStream(streamName string) error
+	Publish(subject string, data []byte) error
+}
 
 func RunTrivyImageScans(config *rest.Config, natsCli *sdk.NATSClient) error {
 	pvcMountPath := "/mnt/agent/kbz"
