@@ -1,4 +1,5 @@
-FROM golang:1.22 AS builder
+FROM cgr.dev/chainguard/go:latest AS builder
+
 WORKDIR /
 COPY ./ ./
 

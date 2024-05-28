@@ -46,6 +46,16 @@ spec:
 #              path: /
 #              port: http
           env:
+          {{- if .Values.mtls.enabled }}
+          - name: CERT_FILE
+            value: /etc/mtls/client-cert.pem
+          - name: KEY_FILE
+            value: /etc/mtls/client-key.pem
+          - name: CA_FILE
+            value: /etc/mtls/ca-cert.pem
+          - name: ENABLE_MTLS_NATS
+            value: "true"  
+          {{- end }}      
           - name: KUBERHEALTHY_URL
             value: {{ .Values.kuberhealthy.url }}
           - name: POLL_INTERVAL
@@ -91,8 +101,13 @@ spec:
             value: {{ .Values.opentelemetry.url }}
           - name : APPLICATION_NAME
             value : {{ .Values.opentelemetry.appName }}
-          {{- if .Values.persistence.enabled }}
+         
           volumeMounts:
+          {{- if .Values.mtls.enabled }}    
+          - name: mtls
+            mountPath: /etc/mtls 
+          {{- end }}   
+          {{- if .Values.persistence.enabled }}
           - name: data
             mountPath: {{ .Values.persistence.mountPath }}
           {{- end }}
@@ -118,6 +133,16 @@ spec:
               containerPort: 8081
               protocol: TCP
           env:
+          {{- if .Values.mtls.enabled }}
+          - name: CERT_FILE
+            value: /etc/mtls/client-cert.pem
+          - name: KEY_FILE
+            value: /etc/mtls/client-key.pem
+          - name: CA_FILE
+            value: /etc/mtls/ca-cert.pem
+          - name: ENABLE_MTLS_NATS
+            value: "true"  
+          {{- end }}      
           - name: CLUSTER_NAME
             value: {{ .Values.clusterName }}
           - name: NATS_TOKEN
@@ -137,8 +162,13 @@ spec:
             value: {{ .Values.opentelemetry.url }}
           - name : APPLICATION_NAME
             value : {{ .Values.opentelemetry.appName }}
-          {{- if .Values.git_bridge.persistence.enabled }}
+         
           volumeMounts:
+          {{- if .Values.mtls.enabled }}    
+          - name: mtls
+            mountPath: /etc/mtls 
+          {{- end }} 
+          {{- if .Values.git_bridge.persistence.enabled }}  
           - name: data
             mountPath: {{ .Values.git_bridge.persistence.mountPath }}
           {{- end }}
@@ -165,6 +195,16 @@ spec:
               containerPort: 8082
               protocol: TCP
           env:
+          {{- if .Values.mtls.enabled }}
+          - name: CERT_FILE
+            value: /etc/mtls/client-cert.pem
+          - name: KEY_FILE
+            value: /etc/mtls/client-key.pem
+          - name: CA_FILE
+            value: /etc/mtls/ca-cert.pem
+          - name: ENABLE_MTLS_NATS
+            value: "true"  
+          {{- end }}          
           - name: CLUSTER_NAME
             value: {{ .Values.clusterName }}
           - name: NATS_TOKEN
@@ -184,8 +224,13 @@ spec:
             value: {{ .Values.opentelemetry.url }}
           - name : APPLICATION_NAME
             value : {{ .Values.opentelemetry.appName }}
-          {{- if .Values.container_bridge.persistence.enabled }}
+          
           volumeMounts:
+          {{- if .Values.mtls.enabled }}    
+          - name: mtls
+            mountPath: /etc/mtls 
+          {{- end }}   
+          {{- if .Values.container_bridge.persistence.enabled }}  
           - name: data
             mountPath: {{ .Values.container_bridge.persistence.mountPath }}
           {{- end }}
@@ -203,12 +248,18 @@ spec:
               ephemeral-storage: {{ .Values.container_bridge.resources.requests.ephemeralstorage }}
               {{- end }}
 {{- end }}
-      {{- if .Values.persistence.enabled }}
+      
       volumes:
+      {{- if .Values.persistence.enabled }}
       - name: data
         persistentVolumeClaim:
           claimName: {{ include "agent.fullname" . }}-data
       {{- end }}
+      {{- if .Values.mtls.enabled }}      
+      - name: mtls
+        secret:
+          secretName: {{ .Values.mtls.secret.name }}
+      {{- end }}         
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

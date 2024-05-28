@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/intelops/kubviz/client
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.1.7"
+  tag: "v1.1.8"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -94,6 +94,15 @@ nats:
     # secret:
     #   name: ""
     #   key: ""
+  tls: {}
+    # secret:
+    #   name: 
+    # ca: ""
+    # cert: ""
+    # key: ""
+    # verify: true
+    # verify_and_map: true
+
   nats:
     jetstream:
       enabled: true
@@ -164,7 +173,7 @@ migration:
   image:
     repository: ghcr.io/intelops/kubviz/migration
     pullPolicy: Always
-    tag: "v1.1.7"
+    tag: "v1.1.8"
   schema:
     path: "/sql"
 
@@ -189,3 +198,11 @@ consumer:
   trivyimageconsumer: "TRIVY_IMAGE_CONSUMER"
   trivysbomconsumer: "TRIVY_SBOM_CONSUMER"
   kuberhealthyconsumer: "KUBERHEALTHY_CONSUMER"
+
+
+mtls:
+  enabled: false
+  secret:
+    name: 
+ 
+
