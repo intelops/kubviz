@@ -43,7 +43,7 @@ func executeCommandTrivy(command string) ([]byte, error) {
 
 	return outc.Bytes(), err
 }
-func RunTrivyK8sClusterScan(natsCli *sdk.NATSClient) error {
+func RunTrivyK8sClusterScan(natsCli sdk.NATSClientInterface) error {
 	pvcMountPath := "/mnt/agent/kbz"
 	trivyCacheDir := fmt.Sprintf("%s/trivy-cache", pvcMountPath)
 	err := os.MkdirAll(trivyCacheDir, 0755)
@@ -94,7 +94,7 @@ func RunTrivyK8sClusterScan(natsCli *sdk.NATSClient) error {
 	return nil
 }
 
-func PublishTrivyK8sReport(report report.ConsolidatedReport, natsCli *sdk.NATSClient) error {
+func PublishTrivyK8sReport(report report.ConsolidatedReport, natsCli sdk.NATSClientInterface) error {
 	metrics := model.Trivy{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,

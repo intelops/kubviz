@@ -37,7 +37,7 @@ type NATSClientInterface interface {
 	Publish(subject string, data []byte) error
 }
 
-func RunTrivyImageScans(config *rest.Config, natsCli *sdk.NATSClient) error {
+func RunTrivyImageScans(config *rest.Config, natsCli sdk.NATSClientInterface) error {
 	pvcMountPath := "/mnt/agent/kbz"
 	trivyImageCacheDir := fmt.Sprintf("%s/trivy-imagecache", pvcMountPath)
 	err := os.MkdirAll(trivyImageCacheDir, 0755)
@@ -97,7 +97,7 @@ func RunTrivyImageScans(config *rest.Config, natsCli *sdk.NATSClient) error {
 	return nil
 }
 
-func PublishImageScanReports(report types.Report, natsCli *sdk.NATSClient) error {
+func PublishImageScanReports(report types.Report, natsCli sdk.NATSClientInterface) error {
 	metrics := model.TrivyImage{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,

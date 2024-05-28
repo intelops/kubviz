@@ -22,7 +22,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func PublishTrivySbomReport(report map[string]interface{}, natsCli *sdk.NATSClient) error {
+func PublishTrivySbomReport(report map[string]interface{}, natsCli sdk.NATSClientInterface) error {
 
 	metrics := model.Sbom{
 		ID:          uuid.New().String(),
@@ -55,7 +55,7 @@ func executeCommandSbom(command string) ([]byte, error) {
 	return outc.Bytes(), err
 }
 
-func RunTrivySbomScan(config *rest.Config, natsCli *sdk.NATSClient) error {
+func RunTrivySbomScan(config *rest.Config, natsCli sdk.NATSClientInterface) error {
 	log.Println("trivy sbom scan started...")
 	pvcMountPath := "/mnt/agent/kbz"
 	trivySbomCacheDir := fmt.Sprintf("%s/trivy-sbomcache", pvcMountPath)
