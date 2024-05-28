@@ -13,8 +13,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
-	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,7 +22,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func PublishTrivySbomReport(report map[string]interface{}, js nats.JetStreamContext) error {
+func PublishTrivySbomReport(report map[string]interface{}, natsCli sdk.NATSClientInterface) error {
 
 	metrics := model.Sbom{
 		ID:          uuid.New().String(),
@@ -34,7 +34,7 @@ func PublishTrivySbomReport(report map[string]interface{}, js nats.JetStreamCont
 		log.Println("error occurred while marshalling sbom metrics in agent", err.Error())
 		return err
 	}
-	_, err = js.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
+	err = natsCli.Publish(constants.TRIVY_SBOM_SUBJECT, metricsJson)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func executeCommandSbom(command string) ([]byte, error) {
 	return outc.Bytes(), err
 }
 
-func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
+func RunTrivySbomScan(config *rest.Config, natsCli sdk.NATSClientInterface) error {
 	log.Println("trivy sbom scan started...")
 	pvcMountPath := "/mnt/agent/kbz"
 	trivySbomCacheDir := fmt.Sprintf("%s/trivy-sbomcache", pvcMountPath)
@@ -100,7 +100,7 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 			log.Printf("Error unmarshaling JSON data for image sbom %s: %v", image.PullableImage, err)
 			continue // Move on to the next image in case of an error
 		}
-		err = PublishTrivySbomReport(report, js)
+		err = PublishTrivySbomReport(report, natsCli)
 		if err != nil {
 			log.Printf("Error publishing Trivy SBOM report for image %s: %v", image.PullableImage, err)
 			continue

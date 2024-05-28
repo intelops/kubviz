@@ -12,7 +12,9 @@ import (
 	"github.com/aquasecurity/trivy/pkg/types"
 	"github.com/golang/mock/gomock"
 	"github.com/intelops/kubviz/constants"
-	"github.com/intelops/kubviz/mocks"
+	mocks "github.com/intelops/kubviz/pkg/nats/sdk/mocks"
+
+	//"github.com/intelops/kubviz/mocks"
 	"github.com/intelops/kubviz/model"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/client-go/kubernetes"
@@ -41,7 +43,7 @@ func TestPublishTrivyK8sReport(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	js := mocks.NewMockJetStreamContextInterface(ctrl)
+	js := mocks.NewMockNATSClientInterface(ctrl)
 
 	// Define the sample consolidated report
 	report := report.ConsolidatedReport{
@@ -51,7 +53,7 @@ func TestPublishTrivyK8sReport(t *testing.T) {
 	// Test case: Testing successful publishing of Trivy K8s report
 	t.Run("Successful publishing", func(t *testing.T) {
 		// Set the mock expectation for Publish
-		js.EXPECT().Publish(constants.TRIVY_K8S_SUBJECT, gomock.Any()).Return(nil, nil)
+		js.EXPECT().Publish(constants.TRIVY_K8S_SUBJECT, gomock.Any()).Return(nil)
 
 		// Call the function under test
 		err := PublishTrivyK8sReport(report, js)
@@ -63,7 +65,7 @@ func TestPublishTrivyK8sReport(t *testing.T) {
 	// Test case: Error handling for Publish failure
 	t.Run("Error handling for Publish failure", func(t *testing.T) {
 		// Set the mock expectation for Publish to return an error
-		js.EXPECT().Publish(constants.TRIVY_K8S_SUBJECT, gomock.Any()).Return(nil, errors.New("publish error"))
+		js.EXPECT().Publish(constants.TRIVY_K8S_SUBJECT, gomock.Any()).Return(errors.New("publish error"))
 
 		// Call the function under test
 		err := PublishTrivyK8sReport(report, js)
@@ -93,12 +95,12 @@ func TestRunTrivyK8sClusterScan(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Create a JetStreamContext mock
-	jsMock := mocks.NewMockJetStreamContextInterface(ctrl)
+	jsMock := mocks.NewMockNATSClientInterface(ctrl)
 
 	// Test case: Successful Trivy scan
 	t.Run("Successful scan", func(t *testing.T) {
 		// Set the mock expectation for PublishTrivyK8sReport
-		jsMock.EXPECT().Publish(gomock.Any(), gomock.Any()).Return(nil, nil)
+		jsMock.EXPECT().Publish(gomock.Any(), gomock.Any()).Return(nil)
 
 		// Call the function under test
 		err := RunTrivyK8sClusterScan(jsMock)
@@ -166,7 +168,7 @@ func TestRunTrivyK8sClusterScan(t *testing.T) {
 		defer monkey.Unpatch(executeCommandTrivy)
 
 		// Mock Publish to return an error
-		jsMock.EXPECT().Publish(gomock.Any(), gomock.Any()).Return(nil, errors.New("publish error"))
+		jsMock.EXPECT().Publish(gomock.Any(), gomock.Any()).Return(errors.New("publish error"))
 
 		// Call the function under test
 		err := RunTrivyK8sClusterScan(jsMock)
@@ -179,7 +181,7 @@ func TestPublishTrivySbomReport(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Create a JetStreamContext mock
-	jsMock := mocks.NewMockJetStreamContextInterface(ctrl)
+	jsMock := mocks.NewMockNATSClientInterface(ctrl)
 
 	// Define a sample report
 	report := map[string]interface{}{
@@ -190,7 +192,7 @@ func TestPublishTrivySbomReport(t *testing.T) {
 	// Test case: Successful publishing of Trivy SBOM report
 	t.Run("Successful publishing", func(t *testing.T) {
 		// Set the mock expectation for Publish
-		jsMock.EXPECT().Publish(constants.TRIVY_SBOM_SUBJECT, gomock.Any()).Return(nil, nil)
+		jsMock.EXPECT().Publish(constants.TRIVY_SBOM_SUBJECT, gomock.Any()).Return(nil)
 
 		// Call the function under test
 		err := PublishTrivySbomReport(report, jsMock)
@@ -202,7 +204,7 @@ func TestPublishTrivySbomReport(t *testing.T) {
 	// Test case: Error handling for Publish failure
 	t.Run("Error handling for Publish failure", func(t *testing.T) {
 		// Set the mock expectation for Publish to return an error
-		jsMock.EXPECT().Publish(constants.TRIVY_SBOM_SUBJECT, gomock.Any()).Return(nil, errors.New("publish error"))
+		jsMock.EXPECT().Publish(constants.TRIVY_SBOM_SUBJECT, gomock.Any()).Return(errors.New("publish error"))
 
 		// Call the function under test
 		err := PublishTrivySbomReport(report, jsMock)
@@ -251,7 +253,7 @@ func TestPublishImageScanReports(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Create a JetStreamContext mock
-	jsMock := mocks.NewMockJetStreamContextInterface(ctrl)
+	jsMock := mocks.NewMockNATSClientInterface(ctrl)
 
 	// Define a sample report
 	report := types.Report{
@@ -261,7 +263,7 @@ func TestPublishImageScanReports(t *testing.T) {
 	// Test case: Successful publishing of Trivy image scan report
 	t.Run("Successful publishing", func(t *testing.T) {
 		// Set the mock expectation for Publish
-		jsMock.EXPECT().Publish(constants.TRIVY_IMAGE_SUBJECT, gomock.Any()).Return(nil, nil)
+		jsMock.EXPECT().Publish(constants.TRIVY_IMAGE_SUBJECT, gomock.Any()).Return(nil)
 
 		// Call the function under test
 		err := PublishImageScanReports(report, jsMock)
@@ -273,7 +275,7 @@ func TestPublishImageScanReports(t *testing.T) {
 	// Test case: Error handling for Publish failure
 	t.Run("Error handling for Publish failure", func(t *testing.T) {
 		// Set the mock expectation for Publish to return an error
-		jsMock.EXPECT().Publish(constants.TRIVY_IMAGE_SUBJECT, gomock.Any()).Return(nil, errors.New("publish error"))
+		jsMock.EXPECT().Publish(constants.TRIVY_IMAGE_SUBJECT, gomock.Any()).Return(errors.New("publish error"))
 
 		// Call the function under test
 		err := PublishImageScanReports(report, jsMock)
@@ -309,7 +311,7 @@ func TestRunTrivySbomScan(t *testing.T) {
 	defer ctrl.Finish()
 
 	// Create a JetStreamContext mock
-	jsMock := mocks.NewMockJetStreamContextInterface(ctrl)
+	jsMock := mocks.NewMockNATSClientInterface(ctrl)
 	monkey.Patch(ListImagesforSbom, func(config *rest.Config) ([]model.RunningImage, error) {
 		return []model.RunningImage{{PullableImage: "image1"}}, nil
 	})
@@ -335,7 +337,7 @@ func TestRunTrivyImageScans(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	jsMock := mocks.NewMockJetStreamContextInterface(ctrl)
+	jsMock := mocks.NewMockNATSClientInterface(ctrl)
 
 	images := []model.RunningImage{
 		{PullableImage: "image1"},

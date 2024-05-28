@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/go-version"
 	semver "github.com/hashicorp/go-version"
 	"github.com/intelops/kubviz/model"
-	"github.com/nats-io/nats.go"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -51,7 +51,8 @@ func TestTruncateTagName(t *testing.T) {
 }
 
 func TestPublishOutdatedImages(t *testing.T) {
-	mockJS := &MockJetStreamContext{}
+	mockJS := &sdk.NATSClient{}
+
 	mockresult := model.CheckResultfinal{
 		Image:          "test-image",
 		Current:        "test-current",
@@ -61,6 +62,16 @@ func TestPublishOutdatedImages(t *testing.T) {
 		Namespace:      "test-namespace",
 		ClusterName:    "test-cluster",
 	}
+
+	mockPublish := gomonkey.ApplyMethod(
+		reflect.TypeOf(mockJS),
+		"Publish",
+		func(*sdk.NATSClient, string, []uint8) error {
+			return nil
+		},
+	)
+	defer mockPublish.Reset()
+
 	PublishOutdatedImages(mockresult, mockJS)
 }
 
@@ -83,7 +94,7 @@ func TestOutDatedImages(t *testing.T) {
 			fmt.Println("test case", tt.name)
 
 			mockConfig := &rest.Config{}
-			mockJS := &MockJetStreamContext{}
+			mockJS := &sdk.NATSClient{}
 
 			mockInitContainer := "test-initcontainer"
 			mockContainer := "test-container"
@@ -146,9 +157,18 @@ func TestOutDatedImages(t *testing.T) {
 			)
 			defer patchImageName.Reset()
 
+			mockPublish := gomonkey.ApplyMethod(
+				reflect.TypeOf(mockJS),
+				"Publish",
+				func(*sdk.NATSClient, string, []uint8) error {
+					return nil
+				},
+			)
+			defer mockPublish.Reset()
+
 			patchPublishOutdatedImages := gomonkey.ApplyFunc(
 				PublishOutdatedImages,
-				func(model.CheckResultfinal, nats.JetStreamContext) error {
+				func(model.CheckResultfinal, *sdk.NATSClient) error {
 					return nil
 				},
 			)
@@ -949,184 +969,6 @@ func TestListImages(t *testing.T) {
 		})
 
 	}
-}
-
-type MockJetStreamContext struct{}
-
-func (m *MockJetStreamContext) AccountInfo(opts ...nats.JSOpt) (*nats.AccountInfo, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) AddConsumer(stream string, cfg *nats.ConsumerConfig, opts ...nats.JSOpt) (*nats.ConsumerInfo, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) AddStream(cfg *nats.StreamConfig, opts ...nats.JSOpt) (*nats.StreamInfo, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) ChanQueueSubscribe(subj, queue string, ch chan *nats.Msg, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) ChanSubscribe(subj string, ch chan *nats.Msg, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) ConsumerInfo(stream, consumer string, opts ...nats.JSOpt) (*nats.ConsumerInfo, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) ConsumerNames(stream string, opts ...nats.JSOpt) <-chan string {
-	return nil
-}
-
-func (m *MockJetStreamContext) Consumers(stream string, opts ...nats.JSOpt) <-chan *nats.ConsumerInfo {
-	return nil
-}
-
-func (m *MockJetStreamContext) ConsumersInfo(stream string, opts ...nats.JSOpt) <-chan *nats.ConsumerInfo {
-	return nil
-}
-
-func (m *MockJetStreamContext) CreateKeyValue(kv *nats.KeyValueConfig) (nats.KeyValue, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) CreateObjectStore(store *nats.ObjectStoreConfig) (nats.ObjectStore, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) DeleteConsumer(stream, consumer string, opts ...nats.JSOpt) error {
-	return nil
-}
-
-func (m *MockJetStreamContext) DeleteKeyValue(key string) error {
-	return nil
-}
-
-func (m *MockJetStreamContext) DeleteMsg(stream string, seq uint64, opts ...nats.JSOpt) error {
-	return nil
-}
-
-func (m *MockJetStreamContext) DeleteObjectStore(store string) error {
-	return nil
-}
-
-func (m *MockJetStreamContext) DeleteStream(stream string, opts ...nats.JSOpt) error {
-	return nil
-}
-
-func (m *MockJetStreamContext) GetLastMsg(stream string, lastBy string, opts ...nats.JSOpt) (*nats.RawStreamMsg, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) GetMsg(stream string, seq uint64, opts ...nats.JSOpt) (*nats.RawStreamMsg, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) KeyValue(stream string) (nats.KeyValue, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) KeyValueStoreNames() <-chan string {
-	return nil
-}
-
-func (m *MockJetStreamContext) KeyValueStores() <-chan nats.KeyValueStatus {
-	return nil
-}
-
-func (m *MockJetStreamContext) ObjectStore(stream string) (nats.ObjectStore, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) ObjectStoreNames(opts ...nats.ObjectOpt) <-chan string {
-	return nil
-}
-
-func (m *MockJetStreamContext) ObjectStores(opts ...nats.ObjectOpt) <-chan nats.ObjectStoreStatus {
-	return nil
-}
-
-func (m *MockJetStreamContext) PublishAsync(subj string, data []byte, opts ...nats.PubOpt) (nats.PubAckFuture, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) PublishAsyncComplete() <-chan struct{} {
-	return nil
-}
-
-func (m *MockJetStreamContext) PublishAsyncPending() int {
-	return 0
-}
-
-func (m *MockJetStreamContext) PublishMsg(msg *nats.Msg, opts ...nats.PubOpt) (*nats.PubAck, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) PublishMsgAsync(msg *nats.Msg, opts ...nats.PubOpt) (nats.PubAckFuture, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) PullSubscribe(subject, queue string, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) PurgeStream(stream string, opts ...nats.JSOpt) error {
-	return nil
-}
-
-func (m *MockJetStreamContext) QueueSubscribe(subject, queue string, handler nats.MsgHandler, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) QueueSubscribeSync(subject, queue string, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) SecureDeleteMsg(stream string, seq uint64, opts ...nats.JSOpt) error {
-	return nil
-}
-
-func (m *MockJetStreamContext) StreamInfo(stream string, opts ...nats.JSOpt) (*nats.StreamInfo, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) StreamNameBySubject(subject string, opts ...nats.JSOpt) (string, error) {
-	return "", nil
-}
-
-func (m *MockJetStreamContext) StreamNames(opts ...nats.JSOpt) <-chan string {
-	return nil
-}
-
-func (m *MockJetStreamContext) Streams(opts ...nats.JSOpt) <-chan *nats.StreamInfo {
-	return nil
-}
-
-func (m *MockJetStreamContext) StreamsInfo(opts ...nats.JSOpt) <-chan *nats.StreamInfo {
-	return nil
-}
-
-func (m *MockJetStreamContext) Subscribe(subject string, cb nats.MsgHandler, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) SubscribeSync(subject string, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) UpdateConsumer(stream string, cfg *nats.ConsumerConfig, opts ...nats.JSOpt) (*nats.ConsumerInfo, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) UpdateStream(cfg *nats.StreamConfig, opts ...nats.JSOpt) (*nats.StreamInfo, error) {
-	return nil, nil
-}
-
-func (m *MockJetStreamContext) Publish(subj string, data []byte, opts ...nats.PubOpt) (*nats.PubAck, error) {
-	return nil, errors.New("mocked publish error")
 }
 
 type MockResourceInterface struct{}

@@ -15,7 +15,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/model"
-	"github.com/nats-io/nats.go"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -37,7 +37,7 @@ func accessToOutcome(access Access) (Outcome, error) {
 	}
 }
 
-func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
+func RakeesOutput(config *rest.Config, natsCli *sdk.NATSClient) error {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("rakees")
@@ -96,7 +96,7 @@ func RakeesOutput(config *rest.Config, js nats.JetStreamContext) error {
 			Update:      HumanreadableAccessCode(updateOutcome),
 		}
 		metricsJson, _ := json.Marshal(metrics)
-		_, err = js.Publish(constants.EventSubject_rakees, metricsJson)
+		err = natsCli.Publish(constants.EventSubject_rakees, metricsJson)
 		if err != nil {
 			return err
 		}

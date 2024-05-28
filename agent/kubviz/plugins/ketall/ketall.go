@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/model"
-	"github.com/nats-io/nats.go"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/discovery"
@@ -22,11 +22,11 @@ import (
 
 var ClusterName string = os.Getenv("CLUSTER_NAME")
 
-func PublishAllResources(result model.Resource, js nats.JetStreamContext) error {
+func PublishAllResources(result model.Resource, natsCli *sdk.NATSClient) error {
 	metrics := result
 	metrics.ClusterName = ClusterName
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.EventSubject_getall_resource, metricsJson)
+	err := natsCli.Publish(constants.EventSubject_getall_resource, metricsJson)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func PublishAllResources(result model.Resource, js nats.JetStreamContext) error 
 	return nil
 }
 
-func GetAllResources(config *rest.Config, js nats.JetStreamContext) error {
+func GetAllResources(config *rest.Config, natsCli *sdk.NATSClient) error {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("ketall")
@@ -88,7 +88,7 @@ func GetAllResources(config *rest.Config, js nats.JetStreamContext) error {
 				}
 
 			}
-			err := PublishAllResources(resource, js)
+			err := PublishAllResources(resource, natsCli)
 			if err != nil {
 				return err
 			}

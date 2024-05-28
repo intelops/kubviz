@@ -10,8 +10,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
-	"github.com/nats-io/nats.go"
 	"github.com/zegl/kube-score/renderer/json_v2"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -21,7 +21,7 @@ import (
 
 var ClusterName string = os.Getenv("CLUSTER_NAME")
 
-func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext) error {
+func RunKubeScore(clientset *kubernetes.Clientset, natsCli sdk.NATSClientInterface) error {
 	nsList, err := clientset.CoreV1().
 		Namespaces().
 		List(context.Background(), metav1.ListOptions{})
@@ -33,12 +33,12 @@ func RunKubeScore(clientset *kubernetes.Clientset, js nats.JetStreamContext) err
 	log.Printf("Namespace size: %d", len(nsList.Items))
 	for _, n := range nsList.Items {
 		log.Printf("Publishing kube-score recommendations for namespace: %s\n", n.Name)
-		publish(n.Name, js)
+		publish(n.Name, natsCli)
 	}
 	return nil
 }
 
-func publish(ns string, js nats.JetStreamContext) error {
+func publish(ns string, natsCli sdk.NATSClientInterface) error {
 	var report []json_v2.ScoredObject
 	cmd := "kubectl api-resources --verbs=list --namespaced -o name | xargs -n1 -I{} sh -c \"kubectl get {} -n " + ns + " -oyaml && echo ---\" | kube-score score - -o json"
 	log.Printf("Command:  %#v,", cmd)
@@ -54,7 +54,7 @@ func publish(ns string, js nats.JetStreamContext) error {
 		return err
 	}
 
-	publishKubescoreMetrics(report, js)
+	publishKubescoreMetrics(report, natsCli)
 	//err = publishKubescoreMetrics(uuid.New().String(), ns, out, js)
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func publish(ns string, js nats.JetStreamContext) error {
 	return nil
 }
 
-func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamContext) error {
+func publishKubescoreMetrics(report []json_v2.ScoredObject, natsCli sdk.NATSClientInterface) error {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("kubescore")
@@ -76,7 +76,7 @@ func publishKubescoreMetrics(report []json_v2.ScoredObject, js nats.JetStreamCon
 		Report:      report,
 	}
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.KUBESCORE_SUBJECT, metricsJson)
+	err := natsCli.Publish(constants.KUBESCORE_SUBJECT, metricsJson)
 	if err != nil {
 		return err
 	}

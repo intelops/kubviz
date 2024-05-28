@@ -20,11 +20,11 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/intelops/kubviz/model"
-	"github.com/nats-io/nats.go"
 
 	types "github.com/docker/docker/api/types/registry"
 	"github.com/genuinetools/reg/registry"
 	semver "github.com/hashicorp/go-version"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -60,7 +60,7 @@ func truncateTagName(tagName string) string {
 	}
 	return truncatedTagName
 }
-func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext) error {
+func PublishOutdatedImages(out model.CheckResultfinal, natsCli *sdk.NATSClient) error {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("outdated-images")
@@ -71,7 +71,7 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 	metrics := out
 	metrics.ClusterName = ClusterName
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.EventSubject_outdated_images, metricsJson)
+	err := natsCli.Publish(constants.EventSubject_outdated_images, metricsJson)
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func PublishOutdatedImages(out model.CheckResultfinal, js nats.JetStreamContext)
 	return nil
 }
 
-func OutDatedImages(config *rest.Config, js nats.JetStreamContext) error {
+func OutDatedImages(config *rest.Config, natsCli *sdk.NATSClient) error {
 	images, err := ListImages(config)
 	if err != nil {
 		log.Println("unable to list images")
@@ -102,7 +102,7 @@ func OutDatedImages(config *rest.Config, js nats.JetStreamContext) error {
 			final.LatestVersion = message
 			final.Namespace = namespace
 			final.Pod = pod
-			err := PublishOutdatedImages(final, js)
+			err := PublishOutdatedImages(final, natsCli)
 			if err != nil {
 				return err
 			}
@@ -118,7 +118,7 @@ func OutDatedImages(config *rest.Config, js nats.JetStreamContext) error {
 					final.VersionsBehind = checkResult.VersionsBehind
 					final.Namespace = namespace
 					final.Pod = pod
-					err := PublishOutdatedImages(final, js)
+					err := PublishOutdatedImages(final, natsCli)
 					if err != nil {
 						return err
 					}
@@ -135,7 +135,7 @@ func OutDatedImages(config *rest.Config, js nats.JetStreamContext) error {
 					final.LatestVersion = message
 					final.Namespace = namespace
 					final.Pod = pod
-					err := PublishOutdatedImages(final, js)
+					err := PublishOutdatedImages(final, natsCli)
 					if err != nil {
 						return err
 					}

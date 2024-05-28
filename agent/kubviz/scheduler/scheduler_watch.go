@@ -4,7 +4,6 @@ import (
 	"github.com/intelops/kubviz/agent/kubviz/plugins/events"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/ketall"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/kubepreupgrade"
-	"github.com/nats-io/nats.go"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
@@ -12,51 +11,52 @@ import (
 	"github.com/intelops/kubviz/agent/kubviz/plugins/outdated"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/rakkess"
 	"github.com/intelops/kubviz/agent/kubviz/plugins/trivy"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 )
 
 type OutDatedImagesJob struct {
 	config    *rest.Config
-	js        nats.JetStreamContext
+	js        *sdk.NATSClient
 	frequency string
 }
 
 type KetallJob struct {
 	config    *rest.Config
-	js        nats.JetStreamContext
+	js        *sdk.NATSClient
 	frequency string
 }
 type TrivyImageJob struct {
 	config    *rest.Config
-	js        nats.JetStreamContext
+	js        *sdk.NATSClient
 	frequency string
 }
 type TrivySbomJob struct {
 	config    *rest.Config
-	js        nats.JetStreamContext
+	js        *sdk.NATSClient
 	frequency string
 }
 type TrivyClusterScanJob struct {
 	//config    *rest.Config
-	js        nats.JetStreamContext
+	js        *sdk.NATSClient
 	frequency string
 }
 type RakkessJob struct {
 	config    *rest.Config
-	js        nats.JetStreamContext
+	js        *sdk.NATSClient
 	frequency string
 }
 type KubePreUpgradeJob struct {
 	config    *rest.Config
-	js        nats.JetStreamContext
+	js        *sdk.NATSClient
 	frequency string
 }
 type KubescoreJob struct {
 	clientset *kubernetes.Clientset
-	js        nats.JetStreamContext
+	js        *sdk.NATSClient
 	frequency string
 }
 
-func NewTrivySbomJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*TrivySbomJob, error) {
+func NewTrivySbomJob(config *rest.Config, js *sdk.NATSClient, frequency string) (*TrivySbomJob, error) {
 	return &TrivySbomJob{
 		config:    config,
 		js:        js,
@@ -73,7 +73,7 @@ func (j *TrivySbomJob) Run() {
 	events.LogErr(err)
 }
 
-func NewTrivyClusterScanJob(js nats.JetStreamContext, frequency string) (*TrivyClusterScanJob, error) {
+func NewTrivyClusterScanJob(js *sdk.NATSClient, frequency string) (*TrivyClusterScanJob, error) {
 	return &TrivyClusterScanJob{
 		// config:    config,
 		js:        js,
@@ -89,7 +89,7 @@ func (j *TrivyClusterScanJob) Run() {
 	err := trivy.RunTrivyK8sClusterScan(j.js)
 	events.LogErr(err)
 }
-func NewTrivyImagesJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*TrivyImageJob, error) {
+func NewTrivyImagesJob(config *rest.Config, js *sdk.NATSClient, frequency string) (*TrivyImageJob, error) {
 	return &TrivyImageJob{
 		config:    config,
 		js:        js,
@@ -105,7 +105,7 @@ func (j *TrivyImageJob) Run() {
 	err := trivy.RunTrivyImageScans(j.config, j.js)
 	events.LogErr(err)
 }
-func NewOutDatedImagesJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*OutDatedImagesJob, error) {
+func NewOutDatedImagesJob(config *rest.Config, js *sdk.NATSClient, frequency string) (*OutDatedImagesJob, error) {
 	return &OutDatedImagesJob{
 		config:    config,
 		js:        js,
@@ -121,7 +121,7 @@ func (j *OutDatedImagesJob) Run() {
 	err := outdated.OutDatedImages(j.config, j.js)
 	events.LogErr(err)
 }
-func NewKetallJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*KetallJob, error) {
+func NewKetallJob(config *rest.Config, js *sdk.NATSClient, frequency string) (*KetallJob, error) {
 	return &KetallJob{
 		config:    config,
 		js:        js,
@@ -138,7 +138,7 @@ func (j *KetallJob) Run() {
 	events.LogErr(err)
 }
 
-func NewKubePreUpgradeJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*KubePreUpgradeJob, error) {
+func NewKubePreUpgradeJob(config *rest.Config, js *sdk.NATSClient, frequency string) (*KubePreUpgradeJob, error) {
 	return &KubePreUpgradeJob{
 		config:    config,
 		js:        js,
@@ -155,7 +155,7 @@ func (j *KubePreUpgradeJob) Run() {
 	events.LogErr(err)
 }
 
-func NewKubescoreJob(clientset *kubernetes.Clientset, js nats.JetStreamContext, frequency string) (*KubescoreJob, error) {
+func NewKubescoreJob(clientset *kubernetes.Clientset, js *sdk.NATSClient, frequency string) (*KubescoreJob, error) {
 	return &KubescoreJob{
 		clientset: clientset,
 		js:        js,
@@ -171,7 +171,7 @@ func (j *KubescoreJob) Run() {
 	err := kubescore.RunKubeScore(j.clientset, j.js)
 	events.LogErr(err)
 }
-func NewRakkessJob(config *rest.Config, js nats.JetStreamContext, frequency string) (*RakkessJob, error) {
+func NewRakkessJob(config *rest.Config, js *sdk.NATSClient, frequency string) (*RakkessJob, error) {
 	return &RakkessJob{
 		config:    config,
 		js:        js,
