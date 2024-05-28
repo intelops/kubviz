@@ -99,7 +99,7 @@ jobs:
 
     - run: |
         echo "Run, Build Application using script"
-        chmod buildscript.sh
+        chmod +x buildscript.sh
         ./buildscript.sh
 
     - name: Perform CodeQL Analysis
