@@ -9,12 +9,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/agiledragon/gomonkey"
 	"github.com/intelops/kubviz/agent/config"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	khstatev1 "github.com/kuberhealthy/kuberhealthy/v2/pkg/apis/khstate/v1"
 	"github.com/kuberhealthy/kuberhealthy/v2/pkg/health"
 	"github.com/nats-io/nats.go"
@@ -42,7 +44,8 @@ func TestStartKuberhealthy(t *testing.T) {
 	for _, tt := range cases {
 		log.Println("Running test case: ", tt.name)
 		t.Run(tt.name, func(t *testing.T) {
-			mockJS := &MockJetStreamContext{}
+			//mockJS := &MockJetStreamContext{}
+			mockJS := &sdk.NATSClient{}
 
 			testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				mockResponse := `{"status": "ok"}`
@@ -95,7 +98,7 @@ func TestStartKuberhealthy(t *testing.T) {
 
 			patchPublishKuberhealthyMetrics := gomonkey.ApplyFunc(
 				PublishKuberhealthyMetrics,
-				func(js nats.JetStreamContext, state health.State) error {
+				func(js *sdk.NATSClient, state health.State) error {
 					return nil
 				},
 			)
@@ -131,8 +134,24 @@ func TestPollAndPublishKuberhealthy(t *testing.T) {
 
 	for _, tt := range cases {
 		log.Println("Running test case: ", tt.name)
+		mockJS := &sdk.NATSClient{}
+
+		mockPublish := gomonkey.ApplyMethod(
+			reflect.TypeOf(mockJS),
+			"Publish",
+			func(*sdk.NATSClient, string, []uint8) error {
+				if tt.name == "error" {
+					return errors.New("Error in publish")
+				}
+				return nil
+			},
+		)
+		defer mockPublish.Reset()
+
 		t.Run(tt.name, func(t *testing.T) {
-			mockJS := &MockJetStreamContext{}
+			//mockJS := &MockJetStreamContext{}
+			mockJS := &sdk.NATSClient{}
+
 			if tt.wantErr {
 				patchReadAll := gomonkey.ApplyFunc(
 					io.ReadAll,
@@ -192,7 +211,8 @@ var mockhealthstate health.State
 
 func TestPublishKuberhealthyMetrics(t *testing.T) {
 
-	mockJS := &MockJetStreamContext{}
+	//mockJS := &MockJetStreamContext{}
+	mockJS := &sdk.NATSClient{}
 
 	dummyWorkloadDetails := khstatev1.WorkloadDetails{
 		OK:               true,
@@ -234,6 +254,19 @@ func TestPublishKuberhealthyMetrics(t *testing.T) {
 
 	for i, tt := range tests {
 		fmt.Println("Running test : ", i)
+
+		mockPublish := gomonkey.ApplyMethod(
+			reflect.TypeOf(mockJS),
+			"Publish",
+			func(*sdk.NATSClient, string, []uint8) error {
+				if tt.name == "error" {
+					return errors.New("Error in publish")
+				}
+				return nil
+			},
+		)
+		defer mockPublish.Reset()
+
 		t.Run(tt.name, func(t *testing.T) {
 
 			err := PublishKuberhealthyMetrics(mockJS, tt.resource)
