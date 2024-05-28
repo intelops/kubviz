@@ -45,14 +45,33 @@ jobs:
       with:
         go-version: '1.19'
 
+    - name: Set up Go environment
+      run: |
+
+        echo "Setting up Go environment"
+        echo "GOPATH=$(go env GOPATH)" >> $GITHUB_ENV
+        echo "PATH=$(go env GOPATH)/bin:$PATH" >> $GITHUB_ENV
+
+    - name: Print Go Version
+      run: go version
+
+    - name: Print Go Environment
+      run: go env
+
+    - name: Print GOPATH
+      run: echo $GOPATH
+
+    - name: Print PATH
+      run: echo $PATH
+
     - name: Install Dependencies
-      run: make deps
+      run: go mod download
 
     - name: Build Project
-      run: make build
+      run: go build ./...
 
     - name: Run Tests
-      run: make test
+      run: go test ./...
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
