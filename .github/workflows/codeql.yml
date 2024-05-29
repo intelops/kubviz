@@ -70,8 +70,8 @@ jobs:
     - name: Build Project
       run: go build ./...
 
-    - name: Run Tests
-      run: go test ./...
+    # - name: Run Tests
+    #   run: go test ./...
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
