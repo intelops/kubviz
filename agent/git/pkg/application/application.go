@@ -30,8 +30,6 @@ func New(conf *config.Config, conn *clients.NATSContext) *Application {
 	}
 
 	app.server = &http.Server{
-		// TODO: remove hardcoding
-		// Addr:         fmt.Sprintf(":%d", conf.Port),
 		Addr:         fmt.Sprintf(":%d", 8081),
 		Handler:      app.Routes(),
 		IdleTimeout:  time.Minute,
@@ -56,8 +54,6 @@ func (app *Application) Routes() *gin.Engine {
 }
 
 func (app *Application) Start() {
-	// TODO: remove hardcoding
-	// log.Println("Starting server on port", app.Config.Port)
 	log.Printf("Starting server on port %d", 8081)
 	if err := app.server.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("Server closed, readon: %v", err)
