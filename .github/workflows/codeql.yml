@@ -70,8 +70,8 @@ jobs:
     - name: Build Project
       run: go build ./...
 
-    # - name: Run Tests
-    #   run: go test ./...
+    - name: Run Tests
+      run: go test ./...
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -97,10 +97,16 @@ jobs:
     #   If the Autobuild fails above, remove it and uncomment the following three lines.
     #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
 
+<<<<<<< HEAD
     # - run: |
     #     echo "Run, Build Application using script"
-    #     chmod +x buildscript.sh
-    #     ./buildscript.sh
+    #     ./../../../buildscript.sh
+=======
+    - run: |
+        echo "Run, Build Application using script"
+        chmod +x buildscript.sh
+        ./buildscript.sh
+>>>>>>> f032db8c1cd140d201d37fd02b5a03394321c483
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
