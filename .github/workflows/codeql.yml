@@ -97,16 +97,23 @@ jobs:
     #   If the Autobuild fails above, remove it and uncomment the following three lines.
     #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
 
-<<<<<<< HEAD
     # - run: |
     #     echo "Run, Build Application using script"
     #     ./../../../buildscript.sh
-=======
-    - run: |
-        echo "Run, Build Application using script"
-        chmod +x buildscript.sh
-        ./buildscript.sh
->>>>>>> f032db8c1cd140d201d37fd02b5a03394321c483
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
+    
+    - name: Ensure CodeQL Branch Exists and Push
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        # Create a new branch 'codeql' if it doesn't exist
+        git checkout -b codeql || git checkout codeql
+        # Fetch the latest changes from the remote 'codeql' branch if it exists
+        git fetch origin codeql || echo "Remote branch 'codeql' does not exist yet."
+        git pull origin codeql || echo "No remote changes to pull."
+        # Push the local 'codeql' branch to the remote repository
+        git push --set-upstream origin codeql
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
