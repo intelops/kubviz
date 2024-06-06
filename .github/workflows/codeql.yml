@@ -40,6 +40,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
@@ -65,13 +70,19 @@ jobs:
       run: echo $PATH
 
     - name: Install Dependencies
-      run: go mod download
+      run: |
+        go mod tidy
+        go mod download
 
     - name: Build Project
       run: go build ./...
 
     - name: Run Tests
-      run: go test ./...
+      run: go test -v ./...
+    
+    - name: Lint
+      run: |
+        go fmt ./...
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -104,16 +115,16 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
     
-    - name: Ensure CodeQL Branch Exists and Push
-      run: |
-        git config --global user.name 'github-actions'
-        git config --global user.email 'github-actions@github.com'
-        # Create a new branch 'codeql' if it doesn't exist
-        git checkout -b codeql || git checkout codeql
-        # Fetch the latest changes from the remote 'codeql' branch if it exists
-        git fetch origin codeql || echo "Remote branch 'codeql' does not exist yet."
-        git pull origin codeql || echo "No remote changes to pull."
-        # Push the local 'codeql' branch to the remote repository
-        git push --set-upstream origin codeql
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Ensure CodeQL Branch Exists and Push
+    #   run: |
+    #     git config --global user.name 'github-actions'
+    #     git config --global user.email 'github-actions@github.com'
+    #     # Create a new branch 'codeql' if it doesn't exist
+    #     git checkout -b codeql || git checkout codeql
+    #     # Fetch the latest changes from the remote 'codeql' branch if it exists
+    #     git fetch origin codeql || echo "Remote branch 'codeql' does not exist yet."
+    #     git pull origin codeql || echo "No remote changes to pull."
+    #     # Push the local 'codeql' branch to the remote repository
+    #     git push --set-upstream origin codeql
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
