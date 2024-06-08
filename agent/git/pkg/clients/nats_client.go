@@ -17,6 +17,12 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
+type NATSClientInterface interface {
+	Close()
+	CreateStream() (nats.JetStreamContext, error)
+	Publish(metric []byte, repo string, eventkey model.EventKey, eventvalue model.EventValue) error
+}
+
 // constant variables to use with nats stream and
 // nats publishing
 const (
