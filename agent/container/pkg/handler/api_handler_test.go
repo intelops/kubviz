@@ -9,8 +9,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/agiledragon/gomonkey"
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
+	"github.com/intelops/kubviz/agent/container/api"
 	mock_main "github.com/intelops/kubviz/agent/container/pkg/clients"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,6 +25,65 @@ func TestGetLiveness(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	app.GetStatus(c)
 	assert.Equal(t, http.StatusOK, w.Code)
+}
+func TestGetApiDocs(t *testing.T) {
+	// Set Gin to test mode
+	gin.SetMode(gin.TestMode)
+
+	// Create an instance of the Application struct
+	app := &APIHandler{}
+
+	// Define the test cases
+	tests := []struct {
+		name         string
+		mockResponse *openapi3.T
+		mockError    error
+		expectedCode int
+		expectedBody string
+	}{
+		{
+			name: "Success",
+			mockResponse: &openapi3.T{
+				OpenAPI: "3.0.0",
+				Info: &openapi3.Info{
+					Title:   "Sample API",
+					Version: "1.0.0",
+				},
+				Paths: openapi3.Paths{},
+			},
+			mockError:    nil,
+			expectedCode: http.StatusOK,
+			expectedBody: `{"openapi":"3.0.0","info":{"title":"Sample API","version":"1.0.0"},"paths":{}}`,
+		},
+		{
+			name:         "Error",
+			mockResponse: nil,
+			mockError:    errors.New("error fetching swagger"),
+			expectedCode: http.StatusInternalServerError,
+			expectedBody: `{"error":"error fetching swagger"}`, // Updated to match the actual error response
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Patch the GetSwagger function
+			patch := gomonkey.ApplyFunc(api.GetSwagger, func() (*openapi3.T, error) {
+				return tt.mockResponse, tt.mockError
+			})
+			defer patch.Reset()
+
+			// Create a new Gin context
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			// Call the GetApiDocs method
+			app.GetApiDocs(c)
+
+			// Verify the response
+			assert.Equal(t, tt.expectedCode, w.Code)
+			assert.JSONEq(t, tt.expectedBody, w.Body.String())
+		})
+	}
 }
 
 func TestPostEventAzureContainer(t *testing.T) {
