@@ -14,21 +14,21 @@ spec:
       - key: X-Gitlab-Event
         value: Push Hook
   specs:
-  - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+  - selector: span[qualitytrace.span.type="general" name="Qualitytrace trigger"]
     assertions:
-    - attr:name = "Tracetest trigger"
-    - attr:tracetest.response.status = 200
-    - attr:tracetest.span.type = "general"
-  - selector: span[tracetest.span.type="http" name="/gitlab" http.method="POST"]
+    - attr:name = "Qualitytrace trigger"
+    - attr:qualitytrace.response.status = 200
+    - attr:qualitytrace.span.type = "general"
+  - selector: span[qualitytrace.span.type="http" name="/gitlab" http.method="POST"]
     assertions:
     - attr:http.method = "POST"
     - attr:http.route = "/gitlab"
     - attr:http.status_code = 200
     - attr:net.host.name = "kubviz"
-    - attr:tracetest.span.name = "/gitlab"
-    - attr:tracetest.span.type = "http"
-  - selector: span[tracetest.span.type="http" name="PostGitlab" http.method="POST"]
+    - attr:qualitytrace.span.name = "/gitlab"
+    - attr:qualitytrace.span.type = "http"
+  - selector: span[qualitytrace.span.type="http" name="PostGitlab" http.method="POST"]
     assertions:
     - attr:http.method = "POST"
-    - attr:tracetest.span.name = "PostGitlab"
-    - attr:tracetest.span.type = "http"
+    - attr:qualitytrace.span.name = "PostGitlab"
+    - attr:qualitytrace.span.type = "http"

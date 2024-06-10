@@ -14,24 +14,24 @@ spec:
       - key: X-GitHub-Event
         value: push
   specs:
-  - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+  - selector: span[qualitytrace.span.type="general" name="Qualitytrace trigger"]
     assertions:
-    - attr:name = "Tracetest trigger"
-    - attr:tracetest.response.status = 200
-    - attr:tracetest.span.name = "Tracetest trigger"
-    - attr:tracetest.span.type = "general"
-  - selector: span[tracetest.span.type="http" name="/github" http.method="POST"]
+    - attr:name = "Qualitytrace trigger"
+    - attr:qualitytrace.response.status = 200
+    - attr:qualitytrace.span.name = "Qualitytrace trigger"
+    - attr:qualitytrace.span.type = "general"
+  - selector: span[qualitytrace.span.type="http" name="/github" http.method="POST"]
     assertions:
     - attr:http.method = "POST"
     - attr:http.route = "/github"
     - attr:http.scheme = "http"
     - attr:http.status_code = 200
     - attr:net.host.name = "kubviz"
-    - attr:tracetest.span.name = "/github"
-    - attr:tracetest.span.type = "http"
-  - selector: span[tracetest.span.type="http" name="PostGithub" http.method="POST"]
+    - attr:qualitytrace.span.name = "/github"
+    - attr:qualitytrace.span.type = "http"
+  - selector: span[qualitytrace.span.type="http" name="PostGithub" http.method="POST"]
     assertions:
     - attr:http.method = "POST"
     - attr:name = "PostGithub"
-    - attr:tracetest.span.name = "PostGithub"
-    - attr:tracetest.span.type = "http"
+    - attr:qualitytrace.span.name = "PostGithub"
+    - attr:qualitytrace.span.type = "http"

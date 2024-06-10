@@ -12,24 +12,24 @@ spec:
       - key: Content-Type
         value: application/json
   specs:
-  - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+  - selector: span[qualitytrace.span.type="general" name="Qualitytrace trigger"]
     assertions:
-    - attr:name = "Tracetest trigger"
-    - attr:tracetest.response.status = 200
-    - attr:tracetest.span.name = "Tracetest trigger"
-    - attr:tracetest.span.type = "general"
-  - selector: span[tracetest.span.type="http" name="/azure" http.method="POST"]
+    - attr:name = "Qualitytrace trigger"
+    - attr:qualitytrace.response.status = 200
+    - attr:qualitytrace.span.name = "Qualitytrace trigger"
+    - attr:qualitytrace.span.type = "general"
+  - selector: span[qualitytrace.span.type="http" name="/azure" http.method="POST"]
     assertions:
     - attr:http.method = "POST"
     - attr:http.route = "/azure"
     - attr:http.scheme = "http"
     - attr:net.host.name = "kubviz"
-    - attr:tracetest.span.type = "http"
+    - attr:qualitytrace.span.type = "http"
     - attr:name = "/azure"
     - attr:http.status_code = 200
-  - selector: span[tracetest.span.type="http" name="PostAzure" http.method="POST"]
+  - selector: span[qualitytrace.span.type="http" name="PostAzure" http.method="POST"]
     assertions:
     - attr:name = "PostAzure"
     - attr:http.method = "POST"
-    - attr:tracetest.span.name = "PostAzure"
-    - attr:tracetest.span.type = "http"
+    - attr:qualitytrace.span.name = "PostAzure"
+    - attr:qualitytrace.span.type = "http"

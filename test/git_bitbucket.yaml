@@ -14,12 +14,12 @@ spec:
       - key: X-Event-Key
         value: repo:push
   specs:
-  - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+  - selector: span[qualitytrace.span.type="general" name="Qualitytrace trigger"]
     assertions:
-    - attr:name = "Tracetest trigger"
-    - attr:tracetest.response.status = 200
-    - attr:tracetest.span.type = "general"
-  - selector: span[tracetest.span.type="http" name="/bitbucket" http.method="POST"]
+    - attr:name = "Qualitytrace trigger"
+    - attr:qualitytrace.response.status = 200
+    - attr:qualitytrace.span.type = "general"
+  - selector: span[qualitytrace.span.type="http" name="/bitbucket" http.method="POST"]
     assertions:
     - attr:http.method = "POST"
     - attr:http.route = "/bitbucket"
@@ -27,9 +27,9 @@ spec:
     - attr:http.status_code = 200
     - attr:name = "/bitbucket"
     - attr:net.host.name = "kubviz"
-    - attr:tracetest.span.type = "http"
-  - selector: span[tracetest.span.type="http" name="PostBitbucket" http.method="POST"]
+    - attr:qualitytrace.span.type = "http"
+  - selector: span[qualitytrace.span.type="http" name="PostBitbucket" http.method="POST"]
     assertions:
     - attr:http.method = "POST"
-    - attr:tracetest.span.name = "PostBitbucket"
-    - attr:tracetest.span.type = "http"
+    - attr:qualitytrace.span.name = "PostBitbucket"
+    - attr:qualitytrace.span.type = "http"

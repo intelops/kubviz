@@ -14,17 +14,17 @@ spec:
       - key: X-Gitea-Event
         value: push
   specs:
-  - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+  - selector: span[qualitytrace.span.type="general" name="Qualitytrace trigger"]
     assertions:
-    - attr:tracetest.response.status = 200
-    - attr:tracetest.span.name = "Tracetest trigger"
-    - attr:tracetest.span.type = "general"
-  - selector: span[tracetest.span.type="http" name="/gitea" http.method="POST"]
+    - attr:qualitytrace.response.status = 200
+    - attr:qualitytrace.span.name = "Qualitytrace trigger"
+    - attr:qualitytrace.span.type = "general"
+  - selector: span[qualitytrace.span.type="http" name="/gitea" http.method="POST"]
     assertions:
     - attr:http.method = "POST"
     - attr:http.route = "/gitea"
     - attr:http.scheme = "http"
     - attr:http.status_code = 200
     - attr:net.host.name = "kubviz"
-    - attr:tracetest.span.name = "/gitea"
-    - attr:tracetest.span.type = "http"
+    - attr:qualitytrace.span.name = "/gitea"
+    - attr:qualitytrace.span.type = "http"
