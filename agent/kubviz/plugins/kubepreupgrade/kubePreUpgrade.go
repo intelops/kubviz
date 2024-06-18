@@ -196,7 +196,7 @@ func downloadFile(filename, url string) error {
 		return err
 	}
 	if resp.StatusCode > 305 {
-		log.Errorf("could not download the swagger file %s", url)
+		log.Printf("could not download the swagger file %s", url)
 		return fmt.Errorf("failed to download file, status code: %d", resp.StatusCode)
 	}
 	contentLength := resp.ContentLength
@@ -241,12 +241,12 @@ func getResults(configRest *rest.Config, kubeAPIs model.KubernetesAPIs) *model.R
 
 	client, err := dynamic.NewForConfig(configRest)
 	if err != nil {
-		log.Fatalf("Failed to create the K8s client while listing Deprecated objects: %s", err)
+		log.Printf("Failed to create the K8s client while listing Deprecated objects: %s", err)
 	}
 
 	disco, err := discovery.NewDiscoveryClientForConfig(configRest)
 	if err != nil {
-		log.Fatalf("Failed to create the K8s Discovery client: %s", err)
+		log.Printf("Failed to create the K8s Discovery client: %s", err)
 	}
 
 	ResourceAndGV := DiscoverResourceNameAndPreferredGV(disco)
@@ -292,11 +292,11 @@ func getResults(configRest *rest.Config, kubeAPIs model.KubernetesAPIs) *model.R
 		}
 
 		if apierrors.IsForbidden(err) {
-			log.Fatalf("Failed to list objects in the cluster. Permission denied! Please check if you have the proper authorization")
+			log.Printf("Failed to list objects in the cluster. Permission denied! Please check if you have the proper authorization")
 		}
 
 		if err != nil {
-			log.Fatalf("Failed communicating with k8s while listing objects. \nError: %v", err)
+			log.Printf("Failed communicating with k8s while listing objects. \nError: %v", err)
 		}
 
 		// Now let's see if there's a preferred API containing the same objects
@@ -305,11 +305,11 @@ func getResults(configRest *rest.Config, kubeAPIs model.KubernetesAPIs) *model.R
 
 			listPref, err := client.Resource(gvrPreferred).List(context.TODO(), metav1.ListOptions{})
 			if apierrors.IsForbidden(err) {
-				log.Fatalf("Failed to list objects in the cluster. Permission denied! Please check if you have the proper authorization")
+				log.Printf("Failed to list objects in the cluster. Permission denied! Please check if you have the proper authorization")
 			}
 
 			if err != nil && !apierrors.IsNotFound(err) {
-				log.Fatalf("Failed communicating with k8s while listing objects. \nError: %v", err)
+				log.Printf("Failed communicating with k8s while listing objects. \nError: %v", err)
 			}
 			// If len of the lists is the same we can "assume" they're the same list
 			if len(list.Items) == len(listPref.Items) {
@@ -337,10 +337,10 @@ func getResults(configRest *rest.Config, kubeAPIs model.KubernetesAPIs) *model.R
 	resourcesList, err := disco.ServerPreferredResources()
 	if err != nil {
 		if apierrors.IsForbidden(err) {
-			log.Fatalf("Failed to list Server Resources. Permission denied! Please check if you have the proper authorization")
+			log.Printf("Failed to list Server Resources. Permission denied! Please check if you have the proper authorization")
 		}
 
-		log.Fatalf("Failed communicating with k8s while discovering server resources. \nError: %v", err)
+		log.Printf("Failed communicating with k8s while discovering server resources. \nError: %v", err)
 	}
 	var ignoreObjects ignoreStruct = make(map[string]struct{})
 	for _, resources := range resourcesList {
@@ -405,7 +405,7 @@ func populateCRDGroups(dynClient dynamic.Interface, version string, ignoreStruct
 		return
 	}
 	if err != nil {
-		log.Fatalf("Failed to connect to K8s cluster to List CRDs: %s", err)
+		log.Printf("Failed to connect to K8s cluster to List CRDs: %s", err)
 	}
 	var empty struct{}
 	for _, d := range crdList.Items {
@@ -430,7 +430,7 @@ func populateAPIService(dynClient dynamic.Interface, version string, ignoreStruc
 		return
 	}
 	if err != nil {
-		log.Fatalf("Failed to connect to K8s cluster to List API Services: %s", err)
+		log.Printf("Failed to connect to K8s cluster to List API Services: %s", err)
 	}
 	var empty struct{}
 	for _, d := range apisvcList.Items {
@@ -456,10 +456,10 @@ func DiscoverResourceNameAndPreferredGV(client *discovery.DiscoveryClient) Prefe
 			return pr
 		}
 		if apierrors.IsForbidden(err) {
-			log.Fatalf("Failed to list objects for Name discovery. Permission denied! Please check if you have the proper authorization")
+			log.Printf("Failed to list objects for Name discovery. Permission denied! Please check if you have the proper authorization")
 		}
 
-		log.Fatalf("Failed communicating with k8s while discovering the object preferred name and gv. Error: %v", err)
+		log.Printf("Failed communicating with k8s while discovering the object preferred name and gv. Error: %v", err)
 	}
 
 	for _, rl := range resourcelist {
@@ -493,7 +493,7 @@ func getResources(dynClient dynamic.Interface, grk groupResourceKind) (schema.Gr
 
 	gv, err := schema.ParseGroupVersion(grk.GroupVersion)
 	if err != nil {
-		log.Fatalf("Failed to Parse GroupVersion of Resource: %s", err)
+		log.Printf("Failed to Parse GroupVersion of Resource: %s", err)
 	}
 
 	gvr := schema.GroupVersionResource{Group: gv.Group, Version: gv.Version, Resource: grk.ResourceName}
@@ -503,11 +503,11 @@ func getResources(dynClient dynamic.Interface, grk groupResourceKind) (schema.Gr
 	}
 
 	if apierrors.IsForbidden(err) {
-		log.Fatalf("Failed to list Server Resources of type %s/%s/%s. Permission denied! Please check if you have the proper authorization", gv.Group, gv.Version, grk.ResourceKind)
+		log.Printf("Failed to list Server Resources of type %s/%s/%s. Permission denied! Please check if you have the proper authorization", gv.Group, gv.Version, grk.ResourceKind)
 	}
 
 	if err != nil {
-		log.Fatalf("Failed to List objects of type %s/%s/%s. \nError: %v", gv.Group, gv.Version, grk.ResourceKind, err)
+		log.Printf("Failed to List objects of type %s/%s/%s. \nError: %v", gv.Group, gv.Version, grk.ResourceKind, err)
 	}
 
 	return gvr, list
