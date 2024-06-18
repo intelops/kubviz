@@ -13,8 +13,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -63,10 +65,10 @@ func RunTrivySbomScan(config *rest.Config, js nats.JetStreamContext) error {
 		return err
 	}
 
-	// ctx := context.Background()
-	// tracer := otel.Tracer("trivy-sbom")
-	// _, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivySbomScan")
-	// defer span.End()
+	ctx := context.Background()
+	tracer := otel.Tracer("trivy-sbom")
+	_, span := tracer.Start(opentelemetry.BuildContext(ctx), "RunTrivySbomScan")
+	defer span.End()
 
 	images, err := ListImagesforSbom(config)
 
