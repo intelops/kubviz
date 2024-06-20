@@ -48,7 +48,7 @@ jobs:
           build-args: |
             "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
   
-   test_and_coverage:
+  test_and_coverage:
     runs-on: ubuntu-latest
 
     steps:
