@@ -17,7 +17,7 @@ COPY --from=builder /workspace/kubviz_agent .
 COPY --from=zegl/kube-score:v1.16.0 /usr/bin/kube-score /usr/bin/kube-score
 COPY --from=bitnami/kubectl:1.22.5 /opt/bitnami/kubectl/bin/kubectl /usr/local/bin/
 COPY --from=busybox:1.35.0-uclibc /bin/sh /bin/sh
-COPY --from=aquasec/trivy:v0.43.1 /usr/local/bin/trivy /usr/local/bin/trivy
+COPY --from=aquasec/trivy:v0.43.0 /usr/local/bin/trivy /usr/local/bin/trivy
 
 USER 65532:65532
 
