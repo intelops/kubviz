@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/intelops/kubviz/client
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.1.8"
+  tag: "v1.1.9"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -173,7 +173,7 @@ migration:
   image:
     repository: ghcr.io/intelops/kubviz/migration
     pullPolicy: Always
-    tag: "v1.1.8"
+    tag: "v1.1.9"
   schema:
     path: "/sql"
 
