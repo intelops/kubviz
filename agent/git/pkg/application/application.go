@@ -20,7 +20,7 @@ import (
 type Application struct {
 	Config *config.Config
 	server *http.Server
-	conn   *clients.NATSContext
+	conn   clients.NATSClientInterface
 }
 
 func New(conf *config.Config, conn *clients.NATSContext) *Application {
