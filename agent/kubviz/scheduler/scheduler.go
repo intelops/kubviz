@@ -3,7 +3,6 @@ package scheduler
 import (
 	"sync"
 
-	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
 	"k8s.io/client-go/kubernetes"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/intelops/go-common/logging"
 	"github.com/intelops/kubviz/agent/config"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 )
 
 type jobHandler interface {
@@ -91,7 +91,7 @@ func (t *Scheduler) GetJobs() map[string]jobHandler {
 	return t.jobs
 }
 
-func InitScheduler(config *rest.Config, js nats.JetStreamContext, cfg config.AgentConfigurations, clientset *kubernetes.Clientset) (s *Scheduler) {
+func InitScheduler(config *rest.Config, js *sdk.NATSClient, cfg config.AgentConfigurations, clientset *kubernetes.Clientset) (s *Scheduler) {
 	log := logging.NewLogger()
 	s = NewScheduler(log)
 	if cfg.OutdatedInterval != "" && cfg.OutdatedInterval != "0" {

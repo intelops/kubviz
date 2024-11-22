@@ -13,6 +13,7 @@ import (
 
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel"
@@ -29,7 +30,7 @@ var ClusterName string = os.Getenv("CLUSTER_NAME")
 
 // publishMetrics publishes stream of events
 // with subject "METRICS.created"
-func PublishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, errCh chan error) {
+func PublishMetrics(clientset *kubernetes.Clientset, natsCli *sdk.NATSClient, errCh chan error) {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("kubviz-publish-metrics")
@@ -37,11 +38,11 @@ func PublishMetrics(clientset *kubernetes.Clientset, js nats.JetStreamContext, e
 	span.SetAttributes(attribute.String("kubviz-agent", "publish-metrics"))
 	defer span.End()
 
-	watchK8sEvents(clientset, js)
+	watchK8sEvents(clientset, natsCli)
 	errCh <- nil
 }
 
-func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStreamContext, imageName string) (bool, error) {
+func publishK8sMetrics(id string, mtype string, mdata *v1.Event, natsCli *sdk.NATSClient, imageName string) (bool, error) {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("kubviz-publish-k8smetrics")
@@ -57,7 +58,7 @@ func publishK8sMetrics(id string, mtype string, mdata *v1.Event, js nats.JetStre
 		ImageName:   imageName,
 	}
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.EventSubject, metricsJson)
+	err := natsCli.Publish(constants.EventSubject, metricsJson)
 	if err != nil {
 		return true, err
 	}
@@ -164,7 +165,7 @@ func LogErr(err error) {
 		log.Println(err)
 	}
 }
-func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
+func watchK8sEvents(clientset *kubernetes.Clientset, natsCli *sdk.NATSClient) {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("kubviz-watch-k8sevents")
@@ -191,7 +192,7 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 					return
 				}
 				for _, image := range images {
-					publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, js, image)
+					publishK8sMetrics(string(event.ObjectMeta.UID), "ADD", event, natsCli, image)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
@@ -202,7 +203,7 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 					return
 				}
 				for _, image := range images {
-					publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, js, image)
+					publishK8sMetrics(string(event.ObjectMeta.UID), "DELETE", event, natsCli, image)
 				}
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
@@ -213,7 +214,7 @@ func watchK8sEvents(clientset *kubernetes.Clientset, js nats.JetStreamContext) {
 					return
 				}
 				for _, image := range images {
-					publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, js, image)
+					publishK8sMetrics(string(event.ObjectMeta.UID), "UPDATE", event, natsCli, image)
 				}
 			},
 		},

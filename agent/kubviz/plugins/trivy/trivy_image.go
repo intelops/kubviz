@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/intelops/kubviz/constants"
 	"github.com/intelops/kubviz/model"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
@@ -31,8 +32,12 @@ type JetStreamContextInterface interface {
 	nats.ObjectStoreManager
 	AccountInfo(opts ...nats.JSOpt) (*nats.AccountInfo, error)
 }
+type NATSClientInterface interface {
+	CreateStream(streamName string) error
+	Publish(subject string, data []byte) error
+}
 
-func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
+func RunTrivyImageScans(config *rest.Config, natsCli sdk.NATSClientInterface) error {
 	pvcMountPath := "/mnt/agent/kbz"
 	trivyImageCacheDir := fmt.Sprintf("%s/trivy-imagecache", pvcMountPath)
 	err := os.MkdirAll(trivyImageCacheDir, 0755)
@@ -84,7 +89,7 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 		// 	log.Printf("Error executing command: %v\n", err)
 		// 	return err
 		// }
-		err = PublishImageScanReports(report, js)
+		err = PublishImageScanReports(report, natsCli)
 		if err != nil {
 			return err
 		}
@@ -92,14 +97,14 @@ func RunTrivyImageScans(config *rest.Config, js nats.JetStreamContext) error {
 	return nil
 }
 
-func PublishImageScanReports(report types.Report, js nats.JetStreamContext) error {
+func PublishImageScanReports(report types.Report, natsCli sdk.NATSClientInterface) error {
 	metrics := model.TrivyImage{
 		ID:          uuid.New().String(),
 		ClusterName: ClusterName,
 		Report:      report,
 	}
 	metricsJson, _ := json.Marshal(metrics)
-	_, err := js.Publish(constants.TRIVY_IMAGE_SUBJECT, metricsJson)
+	err := natsCli.Publish(constants.TRIVY_IMAGE_SUBJECT, metricsJson)
 	if err != nil {
 		return err
 	}

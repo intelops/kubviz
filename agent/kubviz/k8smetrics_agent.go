@@ -10,11 +10,11 @@ import (
 
 	//"github.com/go-co-op/gocron"
 	"github.com/go-co-op/gocron"
-	"github.com/nats-io/nats.go"
+	"github.com/intelops/kubviz/constants"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 
 	"context"
 
-	"github.com/intelops/kubviz/pkg/mtlsnats"
 	"github.com/intelops/kubviz/pkg/opentelemetry"
 
 	"k8s.io/client-go/kubernetes"
@@ -56,8 +56,6 @@ const (
 // nats token, natsurl, clustername
 var (
 	ClusterName string = os.Getenv("CLUSTER_NAME")
-	token       string = os.Getenv("NATS_TOKEN")
-	natsurl     string = os.Getenv("NATS_ADDRESS")
 
 	//for local testing provide the location of kubeconfig
 	cluster_conf_loc      string = os.Getenv("CONFIG_LOCATION")
@@ -77,36 +75,13 @@ func main() {
 		clientset *kubernetes.Clientset
 	)
 
-	var mtlsConfig mtlsnats.MtlsConfig
-	var nc *nats.Conn
+	natsCli, err := sdk.NewNATSClient()
 
-	if mtlsConfig.IsEnabled {
-		tlsConfig, err := mtlsnats.GetTlsConfig()
-		if err != nil {
-			log.Println("error while getting tls config ", err)
-			time.Sleep(time.Minute * 30)
-		} else {
-			nc, err = nats.Connect(
-				natsurl,
-				nats.Name("K8s Metrics"),
-				nats.Token(token),
-				nats.Secure(tlsConfig),
-			)
-			if err != nil {
-				log.Println("error while connecting with mtls ", err)
-			}
-		}
-
+	if err != nil {
+		log.Fatalf("error occured while creating nats client %v", err.Error())
 	}
 
-	if nc == nil {
-		nc, err = nats.Connect(natsurl, nats.Name("K8s Metrics"), nats.Token(token))
-		events.CheckErr(err)
-	}
-	js, err := nc.JetStream()
-	events.CheckErr(err)
-	err = events.CreateStream(js)
-	events.CheckErr(err)
+	natsCli.CreateStream(constants.StreamName)
 	if env != Production {
 		config, err = clientcmd.BuildConfigFromFlags("", cluster_conf_loc)
 		if err != nil {
@@ -131,32 +106,32 @@ func main() {
 		}
 	}()
 
-	go events.PublishMetrics(clientset, js, clusterMetricsChan)
+	go events.PublishMetrics(clientset, natsCli, clusterMetricsChan)
 	if cfg.KuberHealthyEnable {
-		go kuberhealthy.StartKuberHealthy(js)
+		go kuberhealthy.StartKuberHealthy(natsCli)
 	}
 	go server.StartServer()
 	collectAndPublishMetrics := func() {
-		err := outdated.OutDatedImages(config, js)
+		err := outdated.OutDatedImages(config, natsCli)
 		events.LogErr(err)
-		err = kubepreupgrade.KubePreUpgradeDetector(config, js)
+		err = kubepreupgrade.KubePreUpgradeDetector(config, natsCli)
 		events.LogErr(err)
-		err = ketall.GetAllResources(config, js)
+		err = ketall.GetAllResources(config, natsCli)
 		events.LogErr(err)
-		err = rakkess.RakeesOutput(config, js)
+		err = rakkess.RakeesOutput(config, natsCli)
 		events.LogErr(err)
-		err = trivy.RunTrivySbomScan(config, js)
+		err = trivy.RunTrivySbomScan(config, natsCli)
 		events.LogErr(err)
-		err = trivy.RunTrivyImageScans(config, js)
+		err = trivy.RunTrivyImageScans(config, natsCli)
 		events.LogErr(err)
-		err = trivy.RunTrivyK8sClusterScan(js)
+		err = trivy.RunTrivyK8sClusterScan(natsCli)
 		events.LogErr(err)
-		err = kubescore.RunKubeScore(clientset, js)
+		err = kubescore.RunKubeScore(clientset, natsCli)
 		events.LogErr(err)
 	}
 	collectAndPublishMetrics()
 	if cfg.SchedulerEnable { // Assuming "cfg.Schedule" is a boolean indicating whether to schedule or not.
-		scheduler := scheduler.InitScheduler(config, js, *cfg, clientset)
+		scheduler := scheduler.InitScheduler(config, natsCli, *cfg, clientset)
 
 		// Start the scheduler
 		scheduler.Start()

@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	nats_go "github.com/nats-io/nats.go"
+	nats "github.com/nats-io/nats.go"
 )
 
 // MockJetStreamContextInterface is a mock of JetStreamContextInterface interface.
@@ -35,14 +35,14 @@ func (m *MockJetStreamContextInterface) EXPECT() *MockJetStreamContextInterfaceM
 }
 
 // AccountInfo mocks base method.
-func (m *MockJetStreamContextInterface) AccountInfo(opts ...nats_go.JSOpt) (*nats_go.AccountInfo, error) {
+func (m *MockJetStreamContextInterface) AccountInfo(opts ...nats.JSOpt) (*nats.AccountInfo, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AccountInfo", varargs...)
-	ret0, _ := ret[0].(*nats_go.AccountInfo)
+	ret0, _ := ret[0].(*nats.AccountInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -54,14 +54,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) AccountInfo(opts ...interfa
 }
 
 // AddConsumer mocks base method.
-func (m *MockJetStreamContextInterface) AddConsumer(stream string, cfg *nats_go.ConsumerConfig, opts ...nats_go.JSOpt) (*nats_go.ConsumerInfo, error) {
+func (m *MockJetStreamContextInterface) AddConsumer(stream string, cfg *nats.ConsumerConfig, opts ...nats.JSOpt) (*nats.ConsumerInfo, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{stream, cfg}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AddConsumer", varargs...)
-	ret0, _ := ret[0].(*nats_go.ConsumerInfo)
+	ret0, _ := ret[0].(*nats.ConsumerInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -74,14 +74,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) AddConsumer(stream, cfg int
 }
 
 // AddStream mocks base method.
-func (m *MockJetStreamContextInterface) AddStream(cfg *nats_go.StreamConfig, opts ...nats_go.JSOpt) (*nats_go.StreamInfo, error) {
+func (m *MockJetStreamContextInterface) AddStream(cfg *nats.StreamConfig, opts ...nats.JSOpt) (*nats.StreamInfo, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{cfg}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AddStream", varargs...)
-	ret0, _ := ret[0].(*nats_go.StreamInfo)
+	ret0, _ := ret[0].(*nats.StreamInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -94,14 +94,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) AddStream(cfg interface{}, 
 }
 
 // ChanQueueSubscribe mocks base method.
-func (m *MockJetStreamContextInterface) ChanQueueSubscribe(subj, queue string, ch chan *nats_go.Msg, opts ...nats_go.SubOpt) (*nats_go.Subscription, error) {
+func (m *MockJetStreamContextInterface) ChanQueueSubscribe(subj, queue string, ch chan *nats.Msg, opts ...nats.SubOpt) (*nats.Subscription, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{subj, queue, ch}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ChanQueueSubscribe", varargs...)
-	ret0, _ := ret[0].(*nats_go.Subscription)
+	ret0, _ := ret[0].(*nats.Subscription)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -114,14 +114,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) ChanQueueSubscribe(subj, qu
 }
 
 // ChanSubscribe mocks base method.
-func (m *MockJetStreamContextInterface) ChanSubscribe(subj string, ch chan *nats_go.Msg, opts ...nats_go.SubOpt) (*nats_go.Subscription, error) {
+func (m *MockJetStreamContextInterface) ChanSubscribe(subj string, ch chan *nats.Msg, opts ...nats.SubOpt) (*nats.Subscription, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{subj, ch}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ChanSubscribe", varargs...)
-	ret0, _ := ret[0].(*nats_go.Subscription)
+	ret0, _ := ret[0].(*nats.Subscription)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -134,14 +134,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) ChanSubscribe(subj, ch inte
 }
 
 // ConsumerInfo mocks base method.
-func (m *MockJetStreamContextInterface) ConsumerInfo(stream, name string, opts ...nats_go.JSOpt) (*nats_go.ConsumerInfo, error) {
+func (m *MockJetStreamContextInterface) ConsumerInfo(stream, name string, opts ...nats.JSOpt) (*nats.ConsumerInfo, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{stream, name}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ConsumerInfo", varargs...)
-	ret0, _ := ret[0].(*nats_go.ConsumerInfo)
+	ret0, _ := ret[0].(*nats.ConsumerInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -154,7 +154,7 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) ConsumerInfo(stream, name i
 }
 
 // ConsumerNames mocks base method.
-func (m *MockJetStreamContextInterface) ConsumerNames(stream string, opts ...nats_go.JSOpt) <-chan string {
+func (m *MockJetStreamContextInterface) ConsumerNames(stream string, opts ...nats.JSOpt) <-chan string {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{stream}
 	for _, a := range opts {
@@ -173,14 +173,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) ConsumerNames(stream interf
 }
 
 // Consumers mocks base method.
-func (m *MockJetStreamContextInterface) Consumers(stream string, opts ...nats_go.JSOpt) <-chan *nats_go.ConsumerInfo {
+func (m *MockJetStreamContextInterface) Consumers(stream string, opts ...nats.JSOpt) <-chan *nats.ConsumerInfo {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{stream}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Consumers", varargs...)
-	ret0, _ := ret[0].(<-chan *nats_go.ConsumerInfo)
+	ret0, _ := ret[0].(<-chan *nats.ConsumerInfo)
 	return ret0
 }
 
@@ -192,14 +192,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) Consumers(stream interface{
 }
 
 // ConsumersInfo mocks base method.
-func (m *MockJetStreamContextInterface) ConsumersInfo(stream string, opts ...nats_go.JSOpt) <-chan *nats_go.ConsumerInfo {
+func (m *MockJetStreamContextInterface) ConsumersInfo(stream string, opts ...nats.JSOpt) <-chan *nats.ConsumerInfo {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{stream}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ConsumersInfo", varargs...)
-	ret0, _ := ret[0].(<-chan *nats_go.ConsumerInfo)
+	ret0, _ := ret[0].(<-chan *nats.ConsumerInfo)
 	return ret0
 }
 
@@ -211,10 +211,10 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) ConsumersInfo(stream interf
 }
 
 // CreateKeyValue mocks base method.
-func (m *MockJetStreamContextInterface) CreateKeyValue(cfg *nats_go.KeyValueConfig) (nats_go.KeyValue, error) {
+func (m *MockJetStreamContextInterface) CreateKeyValue(cfg *nats.KeyValueConfig) (nats.KeyValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateKeyValue", cfg)
-	ret0, _ := ret[0].(nats_go.KeyValue)
+	ret0, _ := ret[0].(nats.KeyValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -226,10 +226,10 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) CreateKeyValue(cfg interfac
 }
 
 // CreateObjectStore mocks base method.
-func (m *MockJetStreamContextInterface) CreateObjectStore(cfg *nats_go.ObjectStoreConfig) (nats_go.ObjectStore, error) {
+func (m *MockJetStreamContextInterface) CreateObjectStore(cfg *nats.ObjectStoreConfig) (nats.ObjectStore, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateObjectStore", cfg)
-	ret0, _ := ret[0].(nats_go.ObjectStore)
+	ret0, _ := ret[0].(nats.ObjectStore)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -241,7 +241,7 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) CreateObjectStore(cfg inter
 }
 
 // DeleteConsumer mocks base method.
-func (m *MockJetStreamContextInterface) DeleteConsumer(stream, consumer string, opts ...nats_go.JSOpt) error {
+func (m *MockJetStreamContextInterface) DeleteConsumer(stream, consumer string, opts ...nats.JSOpt) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{stream, consumer}
 	for _, a := range opts {
@@ -274,7 +274,7 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) DeleteKeyValue(bucket inter
 }
 
 // DeleteMsg mocks base method.
-func (m *MockJetStreamContextInterface) DeleteMsg(name string, seq uint64, opts ...nats_go.JSOpt) error {
+func (m *MockJetStreamContextInterface) DeleteMsg(name string, seq uint64, opts ...nats.JSOpt) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{name, seq}
 	for _, a := range opts {
@@ -307,7 +307,7 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) DeleteObjectStore(bucket in
 }
 
 // DeleteStream mocks base method.
-func (m *MockJetStreamContextInterface) DeleteStream(name string, opts ...nats_go.JSOpt) error {
+func (m *MockJetStreamContextInterface) DeleteStream(name string, opts ...nats.JSOpt) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{name}
 	for _, a := range opts {
@@ -326,14 +326,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) DeleteStream(name interface
 }
 
 // GetLastMsg mocks base method.
-func (m *MockJetStreamContextInterface) GetLastMsg(name, subject string, opts ...nats_go.JSOpt) (*nats_go.RawStreamMsg, error) {
+func (m *MockJetStreamContextInterface) GetLastMsg(name, subject string, opts ...nats.JSOpt) (*nats.RawStreamMsg, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{name, subject}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetLastMsg", varargs...)
-	ret0, _ := ret[0].(*nats_go.RawStreamMsg)
+	ret0, _ := ret[0].(*nats.RawStreamMsg)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -346,14 +346,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) GetLastMsg(name, subject in
 }
 
 // GetMsg mocks base method.
-func (m *MockJetStreamContextInterface) GetMsg(name string, seq uint64, opts ...nats_go.JSOpt) (*nats_go.RawStreamMsg, error) {
+func (m *MockJetStreamContextInterface) GetMsg(name string, seq uint64, opts ...nats.JSOpt) (*nats.RawStreamMsg, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{name, seq}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetMsg", varargs...)
-	ret0, _ := ret[0].(*nats_go.RawStreamMsg)
+	ret0, _ := ret[0].(*nats.RawStreamMsg)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -366,10 +366,10 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) GetMsg(name, seq interface{
 }
 
 // KeyValue mocks base method.
-func (m *MockJetStreamContextInterface) KeyValue(bucket string) (nats_go.KeyValue, error) {
+func (m *MockJetStreamContextInterface) KeyValue(bucket string) (nats.KeyValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "KeyValue", bucket)
-	ret0, _ := ret[0].(nats_go.KeyValue)
+	ret0, _ := ret[0].(nats.KeyValue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -395,10 +395,10 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) KeyValueStoreNames() *gomoc
 }
 
 // KeyValueStores mocks base method.
-func (m *MockJetStreamContextInterface) KeyValueStores() <-chan nats_go.KeyValueStatus {
+func (m *MockJetStreamContextInterface) KeyValueStores() <-chan nats.KeyValueStatus {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "KeyValueStores")
-	ret0, _ := ret[0].(<-chan nats_go.KeyValueStatus)
+	ret0, _ := ret[0].(<-chan nats.KeyValueStatus)
 	return ret0
 }
 
@@ -409,10 +409,10 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) KeyValueStores() *gomock.Ca
 }
 
 // ObjectStore mocks base method.
-func (m *MockJetStreamContextInterface) ObjectStore(bucket string) (nats_go.ObjectStore, error) {
+func (m *MockJetStreamContextInterface) ObjectStore(bucket string) (nats.ObjectStore, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ObjectStore", bucket)
-	ret0, _ := ret[0].(nats_go.ObjectStore)
+	ret0, _ := ret[0].(nats.ObjectStore)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -424,7 +424,7 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) ObjectStore(bucket interfac
 }
 
 // ObjectStoreNames mocks base method.
-func (m *MockJetStreamContextInterface) ObjectStoreNames(opts ...nats_go.ObjectOpt) <-chan string {
+func (m *MockJetStreamContextInterface) ObjectStoreNames(opts ...nats.ObjectOpt) <-chan string {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range opts {
@@ -442,14 +442,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) ObjectStoreNames(opts ...in
 }
 
 // ObjectStores mocks base method.
-func (m *MockJetStreamContextInterface) ObjectStores(opts ...nats_go.ObjectOpt) <-chan nats_go.ObjectStoreStatus {
+func (m *MockJetStreamContextInterface) ObjectStores(opts ...nats.ObjectOpt) <-chan nats.ObjectStoreStatus {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ObjectStores", varargs...)
-	ret0, _ := ret[0].(<-chan nats_go.ObjectStoreStatus)
+	ret0, _ := ret[0].(<-chan nats.ObjectStoreStatus)
 	return ret0
 }
 
@@ -460,14 +460,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) ObjectStores(opts ...interf
 }
 
 // Publish mocks base method.
-func (m *MockJetStreamContextInterface) Publish(subj string, data []byte, opts ...nats_go.PubOpt) (*nats_go.PubAck, error) {
+func (m *MockJetStreamContextInterface) Publish(subj string, data []byte, opts ...nats.PubOpt) (*nats.PubAck, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{subj, data}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Publish", varargs...)
-	ret0, _ := ret[0].(*nats_go.PubAck)
+	ret0, _ := ret[0].(*nats.PubAck)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -480,14 +480,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) Publish(subj, data interfac
 }
 
 // PublishAsync mocks base method.
-func (m *MockJetStreamContextInterface) PublishAsync(subj string, data []byte, opts ...nats_go.PubOpt) (nats_go.PubAckFuture, error) {
+func (m *MockJetStreamContextInterface) PublishAsync(subj string, data []byte, opts ...nats.PubOpt) (nats.PubAckFuture, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{subj, data}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "PublishAsync", varargs...)
-	ret0, _ := ret[0].(nats_go.PubAckFuture)
+	ret0, _ := ret[0].(nats.PubAckFuture)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -528,14 +528,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) PublishAsyncPending() *gomo
 }
 
 // PublishMsg mocks base method.
-func (m_2 *MockJetStreamContextInterface) PublishMsg(m *nats_go.Msg, opts ...nats_go.PubOpt) (*nats_go.PubAck, error) {
+func (m_2 *MockJetStreamContextInterface) PublishMsg(m *nats.Msg, opts ...nats.PubOpt) (*nats.PubAck, error) {
 	m_2.ctrl.T.Helper()
 	varargs := []interface{}{m}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m_2.ctrl.Call(m_2, "PublishMsg", varargs...)
-	ret0, _ := ret[0].(*nats_go.PubAck)
+	ret0, _ := ret[0].(*nats.PubAck)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -548,14 +548,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) PublishMsg(m interface{}, o
 }
 
 // PublishMsgAsync mocks base method.
-func (m_2 *MockJetStreamContextInterface) PublishMsgAsync(m *nats_go.Msg, opts ...nats_go.PubOpt) (nats_go.PubAckFuture, error) {
+func (m_2 *MockJetStreamContextInterface) PublishMsgAsync(m *nats.Msg, opts ...nats.PubOpt) (nats.PubAckFuture, error) {
 	m_2.ctrl.T.Helper()
 	varargs := []interface{}{m}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m_2.ctrl.Call(m_2, "PublishMsgAsync", varargs...)
-	ret0, _ := ret[0].(nats_go.PubAckFuture)
+	ret0, _ := ret[0].(nats.PubAckFuture)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -568,14 +568,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) PublishMsgAsync(m interface
 }
 
 // PullSubscribe mocks base method.
-func (m *MockJetStreamContextInterface) PullSubscribe(subj, durable string, opts ...nats_go.SubOpt) (*nats_go.Subscription, error) {
+func (m *MockJetStreamContextInterface) PullSubscribe(subj, durable string, opts ...nats.SubOpt) (*nats.Subscription, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{subj, durable}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "PullSubscribe", varargs...)
-	ret0, _ := ret[0].(*nats_go.Subscription)
+	ret0, _ := ret[0].(*nats.Subscription)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -588,7 +588,7 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) PullSubscribe(subj, durable
 }
 
 // PurgeStream mocks base method.
-func (m *MockJetStreamContextInterface) PurgeStream(name string, opts ...nats_go.JSOpt) error {
+func (m *MockJetStreamContextInterface) PurgeStream(name string, opts ...nats.JSOpt) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{name}
 	for _, a := range opts {
@@ -607,14 +607,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) PurgeStream(name interface{
 }
 
 // QueueSubscribe mocks base method.
-func (m *MockJetStreamContextInterface) QueueSubscribe(subj, queue string, cb nats_go.MsgHandler, opts ...nats_go.SubOpt) (*nats_go.Subscription, error) {
+func (m *MockJetStreamContextInterface) QueueSubscribe(subj, queue string, cb nats.MsgHandler, opts ...nats.SubOpt) (*nats.Subscription, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{subj, queue, cb}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "QueueSubscribe", varargs...)
-	ret0, _ := ret[0].(*nats_go.Subscription)
+	ret0, _ := ret[0].(*nats.Subscription)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -627,14 +627,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) QueueSubscribe(subj, queue,
 }
 
 // QueueSubscribeSync mocks base method.
-func (m *MockJetStreamContextInterface) QueueSubscribeSync(subj, queue string, opts ...nats_go.SubOpt) (*nats_go.Subscription, error) {
+func (m *MockJetStreamContextInterface) QueueSubscribeSync(subj, queue string, opts ...nats.SubOpt) (*nats.Subscription, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{subj, queue}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "QueueSubscribeSync", varargs...)
-	ret0, _ := ret[0].(*nats_go.Subscription)
+	ret0, _ := ret[0].(*nats.Subscription)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -647,7 +647,7 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) QueueSubscribeSync(subj, qu
 }
 
 // SecureDeleteMsg mocks base method.
-func (m *MockJetStreamContextInterface) SecureDeleteMsg(name string, seq uint64, opts ...nats_go.JSOpt) error {
+func (m *MockJetStreamContextInterface) SecureDeleteMsg(name string, seq uint64, opts ...nats.JSOpt) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{name, seq}
 	for _, a := range opts {
@@ -666,14 +666,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) SecureDeleteMsg(name, seq i
 }
 
 // StreamInfo mocks base method.
-func (m *MockJetStreamContextInterface) StreamInfo(stream string, opts ...nats_go.JSOpt) (*nats_go.StreamInfo, error) {
+func (m *MockJetStreamContextInterface) StreamInfo(stream string, opts ...nats.JSOpt) (*nats.StreamInfo, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{stream}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "StreamInfo", varargs...)
-	ret0, _ := ret[0].(*nats_go.StreamInfo)
+	ret0, _ := ret[0].(*nats.StreamInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -686,7 +686,7 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) StreamInfo(stream interface
 }
 
 // StreamNameBySubject mocks base method.
-func (m *MockJetStreamContextInterface) StreamNameBySubject(arg0 string, arg1 ...nats_go.JSOpt) (string, error) {
+func (m *MockJetStreamContextInterface) StreamNameBySubject(arg0 string, arg1 ...nats.JSOpt) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
@@ -706,7 +706,7 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) StreamNameBySubject(arg0 in
 }
 
 // StreamNames mocks base method.
-func (m *MockJetStreamContextInterface) StreamNames(opts ...nats_go.JSOpt) <-chan string {
+func (m *MockJetStreamContextInterface) StreamNames(opts ...nats.JSOpt) <-chan string {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range opts {
@@ -724,14 +724,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) StreamNames(opts ...interfa
 }
 
 // Streams mocks base method.
-func (m *MockJetStreamContextInterface) Streams(opts ...nats_go.JSOpt) <-chan *nats_go.StreamInfo {
+func (m *MockJetStreamContextInterface) Streams(opts ...nats.JSOpt) <-chan *nats.StreamInfo {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Streams", varargs...)
-	ret0, _ := ret[0].(<-chan *nats_go.StreamInfo)
+	ret0, _ := ret[0].(<-chan *nats.StreamInfo)
 	return ret0
 }
 
@@ -742,14 +742,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) Streams(opts ...interface{}
 }
 
 // StreamsInfo mocks base method.
-func (m *MockJetStreamContextInterface) StreamsInfo(opts ...nats_go.JSOpt) <-chan *nats_go.StreamInfo {
+func (m *MockJetStreamContextInterface) StreamsInfo(opts ...nats.JSOpt) <-chan *nats.StreamInfo {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "StreamsInfo", varargs...)
-	ret0, _ := ret[0].(<-chan *nats_go.StreamInfo)
+	ret0, _ := ret[0].(<-chan *nats.StreamInfo)
 	return ret0
 }
 
@@ -760,14 +760,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) StreamsInfo(opts ...interfa
 }
 
 // Subscribe mocks base method.
-func (m *MockJetStreamContextInterface) Subscribe(subj string, cb nats_go.MsgHandler, opts ...nats_go.SubOpt) (*nats_go.Subscription, error) {
+func (m *MockJetStreamContextInterface) Subscribe(subj string, cb nats.MsgHandler, opts ...nats.SubOpt) (*nats.Subscription, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{subj, cb}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Subscribe", varargs...)
-	ret0, _ := ret[0].(*nats_go.Subscription)
+	ret0, _ := ret[0].(*nats.Subscription)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -780,14 +780,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) Subscribe(subj, cb interfac
 }
 
 // SubscribeSync mocks base method.
-func (m *MockJetStreamContextInterface) SubscribeSync(subj string, opts ...nats_go.SubOpt) (*nats_go.Subscription, error) {
+func (m *MockJetStreamContextInterface) SubscribeSync(subj string, opts ...nats.SubOpt) (*nats.Subscription, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{subj}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SubscribeSync", varargs...)
-	ret0, _ := ret[0].(*nats_go.Subscription)
+	ret0, _ := ret[0].(*nats.Subscription)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -800,14 +800,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) SubscribeSync(subj interfac
 }
 
 // UpdateConsumer mocks base method.
-func (m *MockJetStreamContextInterface) UpdateConsumer(stream string, cfg *nats_go.ConsumerConfig, opts ...nats_go.JSOpt) (*nats_go.ConsumerInfo, error) {
+func (m *MockJetStreamContextInterface) UpdateConsumer(stream string, cfg *nats.ConsumerConfig, opts ...nats.JSOpt) (*nats.ConsumerInfo, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{stream, cfg}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "UpdateConsumer", varargs...)
-	ret0, _ := ret[0].(*nats_go.ConsumerInfo)
+	ret0, _ := ret[0].(*nats.ConsumerInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -820,14 +820,14 @@ func (mr *MockJetStreamContextInterfaceMockRecorder) UpdateConsumer(stream, cfg 
 }
 
 // UpdateStream mocks base method.
-func (m *MockJetStreamContextInterface) UpdateStream(cfg *nats_go.StreamConfig, opts ...nats_go.JSOpt) (*nats_go.StreamInfo, error) {
+func (m *MockJetStreamContextInterface) UpdateStream(cfg *nats.StreamConfig, opts ...nats.JSOpt) (*nats.StreamInfo, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{cfg}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "UpdateStream", varargs...)
-	ret0, _ := ret[0].(*nats_go.StreamInfo)
+	ret0, _ := ret[0].(*nats.StreamInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

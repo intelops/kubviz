@@ -23,7 +23,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/intelops/kubviz/model"
-	"github.com/nats-io/nats.go"
+	"github.com/intelops/kubviz/pkg/nats/sdk"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
@@ -59,11 +59,11 @@ var (
 )
 var result *model.Result
 
-func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamContext) error {
+func publishK8sDepricated_Deleted_Api(result *model.Result, natsCli *sdk.NATSClient) error {
 	for _, deprecatedAPI := range result.DeprecatedAPIs {
 		deprecatedAPI.ClusterName = ClusterName
 		deprecatedAPIJson, _ := json.Marshal(deprecatedAPI)
-		_, err := js.Publish(constants.EventSubject_depricated, deprecatedAPIJson)
+		err := natsCli.Publish(constants.EventSubject_depricated, deprecatedAPIJson)
 		if err != nil {
 			return err
 		}
@@ -73,7 +73,7 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 		deletedAPI.ClusterName = ClusterName
 		fmt.Println("deletedAPI", deletedAPI)
 		deletedAPIJson, _ := json.Marshal(deletedAPI)
-		_, err := js.Publish(constants.EventSubject_deleted, deletedAPIJson)
+		err := natsCli.Publish(constants.EventSubject_deleted, deletedAPIJson)
 		if err != nil {
 			return err
 		}
@@ -83,7 +83,7 @@ func publishK8sDepricated_Deleted_Api(result *model.Result, js nats.JetStreamCon
 	return nil
 }
 
-func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error {
+func KubePreUpgradeDetector(config *rest.Config, natsCli *sdk.NATSClient) error {
 
 	ctx := context.Background()
 	tracer := otel.Tracer("kubepreupgrade")
@@ -109,7 +109,7 @@ func KubePreUpgradeDetector(config *rest.Config, js nats.JetStreamContext) error
 		return err
 	}
 	result = getResults(config, kubernetesAPIs)
-	err = publishK8sDepricated_Deleted_Api(result, js)
+	err = publishK8sDepricated_Deleted_Api(result, natsCli)
 	return err
 }
 
