@@ -156,7 +156,7 @@ func GetK8sEvents(clientset *kubernetes.Clientset) string {
 
 func CheckErr(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 func LogErr(err error) {

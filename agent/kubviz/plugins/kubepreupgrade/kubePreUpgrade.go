@@ -196,7 +196,7 @@ func downloadFile(filename, url string) error {
 		return err
 	}
 	if resp.StatusCode > 305 {
-		log.Errorf("could not download the swagger file %s", url)
+		log.Printf("could not download the swagger file %s", url)
 		return fmt.Errorf("failed to download file, status code: %d", resp.StatusCode)
 	}
 	contentLength := resp.ContentLength
